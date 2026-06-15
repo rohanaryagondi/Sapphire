@@ -1,0 +1,66 @@
+# Expert Agent — example configuration.
+# Copy to config.yaml and edit. The offline scaffold does NOT require this file;
+# it documents the intended production knobs (source registry + weighting).
+
+# ---------------------------------------------------------------------------
+# SOURCE REGISTRY
+# Public expert content ONLY. Never list Quiver proprietary data here.
+# credibility_tier: tier_1_named_credentialed | tier_2_named_practitioner
+#                   | tier_3_anonymous_unverified
+# on_record: true for deliberate/attributable posts; false for off-the-cuff
+#            speculation (down-weighted at retrieval).
+# ---------------------------------------------------------------------------
+sources:
+  - source_id: avega_blog
+    author: "Dr. A. Vega"
+    author_role: "Former FDA CDER reviewer, neurology"
+    venue: "personal blog"
+    url: "https://example.invalid/avega"
+    credibility_tier: tier_1_named_credentialed
+    on_record: true
+    ingest:
+      kind: rss            # rss | html | podcast | social
+      feed_url: "https://example.invalid/avega/rss"
+
+  - source_id: pharmacast
+    author: "anon_pharmacast"
+    author_role: "anonymous industry podcaster"
+    venue: "podcast"
+    url: "https://example.invalid/pharmacast"
+    credibility_tier: tier_3_anonymous_unverified
+    on_record: false
+    ingest:
+      kind: podcast        # routed through ASR transcription at ingest
+      audio_feed: "https://example.invalid/pharmacast/feed.xml"
+
+# ---------------------------------------------------------------------------
+# CREDIBILITY TIER WEIGHTS  (final = sim^a * cred^b * recency^c)
+# ---------------------------------------------------------------------------
+credibility_weights:
+  tier_1_named_credentialed: 1.0
+  tier_2_named_practitioner: 0.7
+  tier_3_anonymous_unverified: 0.4
+off_record_multiplier: 0.6     # extra discount for speculative/off-record
+
+# ---------------------------------------------------------------------------
+# RETRIEVAL / RANKING
+# ---------------------------------------------------------------------------
+retrieval:
+  top_k: 5
+  candidate_k: 25
+  similarity_exp: 1.0          # a
+  credibility_exp: 1.0         # b
+  recency_exp: 0.5             # c
+  recency_halflife_days: 540   # ~18 months
+
+# ---------------------------------------------------------------------------
+# SYNTHESIS / ABSTENTION
+# ---------------------------------------------------------------------------
+synthesis:
+  require_citations: true      # hard requirement; ungrounded claims are dropped
+  abstain_below_score: 0.02    # thin evidence -> abstain
+  # llm: set provider + ANTHROPIC_API_KEY to enable abstractive synthesis;
+  # leave unset to use the offline extractive cited summary.
+  llm:
+    provider: none             # none | anthropic
+    model: ""

@@ -1,0 +1,25 @@
+# Expert Agent scaffold — runtime requirements.
+#
+# The OFFLINE scaffold (run.py over sample_corpus) requires NOTHING beyond the
+# Python 3.9+ standard library. The packages below are OPTIONAL and only needed
+# when you move past the stub toward a production build. They are intentionally
+# left unpinned/commented so `python run.py` works on a clean machine.
+
+# --- Optional: real embeddings instead of the TF-IDF fallback ---
+# sentence-transformers>=2.7
+# faiss-cpu>=1.8            # or chromadb / qdrant-client for a vector DB
+
+# --- Optional: GraphRAG / orchestration (multi-hop, expert panel graph) ---
+# llama-index>=0.10
+# langchain>=0.2
+# graphrag>=0.3            # Microsoft GraphRAG
+
+# --- Optional: podcast/talk ingestion (replaces the transcription stub) ---
+# faster-whisper>=1.0      # local ASR, no API key
+# feedparser>=6.0          # blog/RSS ingestion
+
+# --- Optional: config parsing (a tiny built-in parser is used otherwise) ---
+# PyYAML>=6.0
+
+# --- Optional: LLM-backed synthesis (replaces the extractive fallback) ---
+# anthropic>=0.40          # set ANTHROPIC_API_KEY to enable
