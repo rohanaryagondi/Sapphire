@@ -1,0 +1,131 @@
+================================================================================
+SAPPHIRE PIPELINE DOCUMENTS 198 & 199 - REGENERATION REPORT
+================================================================================
+
+Generation Date: 2026-03-03
+Task: Fix bold formatting and H2 structure
+Location: /sessions/youthful-vigilant-planck/mnt/Desktop/Sapphire Prompt Work_Feb 2026/Sapphire Pipelines/
+
+================================================================================
+PIPELINE 198
+================================================================================
+
+Prompt:
+  "Rank top 5 orphan-drug–eligible candidates for rare epileptic encephalopathies"
+
+Document Statistics:
+  Total Paragraphs: 181
+  H1 Headings: 1
+  H2 Headings: 9
+  Stages: 6
+  Bullet List Items: 133
+
+Heading Structure:
+  H1: Sapphire Pipeline Workflow
+  H2: Prompt: "Rank top 5 orphan-drug–eligible candidates for rare epileptic encephalopathies"
+  H2: Pipeline Overview
+  H2: Stage 1: Disease-Gene Association Mining
+  H2: Stage 2: EP Phenotype Rescue Scoring
+  H2: Stage 3: Competitive Landscape & Regulatory Assessment
+  H2: Stage 4: Target Viability & Safety Profiling
+  H2: Stage 5: Commercial & Patent Analysis
+  H2: Stage 6: Final Ranking & Development Strategy
+  H2: Tools & Databases Summary
+
+File Information:
+  Path: /sessions/youthful-vigilant-planck/mnt/Desktop/Sapphire Prompt Work_Feb 2026/Sapphire Pipelines/Pipeline_198.docx
+  Size: 43.8 KB
+  Modified: 2026-03-03 13:41
+
+Formatting Verification:
+  ✓ All section labels properly bolded
+
+================================================================================
+PIPELINE 199
+================================================================================
+
+Prompt:
+  "Identify disease-modifying vs symptomatic rescue candidates in Dup15q syndrome"
+
+Document Statistics:
+  Total Paragraphs: 184
+  H1 Headings: 1
+  H2 Headings: 9
+  Stages: 6
+  Bullet List Items: 136
+
+Heading Structure:
+  H1: Sapphire Pipeline Workflow
+  H2: Prompt: "Identify disease-modifying vs symptomatic rescue candidates in Dup15q syndrome"
+  H2: Pipeline Overview
+  H2: Stage 1: Phenotype Characterization & Mechanism Dissection
+  H2: Stage 2: Disease-Modifying Candidate Identification
+  H2: Stage 3: Symptomatic Rescue Candidate Profiling
+  H2: Stage 4: Efficacy & Selectivity Assessment
+  H2: Stage 5: Clinical Translation & Patient Stratification
+  H2: Stage 6: Final Classification & Combination Strategy
+  H2: Tools & Databases Summary
+
+File Information:
+  Path: /sessions/youthful-vigilant-planck/mnt/Desktop/Sapphire Prompt Work_Feb 2026/Sapphire Pipelines/Pipeline_199.docx
+  Size: 45.6 KB
+  Modified: 2026-03-03 13:41
+
+Formatting Verification:
+  ✓ All section labels properly bolded
+
+================================================================================
+CRITICAL FORMATTING FIXES APPLIED
+================================================================================
+1. ALL section labels (Purpose, Inputs, Tools & Databases Called, Exemplary
+   Sub-Prompts, Expected Outputs, Format) now use bold: true in TextRun
+
+2. Proper HeadingLevel structure:
+   - H1: 'Sapphire Pipeline Workflow' (Heading 1, 32pt bold Arial)
+   - H2: Prompt section (Heading 2, 28pt bold Arial)
+   - H2: Pipeline Overview (Heading 2, 28pt bold Arial)
+   - H2: Stage 1-6 sections (Heading 2, 28pt bold Arial)
+   - H2: Tools & Databases Summary (Heading 2, 28pt bold Arial)
+
+3. TextRun structure: Every text element wrapped in proper TextRun with
+   bold, font name (Arial), and size (24pt for body, 28pt for H2, 32pt for H1)
+
+4. Section labels (Purpose:, Inputs:, etc.) have bold applied WITHIN the
+   TextRun, NOT as paragraph-level formatting
+
+5. All 6 stages present with correct content structure:
+   - Pipeline 198: Disease genes → EP rescue → Competitive → Safety →
+     Commercial → Final ranking (orphan drug candidates for rare DEE)
+   - Pipeline 199: Phenotype characterization → Disease-modifying →
+     Symptomatic → Efficacy → Patient stratification → Final strategy
+     (Dup15q disease-modifying vs symptomatic classification)
+
+6. Bullet lists properly formatted with LevelFormat.BULLET
+
+7. Page setup: 1440 twips (1-inch) margins on all sides
+
+8. Font consistency: Arial 24pt for body text, proper spacing
+
+================================================================================
+DOCUMENT VALIDATION SUMMARY
+================================================================================
+Pipeline 198: ✓ PASS
+  - 181 paragraphs (exceeds 165 minimum)
+  - 1 H1, 9 H2, 6 stages correctly structured
+  - 133 bullet items across all stages
+  - All bold formatting correct
+  - File size: 44 KB
+
+Pipeline 199: ✓ PASS
+  - 184 paragraphs (exceeds 165 minimum)
+  - 1 H1, 9 H2, 6 stages correctly structured
+  - 136 bullet items across all stages
+  - All bold formatting correct
+  - File size: 46 KB
+
+Overall Status: ✓ SUCCESS
+  - Both documents meet all formatting requirements
+  - Scientific content comprehensive and detailed
+  - Ready for production use
+
+================================================================================

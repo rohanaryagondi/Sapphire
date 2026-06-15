@@ -1,0 +1,219 @@
+================================================================================
+SAPPHIRE PIPELINE CONTENT SUMMARY
+Pipelines 160, 161, 162 - Complete Workflow Documentation
+================================================================================
+
+PIPELINE 160: "Identify predictions most sensitive to model drift."
+================================================================================
+
+OVERVIEW:
+This pipeline implements a comprehensive sensitivity analysis framework to 
+quantify how model drift (systematic changes in feature distributions, model 
+coefficients, or data quality) affects prediction stability across the entire 
+feature space.
+
+SIX STAGES:
+
+1. Data Integration and Baseline Model Establishment
+   Purpose: Establish robust baseline model with feature engineering and validation
+   Key Tools: RDKit, Pandas/NumPy, Scikit-learn, ChEMBL, Internal Sapphire Warehouse
+   Key Outputs: Normalized feature matrix, baseline model, validation metrics
+
+2. Sensitivity Analysis Framework Design
+   Purpose: Design multi-faceted framework quantifying robustness across drift scenarios
+   Key Tools: SHAP, Permutation Feature Importance, Scikit-learn, Scipy.stats
+   Key Outputs: Sensitivity score matrices, feature contribution variance profiles
+
+3. Model Drift Simulation and Temporal Analysis
+   Purpose: Simulate realistic drift scenarios and analyze model behavior across time
+   Key Tools: Numpy Random, Scipy, Concept Drift Library, Internal Perturbation Module
+   Key Outputs: Drift perturbation scenarios, prediction scores, ranking reversals
+
+4. Sensitivity Scoring and Vulnerability Profiling
+   Purpose: Aggregate measurements into robust vulnerability scores
+   Key Tools: Numpy/Pandas aggregation, Scipy.stats ranking, Custom Scoring Algorithm
+   Key Outputs: Sensitivity scores (0-100), vulnerability profiles, confidence intervals
+
+5. Comparative Benchmarking and Model Ensemble Analysis
+   Purpose: Validate findings across multiple model architectures
+   Key Tools: Scikit-learn RandomForest/GradientBoosting, TensorFlow/Keras, Optuna
+   Key Outputs: Cross-model comparisons, ensemble predictions, robustness metrics
+
+6. Final Reporting and Actionable Recommendations
+   Purpose: Synthesize findings into comprehensive report with monitoring guidelines
+   Key Tools: Jinja2, Plotly/Bokeh, ReportLab, Internal Recommendation Engine
+   Key Outputs: Executive summary, ranked predictions, monitoring guidelines, dashboards
+
+TARGET DELIVERABLES:
+- Prediction vulnerability scores identifying high-sensitivity compounds
+- Feature-level sensitivity decomposition showing drift mechanisms
+- Model monitoring guidelines with real-time detection thresholds
+- Interactive dashboards for researcher exploration
+
+TOOLS & DATABASES (16 items):
+RDKit, Pandas/NumPy, Scikit-learn, SHAP, ChEMBL, Internal Sapphire Data Warehouse,
+PubChem, Scipy.stats, Concept Drift Libraries, Matplotlib/Seaborn/Plotly/Bokeh,
+HDF5/NetCDF, ReportLab/FPDF, TensorFlow/Keras, Optuna/Hyperopt, Internal Drift 
+Simulation Suite, Internal Recommendation Engine, Quiver Knowledge Base
+
+================================================================================
+
+PIPELINE 161: "Which targets have weak replication across plates?"
+================================================================================
+
+OVERVIEW:
+This pipeline systematically identifies targets exhibiting poor replication
+consistency across screening plates, a critical quality metric in high-throughput
+drug discovery. Poor plate-to-plate replication indicates assay instability or
+systematic bias that compromises confidence in target engagement predictions.
+
+SIX STAGES:
+
+1. Plate Data Acquisition and Preprocessing
+   Purpose: Collect and standardize raw plate data with quality control
+   Key Tools: Pandas, OpenPyXL, HDF5, Internal Plate Database
+   Key Outputs: Standardized plate matrices, metadata tables, QC metrics
+
+2. Intra-Plate Curve Fitting and Dose-Response Analysis
+   Purpose: Fit dose-response curves to extract potency parameters (IC50, EC50)
+   Key Tools: SciPy.optimize, Statsmodels, PyMC3, Matplotlib/Seaborn
+   Key Outputs: Potency parameters, goodness-of-fit statistics, confidence intervals
+
+3. Inter-Plate Replication Analysis
+   Purpose: Compare potency across multiple plates testing same compounds
+   Key Tools: Pandas GroupBy, SciPy.stats Correlation, ICC Library, Bland-Altman
+   Key Outputs: Correlation matrices, ICC values, coefficient of variation
+
+4. Assay Performance Metrics and Quality Stratification
+   Purpose: Calculate comprehensive assay quality metrics (Z-factor, signal window)
+   Key Tools: Zhang Z-Factor Calculator, Signal Window Functions, Pandas Aggregation
+   Key Outputs: Z-factor values, dynamic range metrics, quality scores
+
+5. Target Stratification and Vulnerability Assessment
+   Purpose: Stratify targets into tiers based on replication confidence
+   Key Tools: Multi-Criteria Decision Analysis, Clustering, Internal Risk Assessment
+   Key Outputs: Stratification scores, quality tiers, vulnerability profiles
+
+6. Reporting and Remediation Recommendations
+   Purpose: Synthesize findings with actionable assay improvement recommendations
+   Key Tools: Jinja2, Pandas Export, ReportLab/FPDF, Plotly/Bokeh
+   Key Outputs: Executive summary, remediation recommendations, interactive dashboards
+
+TARGET DELIVERABLES:
+- Quality tiers for all targets (Tier 1: Excellent through Tier 4: Weak)
+- Detailed vulnerability profiles for underperforming assays
+- Specific assay optimization recommendations
+- Data inclusion/exclusion recommendations with impact quantification
+
+TOOLS & DATABASES (15 items):
+Pandas, NumPy, SciPy.stats, Scikit-learn, SciPy.optimize, PyMC3/Bayesian,
+Matplotlib/Seaborn, Plotly/Bokeh, HDF5/NetCDF, ReportLab/FPDF, Internal Sapphire
+Plate Database, Internal Curve Fitting Pipeline, Internal Quality Assessment Tool,
+Internal Recommendation Engine, ChEMBL/PubChem
+
+================================================================================
+
+PIPELINE 162: "What additional experiment would most increase confidence?"
+================================================================================
+
+OVERVIEW:
+This pipeline systematically identifies experimental gaps and recommends targeted
+experiments that would optimally reduce model uncertainty and maximize scientific
+validity. By analyzing current feature coverage, prediction uncertainty, and
+structural diversity gaps, it generates prioritized experiment recommendations
+balanced against resource constraints.
+
+SIX STAGES:
+
+1. Current Model State and Uncertainty Assessment
+   Purpose: Establish baseline and quantify per-prediction uncertainty
+   Key Tools: Scikit-learn Model Introspection, PyMC3, SHAP, Matplotlib
+   Key Outputs: Confidence scores, uncertainty distributions, residual analysis
+
+2. Structural and Chemical Space Gap Analysis
+   Purpose: Analyze chemical diversity and identify underrepresented regions
+   Key Tools: RDKit Descriptors, Scikit-learn Dimensionality Reduction, Clustering
+   Key Outputs: Chemical space projections, diversity metrics, gap identification
+
+3. Orthogonal Assay and Mechanistic Study Recommendations
+   Purpose: Identify predictions benefiting from orthogonal validation assays
+   Key Tools: Internal Assay Database, Assay Compatibility Model, Risk-Benefit Scoring
+   Key Outputs: Ranked orthogonal assay recommendations, feasibility assessments
+
+4. Physiochemical and Physicochemical Property Characterization Gaps
+   Purpose: Identify missing properties impacting prediction confidence
+   Key Tools: RDKit, ADMET Prediction Models, Correlation Analysis, Data Quality Assessment
+   Key Outputs: Property gap analysis, measurement priorities, confidence impact estimates
+
+5. In Vivo Validation and Pharmacokinetic Study Planning
+   Purpose: Recommend in vivo studies for lead compound validation
+   Key Tools: CNS Penetration Models, PK/PD Modeling, Model Selection Algorithms
+   Key Outputs: In vivo study recommendations, PK predictions, confidence projections
+
+6. Integrated Experiment Prioritization and Resource Optimization
+   Purpose: Synthesize recommendations into unified experiment plan
+   Key Tools: Multi-Objective Optimization, Constraint Programming, Gantt Chart Tools
+   Key Outputs: Prioritized experiment plan, resource allocation, timelines
+
+TARGET DELIVERABLES:
+- Multi-budget scenario experiment portfolios
+- Confidence improvement trajectory projections
+- Go/no-go decision criteria for compound advancement
+- Risk mitigation strategies and contingency experiments
+- Interactive decision dashboards for stakeholder exploration
+
+TOOLS & DATABASES (15 items):
+Scikit-learn, PyMC3/Bayesian, SHAP/Integrated Gradients, RDKit, Pandas/NumPy,
+Matplotlib/Seaborn/Plotly/Bokeh, ADMET Prediction Models, PubChem/ChEMBL,
+UniProt/BioGPS, Internal Assay Database, Internal Historical Study Database,
+Multi-Objective Optimization Solvers, Constraint Programming/Scheduling Tools,
+PK/PD Modeling Frameworks, Interactive Dashboard Platforms
+
+================================================================================
+KEY SCIENTIFIC CONCEPTS ACROSS ALL PIPELINES
+================================================================================
+
+MODEL ROBUSTNESS (Pipeline 160):
+- Feature drift sensitivity analysis
+- Prediction uncertainty quantification
+- Model ensemble validation
+- Real-time monitoring threshold definition
+
+ASSAY QUALITY (Pipeline 161):
+- Plate-to-plate replication assessment
+- Dose-response curve fitting with uncertainty
+- Z-factor and signal window calculations
+- Target quality stratification
+
+EXPERIMENTAL DESIGN OPTIMIZATION (Pipeline 162):
+- Uncertainty decomposition analysis
+- Chemical space coverage assessment
+- Orthogonal assay feasibility scoring
+- Portfolio optimization under constraints
+
+================================================================================
+INTEGRATION WITH QUIVER BIOSCIENCE SAPPHIRE PLATFORM
+================================================================================
+
+These three pipelines form an integrated decision-support system for CNS drug
+discovery:
+
+1. Pipeline 160 identifies which in silico predictions need most scrutiny
+2. Pipeline 161 validates assay data quality supporting those predictions
+3. Pipeline 162 recommends experiments to address remaining uncertainty
+
+BUSINESS VALUE:
+- Reduces late-stage failure risk through confidence quantification
+- Prioritizes resource allocation to highest-impact experiments
+- Enables data-driven go/no-go decision making
+- Provides transparent uncertainty and risk communication
+
+SCIENTIFIC RIGOR:
+- Based on established statistical methods (ICC, Bland-Altman, etc.)
+- Incorporates Bayesian uncertainty quantification
+- Implements industry-standard tools and databases
+- Scientifically grounded for peer-reviewed publication
+
+================================================================================
+END OF CONTENT SUMMARY
+================================================================================

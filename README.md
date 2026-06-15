@@ -4,6 +4,8 @@ Operationalizes James' Feb-2026 Sapphire prompt corpus the way he laid it out in
 meeting: turn **persona -> prompt -> capability -> model/tool -> gap** into a living map of what
 Sapphire must do, what can do it today, how well, and where Quiver should build.
 
+> **New here? Read [`HANDOFF.md`](HANDOFF.md) first** — single-doc orientation to everything below.
+
 ## What's here
 
 | File | What it is |
@@ -14,6 +16,9 @@ Sapphire must do, what can do it today, how well, and where Quiver should build.
 | [`personas/`](personas/) | All 59 personas as markdown (foldered by archetype) + [`INDEX.md`](personas/INDEX.md). The demand source - usable as agent system-personas or to regenerate prompts. |
 | [`expert-agent/`](expert-agent/) | CAP-15 build: [`PROPOSAL.md`](expert-agent/PROPOSAL.md) (the "$50k expert from public posts" design) + a **runnable offline scaffold** (`python expert-agent/run.py "..."`). |
 | [`orchestration_brief_hayes.md`](orchestration_brief_hayes.md) | Strategic brief for Hayes: 4 agentic-orchestration archetypes for Sapphire, grounded in the v3 stack, with a recommended re-ranking-cascade architecture. |
+| [`HANDOFF.md`](HANDOFF.md) | Comprehensive single-doc handoff — start here. |
+| [`meetings/`](meetings/) | The 2026-06-11 strategy meeting transcript + structured notes (+ Granola link). |
+| [`source/`](source/) | James' raw Feb-2026 corpus (59 personas, 299 + 100 prompts, 399 pipelines, tool-frequency PNGs, Quiver context docs) — the inputs everything was built from. |
 | [`specs/`](specs/) | The design spec this was built from. |
 | `_build/` | The conversion/build scripts (re-runnable). |
 

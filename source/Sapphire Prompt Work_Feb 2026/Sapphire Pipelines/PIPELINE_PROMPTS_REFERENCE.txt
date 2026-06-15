@@ -1,0 +1,213 @@
+================================================================================
+SAPPHIRE PIPELINE PROMPTS REFERENCE
+Complete List of 22 Regenerated Pipelines with Their Prompts
+================================================================================
+
+RESEARCH CLUSTER (7 Pipelines)
+================================================================================
+
+PIPELINE 123
+Prompt: "Identify hub genes whose perturbation collapses multiple disease clusters."
+Focus: Disease cluster mapping and hub gene identification
+File: Pipeline_123.docx
+
+PIPELINE 124
+Prompt: "Rank top 5 two-target combinations for depression based on functional rescue + safety."
+Focus: Multi-target synergy analysis and depression therapeutics
+File: Pipeline_124.docx
+
+PIPELINE 125
+Prompt: "For monogenic epilepsy gene X, design ASO achieving 40% knockdown."
+Focus: Monogenic disease ASO strategy design with specific knockdown target
+File: Pipeline_125.docx
+
+PIPELINE 126
+Prompt: "Identify genotype-specific rescue strategies."
+Focus: Genotype-phenotype-specific intervention strategies
+File: Pipeline_126.docx
+
+PIPELINE 127
+Prompt: "Predict response heterogeneity across iPSC donor lines."
+Focus: iPSC donor line stratification and response prediction
+File: Pipeline_127.docx
+
+PIPELINE 128
+Prompt: "Identify targets for pediatric intervention with minimal developmental risk."
+Focus: Age-appropriate target selection with safety constraints
+File: Pipeline_128.docx
+
+PIPELINE 129
+Prompt: "Map newborn screening targets to functional clusters."
+Focus: Neonatal disease target mapping and clustering
+File: Pipeline_129.docx
+
+COMMERCIAL & MoA ANALYSIS CLUSTER (8 Pipelines)
+================================================================================
+
+PIPELINE 136
+Prompt: "Identify white-space opportunities in schizophrenia MoA landscape."
+Focus: Schizophrenia MoA gap analysis and white-space identification
+File: Pipeline_136.docx
+
+PIPELINE 137
+Prompt: "For gene Y, is market saturation high?"
+Focus: Gene-specific market saturation assessment
+File: Pipeline_137.docx
+
+PIPELINE 138
+Prompt: "Estimate peak sales for top 5 ASO programs."
+Focus: Peak sales forecasting for ASO therapeutic programs
+File: Pipeline_138.docx
+
+PIPELINE 139
+Prompt: "Rank targets by exclusivity durability."
+Focus: Exclusivity assessment and target ranking
+File: Pipeline_139.docx
+
+PIPELINE 140
+Prompt: "Identify MoAs crowded by generics."
+Focus: Competitive landscape analysis for generic crowding
+File: Pipeline_140.docx
+
+PIPELINE 141
+Prompt: "Predict pricing potential for rare genetic CNS target."
+Focus: Rare disease pricing strategy and potential estimation
+File: Pipeline_141.docx
+
+PIPELINE 142
+Prompt: "Identify targets with low competition but high genetic support."
+Focus: Competitive advantage identification with genetic validation
+File: Pipeline_142.docx
+
+PIPELINE 143
+Prompt: "Compare mTOR vs adjacent pathway target commercialization potential."
+Focus: Pathway-level commercial comparison and potential assessment
+File: Pipeline_143.docx
+
+PORTFOLIO OPTIMIZATION CLUSTER (7 Pipelines)
+================================================================================
+
+PIPELINE 144
+Prompt: "For portfolio of 10 programs, optimize for $10B revenue in 10 years."
+Focus: Large portfolio revenue optimization with long-term financial targets
+File: Pipeline_144.docx
+
+PIPELINE 145
+Prompt: "If budget is $100M, allocate across 5 programs for max rNPV."
+Focus: Budget allocation optimization for maximum NPV return
+File: Pipeline_145.docx
+
+PIPELINE 146
+Prompt: "Kill one of these three programs based on data."
+Focus: Program termination decision framework and criteria
+File: Pipeline_146.docx
+
+PIPELINE 147
+Prompt: "Rank current CNS portfolio by translational robustness."
+Focus: Portfolio translational quality ranking and assessment
+File: Pipeline_147.docx
+
+PIPELINE 148
+Prompt: "Identify 3 programs to fast-track to IND."
+Focus: IND fast-tracking prioritization and program selection
+File: Pipeline_148.docx
+
+PIPELINE 149
+Prompt: "Identify 3 programs to terminate preclinical."
+Focus: Preclinical termination prioritization and recommendation
+File: Pipeline_149.docx
+
+PIPELINE 150
+Prompt: "Predict Phase 2 PoS uplift from adding Quiver validation."
+Focus: Quiver validation impact prediction on Phase 2 Proof-of-Concept
+File: Pipeline_150.docx
+
+PIPELINE 151
+Prompt: "For $50M investment, which cluster maximizes PoS delta?"
+Focus: Targeted investment optimization for PoS improvement
+File: Pipeline_151.docx
+
+PIPELINE 152
+Prompt: "Compare small molecule platform vs ASO platform ROI."
+Focus: Platform ROI comparison and financial analysis
+File: Pipeline_152.docx
+
+PIPELINE 153
+Prompt: "Optimize portfolio for 30% PoS improvement."
+Focus: PoS-driven portfolio optimization and target setting
+File: Pipeline_153.docx
+
+PIPELINE 154
+Prompt: "Simulate outcome if top 2 programs fail — what is backup plan?"
+Focus: Risk scenario planning and contingency strategy
+File: Pipeline_154.docx
+
+PIPELINE 155
+Prompt: "Where is Quiver data insufficient to support this hypothesis?"
+Focus: Data gap identification and validation needs assessment
+File: Pipeline_155.docx
+
+THEMATIC ORGANIZATION:
+================================================================================
+
+FUNCTIONAL GENOMICS & TARGET VALIDATION (123-129):
+  Focuses on disease biology, target identification, and functional validation
+  Key activities: Gene discovery, cluster analysis, rescue strategies
+
+COMMERCIAL VIABILITY & COMPETITIVE ANALYSIS (136-143):
+  Focuses on market potential, competitive positioning, and pricing
+  Key activities: Landscape analysis, exclusivity assessment, market sizing
+
+PORTFOLIO & INVESTMENT STRATEGY (144-155):
+  Focuses on program prioritization, resource allocation, risk management
+  Key activities: Portfolio optimization, budget allocation, go/no-go decisions
+
+COMMON WORKFLOW ACROSS ALL PIPELINES:
+================================================================================
+
+All 22 pipelines follow the same 6-stage workflow:
+
+Stage 1: Data Integration & Disease Cluster Mapping
+Stage 2: Target Identification & Prioritization
+Stage 3: Functional Validation & Rescue Strategy Design
+Stage 4: Safety & Manufacturability Assessment
+Stage 5: Commercial & Regulatory Pathway Analysis
+Stage 6: Portfolio Optimization & Decision Framework
+
+Each stage integrates the same 16 scientific databases:
+  STRING, GTEX, ClinVar, OMIM, GenomicsDB, Reactome, DrugBank, LINCS,
+  Connectivity Map, HPO, DisGeNET, Quiver, BioGRID, TCGA, Expression Atlas,
+  UniProt
+
+USING THESE DOCUMENTS:
+================================================================================
+
+1. Select the pipeline matching your prompt/question
+2. Open the corresponding Pipeline_###.docx file
+3. Review all 6 stages for comprehensive workflow coverage
+4. Follow the exemplary sub-prompts for guidance
+5. Reference the Comprehensive Tools & Databases Summary for resources
+
+Each document is self-contained and can be used independently or as part
+of a coordinated portfolio analysis.
+
+FILE LOCATIONS:
+================================================================================
+
+All files stored at:
+/sessions/youthful-vigilant-planck/mnt/Desktop/Sapphire Prompt Work_Feb 2026/Sapphire Pipelines/
+
+File naming: Pipeline_###.docx (where ### is the pipeline number)
+
+Example: Pipeline_123.docx, Pipeline_155.docx
+
+SUPPORTING DOCUMENTATION:
+================================================================================
+
+For overall guidance:     README_22_REGENERATED_PIPELINES.txt
+For detailed structure:   DOCUMENT_STRUCTURE_REFERENCE.txt
+For complete listing:     MANIFEST_22_PIPELINES.txt
+For audit verification:   COMPLETION_CERTIFICATE.txt
+For project summary:      EXECUTIVE_SUMMARY.txt
+
+================================================================================

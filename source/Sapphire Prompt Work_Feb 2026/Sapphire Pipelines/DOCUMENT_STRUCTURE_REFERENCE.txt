@@ -1,0 +1,218 @@
+================================================================================
+SAPPHIRE PIPELINE WORKFLOW DOCUMENT STRUCTURE REFERENCE
+================================================================================
+
+EXACT DOCUMENT STRUCTURE FOR ALL 22 REGENERATED PIPELINES:
+Each document contains 196 paragraphs organized as follows:
+
+HEADER & OVERVIEW (2 paragraphs):
+├─ Paragraph 1: H1 Heading - "Sapphire Pipeline Workflow: [Pipeline Title]"
+└─ Paragraph 2: H2 Heading - "Pipeline Overview"
+└─ Paragraph 3: Overview text
+
+STAGE 1: DATA INTEGRATION & DISEASE CLUSTER MAPPING (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+STAGE 2: TARGET IDENTIFICATION & PRIORITIZATION (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+STAGE 3: FUNCTIONAL VALIDATION & RESCUE STRATEGY DESIGN (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+STAGE 4: SAFETY & MANUFACTURABILITY ASSESSMENT (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+STAGE 5: COMMERCIAL & REGULATORY PATHWAY ANALYSIS (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+STAGE 6: PORTFOLIO OPTIMIZATION & DECISION FRAMEWORK (29 paragraphs):
+├─ Stage Heading (H2)
+├─ Purpose statement
+├─ Inputs section (5 bullets)
+├─ Tools & Databases Called section (6 bullets)
+├─ Exemplary Sub-Prompts section (5 bullets)
+├─ Expected Outputs section (6 bullets)
+└─ Format statement
+
+COMPREHENSIVE SUMMARY (17 paragraphs):
+├─ H2 Heading: "Comprehensive Tools & Databases Summary"
+├─ "Complete Integrated Toolset:" subheading
+├─ 16 Tools & Databases bullets:
+│  ├─ STRING (protein interaction networks)
+│  ├─ GTEX (tissue-specific expression)
+│  ├─ ClinVar (variant significance)
+│  ├─ OMIM (gene-disease associations)
+│  ├─ GenomicsDB (variant frequencies)
+│  ├─ Reactome (pathway knowledge)
+│  ├─ DrugBank (drug targets)
+│  ├─ LINCS (cellular signatures)
+│  ├─ Connectivity Map (perturbations)
+│  ├─ HPO (phenotype ontology)
+│  ├─ DisGeNET (gene-disease)
+│  ├─ Quiver (validation platform)
+│  ├─ BioGRID (interactions)
+│  ├─ TCGA (cancer genomics)
+│  ├─ Expression Atlas (expression data)
+│  └─ UniProt (protein annotations)
+└─ Concluding integration statement
+
+PARAGRAPH COUNT BREAKDOWN:
+================================================================================
+Title & Overview:                          3 paragraphs
+Stage 1 (6 subsections × 1 + 1 + 5 + 1 + 6 + 1 + 1): 22 paragraphs
+                                    WAIT: each stage = 1+1+1+5+1+1+6+1+1 = 18
+Actually:
+  Stage heading:                           1 paragraph
+  Purpose heading + text:                  1 paragraph
+  Inputs heading:                          1 paragraph
+  5 Input bullets:                         5 paragraphs
+  Tools heading:                           1 paragraph
+  6 Tools bullets:                         6 paragraphs
+  Sub-Prompts heading:                     1 paragraph
+  5 Sub-Prompt bullets:                    5 paragraphs
+  Outputs heading:                         1 paragraph
+  6 Output bullets:                        6 paragraphs
+  Format statement:                        1 paragraph
+  ────────────────────────────────────────────
+  Stage subtotal:                          29 paragraphs × 6 stages = 174
+
+Summary Section:
+  Tools & Databases heading:               1 paragraph
+  "Complete Integrated Toolset:" line:     1 paragraph
+  16 Tools bullets:                        16 paragraphs
+  Conclusion statement:                    1 paragraph
+  ────────────────────────────────────────────
+  Summary subtotal:                        19 paragraphs
+
+TOTAL: 3 + 174 + 19 = 196 PARAGRAPHS
+
+STAGE SUBSECTIONS (ALL IDENTICAL ACROSS 6 STAGES):
+================================================================================
+
+1. PURPOSE
+   Format: Bold "Purpose: " followed by descriptive text
+   Content: Brief statement of the stage's objective
+
+2. INPUTS (5 bullets)
+   • Patient clinical phenotype and genetic variant data
+   • Gene expression profiles and network data
+   • Protein interaction and pathway annotations
+   • Prior functional validation results
+   • Target-disease association evidence
+
+3. TOOLS & DATABASES CALLED (6 bullets)
+   • STRING (protein interaction networks)
+   • GTEX (tissue-specific gene expression)
+   • ClinVar (variant pathogenicity assertions)
+   • OMIM (gene-disease associations)
+   • GenomicsDB (variant frequency data)
+   • Reactome (pathway knowledge base)
+
+4. EXEMPLARY SUB-PROMPTS (5 bullets)
+   • Which genes in this pathway are most frequently mutated in disease?
+   • Rank targets by strength of genetic support across populations.
+   • What is the functional consequence of perturbing each candidate?
+   • How do target perturbations affect upstream and downstream pathways?
+   • Which targets show tissue-specific or context-dependent effects?
+
+5. EXPECTED OUTPUTS (6 bullets)
+   • Ranked list of hub genes with perturbation scores
+   • Disease cluster assignments and connectivity heatmaps
+   • Multi-omics evidence summary for each target
+   • Network diagrams showing target-pathway relationships
+   • Functional rescue potential scores
+   • Target triage decision matrix
+
+6. FORMAT
+   Format: Bold "Format: " followed by description
+   Content: "Ranked tables with supporting visualizations, network diagrams,
+            and statistical summaries."
+
+FORMATTING SPECIFICATIONS:
+================================================================================
+Font Family:              Arial throughout
+Font Sizes:
+  H1 (Title):             32pt, bold
+  H2 (Sections):          28pt, bold
+  Body & Bullets:         24pt, regular
+Line Spacing:             360 twips (1.5x spacing)
+Paragraph Spacing:        100-200pt after
+Bullet Indentation:       720 twips left, 360 hanging
+Page Size:                8.5" × 11" (12240 × 15840 twips)
+Page Margins:             1" (1440 twips) on all sides
+List Style:               Bullet format with ○
+
+FILE SPECIFICATIONS:
+================================================================================
+Format:                   Microsoft Word (.docx)
+Compression:              Standard ZIP compression
+File Size:                ~12 KB per document
+Document Language:        English (US)
+Table of Contents:        Not included
+Hyperlinks:               Not included
+Embedded Media:           Not included
+Word Fields:              Not included
+Page Numbers:             Not included
+Headers/Footers:          Not customized
+
+NAMING CONVENTION:
+================================================================================
+Pipeline_###.docx where ### is the pipeline number (001-999 zero-padded)
+
+Examples:
+  Pipeline_123.docx
+  Pipeline_150.docx
+  Pipeline_155.docx
+
+VALIDATION CHECKPOINTS:
+================================================================================
+✓ Document opens without errors in Microsoft Word
+✓ All headings visible and properly formatted
+✓ All bullet points render correctly
+✓ All text is visible (no hidden content)
+✓ Page breaks occur naturally (no forced breaks)
+✓ All spacing and indentation correct
+✓ No spelling or grammar errors
+✓ Consistent formatting throughout
+✓ Proper XML structure in .docx archive
+
+ARCHIVAL INFORMATION:
+================================================================================
+Generation Tool:          Node.js + docx library
+Generation Date:          March 4, 2026
+Total Documents:          22
+Total File Size:          ~264 KB (12K × 22)
+Archive Format:           DOCX (Office Open XML)
+Compatibility:            Word 2007 and later, LibreOffice, Google Docs
+
+================================================================================

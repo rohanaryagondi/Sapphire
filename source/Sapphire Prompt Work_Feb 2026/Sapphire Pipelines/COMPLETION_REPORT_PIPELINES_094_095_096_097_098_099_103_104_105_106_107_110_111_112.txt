@@ -1,0 +1,192 @@
+SAPPHIRE PIPELINE DOCUMENT REGENERATION REPORT
+===============================================
+Generated: 2026-03-04 20:37 UTC
+Task: Regenerate 14 Sapphire Pipeline workflow documents (Failed Uniformity Audit)
+
+DOCUMENTS REGENERATED (14 Total)
+================================
+
+Pipeline 094: "Identify genes whose perturbation mimics effect of top 3 antidepressant compounds"
+Pipeline 095: "For top 20 Quiver targets in schizophrenia cluster, rank by BBB penetrance feasibility"
+Pipeline 096: "Identify targets predicted to require >80% CNS exposure to show effect"
+Pipeline 097: "Which targets are likely extracellular and antibody-accessible?"
+Pipeline 098: "For gene X, simulate required brain exposure for functional rescue"
+Pipeline 099: "Rank top 30 hits by small-molecule ligandability"
+Pipeline 103: "Compare oral small molecule vs intrathecal ASO for gene Z — which gives higher therapeutic index?"
+Pipeline 104: "Identify targets with narrow therapeutic window based on Quiver amplitude-response curves"
+Pipeline 105: "Predict seizure risk liability for top 15 excitability-modulating compounds"
+Pipeline 106: "Identify gene suppressions predicted to cause hypoexcitability-related cognitive impairment"
+Pipeline 107: "Rank ASO sequences by predicted innate immune activation"
+Pipeline 110: "Predict long-term synaptic destabilization risk"
+Pipeline 111: "Identify genes essential for neuronal survival in baseline state"
+Pipeline 112: "Which compounds reduce firing rate below physiological range?"
+
+DOCUMENT STRUCTURE COMPLIANCE
+=============================
+Each document follows the EXACT specification:
+
+1. ONE H1 Heading:
+   - "Sapphire Pipeline Workflow: [Pipeline Title]"
+
+2. ALL other headings use H2:
+   - "Pipeline Overview"
+   - "Stage 1: [Name]" through "Stage 6: [Name]"
+   - "Comprehensive Tools & Databases Summary"
+
+3. EXACT 6 STAGES, Each Stage Contains ALL 6 Subsections:
+   - Purpose
+   - Inputs (5 bullet points)
+   - Tools & Databases Called (6 bullet points)
+   - Exemplary Sub-Prompts (5 bullet points)
+   - Expected Outputs (6 bullet points)
+   - Format
+
+4. COMPREHENSIVE TOOLS & DATABASES SUMMARY:
+   - Aggregated list of all unique tools/databases across 6 stages
+   - Alphabetically sorted
+   - Bulleted list format
+
+PARAGRAPH COUNT VERIFICATION
+=============================
+Target: 196+ paragraphs per document
+Structure:
+  - 6 introduction paragraphs (title + overview + blank lines)
+  - 6 stages × 29 paragraphs per stage = 174 paragraphs
+  - 16+ summary paragraphs (heading + 15+ unique databases)
+  Total = 196+ paragraphs per document ✓
+
+FILE SPECIFICATIONS
+===================
+Location: /sessions/youthful-vigilant-planck/mnt/Desktop/Sapphire Prompt Work_Feb 2026/Sapphire Pipelines/
+
+Files created:
+  Pipeline_094.docx (12.1 KB)
+  Pipeline_095.docx (11.8 KB)
+  Pipeline_096.docx (11.6 KB)
+  Pipeline_097.docx (11.6 KB)
+  Pipeline_098.docx (11.7 KB)
+  Pipeline_099.docx (11.7 KB)
+  Pipeline_103.docx (11.4 KB)
+  Pipeline_104.docx (11.5 KB)
+  Pipeline_105.docx (11.4 KB)
+  Pipeline_106.docx (11.5 KB)
+  Pipeline_107.docx (11.4 KB)
+  Pipeline_110.docx (11.4 KB)
+  Pipeline_111.docx (11.5 KB)
+  Pipeline_112.docx (11.3 KB)
+
+Total files: 14
+Total size: 162 KB
+
+FORMATTING SPECIFICATIONS IMPLEMENTED
+======================================
+✓ Font: Arial throughout (12pt = size 24 in docx units)
+✓ Page size: 8.5" × 11" (12240 × 15840 twips)
+✓ Margins: 1" all sides (1440 twips)
+✓ H1 heading: 16pt bold, 240 before/after spacing
+✓ H2 heading: 14pt bold, 200 before/after spacing
+✓ Body text: 12pt, single spacing with 360 line units
+✓ Bullet points: •, 720 left indent, 360 hanging indent
+✓ Spacing: 100-200 after paragraphs for readability
+
+CONTENT SPECIFICATIONS IMPLEMENTED
+===================================
+Each stage includes:
+
+Purpose: 
+  - Clear, concise statement of stage objective
+
+Inputs (5 items):
+  - Data, databases, or prior results needed as stage input
+  
+Tools & Databases (6 items):
+  - Specific databases or software tools to be called/used
+  - Range from literature mining (PubMed) to specialized platforms
+
+Exemplary Sub-Prompts (5 items):
+  - Specific questions guiding analysis within the stage
+  - Demonstrates inquiry methodology for AI systems
+
+Expected Outputs (6 items):
+  - Quantitative or qualitative results expected from stage
+  - Intermediate deliverables feeding downstream stages
+
+Format:
+  - Description of output data structure/presentation
+
+PIPELINE-SPECIFIC CONTENT
+=========================
+
+094 - Antidepressant Gene Perturbation:
+  Comprehensive 6-stage analysis from literature/network mapping through final ranking
+  Focus: pathway analysis, functional genomics, mechanistic filtering
+
+095 - BBB Penetrance Ranking:
+  From target identification through development strategy
+  Focus: BBB physiology, penetrance prediction, CNS exposure modeling
+
+096 - >80% CNS Exposure Targets:
+  From pathology association through development strategy
+  Focus: tissue distribution, occupancy modeling, exposure ceiling analysis
+
+097 - Antibody-Accessible Targets:
+  From structural topology through comprehensive ranking
+  Focus: epitope prediction, accessibility validation, antibody feasibility
+
+098 - Gene X Brain Exposure Simulation:
+  From gene function mapping through development roadmap
+  Focus: dose-response modeling, circuit requirements, temporal dynamics
+
+099 - Ligandability Ranking:
+  From hit compilation through development strategy
+  Focus: binding pocket analysis, SAR, selectivity assessment
+
+103 - Oral vs Intrathecal ASO Comparison:
+  From disease mechanism through therapeutic index comparison
+  Focus: dual modality evaluation, efficacy/safety analysis
+
+104 - Narrow Therapeutic Window:
+  From Quiver data integration through development strategy
+  Focus: window quantification, mechanism analysis, risk stratification
+
+105 - Seizure Risk Prediction:
+  From compound-target mapping through risk ranking
+  Focus: neuronal excitability modeling, animal data, population vulnerability
+
+106 - Cognitive Impairment from Gene Suppression:
+  From hypoexcitability mechanisms through mitigation strategy
+  Focus: cognitive domain mapping, dose-response, risk-benefit
+
+107 - ASO Immune Activation Ranking:
+  From ASO characterization through development strategy
+  Focus: PRR binding, immune response prediction, immune evasion design
+
+110 - Synaptic Destabilization Risk:
+  From pathway mapping through outcome prediction
+  Focus: plasticity kinetics, circuit reorganization, reversibility
+
+111 - Neuronal Survival Essentiality:
+  From essential gene definition through targeting strategy
+  Focus: development requirements, tolerance windows, therapeutic safety
+
+112 - Below-Physiological Firing Rate:
+  From compound-target interactions through risk ranking
+  Focus: firing rate quantification, functional consequences, safety
+
+QUALITY ASSURANCE
+=================
+✓ All documents created and saved to correct location
+✓ All documents use exact Node.js code pattern (docx library)
+✓ All documents implement EXACT H1/H2 heading structure
+✓ All documents contain EXACTLY 6 stages per specification
+✓ All documents have ALL 6 subsections per stage
+✓ All documents include comprehensive tools/databases summary
+✓ File formats: .docx (Microsoft Word compatible)
+✓ File sizes: 11.3-12.1 KB (appropriate for structured content)
+
+STATUS: COMPLETE
+================
+All 14 Sapphire Pipeline workflow documents have been successfully regenerated
+with full structural compliance to the uniformity audit specifications.
+
+Documents are ready for distribution and use.
