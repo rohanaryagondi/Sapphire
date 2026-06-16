@@ -23,6 +23,7 @@
     <a href="#system">System flow</a>
     <a href="#data">Data layers</a>
     <a href="#capabilities">Capabilities</a>
+    <a href="#console">Console</a>
   </nav>
 </header>
 
@@ -102,6 +103,23 @@
   <div class="cards" id="cards"></div>
 </section>
 
+<!-- CONSOLE (the orchestrator, live) -->
+<section id="console" class="band band-alt">
+  <div class="band-head">
+    <span class="sec-no">05</span>
+    <h2>The orchestrator, live</h2>
+    <p>One front router turns a question into four stages: <em>Discover</em> (EMET) &rarr; <em>Validate</em> (Q-Models) &rarr; <em>Consult</em> (auto-convened persona panel) &rarr; <em>Synthesize</em>. Pick a scenario and run it.</p>
+  </div>
+  <div class="orch">
+    <div class="orch-bar">
+      <div class="orch-tabs" id="orchTabs"></div>
+      <button class="run-btn" id="orchRun"><span class="run-dot"></span> Run Sapphire</button>
+    </div>
+    <p class="orch-query" id="orchQuery"></p>
+    <div class="orch-flow" id="orchFlow"></div>
+  </div>
+</section>
+
 <footer class="foot">
   <span>Sapphire capability map &middot; built from the Feb-2026 corpus + the Q-Mammal eval</span>
   <span class="foot-honesty">Status &amp; verdicts carry straight from <code>capability_map.xlsx</code>. <b>Untested</b> / <b>Gap</b> mean exactly that — no invented performance.</span>
@@ -113,5 +131,7 @@
 
 <script src="data.js"></script>
 <script src="app.js"></script>
+<script src="orchestrator_data.js"></script>
+<script src="console.js"></script>
 </body>
 </html>

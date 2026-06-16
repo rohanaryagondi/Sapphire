@@ -1,0 +1,34 @@
+{
+  "id": "nav1_8",
+  "title": "Nav1.8 / SCN10A neuropathic-pain network",
+  "query": "Prioritize novel analgesic targets in the peripheral sensory-neuron / Nav1.8 network for a systemic neuropathic-pain program.",
+  "headline": "The moat's #7 (SCN11A / Nav1.9) is promoted to #1 — then the persona panel converges on one gating risk.",
+  "discover": {
+    "source": "EMET (live in the cascade) + internal moat (mock)",
+    "summary": "Internal moat ranked SCN11A/Nav1.9 at #7 (ultra-slow persistent current under-detected by the optical-EP assay). EMET gate vetoed CACNA2D1 & NGF (CRITICAL safety), demoted TRPV1 (class hyperthermia); EMET boost promoted SCN11A on strong Mendelian FEPS3 genetics + SAFE class (PMID 26243570).",
+    "result": "SCN11A/Nav1.9: #7 → #1 (SAFE + FEPS3 genetics). CACNA2D1, NGF removed."
+  },
+  "validate": {
+    "source": "Q-Models launchpad (MOCK; AWS later)",
+    "runs": [
+      {"model": "Boltz-2", "out": "pKd 7.2, prob_binder 0.88 — binds; BUT Nav1.5 cross-pKd 6.9 (~2× selectivity vs >100× needed)"},
+      {"model": "Quiver ion-channel fine-tune", "out": "Nav1.9 correctly #1/9 paralogs, but Nav1.5 margin weak"},
+      {"model": "CardioGenAI", "out": "moderate hERG, elevated Nav1.5 risk"}
+    ],
+    "result": "Bindable, but cardiac (Nav1.5/hERG) selectivity is the hard, quantified gate."
+  },
+  "panel": [
+    {"persona":"Dr. Robin Sherrington, Xenon Pharmaceuticals","role":"EVP Strategy & Innovation","lens":"scientific","stance":"conditional","conviction":3,"headline":"Genetics and safety are real; cardiac selectivity is unproven and gating","rationale":"The SCN11A/Nav1.9 promotion rests on credible pillars: SAFE EMET class with LoF tolerability and no clinical tox (PMID 26243570) plus strong FEPS3 Mendelian genetics (0.89), which appropriately rescue a target the optical-EP moat under-detected. But Boltz-2 shows only ~2× Nav1.5 sparing (pKd 7.2 vs 6.9) against a >100× bar, and CardioGenAI flags elevated Nav1.5 plus moderate hERG — for a systemic program this is a cardiac-liability showstopper. SAFE is also provisional: no clinical-stage Nav1.9 inhibitor exists.","top_risk":"Nav1.5 cross-reactivity (~2× vs >100× needed) — systemic cardiac arrhythmia risk","ask":"Resolve Nav1.9 persistent-current in the oEP assay and demonstrate >100× functional Nav1.5 sparing for a lead chemotype before greenlight"},
+    {"persona":"Dr. Henrik Sorensen, H. Lundbeck A/S","role":"SVP, External Innovation & BD","lens":"commercial","stance":"conditional","conviction":3,"headline":"Genuine whitespace, Mendelian-validated, but selectivity gap blocks a deal today","rationale":"Nav1.9/SCN11A is real non-opioid pain whitespace versus the crowded, already-prosecuted Nav1.7/Nav1.8 field, and the FEPS3 genetics (0.89) plus the panel's only SAFE classification give a clean genetic-basis story that fits our focused-innovator heritage. But as a ~$3B player I won't win a bidding war on a hot pain asset, and the ~2× vs >100× Nav1.5 selectivity gap is a hard chemistry liability that kills value if unresolved.","top_risk":"~2× vs >100× cardiac Nav1.5 selectivity gap — no clinical precedent","ask":"Option/research-collab (sub-$50M upfront, milestone-heavy) gated on the oEP experiment establishing >100× Nav1.5 sparing"},
+    {"persona":"Dr. Sam Ostrowski, RA Capital Management","role":"Managing Director, Neuroscience","lens":"investability","stance":"conditional","conviction":4,"headline":"Fundable first-in-class story gated entirely on cardiac selectivity","rationale":"Exactly the asymmetric setup I look for: clean human-genetics validation (Mendelian FEPS3 GoF, PMID 26243570) de-risks the biology, and a SAFE profile with no clinical-stage Nav1.9 inhibitor gives genuine first-in-class whitespace. But the thesis lives or dies on the Boltz-2 ~2× Nav1.5 selectivity vs the >100× a systemic analgesic needs — that gap is the kill-or-cure milestone. The same oEP assay that under-detected this must first prove it can quantify Nav1.9 pharmacology.","top_risk":"Cardiac Nav1.5 liability: ~2× measured vs >100× required","ask":"A real chemical series showing >100× Nav1.5-sparing Nav1.9 block in a validated oEP assay — that single gate would make me lead a Series A"},
+    {"persona":"Dr. Sarah Sheikh, Takeda","role":"Head, Neuroscience TAU","lens":"regulatory","stance":"conditional","conviction":3,"headline":"Genetics is compelling; Nav1.5 selectivity is the clinical-hold gate","rationale":"The FEPS3 GoF genetics (0.89) is genuine human Mendelian validation, and SCN11A's SAFE class (PMID 26243570) is the cleanest in the panel — far better than the correctly vetoed NGF (RPOA, PMID 37652258) and CACNA2D1 (respiratory depression). But Boltz-2 gives ~2× Nav1.5 cross-reactivity where >100× is required, and CardioGenAI flags hERG + Nav1.5 — a proarrhythmia profile that draws a clinical hold or QT-driven dose cap before efficacy is testable.","top_risk":"Insufficient cardiac selectivity → proarrhythmia clinical-hold liability","ask":"Patch-clamp Nav1.9-vs-Nav1.5 panel showing >100× sparing, hERG + iPSC-cardiomyocyte data, and an oEP target-engagement biomarker before FIH dosing"}
+  ],
+  "synthesize": {
+    "recommendation": "Advance SCN11A / Nav1.9 to a focused cardiac-selectivity de-risking experiment — not yet to a full program. Structure any external deal as option / milestone-heavy.",
+    "consensus": "Unanimous: the #7→#1 promotion is scientifically sound — human Mendelian genetics + the panel's only SAFE class make Nav1.9 genuine first-in-class non-opioid pain whitespace.",
+    "dissent": "Low divergence. Conviction 3 (Xenon, Lundbeck, Takeda) vs 4 (RA Capital — weights the asymmetric first-in-class upside higher). No champion, no veto — all four 'conditional'.",
+    "convergent_gate": "All four independently flagged the SAME risk: cardiac Nav1.5 selectivity (~2× measured vs >100× needed).",
+    "proposed_experiment": "Resolve Nav1.9's persistent current in Quiver's oEP assay (the signal the moat under-detected) AND demonstrate >100× functional Nav1.5 sparing for a lead chemotype — closing the active-learning loop on the moat's own blind spot.",
+    "confidence": "Biology: HIGH. Overall program: CONDITIONAL on the selectivity gate."
+  }
+}

@@ -21,17 +21,20 @@ Or open `index.html` directly in a browser — it works from `file://` too (data
 | `index.html` | Structure + Google Fonts (Instrument Serif / IBM Plex Sans + Mono). |
 | `styles.css` | The dark "electrophysiology instrument" theme. |
 | `app.js` | All interactions — renders from `data.js`, animates the cascade, filters, drawer. |
+| `console.js` | The **Console** section — animates the orchestrator (Discover → Validate → Consult → Synthesize) with the live persona panel. |
 | `data.js` | Auto-generated from `../capability_map.xlsx`. **Do not hand-edit.** |
+| `orchestrator_data.js` | Auto-generated from `../sapphire-orchestrator/`. **Do not hand-edit.** |
 
 ## Regenerate the data
 
 The site reads `data.js`, which is generated from the spreadsheet so the two never drift:
 
 ```bash
-python ../_build/build_site_data.py
+python ../_build/build_site_data.py     # capability dashboard  ← capability_map.xlsx
+python ../_build/build_orch_data.py      # Console               ← sapphire-orchestrator/scenarios/*.json
 ```
 
-Re-run that after editing `capability_map.xlsx` (or its build script), then refresh the page.
+Re-run after editing the spreadsheet or the orchestrator scenarios, then refresh the page.
 
 ## Notes
 

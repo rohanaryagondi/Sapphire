@@ -1,0 +1,10 @@
+{
+  "_note": "DEMO MOCK Q-Models outputs for the Nav1.8 scenario. The orchestrator ran these on the cascade's promoted #1 (SCN11A/Nav1.9) to put a quantitative number on the open 'is it druggable + selective?' question the cascade flagged. Shaped like the real Boltz/CardioGenAI/fine-tune outputs; values are illustrative.",
+  "target": "SCN11A (Nav1.9)",
+  "runs": [
+    {"model":"boltz-2","query":"Nav1.9 + tool inhibitor (PF-0518-class chemotype)","result":{"pKd":7.2,"prob_binder":0.88,"Nav1.5_cross_pKd":6.9,"selectivity_fold":"~2x","verdict":"binds, but POOR cardiac selectivity — Nav1.5 margin far below the >100x target"}},
+    {"model":"ionchannel-ft","query":"Quiver fine-tune: Nav1.9 vs 8 paralog panel","result":{"top_selectivity":"Nav1.9 ranked #1 of 9","Nav1.5_margin":"weak (+0.18)","verdict":"correct paralog but selectivity not yet de-risked — matches the cascade's proposed experiment"}},
+    {"model":"cardiogenai","query":"chemotype cardiac liability","result":{"hERG_risk":"moderate","Nav1.5_risk":"elevated","verdict":"reinforces the cardiac-selectivity gate"}}
+  ],
+  "synthesis":"Q-Models confirms Nav1.9 is bindable but quantifies the exact risk the cascade abstained on: cardiac (Nav1.5/hERG) selectivity. The computed ~2x margin (vs >100x needed) makes 'establish Nav1.5 selectivity early' a hard go/no-go gate, not a footnote."
+}

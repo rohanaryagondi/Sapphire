@@ -1,0 +1,10 @@
+{
+  "_note": "DEMO MOCK Q-Models outputs for the TSC2 scenario. Run on the cascade's promoted #1 (RHEB). Shaped like real Boltz/ADMET/docking outputs; values illustrative.",
+  "target": "RHEB",
+  "runs": [
+    {"model":"boltz-2","query":"RHEB GTPase + candidate allosteric/farnesyl-pocket binder","result":{"pKd":5.4,"prob_binder":0.41,"verdict":"weak — small GTPase, shallow pocket; classic ligandability challenge"}},
+    {"model":"atomica-dock","query":"RHEB switch-II / farnesyl pocket docking","result":{"dock_score":-6.1,"pose":"shallow, solvent-exposed","verdict":"no deep druggable pocket off-the-shelf; supports a non-small-molecule modality"}},
+    {"model":"admet-ai","query":"candidate chemotype ADMET","result":{"BBB":"borderline","DILI":"low","hERG":"low","verdict":"clean tox, but moot until ligandability is solved"}}
+  ],
+  "synthesis":"Q-Models adds the nuance the cascade couldn't: RHEB is genetically + network-validated (corroboration 0.76, PPI 0.999) but computationally HARD to drug as a small molecule (pKd 5.4, shallow pocket). This reframes RHEB as a 'novel & validated but modality-challenged' target — pushing toward ASO/degrader rather than a classic inhibitor."
+}

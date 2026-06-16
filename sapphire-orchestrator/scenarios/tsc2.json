@@ -1,0 +1,34 @@
+{
+  "id": "tsc2",
+  "title": "TSC2 / mTOR network — tuberous sclerosis",
+  "query": "Prioritize novel targets to normalize TSC2-loss mTORC1 hyperactivation for a tuberous-sclerosis CNS program (chronic paediatric + adult dosing).",
+  "headline": "The moat's #7 (RHEB) becomes the #1 novel target — then the panel reframes it from a small molecule to a genetic medicine.",
+  "discover": {
+    "source": "EMET (live in the cascade) + internal moat (mock)",
+    "summary": "Internal moat ranked RHEB at #7 (small GTPase, subtle functional signature). EMET gate vetoed PPARD (CRITICAL carcinogenicity), flagged MTOR (everolimus immunosuppression/growth, PMID 31335226). EMET boost promoted RHEB on near-perfect PPI-to-mTOR (0.999) + 2nd somatic cause of FCD. DEPDC5 (best Mendelian genetics) abstained as intractable.",
+    "result": "RHEB: #7 → #1 novel actionable. MTOR = incumbent (set aside). PPARD removed. DEPDC5 abstained."
+  },
+  "validate": {
+    "source": "Q-Models launchpad (MOCK; AWS later)",
+    "runs": [
+      {"model": "Boltz-2", "out": "pKd 5.4, prob_binder 0.41 — weak; shallow GTPase pocket"},
+      {"model": "ATOMICA dock", "out": "dock score -6.1, shallow solvent-exposed pose — no deep druggable pocket"},
+      {"model": "ADMET-AI", "out": "clean tox (low DILI/hERG), BBB borderline — but moot until ligandability solved"}
+    ],
+    "result": "Genetically + network validated, but small-molecule ligandability is HARD → points to an ASO / degrader modality."
+  },
+  "panel": [
+    {"persona":"Dr. Ryan Watts, Denali Therapeutics","role":"CEO & Co-Founder","lens":"scientific","stance":"conditional","conviction":4,"headline":"RHEB biology is right; deliver it as a CNS-penetrant modality","rationale":"RHEB is the cleanest node downstream of TSC2 loss — a selective RHEB inhibitor sits directly above mTORC1 and should phenocopy rapalog efficacy while plausibly sparing the pan-mTOR immunosuppression and growth impairment that limit everolimus in children. But Boltz-2 pKd 5.4 / prob_binder 0.41 and a shallow solvent-exposed ATOMICA pose mean small-molecule ligandability is genuinely hard. This is an ASO/degrader problem — and for chronic paediatric CNS dosing the chemistry is moot unless you solve BBB delivery (a TfR transcytosis platform earns its keep here).","top_risk":"A degrader/ASO that knocks down RHEB but can't be delivered across the BBB at safe, repeat-dosable paediatric exposures","ask":"Confirm RHEB knockdown (ASO/degrader, not FTI) normalizes the oEP hyperexcitability signature, then a CNS PK/PD study showing brain target engagement with a BBB-delivery vehicle"},
+    {"persona":"Dr. James Chen, BioMarin","role":"EVP, Chief Business Officer","lens":"commercial","stance":"conditional","conviction":3,"headline":"Novel node-specific mechanism, but modality risk gates the deal","rationale":"TSC is a genetically defined orphan indication with a validated axis and an assessable phenotype (oEP excitability) — squarely our model. RHEB's appeal is differentiation: a node-specific play downstream of TSC2 that dodges everolimus's pan-mTOR immunosuppression and growth impairment (50,182 FAERS). But Boltz-2 pKd 5.4 with a shallow pocket points to ASO/degrader — a genetic-medicine model with chronic CNS-delivery and reimbursement burdens, and safety is inferred (MONITOR), not clinical.","top_risk":"Ligandability-hard target forces an unproven CNS ASO/degrader with no clinical RHEB safety read","ask":"Quiver oEP proof that RHEB modulation normalizes excitability + a node-specific safety margin vs pan-mTOR + a deliverable CNS modality; structured option/milestone-heavy"},
+    {"persona":"Dr. Catherine Brennan, Third Rock Ventures","role":"Partner, Neuroscience","lens":"investability","stance":"conditional","conviction":3,"headline":"Fundable genetic-medicine NewCo if RHEB ligandability becomes a platform","rationale":"RHEB has what I underwrite: human genetic validation (2nd somatic cause of FCD), near-perfect mechanistic coupling (PPI-to-mTOR 0.999), clean ADMET, and a node-specific thesis that could spare everolimus's paediatric liabilities. But Boltz-2 pKd 5.4 / 0.41 and shallow docking say small molecule is HARD — so the bet is a genetic-medicine modality platform across the TSC2/mTOR axis (RHEB now, DEPDC5 GATOR1-reactivation later), not a single asset.","top_risk":"Ligandability failure: weak pocket forces an unproven CNS ASO/degrader with inferred safety","ask":"Show RHEB knockdown normalizes the oEP phenotype AND a node-specific safety margin vs pan-mTOR, with a credible CNS delivery/CMC plan, before I anchor a launch round"},
+    {"persona":"Dr. Sarah Sheikh, Takeda","role":"Head, Neuroscience TAU","lens":"regulatory","stance":"conditional","conviction":3,"headline":"Node-specific RHEB plausibly safer than mTOR; modality risk unproven","rationale":"In chronic paediatric TSC, everolimus's WARNING-class liabilities are the bar: immunosuppression, vaccine blunting, growth impairment (50,182 FAERS; PMID 31335226) are unacceptable over years in a developing child. A node-specific RHEB inhibitor downstream of TSC2 plausibly spares that — a genuinely differentiated safety thesis. But RHEB is MONITOR-class with no clinical inhibitor (safety inferred), and it's ligandability-hard (Boltz-2 pKd 5.4), forcing an unproven CNS ASO/degrader. Research commitment, not a development decision.","top_risk":"Inferred-only RHEB safety + chronic intrathecal ASO in children = unproven long-term CNS/developmental risk","ask":"Head-to-head juvenile-animal tox (RHEB modulation vs pan-mTOR: immune competence, growth, neurodevelopment) + chronic intrathecal ASO CNS tolerability, plus oEP phenotype normalization"}
+  ],
+  "synthesize": {
+    "recommendation": "Pursue RHEB as a genetic-medicine (ASO / degrader) platform bet on the TSC2–mTOR axis — a research commitment, not a small-molecule program.",
+    "consensus": "Unanimous: RHEB biology is right (node-specific downstream of TSC2, PPI 0.999, 2nd somatic FCD cause) and could spare everolimus's pan-mTOR paediatric liabilities.",
+    "dissent": "Low divergence. Conviction 4 (Denali — sees direct BBB-platform fit) vs 3 (BioMarin, Third Rock, Takeda — gate on modality + paediatric safety). No champion, no veto.",
+    "convergent_gate": "All four independently reframed the target: small-molecule ligandability is the blocker (Boltz-2 pKd 5.4, shallow pocket) → the modality must be ASO/degrader, and CNS delivery + paediatric chronic safety are the real gates.",
+    "proposed_experiment": "Show RHEB knockdown/degradation normalizes the oEP excitability phenotype the moat under-resolved, with a node-specific safety margin vs pan-mTOR and a credible CNS-delivery (BBB) plan for the chosen modality.",
+    "confidence": "Biology: HIGH. Modality / feasibility: CONDITIONAL — reframed from inhibitor to genetic medicine."
+  }
+}

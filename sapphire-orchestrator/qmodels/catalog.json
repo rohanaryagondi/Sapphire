@@ -1,0 +1,12 @@
+{
+  "_note": "Q-Models launchpad catalog (DEMO MOCK). Mirrors the real model launch scripts in the Q-Models repo (github.com/rohanaryagondi/Q-Models, aws/*_eval.py + *_userdata.sh). In the demo these return shaped, labeled-MOCK outputs; in production each entry maps to an AWS GPU launch with the same I/O contract.",
+  "models": [
+    {"id":"boltz-2","task":"binding_affinity","name":"Boltz-2","inputs":["target_seq","ligand_smiles"],"outputs":["pKd","prob_binder","selectivity_vs_offtarget"],"hardware":"GPU (g4dn/g5)","status":"mock","real_script":"aws/boltz_runner.py","note":"AF3-class co-folding + affinity head; the cascade already proved it runs on a T4."},
+    {"id":"admet-ai","task":"admet","name":"ADMET-AI","inputs":["ligand_smiles"],"outputs":["BBB","DILI","hERG","CYP","clearance"],"hardware":"CPU","status":"mock","real_script":"aws/comprehensive_admet_char.py","note":"calibrated ADMET; preferred over MAMMAL ClinTox (Q-Mammal)."},
+    {"id":"cardiogenai","task":"cardiotoxicity","name":"CardioGenAI","inputs":["ligand_smiles"],"outputs":["hERG_risk","Nav1.5_risk","Cav1.2_risk"],"hardware":"GPU","status":"mock","real_script":"aws/cardiogenai_eval.py","note":"cardiac ion-channel liability profiler."},
+    {"id":"cns-dti","task":"dti_triage","name":"CNS DTI head","inputs":["target_seq","ligand_smiles"],"outputs":["binding_prob"],"hardware":"GPU","status":"mock","real_script":"aws/cns_dti_benchmark_eval.py","note":"single-target triage; off-the-shelf ~chance on Nav (Q-Mammal) — Quiver fine-tune is the lever."},
+    {"id":"ionchannel-ft","task":"channel_selectivity","name":"Quiver ion-channel fine-tune","inputs":["target_seq","ligand_smiles","paralog_panel"],"outputs":["selectivity_profile"],"hardware":"GPU","status":"mock","real_script":"aws/ionchannel_finetune_eval.py","note":"QUIVER-DATA fine-tune — the one place a trained head beats off-the-shelf."},
+    {"id":"atomica-dock","task":"docking","name":"ATOMICA dock","inputs":["target_struct","ligand_smiles"],"outputs":["pose","dock_score"],"hardware":"GPU","status":"mock","real_script":"aws/atomica_dock_nav18_eval.py"},
+    {"id":"esm-embed","task":"embedding","name":"ESM-2 / Ankh","inputs":["protein_seq"],"outputs":["embedding","family_cluster"],"hardware":"GPU","status":"mock","real_script":"aws/esm2_big_layer_sweep.py","note":"protein-family embeddings; ties/edges MAMMAL (Q-Mammal)."}
+  ]
+}
