@@ -26,12 +26,14 @@ two-bucket "firm":
   Moderator) + 3 scientific-core fact agents (Internal Science Lead, EMET Analyst, Q-Models Runner) +
   4 institutional partners (ex-FDA Regulator, Adversarial Red-Team, Payer, KOL) + company-partner
   template + dossier schema.
-- **Phase 2 IN PROGRESS:** the **13 semantic (non-scientific) fact agents**. **Built (veto-class):** FDA
-  Institutional Memory ⛔ + Patent/IP ⛔ (`agents/facts/semantic/`). **TODO (11):** global regulatory
-  divergence, DEA scheduling, clinical-trial registry, post-market safety, financial, payer, reputational,
-  patient advocacy, KOL/social, policy/legislative, manufacturing/CMC. Source = Hayes' draft
-  (`SemanticAgentsHayes_Sapphire_6.16.docx`; not in this machine's Downloads as of 6/16 — the two veto
-  agents were built from the documented roster + Phase 1 template, pending Hayes' draft for the rest).
+- **Phase 2 DONE:** all **13 semantic (non-scientific) fact agents** built in `agents/facts/semantic/`
+  (2 veto-class: FDA Institutional Memory ⛔, Patent/IP ⛔; + global regulatory divergence, DEA scheduling,
+  clinical-trial registry, post-market safety, financial, payer, manufacturing/CMC, patient advocacy,
+  KOL/social, policy/legislative, reputational). Built from Hayes' draft
+  (`SemanticAgents/SemanticAgentsHayes_Sapphire_6.16.docx` on `origin/main`) — source lists kept, framing
+  adapted to Quiver CNS; DEA + reputational are project additions beyond Hayes' 11.
+- **Phase 3 TODO:** wire the orchestrator end-to-end (control → Bucket 1 → Bucket 2 → report) on a real
+  scenario; upgrade the `site/` Console to drive it.
 - **Then:** wire the orchestrator end-to-end; upgrade the `site/` Console to drive it.
 
 ## Hard rules (non-negotiable)

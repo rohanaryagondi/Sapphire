@@ -37,9 +37,13 @@ KNOWN UNKNOWNS: agency actions plausibly relevant but not publicly documented
 ```
 
 ## Sources / tools
-FDA primary record: Drugs@FDA, CRL releases, FDA AdComm calendars/transcripts, Federal Register,
-FDA guidance & Warning Letters, openFDA. Published context via the **EMET Analyst interface**.
-Tier all agency records **T1 (regulatory/primary)** for the Research Manager's contradiction logic.
+FDA primary record (per Hayes' draft): Drugs@FDA (approval letters, CRLs, NDA reviews), FDA AdComm
+archive (transcripts, briefing docs, voting records), FDA guidance database, Federal Register, FDA FOIA
+electronic reading room, MedWatch safety communications, Orange/Purple Book, **PDUFA commitment
+letters**, **Breakthrough / Fast Track / Accelerated Approval** designation + confirmatory-trial
+tracking, clinical-pharmacology reviews, import alerts, openFDA. Published context via the **EMET
+Analyst interface**. Tier all agency records **T1 (regulatory/primary)** for the Research Manager's
+contradiction logic.
 
 ## Rules
 - **Veto facts are gates, not kills** (operating rule 6): raise the ⛔ flag, attach evidence, hand to the

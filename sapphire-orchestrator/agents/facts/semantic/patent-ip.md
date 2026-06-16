@@ -40,9 +40,12 @@ KNOWN UNKNOWNS: pending applications, unpublished filings (≤18mo), items needi
 ```
 
 ## Sources / tools
-USPTO (PatFT/AppFT, PTAB), Google Patents, Espacenet, PatentsView, Orange Book, Purple Book.
-Scientific prior-art via the **EMET Analyst interface**. Tier granted patents & Orange/Purple Book
-listings **T1 (primary)**; analyst commentary **T3**.
+Per Hayes' draft: **Lens.org** (free, comprehensive — patent families, expiry, citation graphs),
+USPTO (PatentsView API, full-text, **PTAB** IPR/invalidity filings), Google Patents, Espacenet OPS
+(ex-US legal status), **WIPO PATENTSCOPE** (PCT), Orange Book / Purple Book listings, **ANDA Paragraph
+IV** certification database (contested patents), **PACER** litigation dockets (Markman/invalidity
+rulings), SEC EDGAR 10-K IP-portfolio descriptions. Scientific prior-art via the **EMET Analyst
+interface**. Tier granted patents & Orange/Purple Book listings **T1 (primary)**; analyst commentary **T3**.
 
 ## Rules
 - **Veto facts are gates, not kills** (operating rule 6): raise the ⛔ blocking-patent flag with
