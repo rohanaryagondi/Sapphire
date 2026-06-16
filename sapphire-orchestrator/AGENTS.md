@@ -4,9 +4,10 @@ The orchestrator runs like a **firm**: junior analysts gather facts (Bucket 1), 
 (Bucket 2), and a management layer decides what to run and writes the report. This doc is the index +
 the operating rules. Per-agent specs live under [`agents/`](agents/).
 
-> Status: **Phase 1** (this commit) = the 3 control agents + 3 scientific-core fact agents + 4
-> institutional partners + the [dossier schema](dossier_schema.md). **Phase 2** = the 13 semantic
-> (non-scientific) fact agents from Hayes' draft. Company partners reuse [`../personas/`](../personas/).
+> Status: **Phase 1** done = the 3 control agents + 3 scientific-core fact agents + 4
+> institutional partners + the [dossier schema](dossier_schema.md). **Phase 2 in progress** = the 13
+> semantic (non-scientific) fact agents from Hayes' draft; the 2 veto-class agents (FDA Institutional
+> Memory ⛔, Patent & IP ⛔) are built, 11 remain. Company partners reuse [`../personas/`](../personas/).
 
 ## The two buckets
 
@@ -63,9 +64,11 @@ the operating rules. Per-agent specs live under [`agents/`](agents/).
 | Q-Models Runner | [`agents/facts/scientific/q-models-runner.md`](agents/facts/scientific/q-models-runner.md) |
 
 ### Bucket 1 — semantic intelligence *(Phase 2, from Hayes' draft)*
-FDA Institutional Memory ⛔ · Global Regulatory Divergence · DEA Scheduling · Clinical-Trial Registry
-Intelligence · Post-Market Safety · Patent & IP ⛔ · Financial & Investor · Payer & Market Access ·
-Reputational/Institutional · Patient Advocacy · KOL & Social Signal · Policy & Legislative · Manufacturing/CMC.
+**Built (veto-class first):** [FDA Institutional Memory ⛔](agents/facts/semantic/fda-institutional-memory.md) ·
+[Patent & IP ⛔](agents/facts/semantic/patent-ip.md).
+**TODO (11):** Global Regulatory Divergence · DEA Scheduling · Clinical-Trial Registry Intelligence ·
+Post-Market Safety · Financial & Investor · Payer & Market Access · Reputational/Institutional ·
+Patient Advocacy · KOL & Social Signal · Policy & Legislative · Manufacturing/CMC.
 
 ### Bucket 2 — partners
 - **Company partners** — reuse [`../personas/`](../personas/) via the
