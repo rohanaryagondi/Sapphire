@@ -13,6 +13,11 @@ adds the two pieces the cascade didn't have — an **on-demand compute step (Q-M
 
 > Realizes the architecture in [`../orchestration_brief_hayes.md`](../orchestration_brief_hayes.md)
 > and the user's three-workflow vision (EMET · Q-Models · personas).
+>
+> **The four stages below are the happy-path view.** The full operating model — the two-bucket "firm"
+> (junior analysts → partners), the agent roster, the iterate-until-complete fact loop, contradiction/
+> veto/divergence handling, and the dossier "done" definition — lives in **[`AGENTS.md`](AGENTS.md)**
+> and **[`dossier_schema.md`](dossier_schema.md)**. Start there.
 
 ## The four stages
 
@@ -20,8 +25,8 @@ adds the two pieces the cascade didn't have — an **on-demand compute step (Q-M
 |---|---|---|---|
 | **Discover** | EMET (BenchSci) + internal moat | hypotheses + cited evidence; the ranked candidate list | EMET **live** in the cascade; moat **mock** |
 | **Validate** | [Q-Models launchpad](qmodels/catalog.json) | quantitative predictions (Boltz binding, ADMET, ion-channel selectivity) on the specific pairs Discover surfaced | **mock** (no AWS yet; same I/O contract) |
-| **Consult** | auto-convened [persona panel](agents/persona-panelist.md) | multi-viewpoint verdicts (scientific / commercial / investability / regulatory), grounded in the evidence, dissent surfaced | persona deliberation is **live** (real LLM agents on the real persona files) |
-| **Synthesize** | the [router](agents/front-router.md) | one recommendation + consensus/dissent + confidence + proposed experiment | — |
+| **Consult** | auto-convened roundtable — [company partners](agents/partners/company-partner-template.md) + [institutional partners](agents/partners/institutional/) | multi-viewpoint verdicts (scientific / commercial / investability / regulatory / payer / academic / adversarial), grounded in the dossier, dissent surfaced | persona deliberation is **live** (real LLM agents on the real persona files) |
+| **Synthesize** | the [Engagement Lead](agents/control/engagement-lead.md) (+ [Research Manager](agents/control/research-manager.md), [Moderator](agents/control/roundtable-moderator.md)) | one recommendation + consensus/dissent + confidence + proposed experiment | — |
 
 ## Facts vs. judgment (the key design rule)
 

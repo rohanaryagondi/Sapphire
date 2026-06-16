@@ -1,10 +1,30 @@
-# Sapphire Capability Map
+# Sapphire — Quiver Bioscience
 
-Operationalizes James' Feb-2026 Sapphire prompt corpus the way he laid it out in the 2026-06-11
-meeting: turn **persona -> prompt -> capability -> model/tool -> gap** into a living map of what
-Sapphire must do, what can do it today, how well, and where Quiver should build.
+An agentic CNS drug-discovery **decision system**. A user-facing orchestrator runs a two-bucket "firm":
+**Bucket 1** (fact agents — EMET · Q-Models · the Quiver moat · 13 semantic web agents) builds a cited
+fact dossier; **Bucket 2** (a roundtable of company + institutional persona agents) deliberates; the
+orchestrator reports the facts **and** how each player reacted. Goal: handle the ~300 hard CNS questions
+in James' corpus — and harder.
 
-> **New here? Read [`HANDOFF.md`](HANDOFF.md) first** — single-doc orientation to everything below.
+> **New here?** Read **[`CLAUDE.md`](CLAUDE.md)** (quick orientation) → **[`sapphire-orchestrator/AGENTS.md`](sapphire-orchestrator/AGENTS.md)**
+> (operating model + roster) → **[`HANDOFF.md`](HANDOFF.md)** (full narrative, status, next steps).
+> Work happens on the **`Rohan`** branch.
+
+## Project structure
+- **`sapphire-orchestrator/`** — the core: the agent system (`agents/`), the Q-Models mock (`qmodels/`),
+  worked scenarios, the operating model (`AGENTS.md`) and dossier schema.
+- **`sapphire-cascade/`** — the runnable evidence pipeline (live EMET). **`personas/`** — James' 59 company personas.
+- **`site/`** — interactive walkthrough + the orchestrator Console (demo surface).
+- **Research foundation** — `capability_map.xlsx`, `model_landscape.md`, `integration_map.md`,
+  `orchestration_brief_hayes.md`, `expert-agent/`: what to build, which models, the 3-layer data vision.
+- **`source/` · `meetings/` · `specs/` · `_build/`** — raw corpus, transcripts, design specs, generators.
+
+---
+
+## The research foundation (how this started)
+
+The repo began as the analysis that justifies the build — operationalizing James' Feb-2026 prompt corpus
+into a living map of what Sapphire must do, what can do it today, and where Quiver should build.
 
 ## What's here
 

@@ -4,3 +4,6 @@ __pycache__/
 *.tmp
 
 .playwright-mcp/
+
+# Hayes' semantic-agents source doc lives in Downloads; excluded from this branch by request
+SemanticAgents/
