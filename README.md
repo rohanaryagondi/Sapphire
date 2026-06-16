@@ -16,6 +16,7 @@ Sapphire must do, what can do it today, how well, and where Quiver should build.
 | [`personas/`](personas/) | All 59 personas as markdown (foldered by archetype) + [`INDEX.md`](personas/INDEX.md). The demand source - usable as agent system-personas or to regenerate prompts. |
 | [`expert-agent/`](expert-agent/) | CAP-15 build: [`PROPOSAL.md`](expert-agent/PROPOSAL.md) (the "$50k expert from public posts" design) + a **runnable offline scaffold** (`python expert-agent/run.py "..."`). |
 | [`orchestration_brief_hayes.md`](orchestration_brief_hayes.md) | Strategic brief for Hayes: 4 agentic-orchestration archetypes for Sapphire, grounded in the v3 stack, with a recommended re-ranking-cascade architecture. |
+| [`sapphire-cascade/`](sapphire-cascade/) | **Runnable multi-agent realization of the orchestration brief** — the 3-layer re-ranking cascade (internal moat → context *gate* → predictivity *boost* → uncertainty/abstention) as a 5-agent panel that pulls live, cited evidence from **EMET (BenchSci)**. Two end-to-end **#7→#1** runs ([Nav1.8 pain](sapphire-cascade/scenarios/nav1_8_pain.md), [TSC2](sapphire-cascade/scenarios/tsc2.md)); see [`RUN_LOG.md`](sapphire-cascade/RUN_LOG.md). |
 | [`HANDOFF.md`](HANDOFF.md) | Comprehensive single-doc handoff — start here. |
 | [`meetings/`](meetings/) | The 2026-06-11 strategy meeting transcript + structured notes (+ Granola link). |
 | [`source/`](source/) | James' raw Feb-2026 corpus (59 personas, 299 + 100 prompts, 399 pipelines, tool-frequency PNGs, Quiver context docs) — the inputs everything was built from. |

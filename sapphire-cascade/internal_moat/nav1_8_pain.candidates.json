@@ -1,0 +1,99 @@
+{
+  "_comment": "SYNTHETIC / MOCK internal-moat output. Stands in for a query against Quiver's real fused EP-CRISPR latent space. s_internal, internal_id, provenance, and neighborhood_density are AUTHORED (clearly labeled MOCK). The corroboration sub-scores (genetics/ppi/screen) are transcribed from REAL EMET evidence: L3 corroboration chat d070bf32 (43 sources) and L2 Drug Safety chat eacfaebc. Disease-gene anchors SCN10A (Nav1.8) and SCN9A (Nav1.7) are EXCLUDED as already-prosecuted; the cascade's value is promoting a non-obvious target.",
+  "scenario": "nav1_8_pain",
+  "disease": "neuropathic pain (peripheral sensory-neuron / Nav1.8 (SCN10A) network)",
+  "anchors_excluded": ["SCN10A", "SCN9A"],
+  "evidence_anchors": {
+    "L3_corroboration_chat": "https://app.summit-prod.benchsci.com/chat/d070bf32-5661-4a47-856b-68026d50f0df",
+    "L2_drug_safety_chat": "https://app.summit-prod.benchsci.com/chat/eacfaebc-e60f-4471-bda6-f8fd859135b0"
+  },
+  "scoring": {
+    "corroboration": "0.45*genetics + 0.30*ppi_to_SCN10A + 0.25*functional_screen   (each 0..1, from EMET)",
+    "s_final": "(s_internal + (1 - s_internal) * corroboration) * gate_penalty   (no_go -> removed)",
+    "gate_penalty": {"pass": 1.0, "flag_mild": 0.92, "flag": 0.85, "no_go": "removed"},
+    "gate_mapping_from_emet_class": {"SAFE": "pass", "MONITOR": "flag_mild", "WARNING": "flag", "CRITICAL": "no_go"}
+  },
+  "candidates": [
+    {"rank_internal": 1, "gene": "TRPV1", "internal_id": "QS0pain01", "s_internal": 0.86,
+     "provenance": ["MODEX", "ENS", "PCA"], "neighborhood_density": "dense",
+     "moat_note": "Capsaicin/heat receptor — large, sharp EP current; moat ranks it #1.",
+     "corroboration": {"genetics": 0.05, "ppi": 0.806, "screen": 0.60, "score": 0.414},
+     "emet_safety_class": "WARNING", "gate": "flag", "gate_penalty": 0.85,
+     "gate_evidence": "Class-wide on-target HYPERTHERMIA (mean +0.76 to +1.8 C); every systemic Phase 2 program failed (AMG-517, SB-705498, JNJ-39439335). [L2: PMID 31926897, 38492574, 35968676]",
+     "s_final": 0.780},
+
+    {"rank_internal": 2, "gene": "CACNA2D1", "internal_id": "QS0pain02", "s_internal": 0.83,
+     "provenance": ["MODEX", "PCA"], "neighborhood_density": "dense",
+     "moat_note": "alpha2-delta-1 VGCC subunit — strong Ca-current modulation signal.",
+     "corroboration": {"genetics": 0.05, "ppi": 0.710, "screen": 0.80, "score": 0.436},
+     "emet_safety_class": "CRITICAL", "gate": "no_go", "gate_penalty": "removed",
+     "gate_evidence": "FDA black-box (2019) respiratory depression; 267K/360K FAERS reports; 4,569 fatal pregabalin outcomes; Schedule V abuse liability. On-target, ubiquitous CNS expression. [L2: PMID 28972983, 28493329; FDA 2019]",
+     "s_final": null},
+
+    {"rank_internal": 3, "gene": "TRPA1", "internal_id": "QS0pain03", "s_internal": 0.80,
+     "provenance": ["MODEX", "ENS", "PCA"], "neighborhood_density": "dense",
+     "moat_note": "Irritant-evoked current — strong EP signature; genuinely strong target.",
+     "corroboration": {"genetics": 0.65, "ppi": 0.763, "screen": 0.90, "score": 0.746},
+     "emet_safety_class": "(not in L2 panel)", "gate": "flag_mild", "gate_penalty": 0.92,
+     "gate_evidence": "Broadly-tuned chemosensor expressed beyond nociceptors (airway, vascular) -> systemic selectivity concern. [L3: FEPS1 N855S; broad hub edges]",
+     "s_final": 0.873},
+
+    {"rank_internal": 4, "gene": "P2RX3", "internal_id": "QS0pain04", "s_internal": 0.78,
+     "provenance": ["MODEX", "ENS"], "neighborhood_density": "moderate",
+     "moat_note": "ATP-gated current in C-fibres — strong EP signature.",
+     "corroboration": {"genetics": 0.05, "ppi": 0.657, "screen": 0.60, "score": 0.370},
+     "emet_safety_class": "MONITOR", "gate": "flag_mild", "gate_penalty": 0.92,
+     "gate_evidence": "Dose-limiting dysgeusia 58-69% at 45mg BID (gefapixant COUGH-1/2); FDA CRL 2023; no life-threatening tox. Primary validated indication is cough, not pain. [L2: PMID 35248186, 36879087, 40430576]",
+     "s_final": 0.793},
+
+    {"rank_internal": 5, "gene": "NGF", "internal_id": "QS0pain05", "s_internal": 0.74,
+     "provenance": ["LINCS", "ENS"], "neighborhood_density": "moderate",
+     "moat_note": "NGF ligand — strong CRISPR-perturbation signal (KO collapses nociceptor program).",
+     "corroboration": {"genetics": 0.788, "ppi": 0.627, "screen": 0.85, "score": 0.756},
+     "emet_safety_class": "CRITICAL", "gate": "no_go", "gate_penalty": "removed",
+     "gate_evidence": "Anti-NGF (tanezumab/fasinumab) -> rapidly progressive osteoarthritis (2-7%), osteonecrosis, joint replacement; FDA holds 2010/2012; NDA rejected 2021. [L2: PMID 37652258, 26554876; NCT02697773]",
+     "s_final": null},
+
+    {"rank_internal": 6, "gene": "KCNQ2", "internal_id": "QS0pain06", "s_internal": 0.70,
+     "provenance": ["MODEX", "ENS"], "neighborhood_density": "moderate",
+     "moat_note": "Kv7.2 M-current — EP signature, but primarily a seizure/DEE gene.",
+     "corroboration": {"genetics": 0.05, "ppi": 0.40, "screen": 0.40, "score": 0.243},
+     "emet_safety_class": "WARNING", "gate": "flag", "gate_penalty": 0.85,
+     "gate_evidence": "Kv7 opener retigabine/ezogabine WITHDRAWN worldwide 2017 (blue pigmentation, retinal toxicity, urinary retention); CNS seizure-gene context. [L2: PMID 25642319; FDA 2013]",
+     "s_final": 0.657},
+
+    {"rank_internal": 7, "gene": "SCN11A", "internal_id": "QS0pain07", "s_internal": 0.62,
+     "provenance": ["MODEX", "PLATINUM"], "neighborhood_density": "sparse",
+     "moat_note": "Nav1.9: ultra-slow, non-inactivating PERSISTENT Na+ current is hard to resolve in the optical-EP assay -> the moat UNDER-DETECTS it and ranks it #7. EMET independently notes its 'ultra-slow kinetic profile.' THIS IS THE TARGET TO WATCH.",
+     "corroboration": {"genetics": 0.887, "ppi": 0.630, "screen": 0.50, "score": 0.713},
+     "emet_safety_class": "SAFE", "gate": "pass", "gate_penalty": 1.0,
+     "gate_evidence": "Most favorable safety profile in the panel: restricted peripheral expression (low CNS), GoF genetics validate analgesia, LoF tolerable (pain insensitivity WITHOUT anhidrosis/autonomic failure, unlike CIPA). No clinical inhibitor toxicities on record. [L2: PMID 26243570, 26746779, 31551682]",
+     "s_final": 0.891, "target_to_watch": true},
+
+    {"rank_internal": 8, "gene": "NTRK1", "internal_id": "QS0pain08", "s_internal": 0.55,
+     "provenance": ["LINCS", "PCA"], "neighborhood_density": "sparse",
+     "moat_note": "TrkA receptor tyrosine kinase — no direct channel EP signature; indirect/transcriptional excitability signal only.",
+     "corroboration": {"genetics": 0.941, "ppi": 0.54, "screen": 0.85, "score": 0.798},
+     "emet_safety_class": "WARNING", "gate": "flag", "gate_penalty": 0.85,
+     "gate_evidence": "CIPA (complete LoF) phenotype predicts anhidrosis (life-threatening hyperthermia), bone fragility, sympathetic failure; shares anti-NGF RPOA liability; CNS-penetrant TRK effects. [L2: PMID 37869783, 26554876]",
+     "s_final": 0.773},
+
+    {"rank_internal": 9, "gene": "PRDM12", "internal_id": "QS0pain09", "s_internal": 0.46,
+     "provenance": ["LINCS"], "neighborhood_density": "sparse",
+     "moat_note": "Developmental transcription factor — no effector EP signature.",
+     "corroboration": {"genetics": 0.88, "ppi": 0.10, "screen": 0.50, "score": 0.551},
+     "emet_safety_class": "(no drug)", "gate": "pass", "gate_penalty": 1.0,
+     "gate_evidence": "No safety veto, BUT a developmental regulator, not a druggable adult-pain effector (EMET: 'not a pharmacological target in adult pain'); no direct STRING edge to SCN10A. -> uncertainty/abstention candidate.",
+     "s_final": 0.758, "abstain": true}
+  ],
+  "expected_final_ranking": [
+    {"rank": 1, "gene": "SCN11A", "s_final": 0.891, "was_internal": 7, "note": "#7 -> #1: SAFE + strong Mendelian genetics; moat under-resolved its persistent current"},
+    {"rank": 2, "gene": "TRPA1", "s_final": 0.873, "was_internal": 3},
+    {"rank": 3, "gene": "P2RX3", "s_final": 0.793, "was_internal": 4},
+    {"rank": 4, "gene": "TRPV1", "s_final": 0.780, "was_internal": 1, "note": "#1 -> #4: hyperthermia flag"},
+    {"rank": 5, "gene": "NTRK1", "s_final": 0.773, "was_internal": 8},
+    {"rank": 6, "gene": "PRDM12", "s_final": 0.758, "was_internal": 9, "note": "ABSTAIN — not druggable"},
+    {"rank": 7, "gene": "KCNQ2", "s_final": 0.657, "was_internal": 6},
+    {"removed": ["CACNA2D1 (CRITICAL no-go)", "NGF (CRITICAL no-go)"]}
+  ]
+}
