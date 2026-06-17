@@ -24,48 +24,34 @@
   </nav>
 </header>
 
-<!-- CONSOLE HERO -->
-<section class="console-hero">
-  <svg class="hero-trace" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
-    <path id="epTrace" d="" fill="none" stroke="var(--signal)" stroke-width="1.6" />
-    <path id="epTrace2" d="" fill="none" stroke="var(--signal-dim)" stroke-width="1" />
-  </svg>
-  <div class="hero-inner">
-    <p class="eyebrow">CNS discovery decision system &middot; Claude under the hood</p>
-    <h1 class="hero-title">Ask <em>Sapphire</em>.</h1>
-    <p class="hero-lede">
-      One engagement lead turns your question into a plan, then runs a two-bucket firm — junior analysts
-      gather a <b>cited fact dossier</b> (EMET, Q-Models, 13 semantic agents), partners <b>deliberate</b> —
-      and returns a recommendation with the dissent intact. The moat reasons first; external tools only
-      <em>gate</em> then <em>boost</em>. <a href="explainer.html">See the full flow &rarr;</a>
-    </p>
-  </div>
+<section class="console-head">
+  <p class="eyebrow">CNS discovery decision system &middot; Claude under the hood</p>
+  <h1 class="console-title">Ask <em>Sapphire</em>.</h1>
+  <p class="console-sub">A two-bucket firm: junior analysts gather a cited fact dossier, partners deliberate. The moat reasons first; external tools only <em>gate</em> then <em>boost</em>. Every fact shows where it came from. <a href="explainer.html">See the full flow &rarr;</a></p>
 </section>
 
-<!-- CONSOLE -->
-<section id="console" class="band console-main">
-  <div class="orch">
-    <div class="orch-bar">
-      <div class="orch-tabs" id="orchTabs"></div>
-      <button class="run-btn" id="orchRun"><span class="run-dot"></span> Run Sapphire</button>
+<!-- CHAT + INSPECTOR -->
+<main class="chat-shell">
+  <section class="chat-pane" aria-label="conversation">
+    <div class="chat-thread" id="chatThread"></div>
+    <div class="chat-inputbar">
+      <div class="chat-presets" id="chatPresets"></div>
+      <div class="chat-entry">
+        <textarea id="chatInput" rows="1" placeholder="Ask Sapphire — e.g. prioritize Nav1.8 pain targets, or is RHEB fundable for TSC?"></textarea>
+        <button id="chatSend" class="run-btn"><span class="run-dot"></span> Send</button>
+      </div>
     </div>
-    <div class="orch-intake">
-      <span class="oq-mark">QUERY</span>
-      <input id="orchInput" class="orch-input" type="text" autocomplete="off" spellcheck="false"
-        placeholder="Ask Sapphire — e.g. prioritize Nav1.8 pain targets, or is RHEB fundable for TSC?" />
-    </div>
-    <p class="orch-route" id="orchRoute"></p>
-    <div class="orch-flow" id="orchFlow"></div>
-    <div class="loop-note">
-      <span class="loop-ico" aria-hidden="true">&#8635;</span>
-      <span>Two shipped scenarios run instantly from the engine. A novel question routes to <b>Claude on your subscription</b> (when the local bridge is running) — or shows the engagement plan and falls back to the worked scenarios on static hosting.</span>
-    </div>
-  </div>
-</section>
+  </section>
+
+  <aside class="inspector" aria-label="inspector">
+    <div class="insp-card insp-systems" id="inspSystems"></div>
+    <div class="insp-card insp-run" id="inspRun"></div>
+  </aside>
+</main>
 
 <footer class="foot">
   <span>Sapphire orchestrator &middot; the firm: junior analysts &rarr; partners &middot; Claude under the hood</span>
-  <span class="foot-honesty">Internal moat &amp; Q-Models are <b>MOCK</b> in the demo; EMET &amp; personas are live. Facts are cited; opinions cite the facts.</span>
+  <span class="foot-honesty">Provenance is shown per fact: <b>✓ EMET</b> (captured) &middot; <b>◇ Claude</b> (reconstructed) &middot; <b>◍ mock</b> (Q-Models / moat). Opinions cite the facts.</span>
 </footer>
 
 <script src="orchestrator_data.js"></script>

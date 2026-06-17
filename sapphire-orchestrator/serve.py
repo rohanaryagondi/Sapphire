@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import sys
 import urllib.parse
@@ -106,6 +107,73 @@ RUN_SCHEMA = {
 }
 
 
+# follow-up answer schema (grounded chat reply, no new run)
+FOLLOWUP_SCHEMA = {
+    "type": "object", "additionalProperties": False, "required": ["text"],
+    "properties": {"text": {"type": "string"}, "cites": {"type": "array", "items": {"type": "string"}}},
+}
+
+GENE_RE = re.compile(r"\b[A-Z][A-Z0-9]{2,}\b")
+ENGAGEMENT_KW = ("prioriti", "rank", "triage", "fundable", "diligence", "trial", "go/no-go",
+                 "portfolio", "franchise", "validate", "de-risk", "target list", "should we")
+
+
+def _looks_like_engagement(msg: str) -> bool:
+    """Fresh engagement (run the firm) vs follow-up (answer over the current dossier)."""
+    m = msg.lower()
+    if any(k in m for k in ENGAGEMENT_KW):
+        return True
+    if ENGINE.triage(msg)["disease"]:
+        return True
+    return bool(GENE_RE.search(msg))   # a gene-like token (SCN11A, RHEB, KCNQ2…) names a new target
+
+
+def _provenance_for(source: str, origin: str) -> str:
+    s = (source or "").lower()
+    if any(k in s for k in ("mock", "q-models", "moat")):
+        return "mock"
+    if origin == "live":
+        return "claude"          # web live runs never query EMET — facts are Claude's reconstruction
+    return "emet" if "emet" in s else "other"
+
+
+def _stamp(run: dict, origin: str) -> dict:
+    """Tag every dossier fact with its true provenance; mark the run origin."""
+    for f in run.get("discover", {}).get("dossier", []):
+        f["provenance"] = _provenance_for(f.get("source", ""), origin)
+    run["origin"] = origin       # 'captured' (shipped scenario) | 'live' (claude reconstruction)
+    return run
+
+
+def _follow_up(message: str, dossier: list, history: list) -> dict:
+    """A grounded conversational reply over the CURRENT dossier — no new run."""
+    ctx = "\n".join(f"- {f.get('field')}: {f.get('value')} [{f.get('source')}]" for f in (dossier or [])[:14])
+    hist = "\n".join(f"{h.get('role')}: {h.get('content')}" for h in (history or [])[-6:])
+    prompt = f"""You are the Sapphire Orchestrator answering a FOLLOW-UP in an ongoing conversation.
+Answer ONLY from the current fact dossier below — these are the established facts; do not invent new
+ones. If the dossier doesn't cover it, say so plainly and name the agent/tool that would have to run.
+Concise (2–5 sentences). List the dossier fields you used in "cites".
+
+CURRENT DOSSIER:
+{ctx or '(no dossier yet — ask for a target prioritization first)'}
+
+RECENT CONVERSATION:
+{hist or '(none)'}
+
+FOLLOW-UP: {message}"""
+    cmd = [CLAUDE_BIN, "-p", prompt, "--output-format", "json", "--json-schema", json.dumps(FOLLOWUP_SCHEMA)]
+    if CLAUDE_MODEL:
+        cmd += ["--model", CLAUDE_MODEL]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=CLAUDE_TIMEOUT, cwd=ROOT)
+        env = json.loads(proc.stdout)
+        body = env.get("structured_output") or {"text": env.get("result", "")}
+        model = (env.get("modelUsage") and list(env["modelUsage"].keys())[0]) or "claude (subscription)"
+        return {"kind": "reply", "text": body.get("text", ""), "cites": body.get("cites", []), "live": True, "model": model}
+    except Exception as e:
+        return {"kind": "reply", "text": f"(Live brain unavailable: {type(e).__name__}. Start serve.py to enable follow-ups.)", "cites": [], "live": False}
+
+
 def _prompt(query: str, plan: dict) -> str:
     panel = "; ".join(f"{s['lens']}: {s['persona']}" for s in plan["panel"])
     return f"""You are the Sapphire Orchestrator — Quiver Bioscience's CNS drug-discovery decision firm.
@@ -129,8 +197,10 @@ Produce the four downstream stages, obeying these NON-NEGOTIABLE rules:
 - Personas in round1 each give a verdict (stance: champion|conditional|skeptic|veto; conviction 1-5).
   In round2, each is shown the others and revises or holds with a reason. No forced consensus.
 - If evidence is thin or contradictory, ABSTAIN in synthesis and propose the resolving experiment.
-- Public identifiers only; never fabricate a PMID — cite a source type (e.g. "EMET / GWAS Catalog") if
-  you don't know the exact id. Keep every string concise (one to three sentences)."""
+- HONESTY: you are NOT querying EMET or Q-Models live in this web run — the dossier facts are your own
+  reconstruction from training. Do not claim a fact came from a live database hit; the UI labels these
+  as Claude-reconstructed. Public identifiers only; never fabricate a PMID — cite a source TYPE
+  (e.g. "EMET / GWAS Catalog") if you don't know the exact id. Keep every string concise (1–3 sentences)."""
 
 
 def _run_live(query: str) -> dict:
@@ -161,7 +231,7 @@ def _run_live(query: str) -> dict:
            "discover": body["discover"], "validate": body["validate"],
            "consult": body["consult"], "synthesize": body["synthesize"],
            "via": "claude-subscription", "live": True, "model": model}
-    return run
+    return _stamp(run, "live")
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -182,7 +252,9 @@ class Handler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/health":
             have = _claude_available()
             return self._json({"live": have, "model": CLAUDE_MODEL or "subscription default (Opus)",
-                               "scenarios": list(SCENARIOS)})
+                               "scenarios": list(SCENARIOS),
+                               "subsystems": {"claude": "live" if have else "down",
+                                              "emet": "not-wired", "qmodels": "mock", "moat": "mock"}})
         if parsed.path == "/api/run":
             q = urllib.parse.parse_qs(parsed.query).get("q", [""])[0].strip()
             if not q:
@@ -191,11 +263,44 @@ class Handler(SimpleHTTPRequestHandler):
             from orchestrator import DISEASE_TO_SCENARIO
             sid = DISEASE_TO_SCENARIO.get(tri["disease"])
             if sid:
-                run = ENGINE.run(sid)
+                run = _stamp(ENGINE.run(sid), "captured")
                 run.update({"via": "engine", "live": False, "_routed_from_query": q})
                 return self._json(run)
             return self._json(_run_live(q))
         return super().do_GET()
+
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path != "/api/chat":
+            return self._json({"error": "not found"}, 404)
+        length = int(self.headers.get("Content-Length", "0") or 0)
+        try:
+            req = json.loads(self.rfile.read(length) or "{}")
+        except json.JSONDecodeError:
+            return self._json({"error": "bad json"}, 400)
+        msg = (req.get("message") or "").strip()
+        if not msg:
+            return self._json({"error": "missing message"}, 400)
+        history = req.get("history") or []
+        dossier = req.get("current_dossier") or []
+
+        # follow-up vs fresh engagement
+        if dossier and not _looks_like_engagement(msg):
+            return self._json(_follow_up(msg, dossier, history))
+
+        from orchestrator import DISEASE_TO_SCENARIO
+        sid = DISEASE_TO_SCENARIO.get(ENGINE.triage(msg)["disease"])
+        if sid:
+            run = _stamp(ENGINE.run(sid), "captured")
+            run.update({"via": "engine", "live": False})
+            return self._json({"kind": "run", "run": run, "live": False, "via": "engine"})
+        live = _run_live(msg)
+        if live.get("live") and "discover" in live:
+            return self._json({"kind": "run", "run": live, "live": True,
+                               "via": "claude-subscription", "model": live.get("model")})
+        # live brain unavailable → reply with the engagement plan note
+        return self._json({"kind": "reply", "text": live.get("note", "Live brain unavailable."),
+                           "plan": live.get("plan"), "cites": [], "live": False})
 
     def log_message(self, fmt, *args):
         if "/api/" in (args[0] if args else ""):
