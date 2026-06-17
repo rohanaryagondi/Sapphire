@@ -50,9 +50,29 @@ The router reads the question + disease area and convenes a 3–5 persona panel 
 Both panels are real persona-agent runs (4 personas each) grounded in the cascade's cited EMET
 evidence + the Q-Models mock outputs.
 
+## Run it (end-to-end)
+
+The pipeline is a runnable engine — [`orchestrator.py`](orchestrator.py) — not just specs. The control
+flow, dossier rules (completeness / contradiction-by-tier / VETO / DIVERGENCE), panel seating, the
+two-round roundtable, and synthesis are all real, computed code; facts + persona verdicts come from the
+captured scenario evidence (live EMET + Q-Models mock + real persona deliberation) — or from live agents
+on a novel query.
+
+```bash
+python sapphire-orchestrator/run.py                 # list scenarios
+python sapphire-orchestrator/run.py nav1_8          # full run: PLAN → DISCOVER(dossier) → VALIDATE → CONSULT(2 rounds) → SYNTHESIZE
+python sapphire-orchestrator/run.py "is RHEB fundable for tuberous sclerosis?"   # free text → routed
+python sapphire-orchestrator/run.py --json tsc2     # the canonical run object the site consumes
+```
+
+For a **novel** query with live EMET + persona agents, drive it via the **`/sapphire`** skill (the
+planner is live for any query; Bucket 1/2 run the cascade + persona subagents).
+
 ## See it
-The interactive visualization is the **Console** section of the site
-([`../site/`](../site/)) — run `python -m http.server` there and open the Console tab.
+The interactive visualization is the **Console** section of the site ([`../site/`](../site/)):
+`cd site && python -m http.server 8077`, open `#console`. The Console renders exactly what the engine
+produces — `_build/build_orch_data.py` runs `orchestrator.py` to generate `site/orchestrator_data.js`.
+Type a question or pick a worked scenario; the planner scopes any query live.
 
 ## Demo vs. production
 - **Now (demo):** EMET live (cascade), Q-Models mocked, personas live, internal moat mocked.

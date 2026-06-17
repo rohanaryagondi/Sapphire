@@ -108,14 +108,19 @@
   <div class="band-head">
     <span class="sec-no">05</span>
     <h2>The orchestrator, live</h2>
-    <p>One front router turns a question into four stages: <em>Discover</em> (EMET) &rarr; <em>Validate</em> (Q-Models) &rarr; <em>Consult</em> (auto-convened persona panel) &rarr; <em>Synthesize</em>. Pick a scenario and run it.</p>
+    <p>One engagement lead turns a question into a plan, then runs the firm: <em>Plan</em> &rarr; <em>Discover</em> (EMET &rarr; fact dossier) &rarr; <em>Validate</em> (Q-Models) &rarr; <em>Consult</em> (auto-convened roundtable, two rounds) &rarr; <em>Synthesize</em>. Type a question or pick a worked scenario.</p>
   </div>
   <div class="orch">
     <div class="orch-bar">
       <div class="orch-tabs" id="orchTabs"></div>
       <button class="run-btn" id="orchRun"><span class="run-dot"></span> Run Sapphire</button>
     </div>
-    <p class="orch-query" id="orchQuery"></p>
+    <div class="orch-intake">
+      <span class="oq-mark">QUERY</span>
+      <input id="orchInput" class="orch-input" type="text" autocomplete="off" spellcheck="false"
+        placeholder="Ask Sapphire — e.g. prioritize Nav1.8 pain targets, or is RHEB fundable for TSC?" />
+    </div>
+    <p class="orch-route" id="orchRoute"></p>
     <div class="orch-flow" id="orchFlow"></div>
   </div>
 </section>

@@ -7,7 +7,10 @@ the operating rules. Per-agent specs live under [`agents/`](agents/).
 > Status: **Phase 1 + Phase 2 done.** Phase 1 = 3 control agents + 3 scientific-core fact agents + 4
 > institutional partners + the [dossier schema](dossier_schema.md). Phase 2 = all **13 semantic
 > (non-scientific) fact agents** built (from Hayes' draft + 2 project additions). Company partners reuse
-> [`../personas/`](../personas/). **Next:** wire the orchestrator end-to-end + upgrade the `site/` Console.
+> [`../personas/`](../personas/). **Phase 3 done:** the orchestrator runs end-to-end —
+> [`orchestrator.py`](orchestrator.py) + [`run.py`](run.py) execute control → Bucket 1 (dossier) →
+> Bucket 2 (two-round roundtable) → synthesis; the `site/` Console drives it live (real query intake,
+> PLAN/dossier/round-2 stages). Run: `python run.py nav1_8`, or the `/sapphire` skill for a live query.
 
 ## The two buckets
 

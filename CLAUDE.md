@@ -32,8 +32,16 @@ two-bucket "firm":
   KOL/social, policy/legislative, reputational). Built from Hayes' draft
   (`SemanticAgents/SemanticAgentsHayes_Sapphire_6.16.docx` on `origin/main`) — source lists kept, framing
   adapted to Quiver CNS; DEA + reputational are project additions beyond Hayes' 11.
-- **Phase 3 TODO:** wire the orchestrator end-to-end (control → Bucket 1 → Bucket 2 → report) on a real
-  scenario; upgrade the `site/` Console to drive it.
+- **Phase 3 DONE:** the orchestrator runs end-to-end. `sapphire-orchestrator/orchestrator.py` is the
+  engine (real triage→scope→plan, Bucket-1 dossier with Research-Manager completeness/contradiction/
+  VETO/DIVERGENCE rules, Bucket-2 two-round roundtable + spread, synthesis); `run.py` is the CLI
+  (`python run.py nav1_8` | `"free text"` | `--json`). The `site/` Console is the front face — real
+  query intake + a JS planner mirror (PLAN stage for any query), dossier with tier/flag chips, and the
+  round-1→round-2 rebuttal. `_build/build_orch_data.py` runs the engine to generate the Console data
+  (one source of truth). The `/sapphire` skill drives a live query (planner → cascade/EMET → Q-Models →
+  persona subagents → synthesis). Facts MOCK where labeled (Q-Models, internal moat); EMET + personas live.
+- **Phase 4 ideas (TODO):** wire Q-Models to real AWS launches; swap the mock moat for the real Quiver
+  latent space; capture more `scenarios/*.json`; add the cross-engagement memory / active-learning loop.
 - **Then:** wire the orchestrator end-to-end; upgrade the `site/` Console to drive it.
 
 ## Hard rules (non-negotiable)
