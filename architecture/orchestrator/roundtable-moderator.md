@@ -11,7 +11,7 @@ honest — verdicts then a rebuttal round, no forced consensus.
 
 ## Procedure
 1. **Seat the panel.** Confirm/adjust 3–7 partners for *this* prompt — one per relevant lens, drawn
-   from company personas ([template](../partners/company-partner-template.md)) + institutional
+   from company personas ([template](../bucket2/company-partner-template.md)) + institutional
    archetypes (regulator, payer, KOL, red-team). Always seat the **Red-Team**. Disease-match the CSO.
 2. **Round 1 — independent verdicts.** Each partner returns its verdict object (stance · conviction ·
    headline · rationale grounded in the dossier · top risk · ask), in character, in isolation.

@@ -2,7 +2,7 @@
 
 The orchestrator runs like a **firm**: junior analysts gather facts (Bucket 1), partners deliberate
 (Bucket 2), and a management layer decides what to run and writes the report. This doc is the index +
-the operating rules. Per-agent specs live under [`agents/`](agents/).
+the operating rules. Per-agent specs now live under [`/architecture/`](../architecture/) — `orchestrator/`, `bucket1/`, `bucket2/`, each with its own README.
 
 > Status: **Phase 1 + Phase 2 done.** Phase 1 = 3 control agents + 3 scientific-core fact agents + 4
 > institutional partners + the [dossier schema](dossier_schema.md). Phase 2 = all **13 semantic
@@ -55,32 +55,32 @@ the operating rules. Per-agent specs live under [`agents/`](agents/).
 ### Control layer
 | Agent | File | Owns |
 |---|---|---|
-| Engagement Lead | [`agents/control/engagement-lead.md`](agents/control/engagement-lead.md) | plan · route · activate-only-needed · own the loop · deliver report |
-| Research Manager | [`agents/control/research-manager.md`](agents/control/research-manager.md) | Bucket-1 completeness · contradiction/gap/veto handling · re-run orders |
-| Roundtable Moderator | [`agents/control/roundtable-moderator.md`](agents/control/roundtable-moderator.md) | convene partners · verdicts → rebuttal · route fact-requests |
+| Engagement Lead | [`../architecture/orchestrator/engagement-lead.md`](../architecture/orchestrator/engagement-lead.md) | plan · route · activate-only-needed · own the loop · deliver report |
+| Research Manager | [`../architecture/orchestrator/research-manager.md`](../architecture/orchestrator/research-manager.md) | Bucket-1 completeness · contradiction/gap/veto handling · re-run orders |
+| Roundtable Moderator | [`../architecture/orchestrator/roundtable-moderator.md`](../architecture/orchestrator/roundtable-moderator.md) | convene partners · verdicts → rebuttal · route fact-requests |
 
 ### Bucket 1 — scientific core
 | Agent | File |
 |---|---|
-| Internal Science Lead (moat) | [`agents/facts/scientific/internal-science-lead.md`](agents/facts/scientific/internal-science-lead.md) |
-| EMET Analyst (+ EMET interface) | [`agents/facts/scientific/emet-analyst.md`](agents/facts/scientific/emet-analyst.md) |
-| Q-Models Runner | [`agents/facts/scientific/q-models-runner.md`](agents/facts/scientific/q-models-runner.md) |
+| Internal Science Lead (moat) | [`../architecture/bucket1/scientific/internal-science-lead.md`](../architecture/bucket1/scientific/internal-science-lead.md) |
+| EMET Analyst (+ EMET interface) | [`../architecture/bucket1/scientific/emet-analyst.md`](../architecture/bucket1/scientific/emet-analyst.md) |
+| Q-Models Runner | [`../architecture/bucket1/scientific/q-models-runner.md`](../architecture/bucket1/scientific/q-models-runner.md) |
 
 ### Bucket 1 — semantic intelligence *(Phase 2 — all 13 built, from Hayes' draft + 2 project additions)*
 Each maps to dossier fields (see `dossier_schema.md`). Two carry ⛔ veto power.
-- **Veto-class:** [FDA Institutional Memory ⛔](agents/facts/semantic/fda-institutional-memory.md) (C3/D2) ·
-  [Patent & IP ⛔](agents/facts/semantic/patent-ip.md) (E1)
-- **Regulatory/clinical:** [Global Regulatory Divergence](agents/facts/semantic/global-regulatory-divergence.md) (D3) ·
-  [DEA Scheduling](agents/facts/semantic/dea-scheduling.md) (D4) ·
-  [Clinical-Trial Registry](agents/facts/semantic/clinical-trial-registry.md) (D1) ·
-  [Post-Market Safety](agents/facts/semantic/post-market-safety.md) (C1/C2)
-- **Commercial:** [Financial & Investor](agents/facts/semantic/financial-investor.md) (E2) ·
-  [Payer & Market Access](agents/facts/semantic/payer-market-access.md) (E4) ·
-  [Manufacturing/CMC](agents/facts/semantic/manufacturing-cmc.md) (E5)
-- **Ecosystem/perception:** [Patient Advocacy](agents/facts/semantic/patient-advocacy.md) (F1) ·
-  [KOL & Social Signal](agents/facts/semantic/kol-social-signal.md) (F2) ·
-  [Policy & Legislative](agents/facts/semantic/policy-legislative.md) (F3) ·
-  [Reputational/Institutional](agents/facts/semantic/reputational-institutional.md) (F4, project addition)
+- **Veto-class:** [FDA Institutional Memory ⛔](../architecture/bucket1/semantic/fda-institutional-memory.md) (C3/D2) ·
+  [Patent & IP ⛔](../architecture/bucket1/semantic/patent-ip.md) (E1)
+- **Regulatory/clinical:** [Global Regulatory Divergence](../architecture/bucket1/semantic/global-regulatory-divergence.md) (D3) ·
+  [DEA Scheduling](../architecture/bucket1/semantic/dea-scheduling.md) (D4) ·
+  [Clinical-Trial Registry](../architecture/bucket1/semantic/clinical-trial-registry.md) (D1) ·
+  [Post-Market Safety](../architecture/bucket1/semantic/post-market-safety.md) (C1/C2)
+- **Commercial:** [Financial & Investor](../architecture/bucket1/semantic/financial-investor.md) (E2) ·
+  [Payer & Market Access](../architecture/bucket1/semantic/payer-market-access.md) (E4) ·
+  [Manufacturing/CMC](../architecture/bucket1/semantic/manufacturing-cmc.md) (E5)
+- **Ecosystem/perception:** [Patient Advocacy](../architecture/bucket1/semantic/patient-advocacy.md) (F1) ·
+  [KOL & Social Signal](../architecture/bucket1/semantic/kol-social-signal.md) (F2) ·
+  [Policy & Legislative](../architecture/bucket1/semantic/policy-legislative.md) (F3) ·
+  [Reputational/Institutional](../architecture/bucket1/semantic/reputational-institutional.md) (F4, project addition)
 
 > Hayes' draft framed these on a psychedelics example (MM-120); the source lists are kept and the framing
 > adapted to Quiver's CNS context. DEA Scheduling + Reputational/Institutional are the project's two
@@ -88,11 +88,11 @@ Each maps to dossier fields (see `dossier_schema.md`). Two carry ⛔ veto power.
 
 ### Bucket 2 — partners
 - **Company partners** — reuse [`../personas/`](../personas/) via the
-  [company-partner template](agents/partners/company-partner-template.md): Pharma BD · Biotech CSO · VC GP · Pharma R&D SVP.
-- **Institutional archetypes** (net-new): [Ex-FDA Regulator](agents/partners/institutional/ex-fda-regulator.md) ·
-  [Adversarial Red-Team](agents/partners/institutional/adversarial-red-team.md) ·
-  [Payer / Market-Access](agents/partners/institutional/payer-market-access.md) ·
-  [KOL / Academic](agents/partners/institutional/kol-academic.md).
+  [company-partner template](../architecture/bucket2/company-partner-template.md): Pharma BD · Biotech CSO · VC GP · Pharma R&D SVP.
+- **Institutional archetypes** (net-new): [Ex-FDA Regulator](../architecture/bucket2/institutional/ex-fda-regulator.md) ·
+  [Adversarial Red-Team](../architecture/bucket2/institutional/adversarial-red-team.md) ·
+  [Payer / Market-Access](../architecture/bucket2/institutional/payer-market-access.md) ·
+  [KOL / Academic](../architecture/bucket2/institutional/kol-academic.md).
 - **Modality specialists** *(later, as needed)*: ASO · gene-therapy · small-molecule chemist.
 
 ## Agent file format (the template every spec follows)

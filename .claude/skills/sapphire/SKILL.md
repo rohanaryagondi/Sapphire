@@ -30,8 +30,8 @@ control logic and live agents for the facts/judgment:
 3. **VALIDATE (mock today).** Apply the Q-Models contract from `qmodels/catalog.json` to the top
    candidate (binding / selectivity / ADMET). Label outputs MOCK (prod = AWS launch, same contract).
 4. **CONSULT (live).** Seat the panel from the plan. Dispatch **one subagent per partner**, each
-   loading its persona file from `personas/` (via `agents/partners/company-partner-template.md`) +
-   the institutional archetypes in `agents/partners/institutional/`. Round 1: independent verdict
+   loading its persona file from `personas/` (via `architecture/bucket2/company-partner-template.md`) +
+   the institutional archetypes in `architecture/bucket2/institutional/`. Round 1: independent verdict
    objects (the verdict contract). Round 2: show each the others' verdicts → revise/hold with reason.
    Always seat the Red-Team. Partners cite the dossier; never invent facts (route fact-requests back).
 5. **SYNTHESIZE (you, as Engagement Lead).** Recommendation + consensus + dissent + the convergent

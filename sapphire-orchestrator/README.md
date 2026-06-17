@@ -25,8 +25,8 @@ adds the two pieces the cascade didn't have — an **on-demand compute step (Q-M
 |---|---|---|---|
 | **Discover** | EMET (BenchSci) + internal moat | hypotheses + cited evidence; the ranked candidate list | EMET **live** in the cascade; moat **mock** |
 | **Validate** | [Q-Models launchpad](qmodels/catalog.json) | quantitative predictions (Boltz binding, ADMET, ion-channel selectivity) on the specific pairs Discover surfaced | **mock** (no AWS yet; same I/O contract) |
-| **Consult** | auto-convened roundtable — [company partners](agents/partners/company-partner-template.md) + [institutional partners](agents/partners/institutional/) | multi-viewpoint verdicts (scientific / commercial / investability / regulatory / payer / academic / adversarial), grounded in the dossier, dissent surfaced | persona deliberation is **live** (real LLM agents on the real persona files) |
-| **Synthesize** | the [Engagement Lead](agents/control/engagement-lead.md) (+ [Research Manager](agents/control/research-manager.md), [Moderator](agents/control/roundtable-moderator.md)) | one recommendation + consensus/dissent + confidence + proposed experiment | — |
+| **Consult** | auto-convened roundtable — [company partners](../architecture/bucket2/company-partner-template.md) + [institutional partners](../architecture/bucket2/institutional/) | multi-viewpoint verdicts (scientific / commercial / investability / regulatory / payer / academic / adversarial), grounded in the dossier, dissent surfaced | persona deliberation is **live** (real LLM agents on the real persona files) |
+| **Synthesize** | the [Engagement Lead](../architecture/orchestrator/engagement-lead.md) (+ [Research Manager](../architecture/orchestrator/research-manager.md), [Moderator](../architecture/orchestrator/roundtable-moderator.md)) | one recommendation + consensus/dissent + confidence + proposed experiment | — |
 
 ## Facts vs. judgment (the key design rule)
 

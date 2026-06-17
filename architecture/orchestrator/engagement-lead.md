@@ -7,7 +7,7 @@ Bucket-1↔Bucket-2 loop, and delivers the final report.
 
 ## Inputs
 - The user's prompt.
-- The [dossier schema](../../dossier_schema.md) and the [roster](../../AGENTS.md).
+- The [dossier schema](../../sapphire-orchestrator/dossier_schema.md) and the [roster](../../sapphire-orchestrator/AGENTS.md).
 
 ## Procedure
 1. **Triage.** Classify the prompt: type (discovery / prioritization / diligence / trial-design /

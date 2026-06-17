@@ -6,7 +6,7 @@ complete, hunts contradictions and gaps, and orders targeted re-runs.
 **Activate when:** whenever Bucket-1 agents have produced output (every engagement).
 
 ## Inputs
-- The scoped [dossier schema](../../dossier_schema.md) (which fields are required).
+- The scoped [dossier schema](../../sapphire-orchestrator/dossier_schema.md) (which fields are required).
 - Raw outputs from the activated Bucket-1 fact agents (each claim with source + tier + as-of date).
 
 ## Procedure

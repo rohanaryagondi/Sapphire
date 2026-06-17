@@ -8,7 +8,7 @@ tox, BBB, paralog selectivity). Skip for purely qualitative / strategic prompts.
 
 ## Inputs
 - The Internal Science Lead's validation asks (specific targets/pairs).
-- The [Q-Models catalog](../../qmodels/catalog.json) (model → task → I/O contract).
+- The [Q-Models catalog](../../../sapphire-orchestrator/qmodels/catalog.json) (model → task → I/O contract).
 
 ## Procedure
 1. **Select the model(s)** for the question: Boltz-2 (binding affinity / co-folding), ADMET-AI (tox /
@@ -27,7 +27,7 @@ SUMMARY: what the compute does/doesn't establish for this candidate
 ```
 
 ## Sources / tools
-The Q-Models launchpad ([catalog](../../qmodels/catalog.json); real scripts in the Q-Models repo `aws/`).
+The Q-Models launchpad ([catalog](../../../sapphire-orchestrator/qmodels/catalog.json); real scripts in the Q-Models repo `aws/`).
 
 ## Rules
 - Public identifiers only; never feed Quiver functional traces into a model.

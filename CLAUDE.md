@@ -26,7 +26,7 @@ two-bucket "firm":
   Moderator) + 3 scientific-core fact agents (Internal Science Lead, EMET Analyst, Q-Models Runner) +
   4 institutional partners (ex-FDA Regulator, Adversarial Red-Team, Payer, KOL) + company-partner
   template + dossier schema.
-- **Phase 2 DONE:** all **13 semantic (non-scientific) fact agents** built in `agents/facts/semantic/`
+- **Phase 2 DONE:** all **13 semantic (non-scientific) fact agents** built in `architecture/bucket1/semantic/`
   (2 veto-class: FDA Institutional Memory ⛔, Patent/IP ⛔; + global regulatory divergence, DEA scheduling,
   clinical-trial registry, post-market safety, financial, payer, manufacturing/CMC, patient advocacy,
   KOL/social, policy/legislative, reputational). Built from Hayes' draft
@@ -66,7 +66,8 @@ two-bucket "firm":
 ## Map
 | Path | What |
 |---|---|
-| `sapphire-orchestrator/` | **The project core** — the agent system. `agents/{control, facts/scientific, facts/semantic, partners}` · `qmodels/` (launchpad mock) · `scenarios/` · `AGENTS.md` · `dossier_schema.md`. |
+| `architecture/` | **The agent specs**, organized as the firm: `orchestrator/` (control) · `bucket1/` (facts — `scientific/` + `semantic/`) · `bucket2/` (partners + `institutional/`). A README at every level + a top-level agent report. |
+| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `serve.py` (subscription bridge) · `qmodels/` (launchpad mock) · `scenarios/` · `AGENTS.md` (operating model) · `dossier_schema.md`. |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |
 | `personas/` | James' 59 company personas (md, by archetype). Wrapped by `company-partner-template.md`. |
 | `capability_map.xlsx`, `model_landscape.md`, `integration_map.md`, `orchestration_brief_hayes.md`, `expert-agent/` | **Research foundation** — what to build, which models per capability, the 3-layer data vision, the CAP-15 expert-agent design (regulator partner reuses it). |
