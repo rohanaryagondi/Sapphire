@@ -19,9 +19,10 @@
     <span class="brand-sub">the full flow</span>
   </a>
   <nav class="nav-links">
-    <a href="#method">Method</a>
-    <a href="#system">System flow</a>
-    <a href="#data">Data layers</a>
+    <a href="#firm">The firm</a>
+    <a href="#system">Cascade</a>
+    <a href="#method">Foundation</a>
+    <a href="#data">Data</a>
     <a href="#capabilities">Capabilities</a>
     <a href="index.html" class="nav-cta">&larr; Console</a>
   </nav>
@@ -34,36 +35,77 @@
     <path id="epTrace2" d="" fill="none" stroke="var(--signal-dim)" stroke-width="1" />
   </svg>
   <div class="hero-inner">
-    <p class="eyebrow">CNS discovery engine &middot; the full flow behind the <a href="index.html">Console</a></p>
-    <h1 class="hero-title">How <em>Sapphire</em> reasons:<br/>the moat, the firm, and where we build.</h1>
+    <p class="eyebrow">CNS discovery decision system &middot; the full flow behind the <a href="index.html">Console</a></p>
+    <h1 class="hero-title">How <em>Sapphire</em> reasons,<br/>end to end.</h1>
     <p class="hero-lede">
-      The orchestrator on the <a href="index.html">Console</a> runs a two-bucket firm — junior analysts gather a cited fact
-      dossier (EMET, Q-Models, 13 semantic agents), partners deliberate — over the foundation built here:
-      <b>persona &rarr; prompt &rarr; pipeline &rarr; capability map &rarr; gaps</b>.
-      The moat is Quiver's functional data; everything external is an envelope around it.
+      Ask a question on the <a href="index.html">Console</a> and a <b>firm</b> goes to work: junior analysts gather a cited
+      fact dossier, partners deliberate, a recommendation comes back with the dissent intact. This page is the whole
+      picture — the firm, the internal-first cascade, the corpus it was built from, the data it draws on, and exactly
+      what's real vs. mock today.
     </p>
     <div class="stats" id="statChips"></div>
   </div>
   <div class="scroll-cue" aria-hidden="true">scroll</div>
 </section>
 
-<!-- METHODOLOGY -->
-<section id="method" class="band">
+<!-- 01 · THE FIRM -->
+<section id="firm" class="band">
   <div class="band-head">
     <span class="sec-no">01</span>
-    <h2>The methodology flow</h2>
-    <p>How the picture was built — James' design. Click any stage.</p>
+    <h2>Sapphire is a firm, not a chatbot</h2>
+    <p>A question goes to an <b>engagement lead</b>, who runs two buckets: junior analysts gather a <b>cited fact dossier</b>, then partners <b>deliberate</b> over it. No forced consensus — the spread of opinion is the product.</p>
   </div>
-  <div class="pipeline" id="pipeline"></div>
-  <div class="pipeline-detail" id="pipelineDetail"></div>
+
+  <div class="firm-flow">
+    <div class="ff-step"><span class="ff-k">ask</span>a CNS question</div>
+    <span class="ff-arrow">&rarr;</span>
+    <div class="ff-step ff-control"><span class="ff-k">control</span>plan &amp; scope</div>
+    <span class="ff-arrow">&rarr;</span>
+    <div class="ff-step ff-b1"><span class="ff-k">bucket 1</span>facts &rarr; dossier</div>
+    <span class="ff-arrow">&rarr;</span>
+    <div class="ff-step ff-b2"><span class="ff-k">bucket 2</span>partners deliberate</div>
+    <span class="ff-arrow">&rarr;</span>
+    <div class="ff-step ff-synth"><span class="ff-k">synthesize</span>recommendation + dissent</div>
+  </div>
+
+  <div class="firm-lanes">
+    <div class="lane">
+      <h3>Control</h3>
+      <p class="lane-sub">plans the work, judges when facts are complete, runs the debate</p>
+      <ul>
+        <li><b>Engagement Lead</b> — triage &rarr; plan &rarr; deliver; activates only what's needed</li>
+        <li><b>Research Manager</b> — owns the dossier: completeness, contradictions, vetoes</li>
+        <li><b>Roundtable Moderator</b> — convenes the partners, runs verdicts &rarr; rebuttal</li>
+      </ul>
+    </div>
+    <div class="lane lane-facts">
+      <h3>Bucket 1 — Facts <span class="lane-tag">cited only</span></h3>
+      <p class="lane-sub">junior analysts; every claim carries a source + credibility tier</p>
+      <div class="lane-grp"><span class="lg-k">scientific core</span> Internal Science Lead (the moat) &middot; EMET Analyst &middot; Q-Models Runner</div>
+      <div class="lane-grp"><span class="lg-k">13 semantic agents</span> FDA Institutional Memory ⛔ &middot; Patent &amp; IP ⛔ &middot; Global Regulatory &middot; DEA Scheduling &middot; Clinical-Trial Registry &middot; Post-Market Safety &middot; Financial &amp; Investor &middot; Payer &amp; Market Access &middot; Manufacturing / CMC &middot; Patient Advocacy &middot; KOL &amp; Social &middot; Policy &amp; Legislative &middot; Reputational</div>
+    </div>
+    <div class="lane lane-partners">
+      <h3>Bucket 2 — Deliberation <span class="lane-tag">opinions cite the facts</span></h3>
+      <p class="lane-sub">partners argue the dossier through their mandate; they never invent facts</p>
+      <div class="lane-grp"><span class="lg-k">company partners</span> Biotech CSO &middot; Pharma BD &middot; Venture GP &middot; Pharma R&amp;D SVP — drawn from 59 real-company personas</div>
+      <div class="lane-grp"><span class="lg-k">institutional</span> ex-FDA Regulator &middot; Adversarial Red-Team &middot; Payer / Market-Access &middot; KOL / Academic</div>
+    </div>
+  </div>
+
+  <div class="firm-rules">
+    <div class="frule"><span class="fr-tag">internal-first</span> the moat reasons first; external tools only <b>gate</b> (veto) then <b>boost</b> (corroborate) — never author the hypothesis</div>
+    <div class="frule"><span class="fr-tag">facts vs judgment</span> Bucket 1 produces cited facts; Bucket 2 produces opinions that must cite them</div>
+    <div class="frule"><span class="fr-tag">veto = gate</span> a prior CRL or a blocking patent is tabled for the panel, never a silent kill</div>
+    <div class="frule"><span class="fr-tag">abstain</span> thin or contradictory evidence &rarr; propose the experiment that resolves it, don't guess</div>
+  </div>
 </section>
 
-<!-- SYSTEM FLOW -->
+<!-- 02 · THE CASCADE -->
 <section id="system" class="band band-alt">
   <div class="band-head">
     <span class="sec-no">02</span>
-    <h2>The Sapphire system flow</h2>
-    <p>Internal data is the privileged substrate; external tools <em>gate</em> then <em>boost</em>. Run a query to watch a candidate climb #7 &rarr; #1.</p>
+    <h2>The cascade: internal &rarr; gate &rarr; boost</h2>
+    <p>Inside Bucket 1, the evidence engine. Internal data is the privileged substrate; external tools <em>gate</em> (veto) then <em>boost</em> (corroborate). Run the query to watch a real candidate climb #7 &rarr; #1.</p>
   </div>
 
   <div class="tiers" id="tiers"></div>
@@ -81,22 +123,33 @@
   </div>
 </section>
 
-<!-- DATA LAYERS -->
-<section id="data" class="band">
+<!-- 03 · FOUNDATION -->
+<section id="method" class="band">
   <div class="band-head">
     <span class="sec-no">03</span>
+    <h2>The foundation: where the system comes from</h2>
+    <p>James' Feb-2026 corpus, operationalized into the map of what Sapphire must serve. Click any stage.</p>
+  </div>
+  <div class="pipeline" id="pipeline"></div>
+  <div class="pipeline-detail" id="pipelineDetail"></div>
+</section>
+
+<!-- 04 · DATA LAYERS -->
+<section id="data" class="band band-alt">
+  <div class="band-head">
+    <span class="sec-no">04</span>
     <h2>The three-layer data map</h2>
-    <p>Every external source placed in the layer it serves, with how many of the 299 pipelines call it. Click a layer.</p>
+    <p>Every external source placed in the layer it serves — Internal moat, Context (gate), Predictivity (boost) — with how many of the 299 pipelines call it. Click a layer.</p>
   </div>
   <div class="layers" id="layers"></div>
 </section>
 
-<!-- CAPABILITIES -->
-<section id="capabilities" class="band band-alt">
+<!-- 05 · CAPABILITIES -->
+<section id="capabilities" class="band">
   <div class="band-head">
-    <span class="sec-no">04</span>
+    <span class="sec-no">05</span>
     <h2>The 16 capabilities</h2>
-    <p>What Sapphire must serve. Filter by layer or status; click a card for models, status, and the empirical verdict.</p>
+    <p>What Sapphire must serve. Filter by layer or status; click a card for candidate models, status, and the empirical verdict.</p>
   </div>
   <div class="filters" id="filters">
     <div class="filter-group" data-group="layer"><span class="filter-label">Layer</span></div>
@@ -105,12 +158,32 @@
   <div class="cards" id="cards"></div>
 </section>
 
-<!-- BACK TO CONSOLE -->
-<section id="toconsole" class="band band-alt">
+<!-- 06 · REAL VS MOCK -->
+<section id="honesty" class="band band-alt">
   <div class="band-head">
-    <span class="sec-no">05</span>
+    <span class="sec-no">06</span>
+    <h2>What's real, what's mock</h2>
+    <p>We never show a fabricated fact as a real one. The Console tags every fact with its source — here's the wiring exactly as it stands today.</p>
+  </div>
+  <div class="honesty-grid">
+    <div class="hcell hc-live"><span class="h-dot"></span><div class="h-name">Claude</div><span class="h-state">live</span><p class="h-why">the reasoning at every step — on the Quiver Claude subscription, no API key.</p></div>
+    <div class="hcell hc-part"><span class="h-dot"></span><div class="h-name">EMET <span class="h-org">(BenchSci)</span></div><span class="h-state">captured</span><p class="h-why">real evidence in the two shipped scenarios (pulled live via Playwright). Not yet wired to live web queries — a novel web question is Claude's reconstruction.</p></div>
+    <div class="hcell hc-mock"><span class="h-dot"></span><div class="h-name">Q-Models</div><span class="h-state">mock</span><p class="h-why">binding / ADMET / selectivity — shaped placeholders today; real AWS GPU launches are the next swap.</p></div>
+    <div class="hcell hc-mock"><span class="h-dot"></span><div class="h-name">Internal moat</div><span class="h-state">mock</span><p class="h-why">Quiver's EP-CRISPR latent space — a synthetic stand-in until the real data + AWS land.</p></div>
+  </div>
+  <div class="prov-key">
+    <span class="pvkey"><span class="pvtag pv-emet">✓ EMET</span> captured live</span>
+    <span class="pvkey"><span class="pvtag pv-claude">◇ Claude</span> reconstructed (no live tool)</span>
+    <span class="pvkey"><span class="pvtag pv-mock">◍ mock</span> Q-Models / moat</span>
+  </div>
+</section>
+
+<!-- SEE IT RUN -->
+<section id="toconsole" class="band">
+  <div class="band-head">
+    <span class="sec-no">&rarr;</span>
     <h2>See it run</h2>
-    <p>This is the foundation. The live orchestrator that turns a question into a plan &rarr; fact dossier &rarr; roundtable &rarr; recommendation is on the Console.</p>
+    <p>That's the full flow. The live orchestrator that turns a question into a plan &rarr; cited dossier &rarr; roundtable &rarr; recommendation is on the Console.</p>
   </div>
   <div style="text-align:center;padding:10px 0 8px">
     <a class="run-btn" href="index.html"><span class="run-dot"></span> Open the Console &rarr;</a>
@@ -118,8 +191,8 @@
 </section>
 
 <footer class="foot">
-  <span>Sapphire capability map &middot; built from the Feb-2026 corpus + the Q-Mammal eval</span>
-  <span class="foot-honesty">Status &amp; verdicts carry straight from <code>capability_map.xlsx</code>. <b>Untested</b> / <b>Gap</b> mean exactly that — no invented performance.</span>
+  <span>Sapphire &middot; a CNS discovery decision system &middot; the firm runs on Claude; foundation built from the Feb-2026 corpus + the Q-Mammal eval</span>
+  <span class="foot-honesty">Capability status &amp; verdicts carry straight from <code>capability_map.xlsx</code>. <b>Untested</b> / <b>Gap</b> mean exactly that — and every Console fact shows its provenance. No invented performance.</span>
 </footer>
 
 <!-- detail drawer -->
