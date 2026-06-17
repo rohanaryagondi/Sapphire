@@ -40,6 +40,12 @@ two-bucket "firm":
   round-1→round-2 rebuttal. `_build/build_orch_data.py` runs the engine to generate the Console data
   (one source of truth). The `/sapphire` skill drives a live query (planner → cascade/EMET → Q-Models →
   persona subagents → synthesis). Facts MOCK where labeled (Q-Models, internal moat); EMET + personas live.
+  The **front-facing site is Console-first** (`site/index.html`); the full-flow explainer moved to
+  `site/explainer.html`. **`sapphire-orchestrator/serve.py` is the subscription bridge** — serves the site
+  and runs novel queries through **Claude Code headless on the user's subscription** (no API key; one
+  `claude -p --json-schema` call returns the structured run) via `/api/run`, with graceful fallback to the
+  canned scenarios + engagement plan on static hosting. "Claude under the hood" = the engine is the harness
+  that enforces the rules; Claude is the reasoning at each box.
 - **Phase 4 ideas (TODO):** wire Q-Models to real AWS launches; swap the mock moat for the real Quiver
   latent space; capture more `scenarios/*.json`; add the cross-engagement memory / active-learning loop.
 - **Then:** wire the orchestrator end-to-end; upgrade the `site/` Console to drive it.

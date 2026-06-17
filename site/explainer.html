@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sapphire — The Full Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html">
+    <span class="brand-mark" aria-hidden="true"></span>
+    <span class="brand-text">SAPPHIRE</span>
+    <span class="brand-sub">the full flow</span>
+  </a>
+  <nav class="nav-links">
+    <a href="#method">Method</a>
+    <a href="#system">System flow</a>
+    <a href="#data">Data layers</a>
+    <a href="#capabilities">Capabilities</a>
+    <a href="index.html" class="nav-cta">&larr; Console</a>
+  </nav>
+</header>
+
+<!-- OVERVIEW -->
+<section id="overview" class="hero">
+  <svg class="hero-trace" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
+    <path id="epTrace" d="" fill="none" stroke="var(--signal)" stroke-width="1.6" />
+    <path id="epTrace2" d="" fill="none" stroke="var(--signal-dim)" stroke-width="1" />
+  </svg>
+  <div class="hero-inner">
+    <p class="eyebrow">CNS discovery engine &middot; the full flow behind the <a href="index.html">Console</a></p>
+    <h1 class="hero-title">How <em>Sapphire</em> reasons:<br/>the moat, the firm, and where we build.</h1>
+    <p class="hero-lede">
+      The orchestrator on the <a href="index.html">Console</a> runs a two-bucket firm — junior analysts gather a cited fact
+      dossier (EMET, Q-Models, 13 semantic agents), partners deliberate — over the foundation built here:
+      <b>persona &rarr; prompt &rarr; pipeline &rarr; capability map &rarr; gaps</b>.
+      The moat is Quiver's functional data; everything external is an envelope around it.
+    </p>
+    <div class="stats" id="statChips"></div>
+  </div>
+  <div class="scroll-cue" aria-hidden="true">scroll</div>
+</section>
+
+<!-- METHODOLOGY -->
+<section id="method" class="band">
+  <div class="band-head">
+    <span class="sec-no">01</span>
+    <h2>The methodology flow</h2>
+    <p>How the picture was built — James' design. Click any stage.</p>
+  </div>
+  <div class="pipeline" id="pipeline"></div>
+  <div class="pipeline-detail" id="pipelineDetail"></div>
+</section>
+
+<!-- SYSTEM FLOW -->
+<section id="system" class="band band-alt">
+  <div class="band-head">
+    <span class="sec-no">02</span>
+    <h2>The Sapphire system flow</h2>
+    <p>Internal data is the privileged substrate; external tools <em>gate</em> then <em>boost</em>. Run a query to watch a candidate climb #7 &rarr; #1.</p>
+  </div>
+
+  <div class="tiers" id="tiers"></div>
+
+  <div class="cascade-wrap">
+    <div class="cascade-controls">
+      <p class="cascade-q" id="cascadeQ"></p>
+      <button class="run-btn" id="runBtn"><span class="run-dot"></span> Run query</button>
+    </div>
+    <div class="cascade" id="cascade"></div>
+    <div class="loop-note">
+      <span class="loop-ico" aria-hidden="true">&#8635;</span>
+      <span>Active-learning loop: the answer (or an abstention) proposes the next wet-lab experiment &rarr; results update the embeddings the cascade reads from. The loop Emit structurally can't have.</span>
+    </div>
+  </div>
+</section>
+
+<!-- DATA LAYERS -->
+<section id="data" class="band">
+  <div class="band-head">
+    <span class="sec-no">03</span>
+    <h2>The three-layer data map</h2>
+    <p>Every external source placed in the layer it serves, with how many of the 299 pipelines call it. Click a layer.</p>
+  </div>
+  <div class="layers" id="layers"></div>
+</section>
+
+<!-- CAPABILITIES -->
+<section id="capabilities" class="band band-alt">
+  <div class="band-head">
+    <span class="sec-no">04</span>
+    <h2>The 16 capabilities</h2>
+    <p>What Sapphire must serve. Filter by layer or status; click a card for models, status, and the empirical verdict.</p>
+  </div>
+  <div class="filters" id="filters">
+    <div class="filter-group" data-group="layer"><span class="filter-label">Layer</span></div>
+    <div class="filter-group" data-group="status"><span class="filter-label">Status</span></div>
+  </div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<!-- BACK TO CONSOLE -->
+<section id="toconsole" class="band band-alt">
+  <div class="band-head">
+    <span class="sec-no">05</span>
+    <h2>See it run</h2>
+    <p>This is the foundation. The live orchestrator that turns a question into a plan &rarr; fact dossier &rarr; roundtable &rarr; recommendation is on the Console.</p>
+  </div>
+  <div style="text-align:center;padding:10px 0 8px">
+    <a class="run-btn" href="index.html"><span class="run-dot"></span> Open the Console &rarr;</a>
+  </div>
+</section>
+
+<footer class="foot">
+  <span>Sapphire capability map &middot; built from the Feb-2026 corpus + the Q-Mammal eval</span>
+  <span class="foot-honesty">Status &amp; verdicts carry straight from <code>capability_map.xlsx</code>. <b>Untested</b> / <b>Gap</b> mean exactly that — no invented performance.</span>
+</footer>
+
+<!-- detail drawer -->
+<div class="drawer-scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="capability detail"></aside>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

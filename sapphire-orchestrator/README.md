@@ -68,6 +68,16 @@ python sapphire-orchestrator/run.py --json tsc2     # the canonical run object t
 For a **novel** query with live EMET + persona agents, drive it via the **`/sapphire`** skill (the
 planner is live for any query; Bucket 1/2 run the cascade + persona subagents).
 
+**As a web app on your Claude subscription** — `serve.py` is the bridge: it serves the site and runs
+novel queries through **Claude Code headless on your subscription** (no API key), returning the same
+structured run the Console renders:
+
+```bash
+python sapphire-orchestrator/serve.py     # http://localhost:8077 — Console (main) + /api/run live brain
+```
+Shipped scenarios stay instant ($0, engine); only novel queries call Claude. On plain static hosting
+(no bridge) the Console falls back to the canned scenarios + the engagement plan.
+
 ## See it
 The interactive visualization is the **Console** section of the site ([`../site/`](../site/)):
 `cd site && python -m http.server 8077`, open `#console`. The Console renders exactly what the engine

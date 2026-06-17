@@ -66,8 +66,8 @@ sq.stages.forEach(s => {
 });
 // inject the rank badge into L3 + OUT results for emphasis
 const stageEls = [...casc.querySelectorAll(".stage")];
-stageEls[2].querySelector(".sres").innerHTML = 'Gene X corroborated — PPI with UBE3A + academic-screen hit &rarr; re-ranked <span class="rank-badge">#7 → #1</span>.';
-stageEls[3].querySelector(".sres").innerHTML = 'Gene X <span class="rank-badge">#1</span> with provenance. Confidence: <b>HIGH</b>.';
+stageEls[2].querySelector(".sres").innerHTML = 'SCN11A/Nav1.9 corroborated — FEPS3 Mendelian genetics + SAFE class &rarr; re-ranked <span class="rank-badge">#7 → #1</span>.';
+stageEls[3].querySelector(".sres").innerHTML = 'SCN11A/Nav1.9 <span class="rank-badge">#1</span> with provenance; cardiac Nav1.5 selectivity is the one gate. Biology: <b>HIGH</b>.';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let cascadeRunning = false;

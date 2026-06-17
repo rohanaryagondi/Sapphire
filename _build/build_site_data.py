@@ -4,7 +4,7 @@ import json, os, re
 from collections import Counter, defaultdict
 import openpyxl
 
-ROOT = r"C:\Users\rohan.gondi\Desktop\Sapphire\sapphire-capability-map"
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 XLSX = os.path.join(ROOT, "capability_map.xlsx")
 OUT  = os.path.join(ROOT, "site", "data.js")
 
@@ -72,23 +72,23 @@ methodology = [
   {"k":"gaps","n":"2","t":"Gaps → build","d":"Where no off-the-shelf model exists (CAP-04 ASO design, CAP-15 expert judgment) → Quiver builds: curated corpus, expert agent, or data fine-tune."},
 ]
 
-# Sample query for the system-flow animation (the Dup15q #7->#1 example from the meeting)
+# Sample query for the system-flow animation (the real Nav1.8 SCN11A #7->#1 run; matches the Console)
 sampleQuery = {
-  "query": "Which novel targets rescue Dup15q syndrome, outside UBE3A?",
+  "query": "Prioritize novel analgesic targets in the Nav1.8 (SCN10A) network for a systemic neuropathic-pain program.",
   "tier": "Unified Orchestration (400–2000 ms)",
   "stages": [
     {"id":"L1","name":"Internal latent","kind":"internal",
-     "detail":"Quiver EP-CRISPR fused embedding + DrugReflector rank rescuers by antipodal mechanism.",
-     "result":"Ranked candidates. Gene Y = #1, Gene X = #7."},
+     "detail":"Quiver EP-CRISPR fused embedding + DrugReflector rank the candidates.",
+     "result":"SCN11A/Nav1.9 lands at #7 — its ultra-slow persistent current is under-resolved by the optical-EP assay."},
     {"id":"L2","name":"Context gate","kind":"gate",
-     "detail":"ClinVar / OMIM / GTEx / TCGA / ClinicalTrials.gov — a veto channel only (demote / kill, never promote).",
-     "result":"One candidate flagged: oncogenic in TCGA → no-go. Gene X & Y pass."},
+     "detail":"EMET drug-safety / FDA-memory — a veto channel only (demote / kill, never promote).",
+     "result":"Vetoes CACNA2D1 (black-box respiratory depression) and NGF (RPOA, NDA rejected 2021). SCN11A passes — SAFE class."},
     {"id":"L3","name":"Predictivity boost","kind":"boost",
-     "detail":"Independent corroboration: GWAS, STRING/BioGRID PPI with the disease gene, Reactome co-pathway, LINCS signature.",
-     "result":"Gene X corroborated — PPI with UBE3A + hit in an academic screen → re-ranked #7 → #1."},
+     "detail":"Independent corroboration: GWAS / Mendelian genetics, STRING PPI with the disease gene, academic functional screens, LINCS signature.",
+     "result":"SCN11A corroborated — FEPS3 Mendelian genetics + the panel's only SAFE class → re-ranked #7 → #1."},
     {"id":"OUT","name":"Answer + execution plan","kind":"out",
      "detail":"Calibrated uncertainty gate. Confident → emit ranked hits + which embeddings/sources moved each rank. Uncertain → abstain & propose the experiment.",
-     "result":"Gene X #1 with provenance. Confidence: HIGH."},
+     "result":"SCN11A/Nav1.9 #1 with provenance; one gate remains — cardiac Nav1.5 selectivity. Biology: HIGH."},
   ],
   "tiers": [
     ["Direct Run","<100 ms","internal latent similarity only"],
