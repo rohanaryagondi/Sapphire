@@ -48,5 +48,26 @@ class TestReflect(unittest.TestCase):
     def test_missing_trace_is_empty_not_error(self):
         self.assertEqual(reflect("no_such_engagement")["written"], 0)
 
+    def test_conclusion_recallable_when_synthesis_lacks_entities(self):
+        import json
+        from pathlib import Path
+        from memory import recall
+        d = Path(self.eng) / "engNoEnt"
+        d.mkdir(parents=True, exist_ok=True)
+        rows = [
+            {"type": "engagement_open", "engagement_id": "engNoEnt", "plan": {"query": "Nav1.9?"}},
+            {"engagement_id": "engNoEnt", "agent_id": "emet-runner", "provenance": "emet-live",
+             "output": {"candidate": "SCN11A",
+                        "facts": [{"value": "GoF analgesia", "source": "PMID:1", "tier": "T2"}]}},
+            {"type": "engagement_close", "engagement_id": "engNoEnt",
+             "synthesis": {"recommendation": "advance", "confidence": "conditional",
+                           "proposed_experiment": "resolve persistent current"}},  # NO entities key
+        ]
+        (d / "trace.jsonl").write_text("\n".join(json.dumps(r) for r in rows) + "\n")
+        reflect("engNoEnt")
+        hits = recall({"genes": ["SCN11A"]})
+        self.assertTrue(any(r["type"] == "conclusion" for r in hits))          # recallable via candidate fallback
+        self.assertTrue(any(r["type"] == "experiment_proposal" for r in hits))
+
 if __name__ == "__main__":
     unittest.main()

@@ -24,11 +24,26 @@ def _rows(engagement_id: str) -> list:
 
 
 def reflect(engagement_id: str) -> dict:
+    rows = _rows(engagement_id)
+    fallback = blank_entities()
+    for row in rows:
+        if row.get("type") == "engagement_open":
+            pe = (row.get("plan") or {}).get("entities")
+            if isinstance(pe, dict):
+                for k in fallback:
+                    fallback[k] = sorted(set(fallback[k]) | set(pe.get(k, [])))
+        out = row.get("output")
+        if isinstance(out, dict) and out.get("candidate"):
+            fallback["genes"] = sorted(set(fallback["genes"]) | {out["candidate"]})
+
+    def _has_entities(e):
+        return bool(e) and any(e.get(k) for k in ("genes", "smiles", "diseases", "drugs"))
+
     written = []
-    for row in _rows(engagement_id):
+    for row in rows:
         if row.get("type") == "engagement_close":
             syn = row.get("synthesis", {}) or {}
-            ents = syn.get("entities") or blank_entities()
+            ents = syn.get("entities") if _has_entities(syn.get("entities")) else fallback
             written.append(write({
                 "type": "conclusion", "engagement_id": engagement_id, "entities": ents,
                 "provenance": "synthesis",

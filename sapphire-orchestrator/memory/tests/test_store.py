@@ -49,5 +49,15 @@ class TestStore(unittest.TestCase):
         self.assertIn("SCN11A", idx)
         self.assertEqual(len(idx["SCN11A"]), 1)
 
+    def test_refused_write_leaves_store_untouched(self):
+        import os as _os
+        try:
+            write(rec(payload={"s_internal": 0.9}))      # must be refused
+        except MemoryRefusal:
+            pass
+        store = _os.path.join(self.tmp, "store.jsonl")
+        # nothing partial written: file absent or empty
+        self.assertTrue((not _os.path.exists(store)) or _os.path.getsize(store) == 0)
+
 if __name__ == "__main__":
     unittest.main()
