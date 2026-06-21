@@ -83,5 +83,18 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(r.status, "escalated")
         self.assertEqual(r.error, "login-required")
 
+    def test_output_guard_failure_maps_to_guardrail_violation(self):
+        calls = {"n": 0}
+        def fn(i):
+            calls["n"] += 1
+            return {"candidate": "SCN11A", "facts": [{"value": "x", "tier": "T2"}]}  # no source
+        ctx = {"python_fns": {"t": fn}}
+        r = run("t", {"g": 1}, engagement_id="eng7", ctx=ctx,
+                registry=reg(guardrails=["facts_only_cited", "stamp_provenance"], max_repair=1))
+        self.assertFalse(r.ok)
+        self.assertEqual(r.error, "guardrail-violation")
+        self.assertEqual(r.status, "abstained")
+        self.assertEqual(calls["n"], 2)
+
 if __name__ == "__main__":
     unittest.main()

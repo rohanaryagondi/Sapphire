@@ -22,15 +22,14 @@ _OUTPUT_GUARDS = {
 }
 
 
-def _validate_output(contract, out, ctx) -> list:
-    errs = []
-    if contract.output_schema:
-        errs += validate(out, contract.output_schema, contract.output_schema)
+def _validate_output(contract, out, ctx) -> tuple:
+    schema_errs = validate(out, contract.output_schema, contract.output_schema) if contract.output_schema else []
+    guard_errs = []
     for gname in contract.guardrails:
         fn = _OUTPUT_GUARDS.get(gname)
         if fn:
-            errs += [f"{v.guardrail}: {v.detail}" for v in fn(contract, out, ctx)]
-    return errs
+            guard_errs += [f"{v.guardrail}: {v.detail}" for v in fn(contract, out, ctx)]
+    return schema_errs, guard_errs
 
 
 def _finish(contract, result, engagement_id, t0, repairs, guardrails_run, ihash, cache):
@@ -51,6 +50,8 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
     try:
         contract = resolve(agent_id, registry)
     except KeyError:
+        T.record(engagement_id, {"agent_id": agent_id, "kind": "unknown",
+                                 "status": "escalated", "error": "unknown-agent"})
         return AgentResult(agent_id, False, abstain_envelope("unknown-agent", "a registered agent id"),
                            "synthesis", "escalated", "unknown-agent",
                            {"inputs_hash": None, "latency_ms": 0, "repairs": 0, "guardrails_run": []})
@@ -96,11 +97,12 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
                               contract.provenance_label, status, code)
             return _finish(contract, res, engagement_id, t0, attempt, guardrails_run, ihash, cache)
 
-        errs = _validate_output(contract, out, ctx)
+        schema_errs, guard_errs = _validate_output(contract, out, ctx)
+        errs = schema_errs + guard_errs
         if not errs:
             break
         if attempt >= contract.max_repair:
-            code = "guardrail-violation" if any(":" in e and e.split(":")[0] in _OUTPUT_GUARDS for e in errs) else "malformed-output"
+            code = "malformed-output" if schema_errs else "guardrail-violation"
             status = "escalated" if contract.on_hard_fail == "escalate" else "abstained"
             res = AgentResult(contract.id, False, abstain_envelope(code, "; ".join(errs[:3])),
                               contract.provenance_label, status, code)
