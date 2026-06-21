@@ -40,7 +40,8 @@
             "value": {"type": "string"},
             "source": {"type": "string"},
             "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
-            "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]}
+            "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+            "provenance": {"type": "string"}
           }
         }},
         "provenance": {"type": "string"}

@@ -43,5 +43,15 @@ class TestOutputGuards(unittest.TestCase):
         self.assertEqual(out["provenance"], "emet-live")
         self.assertEqual(out["facts"][0]["provenance"], "emet-live")
 
+    def test_stamped_findings_revalidates_against_schema(self):
+        from harness.contracts import resolve
+        from contracts.jsonschema_min import validate
+        emet = resolve("emet-runner")        # provenance_label = emet-live; output_schema = findings
+        out = {"candidate": "SCN11A",
+               "facts": [{"value": "GoF", "source": "PMID:1", "tier": "T1"}]}
+        stamped = stamp_provenance(emet, out)
+        # stamped output (provenance added to top + each fact row) must still satisfy the findings schema
+        self.assertEqual(validate(stamped, emet.output_schema, emet.output_schema), [])
+
 if __name__ == "__main__":
     unittest.main()

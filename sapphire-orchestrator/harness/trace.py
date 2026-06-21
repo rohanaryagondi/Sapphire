@@ -35,7 +35,7 @@ def open_engagement(engagement_id: str, plan: dict) -> None:
 
 
 def record(engagement_id: str, event: dict) -> None:
-    _append(engagement_id, {"engagement_id": engagement_id, **event})
+    _append(engagement_id, {**event, "engagement_id": engagement_id})
 
 
 def close_engagement(engagement_id: str, synthesis: dict) -> None:
