@@ -103,5 +103,26 @@ def recall(entities, types=None, k=5) -> list:
     return [r for _, _, r in scored[:k]]
 
 
-def record_outcome(*a, **k):  # placeholder replaced in Task 3
-    raise NotImplementedError
+def _entities_of(proposal_id: str) -> dict:
+    for r in read_all():
+        if r.get("id") == proposal_id:
+            return r.get("entities", blank_entities())
+    return blank_entities()
+
+
+def record_outcome(proposal_id: str, outcome: dict, engagement_id: str = "") -> dict:
+    ents = _entities_of(proposal_id)
+    out = write({
+        "type": "experiment_outcome", "engagement_id": engagement_id, "entities": ents,
+        "links": [proposal_id],
+        "payload": {"proposal_id": proposal_id, "result": outcome.get("result"),
+                    "data": outcome.get("data", ""), "source": outcome.get("source", "")},
+    })
+    if outcome.get("result") == "refuted":
+        write({
+            "type": "moat_blindspot", "engagement_id": engagement_id, "entities": ents,
+            "links": [proposal_id, out["id"]],
+            "payload": {"proposal_id": proposal_id,
+                        "note": outcome.get("data") or "prediction refuted by outcome"},
+        })
+    return out
