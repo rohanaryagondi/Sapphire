@@ -54,5 +54,10 @@ class TestEngagement(unittest.TestCase):
         self.assertIn("engagement_id", run)
         self.assertIn("synthesize", run)
 
+    def test_extract_entities_handles_long_prefix_genes(self):
+        e = extract_entities("CACNA1A and GRIN2A and ATP2A2 in ataxia; plus SCN11A")
+        for g in ["CACNA1A", "GRIN2A", "ATP2A2", "SCN11A"]:
+            self.assertIn(g, e["genes"])
+
 if __name__ == "__main__":
     unittest.main()

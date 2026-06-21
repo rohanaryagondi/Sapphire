@@ -10,7 +10,8 @@ from harness import trace
 from memory import recall
 from selfimprove.reflect import reflect as _reflect
 
-_GENE_RE = re.compile(r"\b[A-Z]{2,4}[0-9]{1,3}[A-Z]?\b")   # SCN11A, SCN2A, KCNT1, LRRK2, GBA1
+_GENE_RE = re.compile(r"\b[A-Z]{2,6}[0-9]{1,3}[A-Z]?[0-9]?\b")   # SCN11A, SCN2A, KCNT1, LRRK2, GBA1, CACNA1A, GRIN2A, ATP2A2
+# Note: purely-alphabetic gene symbols (SNCA, MAPT, APP) are out of scope; this heuristic requires a digit anchor.
 
 
 def extract_entities(text: str) -> dict:
