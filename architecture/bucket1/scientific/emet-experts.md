@@ -5,7 +5,9 @@ EMET lets you save a custom **Expert** (`emet.benchsci.com/agents` → *Create E
 always available, so the instructions are what shape it. These are Sapphire-aligned Experts that bake in
 our hard rules (public-identifiers-only, cite-everything, EMET gates/corroborates but never issues a
 formal VETO, return the envelope). They mirror the Sapphire agents in `architecture/` and the cascade
-gates. **Not yet created in the workspace** — paste each into *Create Expert* (or ask me to create them).
+gates. **All three were created live in the EMET workspace on 2026-06-21** (`sapphire-emet-analyst`,
+`sapphire-safety-scout`, `sapphire-target-corroborator` at `emet.benchsci.com/agents`). The definitions
+below are the source of truth — re-paste into *Create Expert* to recreate or update them.
 
 The user already has one: **Quiver CRISPR-N Hit Triager** — "Evaluate a CRISPR-N hit gene for downstream
 Quiver wet-lab follow-up: voltage-imaging tractability, drug binding evidence, and disease relevance."

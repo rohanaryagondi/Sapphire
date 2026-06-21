@@ -1,0 +1,50 @@
+{
+  "id": "lrrk2_pd",
+  "title": "LRRK2 kinase inhibition for Parkinson's — the on-target lung gate",
+  "query": "Is LRRK2 kinase inhibition a viable Parkinson's-disease strategy given the on-target lung safety signal?",
+  "headline": "LRRK2 genetics support kinase inhibition — but a well-cited on-target AT2 lung lysosomal liability is the program gate.",
+  "_provenance_note": "discover dossier facts captured LIVE from EMET (Drug Safety workflow, Thorough) on 2026-06-21; real PMIDs. Genetics row is an honest KNOWN_UNKNOWN pending a Target Validation capture. Panel/synthesis are reasoned Bucket-2 judgment citing the dossier.",
+  "discover": {
+    "source": "EMET Drug Safety workflow (live 2026-06-21) + internal moat (mock)",
+    "summary": "A live EMET Drug Safety run on LRRK2 surfaced a well-cited on-target lung liability — AT2 pneumocyte lamellar-body vacuolation from LRRK2 kinase inhibition, recapitulating the Lrrk2-KO phenotype (on-target), with a human iPSC-AT2 translational model, a lysosomal/surfactant mechanism, and a translatable urinary di-22:6-BMP biomarker; rodents show a species gap. Genetics (G2019S gain-of-kinase) is pending a Target Validation capture.",
+    "result": "LRRK2 inhibition: genetics strong (G2019S; capture pending). The gate is the on-target AT2 lung lysosomal liability and its therapeutic window vs CNS target engagement."
+  },
+  "validate": {
+    "source": "Q-Models launchpad",
+    "runs": [
+      {"model": "Boltz-2", "out": "Brain-penetrant ATP-competitive LRRK2 inhibitor co-folding is applicable; not run in this capture.", "provenance": "stub"}
+    ],
+    "result": "Structure/affinity compute is applicable to the LRRK2 kinase–inhibitor pair; not executed in this capture.",
+    "mock": true
+  },
+  "panel": [
+    {"persona":"Dr. CSO, Neurodegeneration Biotech","role":"Chief Scientific Officer","lens":"scientific","stance":"conditional","conviction":3,"headline":"Genetics-validated target; the lung liability is on-target and human-translatable","rationale":"LRRK2 is among the best human-genetically validated PD targets and kinase inhibition is mechanistically aligned with G2019S gain-of-kinase. But the EMET-captured lung signal is on-target — NHP AT2 lamellar-body vacuolation recapitulates the Lrrk2-KO phenotype (PMID:25653221) and a human primary AT2 model reproduces it dose-dependently (PMID:33049313). That is not a compound problem you medicinal-chemistry your way out of; it is the biology of LRRK2 in lysosomes (PMID:38428793).","top_risk":"On-target AT2 lung lysosomal liability shared by any LRRK2 kinase inhibitor","ask":"Define the therapeutic window between CNS target engagement and the lung effect in a human-relevant AT2 assay before committing a lead"},
+    {"persona":"Dr. ex-FDA Reviewer","role":"Regulatory / Safety","lens":"regulatory","stance":"conditional","conviction":3,"headline":"Approvable only with a translatable lung-safety biomarker and reversibility","rationale":"The species gap (PMID:25653221 — rodents spared at relevant doses) means rodent tox will under-predict; NHP and human in vitro are the relevant models, which complicates the safety package. The mitigating factor is a translatable pharmacodynamic readout: urinary di-22:6-BMP falls with inhibition in NHP and KO (PMID:25653221; PMID:40770658), giving a monitorable clinical biomarker. Reversibility on a drug holiday is unproven and would be a review focus.","top_risk":"A clinical lung-safety signal with no demonstrated reversibility","ask":"Reversibility study + a prospectively-qualified di-22:6-BMP monitoring plan before chronic dosing"},
+    {"persona":"Dr. Pharma BD, Large-cap Neuro","role":"External Innovation & BD","lens":"commercial","stance":"conditional","conviction":3,"headline":"Validated target, crowded field, single well-characterized gate","rationale":"LRRK2 is a genetically clean PD target with active clinical-stage programs, so the biology risk is low and the differentiation race is real. The lung liability is well-characterized rather than unknown, which is dealable — value hinges on whether a window or a peripheral-sparing/CNS-restricted strategy exists. A milestone-heavy structure gated on the lung de-risking package is the rational deal shape.","top_risk":"On-target lung liability caps the therapeutic window and the valuation","ask":"Option/milestone deal gated on a human AT2 window + reversibility readout"},
+    {"persona":"Dr. Adversarial Red-Team","role":"Kill-the-thesis","lens":"adversarial","stance":"hold","conviction":2,"headline":"On-target, human-translatable, mechanism-explained — assume it translates","rationale":"Every escape hatch is closed: the effect is on-target (KO recapitulation), reproduced in a human AT2 model, and mechanistically explained via lysosomal surfactant handling. The base case should be that this translates to humans and constrains chronic CNS dosing. Absent a demonstrated window or a CNS-restricted modality, the program is gated before efficacy is testable.","top_risk":"There may be no therapeutic window between CNS engagement and lung lysosomal disruption","ask":"Show a real human-relevant window, or a CNS-restricted/peripheral-sparing approach, before any program commitment"}
+  ],
+  "facts": [
+    {"field":"A1 target/modality","value":"LRRK2 (leucine-rich repeat kinase 2) — brain-penetrant small-molecule kinase inhibitor in scope for Parkinson's.","source":"EMET (live) + general","tier":"T2","confidence":"high"},
+    {"field":"B1 human genetics","value":"LRRK2 G2019S gain-of-kinase-function is the most common monogenic cause of PD — supports kinase inhibition. (Capture pending: the Target Validation portion scrolled off the live run; not PMID-cited here yet.)","source":"EMET Target Validation — pending capture","tier":"T3","confidence":"med","flag":"KNOWN_UNKNOWN"},
+    {"field":"C1 on-target safety (lung)","value":"LRRK2 kinase inhibition causes AT2 pneumocyte lamellar-body vacuolation in NHPs (GNE-7915/GNE-0877); recapitulates the Lrrk2-KO lung phenotype → on-target, not compound-specific.","source":"EMET Drug Safety (live); PMID:25653221","tier":"T2","confidence":"high"},
+    {"field":"C1 human translational","value":"A human primary AT2 air-liquid-interface model reproduces dose-dependent lamellar-body enlargement → the lung signal likely translates to humans.","source":"EMET Drug Safety (live); PMID:33049313","tier":"T2","confidence":"high"},
+    {"field":"C1 mechanism","value":"LRRK2 regulates AT2 lysosomal function and surfactant-phospholipid processing — the mechanism of the lung liability.","source":"EMET Drug Safety (live); PMID:38428793","tier":"T2","confidence":"med"},
+    {"field":"C2 biomarker","value":"Urinary di-22:6-BMP decreases with LRRK2 inhibition in NHP and Lrrk2-KO → translatable pharmacodynamic / safety biomarker.","source":"EMET Drug Safety (live); PMID:25653221; PMID:40770658","tier":"T2","confidence":"high"},
+    {"field":"C3 species gap","value":"Rodents do not show the lung phenotype at pharmacologically relevant doses; NHP + human in vitro are the only predictive models.","source":"EMET Drug Safety (live); PMID:25653221","tier":"T2","confidence":"med","flag":"DIVERGENCE"},
+    {"field":"open question","value":"Reversibility of the AT2 lung effect on a drug holiday, and the therapeutic window vs CNS target engagement, are unproven.","source":"-","tier":"-","confidence":"low","flag":"KNOWN_UNKNOWN"}
+  ],
+  "rebuttal": [
+    {"persona":"Dr. CSO, Neurodegeneration Biotech","revised":false,"conviction":3,"shift":"Unmoved — the lung effect is on-target biology; sharpens the ask to a quantified human AT2 window before lead commitment."},
+    {"persona":"Dr. ex-FDA Reviewer","revised":true,"conviction":3,"shift":"The di-22:6-BMP biomarker (PMID:40770658) makes a monitorable path plausible; holds 3, conditional on a reversibility study."},
+    {"persona":"Dr. Pharma BD, Large-cap Neuro","revised":false,"conviction":3,"shift":"Confirms a milestone-heavy option gated on the lung-window package; the crowded field rewards a peripheral-sparing differentiator."},
+    {"persona":"Dr. Adversarial Red-Team","revised":false,"conviction":2,"shift":"Three lenses converge on the same on-target lung gate — reinforces that the window must be proven, not assumed."}
+  ],
+  "synthesize": {
+    "recommendation": "Advance LRRK2 kinase inhibition only behind a lung-safety de-risking package; structure any external deal milestone-heavy on the lung gate.",
+    "consensus": "Genetics-validated PD target (G2019S gain-of-kinase); kinase inhibition is mechanistically sound.",
+    "dissent": "Conviction 3 (CSO, regulator, BD) vs 2 (red-team, who weights the on-target lung liability as a likely hard ceiling). No champion; all conditional/hold.",
+    "convergent_gate": "All four flag the SAME risk: the on-target AT2 lung lysosomal liability and whether any therapeutic window exists vs CNS target engagement.",
+    "proposed_experiment": "A human iPSC-AT2 lamellar-body dose-response + reversibility assay, paired with urinary di-22:6-BMP, to define the therapeutic window between CNS target engagement and the lung effect before FIH. (Also capture the LRRK2 genetics via the EMET Target Validation workflow to close the B1 known-unknown.)",
+    "confidence": "Biology: HIGH. Overall program: CONDITIONAL on the lung gate."
+  }
+}

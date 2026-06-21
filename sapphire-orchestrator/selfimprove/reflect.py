@@ -60,10 +60,14 @@ def reflect(engagement_id: str) -> dict:
 
         out = row.get("output")
         if isinstance(out, dict) and out.get("facts"):
-            candidate = out.get("candidate", "")
-            ents = blank_entities()
-            if candidate:
-                ents["genes"] = [candidate]
+            # prefer a full entity set carried on the row; fall back to the single candidate gene
+            if _has_entities(row.get("entities")):
+                ents = row["entities"]
+            else:
+                candidate = out.get("candidate", "")
+                ents = blank_entities()
+                if candidate:
+                    ents["genes"] = [candidate]
             for f in out["facts"]:
                 rtype = "divergence" if f.get("flag") == "DIVERGENCE" else "fact"
                 written.append(write({

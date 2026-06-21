@@ -55,7 +55,9 @@ def run_engagement(sid_or_query: str, *, engine=None, do_reflect: bool = True) -
         facts.append(fact)
     if facts:
         primary = ents["genes"][0] if ents["genes"] else ""
-        trace.record(eid, {"agent_id": "dossier", "provenance": "synthesis",
+        # carry the FULL entity set on the row so reflect tags every fact with all targets
+        # (not just the alphabetically-first gene token — which may be a false positive like "AT2")
+        trace.record(eid, {"agent_id": "dossier", "provenance": "synthesis", "entities": ents,
                            "output": {"candidate": primary, "facts": facts}})
     syn = dict(run.get("synthesize", {}) or {})
     syn["entities"] = ents

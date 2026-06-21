@@ -9,7 +9,7 @@
     {"id": "tsc2", "title": "TSC2 / mTOR", "disease": "epilepsy/TSC", "variety_axis": "selectivity", "status": "captured"},
     {"id": "scn2a_epilepsy", "title": "SCN2A epilepsy — GoF vs LoF", "disease": "epilepsy", "variety_axis": "mechanism", "status": "stub"},
     {"id": "c9orf72_als", "title": "C9orf72 ALS — ASO vs small molecule", "disease": "ALS", "variety_axis": "modality", "status": "stub"},
-    {"id": "lrrk2_pd", "title": "LRRK2 Parkinson's kinase inhibitor", "disease": "Parkinson's", "variety_axis": "admet_bbb", "status": "stub"},
+    {"id": "lrrk2_pd", "title": "LRRK2 Parkinson's kinase inhibitor", "disease": "Parkinson's", "variety_axis": "admet_bbb", "status": "captured", "note": "captured live via EMET Drug Safety workflow 2026-06-21 (real PMIDs); safety-anchored, B1 genetics pending a Target Validation capture"},
     {"id": "gba1_pd", "title": "GBA1 Parkinson's / Gaucher", "disease": "Parkinson's", "variety_axis": "biomarker", "status": "stub"},
     {"id": "kcnt1_dee", "title": "KCNT1 developmental epileptic encephalopathy", "disease": "rare CNS", "variety_axis": "selectivity", "status": "stub"},
     {"id": "novel_ad_target", "title": "Novel Alzheimer's target (thin evidence)", "disease": "Alzheimer's", "variety_axis": "abstain", "status": "stub"},
