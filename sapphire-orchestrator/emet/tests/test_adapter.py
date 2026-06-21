@@ -53,5 +53,19 @@ class TestAdapter(unittest.TestCase):
         schema = resolve("emet-runner").output_schema
         self.assertEqual(validate(out, schema, schema), [])
 
+    def test_none_claim_becomes_empty_string_and_validates(self):
+        env = dict(ENVELOPE, evidence=[{"claim": None, "source": "X", "id_or_url": "PMID:1"}])
+        out = normalize_emet(env)
+        self.assertIsInstance(out["facts"][0]["value"], str)
+        schema = resolve("emet-runner").output_schema
+        self.assertEqual(validate(out, schema, schema), [])
+
+    def test_no_go_empty_chat_url_keeps_nonempty_source(self):
+        env = dict(ENVELOPE, verdict="no_go", notes="cardiac liability", chat_url="")
+        out = normalize_emet(env)
+        self.assertTrue(all(f["source"].strip() for f in out["facts"]))   # no empty source anywhere
+        schema = resolve("emet-runner").output_schema
+        self.assertEqual(validate(out, schema, schema), [])
+
 if __name__ == "__main__":
     unittest.main()

@@ -12,7 +12,7 @@ def normalize_emet(envelope: dict) -> dict:
         src = (ev.get("source") or "").strip()
         idu = (ev.get("id_or_url") or "").strip()
         source = f"{src} [{idu}]".strip() if idu else src
-        facts.append({"value": ev.get("claim", ""), "source": source, "tier": "T2"})
+        facts.append({"value": ev.get("claim") or "", "source": source, "tier": "T2"})
 
     verdict = envelope.get("verdict")
     notes = (envelope.get("notes") or "").strip()
@@ -20,9 +20,9 @@ def normalize_emet(envelope: dict) -> dict:
     workflow = envelope.get("emet_workflow", "")
     if verdict == "flag":
         facts.append({"value": notes or f"EMET {workflow}: thin/contradictory evidence",
-                      "source": chat, "tier": "T2", "flag": "KNOWN_UNKNOWN"})
+                      "source": chat or "EMET session", "tier": "T2", "flag": "KNOWN_UNKNOWN"})
     elif verdict == "no_go":
         facts.append({"value": notes or f"EMET {workflow}: contraindication / negative evidence",
-                      "source": chat, "tier": "T2"})   # cited fact, NOT a VETO flag
+                      "source": chat or "EMET session", "tier": "T2"})   # cited fact, NOT a VETO flag
 
     return {"candidate": envelope.get("candidate", ""), "facts": facts, "provenance": PROVENANCE}
