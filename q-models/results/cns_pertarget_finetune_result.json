@@ -1,0 +1,147 @@
+{
+  "recipe": "Morgan-FP(2048,r2) + GradientBoosting, per target; negatives = target inactives + cross-family decoys; Murcko scaffold-split GroupKFold CV AUROC",
+  "active_pchembl": 6.0,
+  "targets": {
+    "MTOR": {
+      "status": "trained",
+      "family": "mtor_pathway",
+      "n_actives": 614,
+      "n_negatives": 1228,
+      "scaffold_cv_auroc": 0.9896,
+      "model": "models/cns_pertarget/MTOR.joblib"
+    },
+    "PKM": {
+      "status": "trained",
+      "family": "mtor_pathway",
+      "n_actives": 821,
+      "n_negatives": 1637,
+      "scaffold_cv_auroc": 0.9925,
+      "model": "models/cns_pertarget/PKM.joblib"
+    },
+    "PPARD": {
+      "status": "trained",
+      "family": "mtor_pathway",
+      "n_actives": 1264,
+      "n_negatives": 2517,
+      "scaffold_cv_auroc": 0.9956,
+      "model": "models/cns_pertarget/PPARD.joblib"
+    },
+    "AKT1": {
+      "status": "trained",
+      "family": "mtor_pathway",
+      "n_actives": 2545,
+      "n_negatives": 5049,
+      "scaffold_cv_auroc": 0.9888,
+      "model": "models/cns_pertarget/AKT1.joblib"
+    },
+    "RPS6KB1": {
+      "status": "trained",
+      "family": "mtor_pathway",
+      "n_actives": 1592,
+      "n_negatives": 3171,
+      "scaffold_cv_auroc": 0.9814,
+      "model": "models/cns_pertarget/RPS6KB1.joblib"
+    },
+    "SCN9A": {
+      "status": "trained",
+      "family": "nav",
+      "n_actives": 1912,
+      "n_negatives": 3790,
+      "scaffold_cv_auroc": 0.9947,
+      "model": "models/cns_pertarget/SCN9A.joblib"
+    },
+    "SCN10A": {
+      "status": "trained",
+      "family": "nav",
+      "n_actives": 501,
+      "n_negatives": 995,
+      "scaffold_cv_auroc": 0.99,
+      "model": "models/cns_pertarget/SCN10A.joblib"
+    },
+    "SCN2A": {
+      "status": "trained",
+      "family": "nav",
+      "n_actives": 294,
+      "n_negatives": 587,
+      "scaffold_cv_auroc": 0.9967,
+      "model": "models/cns_pertarget/SCN2A.joblib"
+    },
+    "SCN5A": {
+      "status": "skipped_sparse",
+      "n_actives": 0
+    },
+    "CACNA1C": {
+      "status": "trained",
+      "family": "cav",
+      "n_actives": 70,
+      "n_negatives": 140,
+      "scaffold_cv_auroc": 0.9707,
+      "model": "models/cns_pertarget/CACNA1C.joblib"
+    },
+    "GRIN1": {
+      "status": "trained",
+      "family": "nmda",
+      "n_actives": 276,
+      "n_negatives": 552,
+      "scaffold_cv_auroc": 0.9705,
+      "model": "models/cns_pertarget/GRIN1.joblib"
+    },
+    "GRIN2B": {
+      "status": "trained",
+      "family": "nmda",
+      "n_actives": 866,
+      "n_negatives": 1725,
+      "scaffold_cv_auroc": 0.9703,
+      "model": "models/cns_pertarget/GRIN2B.joblib"
+    },
+    "DRD2": {
+      "status": "trained",
+      "family": "gpcr",
+      "n_actives": 1199,
+      "n_negatives": 2383,
+      "scaffold_cv_auroc": 0.9953,
+      "model": "models/cns_pertarget/DRD2.joblib"
+    },
+    "HTR2A": {
+      "status": "trained",
+      "family": "gpcr",
+      "n_actives": 2717,
+      "n_negatives": 5349,
+      "scaffold_cv_auroc": 0.9959,
+      "model": "models/cns_pertarget/HTR2A.joblib"
+    },
+    "GSK3B": {
+      "status": "trained",
+      "family": "kinase",
+      "n_actives": 2694,
+      "n_negatives": 5324,
+      "scaffold_cv_auroc": 0.9778,
+      "model": "models/cns_pertarget/GSK3B.joblib"
+    },
+    "LRRK2": {
+      "status": "trained",
+      "family": "kinase",
+      "n_actives": 2136,
+      "n_negatives": 4224,
+      "scaffold_cv_auroc": 0.9931,
+      "model": "models/cns_pertarget/LRRK2.joblib"
+    },
+    "BACE1": {
+      "status": "trained",
+      "family": "kinase",
+      "n_actives": 1669,
+      "n_negatives": 3314,
+      "scaffold_cv_auroc": 0.99,
+      "model": "models/cns_pertarget/BACE1.joblib"
+    }
+  },
+  "family_mean_auroc": {
+    "mtor_pathway": 0.9896,
+    "nav": 0.9938,
+    "cav": 0.9707,
+    "nmda": 0.9704,
+    "gpcr": 0.9956,
+    "kinase": 0.987
+  },
+  "n_trained": 16
+}

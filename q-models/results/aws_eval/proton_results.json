@@ -1,0 +1,1005 @@
+{
+  "status": "ok",
+  "model": "PROTON (mims-harvard/PROTON, NeuroKG pretrain embeddings)",
+  "panel_size": 40,
+  "n_resolved": 39,
+  "resolved_by_family": {
+    "kinase": 11,
+    "gpcr": 8,
+    "ion_channel": 8,
+    "nuclear_receptor": 6,
+    "e3_ligase": 4,
+    "lipid_kinase": 1,
+    "phosphatase": 1
+  },
+  "comparable_to_mammal_esm": false,
+  "embedding_dim": 512,
+  "panel": [
+    {
+      "accession": "P00533",
+      "gene": "EGFR",
+      "family": "kinase",
+      "node_index": 125,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P15056",
+      "gene": "BRAF",
+      "family": "kinase",
+      "node_index": 1979,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P24941",
+      "gene": "CDK2",
+      "family": "kinase",
+      "node_index": 40,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P00519",
+      "gene": "ABL1",
+      "family": "kinase",
+      "node_index": 601,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P28482",
+      "gene": "MAPK1",
+      "family": "kinase",
+      "node_index": 418,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P17948",
+      "gene": "FLT1",
+      "family": "kinase",
+      "node_index": 2850,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P36888",
+      "gene": "FLT3",
+      "family": "kinase",
+      "node_index": 1440,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q00534",
+      "gene": "CDK6",
+      "family": "kinase",
+      "node_index": 802,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P45984",
+      "gene": "MAPK9",
+      "family": "kinase",
+      "node_index": 763,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P06213",
+      "gene": "INSR",
+      "family": "kinase",
+      "node_index": 4536,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P14416",
+      "gene": "DRD2",
+      "family": "gpcr",
+      "node_index": 2400,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P07550",
+      "gene": "ADRB2",
+      "family": "gpcr",
+      "node_index": 1493,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P28223",
+      "gene": "HTR2A",
+      "family": "gpcr",
+      "node_index": 3417,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P21554",
+      "gene": "CNR1",
+      "family": "gpcr",
+      "node_index": 9196,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P35372",
+      "gene": "OPRM1",
+      "family": "gpcr",
+      "node_index": 532,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P34969",
+      "gene": "HTR7",
+      "family": "gpcr",
+      "node_index": 12235,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P30542",
+      "gene": "ADORA1",
+      "family": "gpcr",
+      "node_index": 11142,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P29274",
+      "gene": "ADORA2A",
+      "family": "gpcr",
+      "node_index": 4968,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q15858",
+      "gene": "SCN9A",
+      "family": "ion_channel",
+      "node_index": 22304,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q9Y5Y9",
+      "gene": "SCN10A",
+      "family": "ion_channel",
+      "node_index": 22244,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "O43526",
+      "gene": "KCNQ2",
+      "family": "ion_channel",
+      "node_index": 3294,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "O60353",
+      "gene": "HCN1",
+      "family": "ion_channel",
+      "node_index": 22180,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q8NER1",
+      "gene": "TRPV1",
+      "family": "ion_channel",
+      "node_index": 12841,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q9ULD8",
+      "gene": "KCNQ5",
+      "family": "ion_channel",
+      "node_index": 13843,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P35498",
+      "gene": "SCN1A",
+      "family": "ion_channel",
+      "node_index": 10694,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q14524",
+      "gene": "SCN5A",
+      "family": "ion_channel",
+      "node_index": 10418,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P37231",
+      "gene": "PPARG",
+      "family": "nuclear_receptor",
+      "node_index": 988,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P19793",
+      "gene": "RXRA",
+      "family": "nuclear_receptor",
+      "node_index": 1925,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P11473",
+      "gene": "VDR",
+      "family": "nuclear_receptor",
+      "node_index": 2016,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P03372",
+      "gene": "ESR1",
+      "family": "nuclear_receptor",
+      "node_index": 375,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P10275",
+      "gene": "AR",
+      "family": "nuclear_receptor",
+      "node_index": 363,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P04637",
+      "gene": "TP53",
+      "family": "nuclear_receptor",
+      "node_index": 1784,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q9NWF9",
+      "gene": "MDM2",
+      "family": "e3_ligase",
+      "node_index": 1551,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P46937",
+      "gene": "YAP1",
+      "family": "e3_ligase",
+      "node_index": 2840,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P10276",
+      "gene": "RARA",
+      "family": "e3_ligase",
+      "node_index": 740,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "Q15637",
+      "gene": "SF3B1",
+      "family": "e3_ligase",
+      "node_index": 3326,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P27361",
+      "gene": "MAPK3",
+      "family": "kinase",
+      "node_index": 866,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P42336",
+      "gene": "PIK3CA",
+      "family": "lipid_kinase",
+      "node_index": 1640,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "P60484",
+      "gene": "PTEN",
+      "family": "phosphatase",
+      "node_index": 177,
+      "node_type": "gene/protein",
+      "n_matches": 1
+    },
+    {
+      "accession": "O15111",
+      "gene": "IKBKA",
+      "family": "kinase",
+      "node_index": null,
+      "node_type": null,
+      "n_matches": 0
+    }
+  ],
+  "raw_cosine": {
+    "nn_recall": 0.48717948717948717,
+    "intra_cos": 0.7643141143701293,
+    "inter_cos": 0.65793661073413,
+    "family_gap": 0.1063775036359993,
+    "knn_k3_accuracy": 0.46153846153846156,
+    "per_family_nn_recall": {
+      "kinase": 0.5454545454545454,
+      "gpcr": 0.125,
+      "ion_channel": 0.625,
+      "nuclear_receptor": 0.6666666666666666,
+      "e3_ligase": 0.75,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    },
+    "nn_detail": [
+      {
+        "gene": "EGFR",
+        "family": "kinase",
+        "nn": "YAP1",
+        "nn_family": "e3_ligase",
+        "match": false,
+        "sim": 0.8958359360694885
+      },
+      {
+        "gene": "BRAF",
+        "family": "kinase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": false,
+        "sim": 0.9172431826591492
+      },
+      {
+        "gene": "CDK2",
+        "family": "kinase",
+        "nn": "ABL1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.9059654474258423
+      },
+      {
+        "gene": "ABL1",
+        "family": "kinase",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.9312852621078491
+      },
+      {
+        "gene": "MAPK1",
+        "family": "kinase",
+        "nn": "MAPK3",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.9438486099243164
+      },
+      {
+        "gene": "FLT1",
+        "family": "kinase",
+        "nn": "BRAF",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.8017442226409912
+      },
+      {
+        "gene": "FLT3",
+        "family": "kinase",
+        "nn": "AR",
+        "nn_family": "nuclear_receptor",
+        "match": false,
+        "sim": 0.894281268119812
+      },
+      {
+        "gene": "CDK6",
+        "family": "kinase",
+        "nn": "ABL1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.8939481973648071
+      },
+      {
+        "gene": "MAPK9",
+        "family": "kinase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": false,
+        "sim": 0.8514556884765625
+      },
+      {
+        "gene": "INSR",
+        "family": "kinase",
+        "nn": "ADORA2A",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.9471945762634277
+      },
+      {
+        "gene": "DRD2",
+        "family": "gpcr",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.9317612051963806
+      },
+      {
+        "gene": "ADRB2",
+        "family": "gpcr",
+        "nn": "INSR",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.8981109857559204
+      },
+      {
+        "gene": "HTR2A",
+        "family": "gpcr",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.9304704666137695
+      },
+      {
+        "gene": "CNR1",
+        "family": "gpcr",
+        "nn": "KCNQ5",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.9291379451751709
+      },
+      {
+        "gene": "OPRM1",
+        "family": "gpcr",
+        "nn": "SCN9A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.9143893718719482
+      },
+      {
+        "gene": "HTR7",
+        "family": "gpcr",
+        "nn": "SCN9A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.9288930296897888
+      },
+      {
+        "gene": "ADORA1",
+        "family": "gpcr",
+        "nn": "ADORA2A",
+        "nn_family": "gpcr",
+        "match": true,
+        "sim": 0.9376012086868286
+      },
+      {
+        "gene": "ADORA2A",
+        "family": "gpcr",
+        "nn": "INSR",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.9471945762634277
+      },
+      {
+        "gene": "SCN9A",
+        "family": "ion_channel",
+        "nn": "HTR7",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.9288930296897888
+      },
+      {
+        "gene": "SCN10A",
+        "family": "ion_channel",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.9283563494682312
+      },
+      {
+        "gene": "KCNQ2",
+        "family": "ion_channel",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.8931329250335693
+      },
+      {
+        "gene": "HCN1",
+        "family": "ion_channel",
+        "nn": "KCNQ5",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.9515430927276611
+      },
+      {
+        "gene": "TRPV1",
+        "family": "ion_channel",
+        "nn": "ADORA1",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.8838040828704834
+      },
+      {
+        "gene": "KCNQ5",
+        "family": "ion_channel",
+        "nn": "HCN1",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.9515430927276611
+      },
+      {
+        "gene": "SCN1A",
+        "family": "ion_channel",
+        "nn": "SCN9A",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.8693982362747192
+      },
+      {
+        "gene": "SCN5A",
+        "family": "ion_channel",
+        "nn": "DRD2",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.9317612051963806
+      },
+      {
+        "gene": "PPARG",
+        "family": "nuclear_receptor",
+        "nn": "AR",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.9480512142181396
+      },
+      {
+        "gene": "RXRA",
+        "family": "nuclear_receptor",
+        "nn": "VDR",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.9469738006591797
+      },
+      {
+        "gene": "VDR",
+        "family": "nuclear_receptor",
+        "nn": "RXRA",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.9469738006591797
+      },
+      {
+        "gene": "ESR1",
+        "family": "nuclear_receptor",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.9109660387039185
+      },
+      {
+        "gene": "AR",
+        "family": "nuclear_receptor",
+        "nn": "PPARG",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.9480512142181396
+      },
+      {
+        "gene": "TP53",
+        "family": "nuclear_receptor",
+        "nn": "PTEN",
+        "nn_family": "phosphatase",
+        "match": false,
+        "sim": 0.8587719202041626
+      },
+      {
+        "gene": "MDM2",
+        "family": "e3_ligase",
+        "nn": "RARA",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.9496819972991943
+      },
+      {
+        "gene": "YAP1",
+        "family": "e3_ligase",
+        "nn": "RARA",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.9301052689552307
+      },
+      {
+        "gene": "RARA",
+        "family": "e3_ligase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.9496819972991943
+      },
+      {
+        "gene": "SF3B1",
+        "family": "e3_ligase",
+        "nn": "MAPK9",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.7675339579582214
+      },
+      {
+        "gene": "MAPK3",
+        "family": "kinase",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.9438486099243164
+      },
+      {
+        "gene": "PIK3CA",
+        "family": "lipid_kinase",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.9010427594184875
+      },
+      {
+        "gene": "PTEN",
+        "family": "phosphatase",
+        "nn": "BRAF",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.9008094072341919
+      }
+    ]
+  },
+  "centered_cosine": {
+    "nn_recall": 0.48717948717948717,
+    "intra_cos": 0.23605620473002395,
+    "inter_cos": -0.07863212067156737,
+    "family_gap": 0.3146883254015913,
+    "knn_k3_accuracy": 0.5384615384615384,
+    "per_family_nn_recall": {
+      "kinase": 0.5454545454545454,
+      "gpcr": 0.25,
+      "ion_channel": 0.625,
+      "nuclear_receptor": 0.5,
+      "e3_ligase": 0.75,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    },
+    "nn_detail": [
+      {
+        "gene": "EGFR",
+        "family": "kinase",
+        "nn": "ABL1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.5163347125053406
+      },
+      {
+        "gene": "BRAF",
+        "family": "kinase",
+        "nn": "PTEN",
+        "nn_family": "phosphatase",
+        "match": false,
+        "sim": 0.7352776527404785
+      },
+      {
+        "gene": "CDK2",
+        "family": "kinase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": false,
+        "sim": 0.7339367866516113
+      },
+      {
+        "gene": "ABL1",
+        "family": "kinase",
+        "nn": "CDK2",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.7200112342834473
+      },
+      {
+        "gene": "MAPK1",
+        "family": "kinase",
+        "nn": "ABL1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.6859391927719116
+      },
+      {
+        "gene": "FLT1",
+        "family": "kinase",
+        "nn": "BRAF",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.46684640645980835
+      },
+      {
+        "gene": "FLT3",
+        "family": "kinase",
+        "nn": "PIK3CA",
+        "nn_family": "lipid_kinase",
+        "match": false,
+        "sim": 0.4564553499221802
+      },
+      {
+        "gene": "CDK6",
+        "family": "kinase",
+        "nn": "ABL1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.6157960891723633
+      },
+      {
+        "gene": "MAPK9",
+        "family": "kinase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": false,
+        "sim": 0.6636561155319214
+      },
+      {
+        "gene": "INSR",
+        "family": "kinase",
+        "nn": "ADORA1",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.772585391998291
+      },
+      {
+        "gene": "DRD2",
+        "family": "gpcr",
+        "nn": "SCN10A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.754339337348938
+      },
+      {
+        "gene": "ADRB2",
+        "family": "gpcr",
+        "nn": "SCN10A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.5710251331329346
+      },
+      {
+        "gene": "HTR2A",
+        "family": "gpcr",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.746539831161499
+      },
+      {
+        "gene": "CNR1",
+        "family": "gpcr",
+        "nn": "KCNQ5",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.8654738664627075
+      },
+      {
+        "gene": "OPRM1",
+        "family": "gpcr",
+        "nn": "SCN9A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.7785516977310181
+      },
+      {
+        "gene": "HTR7",
+        "family": "gpcr",
+        "nn": "SCN9A",
+        "nn_family": "ion_channel",
+        "match": false,
+        "sim": 0.7783793210983276
+      },
+      {
+        "gene": "ADORA1",
+        "family": "gpcr",
+        "nn": "ADORA2A",
+        "nn_family": "gpcr",
+        "match": true,
+        "sim": 0.7985738515853882
+      },
+      {
+        "gene": "ADORA2A",
+        "family": "gpcr",
+        "nn": "ADORA1",
+        "nn_family": "gpcr",
+        "match": true,
+        "sim": 0.7985738515853882
+      },
+      {
+        "gene": "SCN9A",
+        "family": "ion_channel",
+        "nn": "OPRM1",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.7785516977310181
+      },
+      {
+        "gene": "SCN10A",
+        "family": "ion_channel",
+        "nn": "SCN5A",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.7877407073974609
+      },
+      {
+        "gene": "KCNQ2",
+        "family": "ion_channel",
+        "nn": "ADORA1",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.6729931831359863
+      },
+      {
+        "gene": "HCN1",
+        "family": "ion_channel",
+        "nn": "KCNQ5",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.9125130772590637
+      },
+      {
+        "gene": "TRPV1",
+        "family": "ion_channel",
+        "nn": "ADORA1",
+        "nn_family": "gpcr",
+        "match": false,
+        "sim": 0.6446943283081055
+      },
+      {
+        "gene": "KCNQ5",
+        "family": "ion_channel",
+        "nn": "HCN1",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.9125130772590637
+      },
+      {
+        "gene": "SCN1A",
+        "family": "ion_channel",
+        "nn": "KCNQ5",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.7288912534713745
+      },
+      {
+        "gene": "SCN5A",
+        "family": "ion_channel",
+        "nn": "SCN10A",
+        "nn_family": "ion_channel",
+        "match": true,
+        "sim": 0.7877407073974609
+      },
+      {
+        "gene": "PPARG",
+        "family": "nuclear_receptor",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.6450761556625366
+      },
+      {
+        "gene": "RXRA",
+        "family": "nuclear_receptor",
+        "nn": "VDR",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.7714597582817078
+      },
+      {
+        "gene": "VDR",
+        "family": "nuclear_receptor",
+        "nn": "RXRA",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.7714597582817078
+      },
+      {
+        "gene": "ESR1",
+        "family": "nuclear_receptor",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.577014148235321
+      },
+      {
+        "gene": "AR",
+        "family": "nuclear_receptor",
+        "nn": "PPARG",
+        "nn_family": "nuclear_receptor",
+        "match": true,
+        "sim": 0.6167761087417603
+      },
+      {
+        "gene": "TP53",
+        "family": "nuclear_receptor",
+        "nn": "PTEN",
+        "nn_family": "phosphatase",
+        "match": false,
+        "sim": 0.6984984874725342
+      },
+      {
+        "gene": "MDM2",
+        "family": "e3_ligase",
+        "nn": "RARA",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.8098282814025879
+      },
+      {
+        "gene": "YAP1",
+        "family": "e3_ligase",
+        "nn": "RARA",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.6324630975723267
+      },
+      {
+        "gene": "RARA",
+        "family": "e3_ligase",
+        "nn": "MDM2",
+        "nn_family": "e3_ligase",
+        "match": true,
+        "sim": 0.8098282814025879
+      },
+      {
+        "gene": "SF3B1",
+        "family": "e3_ligase",
+        "nn": "MAPK9",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.6464525461196899
+      },
+      {
+        "gene": "MAPK3",
+        "family": "kinase",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": true,
+        "sim": 0.6714056730270386
+      },
+      {
+        "gene": "PIK3CA",
+        "family": "lipid_kinase",
+        "nn": "MAPK1",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.5207436680793762
+      },
+      {
+        "gene": "PTEN",
+        "family": "phosphatase",
+        "nn": "BRAF",
+        "nn_family": "kinase",
+        "match": false,
+        "sim": 0.7352776527404785
+      }
+    ]
+  },
+  "reference_baselines": {
+    "MAMMAL_458M_NN_recall": 0.75,
+    "ESM2_650M_raw_NN_recall": 0.725,
+    "ESM2_650M_centered_NN_recall": 0.75
+  },
+  "wall_time_sec": 3.8
+}

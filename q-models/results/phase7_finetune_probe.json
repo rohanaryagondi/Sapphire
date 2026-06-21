@@ -1,0 +1,41 @@
+{
+  "torch": "2.12.0",
+  "runs": [
+    {
+      "device": "cpu",
+      "n_params": 458007202,
+      "load_s": 10.6,
+      "encoder_seq_len": 26,
+      "label_len": 3,
+      "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+      "task_token": "WDR91_ASMS",
+      "forward_times_s": [
+        0.1083,
+        0.0994,
+        0.108,
+        0.0997,
+        0.0975
+      ],
+      "forward_median_s": 0.0997,
+      "forward_min_s": 0.0975,
+      "fwd_bwd_feasible": true,
+      "fwd_bwd_times_s": [
+        0.535,
+        0.4763,
+        0.4864,
+        1.2573,
+        0.7586
+      ],
+      "fwd_bwd_median_s": 0.535,
+      "loss_value": 6.5536,
+      "train_step_est_s": 0.5549,
+      "train_step_basis": "measured fwd+bwd + 0.2x fwd optimizer add-on",
+      "local_samples_per_s": 1.802
+    }
+  ],
+  "costlane_central_t4_samples_per_s": 10.0,
+  "costlane_band_t4_samples_per_s": [
+    4.0,
+    25.0
+  ]
+}

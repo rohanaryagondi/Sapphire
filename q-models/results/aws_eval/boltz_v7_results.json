@@ -1,0 +1,69 @@
+{
+  "infra": {
+    "boltz_bin": "/mnt/rohan/boltz_venv/bin/boltz",
+    "boltz_version": "2.2.1",
+    "cuequivariance_torch_version": "0.10.0",
+    "boltz_help_head": [
+      "Usage: boltz predict [OPTIONS] DATA",
+      "",
+      "  Run predictions with Boltz.",
+      "",
+      "Options:",
+      "  --out_dir PATH                  The path where to save the predictions.",
+      "  --cache PATH                    The directory where to download the data and",
+      "                                  model. Default is ~/.boltz, or $BOLTZ_CACHE",
+      "                                  if set.",
+      "  --checkpoint PATH               An optional checkpoint, will use the",
+      "                                  provided Boltz-1 model by default.",
+      "  --devices INTEGER               The number of devices to use for prediction.",
+      "                                  Default is 1.",
+      "  --accelerator [gpu|cpu|tpu]     The accelerator to use for prediction.",
+      "                                  Default is gpu.",
+      "  --recycling_steps INTEGER       The number of recycling steps to use for",
+      "                                  prediction. Default is 3.",
+      "  --sampling_steps INTEGER        The number of sampling steps to use for",
+      "                                  prediction. Default is 200.",
+      "  --diffusion_samples INTEGER     The number of diffusion samples to use for",
+      "                                  prediction. Default is 1.",
+      "  --max_parallel_samples INTEGER  The maximum number of samples to predict in",
+      "                                  parallel. Default is None.",
+      "  --step_scale FLOAT              The step size is related to the temperature",
+      "                                  at which the diffusion process samples the",
+      "                                  distribution. The lower the higher the",
+      "                                  diversity among samples (recommended between",
+      "                                  1 and 2). Default is 1.638 for Boltz-1 and",
+      "                                  1.5 for Boltz-2. If not provided, the",
+      "                                  default step size will be used."
+    ],
+    "nvidia_smi": "NVIDIA A10G, 23028 MiB, 580.126.09",
+    "torch_version": "2.12.0+cu130",
+    "torch_cuda": true,
+    "torch_cuda_name": "NVIDIA A10G"
+  },
+  "complexes": [
+    {
+      "name": "ADRB2_propranolol",
+      "target": "ADRB2",
+      "drug": "propranolol",
+      "label": 1,
+      "protein_seq": "MGQPGNGSAFLLAPNGSHAPDHDVTQERDEVWVVGMGIVMSLIVLAIVFGNVLVITAIAKFERLQTVTNYFITSLACADLVMGLAVVPFGAAHILMKMWTFGNFWCEFWTSIDVLCVTASIETLCVIAVDRYFAITSPFKYQSLLTKNKARVIILMVWIVSGLTSFLPIQMHWYRATHQEAINCYANETCCDFFTNQAYAIASSIVSFYVPLVIMVFVYSRVFQEAKRQLQKIDKSEGRFHVQNLSQVEQDGRTGHGLRRSSKFCLKEHKALKTLGIIMGTFTLCWLPFFIVNIVHVIQDNLIRKEVYILLNWIGYVNSGFNPLIYCRSPDFRIAFQELLCLRRSSLKAYGNGYSSNGNTGEQSGYHVEQEKENKLLCEDLPGTEDFVGHQGTVPSDNIDSQGRNCSTNDSLL",
+      "smiles": "CC(C)NCC(COC1=CC=CC2=CC=CC=C21)O",
+      "seq_len": 413,
+      "rc": 1,
+      "elapsed_s": 56.1,
+      "failure_class": {
+        "rc": 1,
+        "killed_by_signal": false,
+        "timeout": false,
+        "oom": false,
+        "cuda_other": false,
+        "flag_mismatch": false,
+        "msa_failure": false
+      },
+      "prob_binder": null,
+      "log_ic50": null,
+      "err_tail": "rgs)\n  File \"/mnt/rohan/boltz_venv/lib/python3.10/site-packages/boltz/model/layers/triangular_mult.py\", line 92, in forward\n    return kernel_triangular_mult(\n  File \"/mnt/rohan/boltz_venv/lib/python3.10/site-packages/torch/_dynamo/eval_frame.py\", line 1298, in _fn\n    return fn(*args, **kwargs)\n  File \"/mnt/rohan/boltz_venv/lib/python3.10/site-packages/boltz/model/layers/triangular_mult.py\", line 23, in kernel_triangular_mult\n    return triangle_multiplicative_update(\n  File \"/mnt/rohan/boltz_venv/lib/python3.10/site-packages/cuequivariance_torch/primitives/triangle.py\", line 240, in triangle_multiplicative_update\n    raise ImportError(\nImportError: Error importing triangle_multiplicative_update from cuequivariance_ops_torch.\n\nPredicting DataLoader 0:   0%|          | 0/1 [00:03<?, ?it/s]"
+    }
+  ],
+  "wall_time_sec": 66.8
+}

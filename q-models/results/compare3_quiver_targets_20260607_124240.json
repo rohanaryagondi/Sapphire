@@ -1,0 +1,191 @@
+{
+  "timestamp": "20260607_124240",
+  "test": "quiver_targets_triage",
+  "metric": "auroc_actives_vs_decoys",
+  "bar": ">0.6 useful; decisive win = AUROC>=0.70 & CI_lo>0.5 on Nav1.8 or mTOR",
+  "decisive_win_fired": false,
+  "panels": {
+    "Nav1.8": {
+      "n_actives": 7,
+      "n_decoys": 4,
+      "seq_len": 1956,
+      "compounds": [
+        "suzetrigine",
+        "A-803467",
+        "lidocaine",
+        "mexiletine",
+        "ranolazine",
+        "carbamazepine",
+        "lacosamide",
+        "metformin",
+        "caffeine",
+        "ibuprofen",
+        "atenolol"
+      ],
+      "labels": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "cells": {
+        "MAMMAL": {
+          "auroc": 0.4286,
+          "ci95": [
+            0.0,
+            0.9286
+          ],
+          "z_separation": 0.0139,
+          "verdict": "CHANCE",
+          "beats_mammal_rule": false
+        },
+        "ConPLex": {
+          "auroc": 0.3929,
+          "ci95": [
+            0.0,
+            0.75
+          ],
+          "z_separation": 0.1204,
+          "verdict": "CHANCE",
+          "beats_mammal_rule": false,
+          "delta_vs_mammal": {
+            "d_auroc": -0.0357,
+            "ci95": [
+              -0.6071,
+              0.4643
+            ],
+            "p_two_sided": 0.9798,
+            "separable": false
+          }
+        },
+        "Boltz-2": {
+          "verdict": "N/A \u2014 over compute budget (per-pair oracle)"
+        }
+      },
+      "raw_scores": {
+        "MAMMAL": [
+          7.00465,
+          6.94153,
+          7.23059,
+          7.34084,
+          7.29982,
+          7.14281,
+          6.82172,
+          6.47222,
+          6.95543,
+          7.60063,
+          7.40117
+        ],
+        "ConPLex": [
+          0.04722,
+          0.1351,
+          0.08623,
+          0.03849,
+          0.13828,
+          0.27769,
+          0.46827,
+          0.14004,
+          0.07776,
+          0.26101,
+          0.14094
+        ]
+      }
+    },
+    "mTOR": {
+      "n_actives": 6,
+      "n_decoys": 4,
+      "seq_len": 2549,
+      "compounds": [
+        "sirolimus",
+        "everolimus",
+        "temsirolimus",
+        "dactolisib",
+        "sapanisertib",
+        "AZD8055",
+        "metformin",
+        "caffeine",
+        "ibuprofen",
+        "atenolol"
+      ],
+      "labels": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "cells": {
+        "MAMMAL": {
+          "auroc": 0.5417,
+          "ci95": [
+            0.0,
+            1.0
+          ],
+          "z_separation": 0.1904,
+          "verdict": "CHANCE",
+          "beats_mammal_rule": false
+        },
+        "ConPLex": {
+          "auroc": 0.5833,
+          "ci95": [
+            0.1667,
+            1.0
+          ],
+          "z_separation": 0.0096,
+          "verdict": "CHANCE",
+          "beats_mammal_rule": false,
+          "delta_vs_mammal": {
+            "d_auroc": 0.0417,
+            "ci95": [
+              -0.8333,
+              0.8333
+            ],
+            "p_two_sided": 0.9652,
+            "separable": false
+          }
+        },
+        "Boltz-2": {
+          "verdict": "N/A \u2014 over compute budget (per-pair oracle)"
+        }
+      },
+      "raw_scores": {
+        "MAMMAL": [
+          6.83695,
+          6.78018,
+          6.80779,
+          6.25031,
+          6.11654,
+          5.99298,
+          5.68572,
+          5.66721,
+          7.25878,
+          6.82522
+        ],
+        "ConPLex": [
+          0.09484,
+          0.09409,
+          0.07599,
+          0.0219,
+          0.04598,
+          0.04075,
+          0.14384,
+          0.0665,
+          0.03313,
+          0.00396
+        ]
+      }
+    }
+  }
+}

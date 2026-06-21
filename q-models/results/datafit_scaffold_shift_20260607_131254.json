@@ -1,0 +1,235 @@
+{
+  "timestamp": "20260607_131254",
+  "checkpoint": "dti_bindingdb_pkd_peer",
+  "checkpoint_path": "/Users/rohanaryagondi/Library/CloudStorage/OneDrive-YaleUniversity/Career/Quiver/Mammal/models/dti_bindingdb_pkd_peer",
+  "norm_constants": [
+    6.286291085593906,
+    1.5422950906208512
+  ],
+  "device": "mps",
+  "wall_time_sec": 1292.0,
+  "params": {
+    "pkd_threshold": 7.0,
+    "n_per_binder": 3,
+    "mw_tol_da": 50.0,
+    "seed": 42,
+    "min_out_of_scaffold": 10
+  },
+  "targets": [
+    {
+      "accession": "P51449",
+      "gene": "RORC",
+      "class": "nuclear_receptor"
+    },
+    {
+      "accession": "Q8K4Z4",
+      "gene": "Adrb2",
+      "class": "gpcr"
+    },
+    {
+      "accession": "P00918",
+      "gene": "CA2",
+      "class": "other"
+    }
+  ],
+  "per_target": [
+    {
+      "accession": "P51449",
+      "gene": "RORC",
+      "class": "nuclear_receptor",
+      "seq_len": 518,
+      "truncated": false,
+      "n_binders_total": 174,
+      "n_distinct_scaffolds": 76,
+      "dominant_scaffold": {
+        "smiles": "c1cnc2ccc(C(c3ccncc3)c3cnc[nH]3)cc2c1",
+        "n_binders": 11,
+        "fraction_of_binders": 0.063
+      },
+      "top_scaffolds": [
+        {
+          "smiles": "c1cnc2ccc(C(c3ccncc3)c3cnc[nH]3)cc2c1",
+          "n": 11
+        },
+        {
+          "smiles": "c1cnc2ccc(C(c3cnc[nH]3)c3cnn[nH]3)cc2c1",
+          "n": 9
+        },
+        {
+          "smiles": "c1cnc2ccc(C(c3cnc[nH]3)c3cnc[nH]3)cc2c1",
+          "n": 9
+        },
+        {
+          "smiles": "c1cncc(C(c2ccc3ncccc3c2)c2cnc[nH]2)c1",
+          "n": 9
+        },
+        {
+          "smiles": "c1cncc(C(c2ccc3ncccc3c2)c2cnn[nH]2)c1",
+          "n": 8
+        }
+      ],
+      "in_scaffold": {
+        "n_smiles": 11,
+        "n_scored": 11,
+        "pkd_range_true": [
+          7.124,
+          8.886
+        ],
+        "mean_predicted_pkd": 8.211,
+        "n_matched_decoys": 33,
+        "n_decoy_scored": 33,
+        "mean_decoy_predicted_pkd": 6.76
+      },
+      "out_of_scaffold": {
+        "n_smiles": 163,
+        "n_scored": 163,
+        "pkd_range_true": [
+          7.04,
+          9.921
+        ],
+        "mean_predicted_pkd": 8.12,
+        "n_matched_decoys": 489,
+        "n_decoy_scored": 489,
+        "mean_decoy_predicted_pkd": 6.834
+      },
+      "auroc_in_vs_decoys": 0.97,
+      "auroc_out_vs_decoys": 0.929,
+      "auroc_in_vs_out": 0.463,
+      "drop_in_minus_out": 0.041,
+      "auroc_random_ceiling": 0.97,
+      "auroc_matched_ceiling": 0.952
+    },
+    {
+      "accession": "Q8K4Z4",
+      "gene": "Adrb2",
+      "class": "gpcr",
+      "seq_len": 418,
+      "truncated": false,
+      "n_binders_total": 69,
+      "n_distinct_scaffolds": 23,
+      "dominant_scaffold": {
+        "smiles": "c1ccccc1",
+        "n_binders": 19,
+        "fraction_of_binders": 0.275
+      },
+      "top_scaffolds": [
+        {
+          "smiles": "c1ccccc1",
+          "n": 19
+        },
+        {
+          "smiles": "",
+          "n": 9
+        },
+        {
+          "smiles": "C1CC1",
+          "n": 7
+        },
+        {
+          "smiles": "c1ccc(OCCC2CCCCN2)cc1",
+          "n": 6
+        },
+        {
+          "smiles": "c1ccc2ccccc2c1",
+          "n": 4
+        }
+      ],
+      "in_scaffold": {
+        "n_smiles": 19,
+        "n_scored": 19,
+        "pkd_range_true": [
+          7.199,
+          8.866
+        ],
+        "mean_predicted_pkd": 7.628,
+        "n_matched_decoys": 57,
+        "n_decoy_scored": 57,
+        "mean_decoy_predicted_pkd": 6.791
+      },
+      "out_of_scaffold": {
+        "n_smiles": 50,
+        "n_scored": 50,
+        "pkd_range_true": [
+          7.01,
+          9.788
+        ],
+        "mean_predicted_pkd": 7.411,
+        "n_matched_decoys": 150,
+        "n_decoy_scored": 150,
+        "mean_decoy_predicted_pkd": 6.884
+      },
+      "auroc_in_vs_decoys": 0.873,
+      "auroc_out_vs_decoys": 0.746,
+      "auroc_in_vs_out": 0.582,
+      "drop_in_minus_out": 0.126,
+      "auroc_random_ceiling": 0.871,
+      "auroc_matched_ceiling": 0.881
+    },
+    {
+      "accession": "P00918",
+      "gene": "CA2",
+      "class": "other",
+      "seq_len": 260,
+      "truncated": false,
+      "n_binders_total": 123,
+      "n_distinct_scaffolds": 61,
+      "dominant_scaffold": {
+        "smiles": "c1ccccc1",
+        "n_binders": 27,
+        "fraction_of_binders": 0.22
+      },
+      "top_scaffolds": [
+        {
+          "smiles": "c1ccccc1",
+          "n": 27
+        },
+        {
+          "smiles": "O=C(NCCc1ccccc1)c1ccccc1",
+          "n": 8
+        },
+        {
+          "smiles": "O=S1(=O)CCCc2ccsc21",
+          "n": 5
+        },
+        {
+          "smiles": "O=C(NCc1ccccc1)c1ccccc1",
+          "n": 5
+        },
+        {
+          "smiles": "O=S1(=O)NCCc2ccsc21",
+          "n": 4
+        }
+      ],
+      "in_scaffold": {
+        "n_smiles": 27,
+        "n_scored": 27,
+        "pkd_range_true": [
+          7.04,
+          9.796
+        ],
+        "mean_predicted_pkd": 7.483,
+        "n_matched_decoys": 81,
+        "n_decoy_scored": 81,
+        "mean_decoy_predicted_pkd": 7.093
+      },
+      "out_of_scaffold": {
+        "n_smiles": 96,
+        "n_scored": 96,
+        "pkd_range_true": [
+          7.017,
+          9.873
+        ],
+        "mean_predicted_pkd": 7.871,
+        "n_matched_decoys": 288,
+        "n_decoy_scored": 288,
+        "mean_decoy_predicted_pkd": 7.138
+      },
+      "auroc_in_vs_decoys": 0.741,
+      "auroc_out_vs_decoys": 0.741,
+      "auroc_in_vs_out": 0.406,
+      "drop_in_minus_out": -0.0,
+      "auroc_random_ceiling": 0.867,
+      "auroc_matched_ceiling": 0.84
+    }
+  ]
+}

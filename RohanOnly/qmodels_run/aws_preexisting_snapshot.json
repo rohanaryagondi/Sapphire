@@ -1,0 +1,241 @@
+{
+  "taken": "2026-06-21T04:50:46.609724Z",
+  "account": "255493511886",
+  "instances": [
+    {
+      "id": "i-0393d9c9a3a392cc3",
+      "state": "running",
+      "name": "RDS DB LOADING - DO NOT DELETE"
+    },
+    {
+      "id": "i-019cbb3b5f35b63c2",
+      "state": "running",
+      "name": "CONFIG SERVER - DO NOT DELETE"
+    },
+    {
+      "id": "i-0accdb9e9887807ba",
+      "state": "running",
+      "name": "OptoViz"
+    },
+    {
+      "id": "i-00bdb9517a9fb9646",
+      "state": "stopped",
+      "name": "SemossCudavpc"
+    },
+    {
+      "id": "i-0d72d7af705e88287",
+      "state": "stopped",
+      "name": "semosstest"
+    },
+    {
+      "id": "i-0d964d89be16a63f4",
+      "state": "running",
+      "name": "Rohan-R82-encode-gpu"
+    },
+    {
+      "id": "i-0b68937b2be898b55",
+      "state": "stopped",
+      "name": "Rohan-R84-xbatch-disc-s0"
+    }
+  ],
+  "volumes": [
+    "vol-0679bcc219686d74b",
+    "vol-0651c24793463a89e",
+    "vol-0c2cf053f170e3a1e",
+    "vol-0098892500b9a3208",
+    "vol-033fcaec22eaabbcc",
+    "vol-0fd8f4ac2070ced4f",
+    "vol-066389517f2740f19",
+    "vol-0fb2fefb175cecede",
+    "vol-058a1ae00b8fde8fc",
+    "vol-012d1f81c3e2724b0"
+  ],
+  "buckets": [
+    "preeve-ptp-cloudcheckr",
+    "qstatebio-backup",
+    "qstatebio-daniel",
+    "qstatebio-genewiz-uploads",
+    "qstatebio-graham",
+    "qstatebio-hci-data",
+    "qstatebio-internal-data",
+    "qstatebio-persistent-data",
+    "qstatebio-production-data",
+    "qstatebio-qlacier",
+    "qstatebio-qlacier-backup",
+    "qstatebio-qnadx-shared-resources",
+    "qstatebio-rnaseq",
+    "qstatebio-rnaseq-bgi",
+    "qstatebio-sequencing",
+    "qstatebio-testing",
+    "qstatebio-transfer-nonpain-therapeutics",
+    "qstatebio-transfer-pain-therapeutics",
+    "qstatebio-ucb-rnaseq",
+    "qstatebio-upp",
+    "qstatebio-vertex-rnaseq",
+    "qstatebio-volatile",
+    "quiver-broad",
+    "quiver-images",
+    "quiver-ml",
+    "quiverbio-psychogenics",
+    "rds-quiver-snapshots",
+    "rohan-mammal-bootstrap-20260610-213029"
+  ],
+  "security_groups": [
+    {
+      "id": "sg-04451b99892c7d5a4",
+      "name": "launch-wizard-104"
+    },
+    {
+      "id": "sg-03ba2fc340c8eab25",
+      "name": "Rohan-oEP-sg"
+    },
+    {
+      "id": "sg-0b14d3c28ad4245c6",
+      "name": "security-group-for-inbound-nfs-d-zgjepfqfqlpx"
+    },
+    {
+      "id": "sg-01efc1f186e36418e",
+      "name": "launch-wizard-106"
+    },
+    {
+      "id": "sg-0a8f919ccee6ae593",
+      "name": "launch-wizard-108"
+    },
+    {
+      "id": "sg-045e650e942751f1f",
+      "name": "launch-wizard-7"
+    },
+    {
+      "id": "sg-a761bddd",
+      "name": "Galenea IP"
+    },
+    {
+      "id": "sg-018e677db596406a5",
+      "name": "launch-wizard-5"
+    },
+    {
+      "id": "sg-0b9722ea0ea2f1e87",
+      "name": "mammal-ft-sg-36921"
+    },
+    {
+      "id": "sg-0bc9eff9f6ffc4d05",
+      "name": "launch-wizard-8"
+    },
+    {
+      "id": "sg-0d4b115c0588e8a7c",
+      "name": "launch-wizard-6"
+    },
+    {
+      "id": "sg-0220900c6ec6e3b73",
+      "name": "security-group-for-outbound-nfs-d-rbozvyywd6rz"
+    },
+    {
+      "id": "sg-0e4644b1df1ca598d",
+      "name": "dfp089-ssh-only"
+    },
+    {
+      "id": "sg-0b3ba69ba1fcfd790",
+      "name": "launch-wizard-1"
+    },
+    {
+      "id": "sg-0a4a7ca8203ec988f",
+      "name": "default"
+    },
+    {
+      "id": "sg-0558018497f070ae7",
+      "name": "Ubuntu 20-04 LTS - Focal-Ubuntu 20-04 20211129-AutogenByAWSMP-"
+    },
+    {
+      "id": "sg-0d63708afc2a7048d",
+      "name": "niklas-paninski-test-sg"
+    },
+    {
+      "id": "sg-0c5353cf066bbe4fc",
+      "name": "launch-wizard-3"
+    },
+    {
+      "id": "sg-075ff0ccd07440b94",
+      "name": "launch-wizard-103"
+    },
+    {
+      "id": "sg-034b9c4d6f6a51610",
+      "name": "Ubuntu 18-04 LTS - Bionic-Ubuntu 18-04 20200729-AutogenByAWSMP-"
+    },
+    {
+      "id": "sg-0962da77204160e3d",
+      "name": "deloitte_m5_ec2"
+    },
+    {
+      "id": "sg-c44894be",
+      "name": "rds-launch-wizard"
+    },
+    {
+      "id": "sg-0acbda5f643b9afb2",
+      "name": "launch-wizard-9"
+    },
+    {
+      "id": "sg-09853cea899ddd152",
+      "name": "ping-target-and-config-server"
+    },
+    {
+      "id": "sg-0711cc33e9711cbe7",
+      "name": "launch-wizard-2"
+    },
+    {
+      "id": "sg-8d32c5f6",
+      "name": "Q-State IP"
+    },
+    {
+      "id": "sg-03af7efe677b7c699",
+      "name": "launch-wizard-105"
+    },
+    {
+      "id": "sg-023151f8ffb6d5cd2",
+      "name": "default"
+    },
+    {
+      "id": "sg-0f681a8b581e76261",
+      "name": "launch-wizard-4"
+    },
+    {
+      "id": "sg-0a4f93c569a46a405",
+      "name": "launch-wizard-107"
+    },
+    {
+      "id": "sg-0b61563fe7ccc36cb",
+      "name": "david rose home"
+    },
+    {
+      "id": "sg-1b4dee62",
+      "name": "default"
+    },
+    {
+      "id": "sg-0f1893ed4c74fce3f",
+      "name": "Ubuntu 20-04 LTS - Focal-Ubuntu 20-04 20211129-AutogenByAWSMP-1"
+    },
+    {
+      "id": "sg-0ca145f91d7ea7988",
+      "name": "security-group-for-inbound-nfs-d-rbozvyywd6rz"
+    },
+    {
+      "id": "sg-09eadeee1edf9edcf",
+      "name": "security-group-for-outbound-nfs-d-zgjepfqfqlpx"
+    },
+    {
+      "id": "sg-0c08c5e5c84d5161b",
+      "name": "launch-wizard-10"
+    },
+    {
+      "id": "sg-09757625617aa0baa",
+      "name": "launch-wizard-11"
+    },
+    {
+      "id": "sg-18e94662",
+      "name": "chempel home"
+    },
+    {
+      "id": "sg-8cc99cf3",
+      "name": "rds-qstate"
+    }
+  ]
+}

@@ -1,0 +1,2351 @@
+{
+  "results": [
+    {
+      "gene": "SCN10A",
+      "binder": "suzetrigine",
+      "post_cutoff": true,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "suzetrigine",
+      "post_cutoff": true,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "ambroxol",
+      "binder_node_index": 15667,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9918557405471802,
+      "rank_of_n": [
+        3365,
+        8160
+      ],
+      "rank_percentile": 0.41237745098039214,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "ambroxol",
+      "binder_node_index": 15667,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.37697604298591614,
+      "rank_of_n": [
+        2619,
+        8160
+      ],
+      "rank_percentile": 0.3209558823529412,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9986695051193237,
+      "rank_of_n": [
+        1532,
+        8160
+      ],
+      "rank_percentile": 0.18774509803921569,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9161497354507446,
+      "rank_of_n": [
+        353,
+        8160
+      ],
+      "rank_percentile": 0.043259803921568626,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "a-803467",
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "a-803467",
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "funapide",
+      "post_cutoff": true,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN10A",
+      "binder": "funapide",
+      "post_cutoff": true,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9877239465713501,
+      "rank_of_n": [
+        2520,
+        8160
+      ],
+      "rank_percentile": 0.3088235294117647,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8642239570617676,
+      "rank_of_n": [
+        413,
+        8160
+      ],
+      "rank_percentile": 0.050612745098039216,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "carbamazepine",
+      "binder_node_index": 15044,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.994679868221283,
+      "rank_of_n": [
+        873,
+        8160
+      ],
+      "rank_percentile": 0.10698529411764705,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "carbamazepine",
+      "binder_node_index": 15044,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.884019136428833,
+      "rank_of_n": [
+        265,
+        8160
+      ],
+      "rank_percentile": 0.032475490196078434,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "tetracaine",
+      "binder_node_index": 17718,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9938138723373413,
+      "rank_of_n": [
+        1145,
+        8160
+      ],
+      "rank_percentile": 0.1403186274509804,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN9A",
+      "binder": "tetracaine",
+      "binder_node_index": 17718,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.7498617768287659,
+      "rank_of_n": [
+        1151,
+        8160
+      ],
+      "rank_percentile": 0.14105392156862745,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "phenytoin",
+      "binder_node_index": 14143,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9971206784248352,
+      "rank_of_n": [
+        482,
+        8160
+      ],
+      "rank_percentile": 0.05906862745098039,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "phenytoin",
+      "binder_node_index": 14143,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.95574551820755,
+      "rank_of_n": [
+        15,
+        8160
+      ],
+      "rank_percentile": 0.001838235294117647,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "carbamazepine",
+      "binder_node_index": 15044,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9967111349105835,
+      "rank_of_n": [
+        591,
+        8160
+      ],
+      "rank_percentile": 0.0724264705882353,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "carbamazepine",
+      "binder_node_index": 15044,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9318984746932983,
+      "rank_of_n": [
+        197,
+        8160
+      ],
+      "rank_percentile": 0.0241421568627451,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "lamotrigine",
+      "binder_node_index": 14206,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9979251623153687,
+      "rank_of_n": [
+        227,
+        8160
+      ],
+      "rank_percentile": 0.02781862745098039,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "lamotrigine",
+      "binder_node_index": 14206,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9375531673431396,
+      "rank_of_n": [
+        140,
+        8160
+      ],
+      "rank_percentile": 0.01715686274509804,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "oxcarbazepine",
+      "binder_node_index": 14253,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9978647828102112,
+      "rank_of_n": [
+        237,
+        8160
+      ],
+      "rank_percentile": 0.029044117647058824,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN1A",
+      "binder": "oxcarbazepine",
+      "binder_node_index": 14253,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.921826958656311,
+      "rank_of_n": [
+        299,
+        8160
+      ],
+      "rank_percentile": 0.0366421568627451,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.99819415807724,
+      "rank_of_n": [
+        2160,
+        8160
+      ],
+      "rank_percentile": 0.2647058823529412,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "lidocaine",
+      "binder_node_index": 15029,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8560174703598022,
+      "rank_of_n": [
+        621,
+        8160
+      ],
+      "rank_percentile": 0.07610294117647058,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "flecainide",
+      "binder_node_index": 14348,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9997459053993225,
+      "rank_of_n": [
+        145,
+        8160
+      ],
+      "rank_percentile": 0.017769607843137254,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "flecainide",
+      "binder_node_index": 14348,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9133231043815613,
+      "rank_of_n": [
+        185,
+        8160
+      ],
+      "rank_percentile": 0.02267156862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "amiodarone",
+      "binder_node_index": 14332,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9997344613075256,
+      "rank_of_n": [
+        169,
+        8160
+      ],
+      "rank_percentile": 0.02071078431372549,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "amiodarone",
+      "binder_node_index": 14332,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8877306580543518,
+      "rank_of_n": [
+        407,
+        8160
+      ],
+      "rank_percentile": 0.04987745098039216,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "quinidine",
+      "binder_node_index": 14282,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9993546605110168,
+      "rank_of_n": [
+        895,
+        8160
+      ],
+      "rank_percentile": 0.1096813725490196,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "quinidine",
+      "binder_node_index": 14282,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9146825075149536,
+      "rank_of_n": [
+        169,
+        8160
+      ],
+      "rank_percentile": 0.02071078431372549,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "mexiletine",
+      "binder_node_index": 15194,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9996387958526611,
+      "rank_of_n": [
+        389,
+        8160
+      ],
+      "rank_percentile": 0.04767156862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "SCN5A",
+      "binder": "mexiletine",
+      "binder_node_index": 15194,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9070769548416138,
+      "rank_of_n": [
+        235,
+        8160
+      ],
+      "rank_percentile": 0.028799019607843136,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "rapamycin",
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "rapamycin",
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "sirolimus",
+      "binder_node_index": 14276,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.849399209022522,
+      "rank_of_n": [
+        5623,
+        8160
+      ],
+      "rank_percentile": 0.689093137254902,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "sirolimus",
+      "binder_node_index": 14276,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.6832794547080994,
+      "rank_of_n": [
+        305,
+        8160
+      ],
+      "rank_percentile": 0.037377450980392156,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "everolimus",
+      "binder_node_index": 15268,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9366976618766785,
+      "rank_of_n": [
+        2009,
+        8160
+      ],
+      "rank_percentile": 0.24620098039215688,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "everolimus",
+      "binder_node_index": 15268,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.7770670056343079,
+      "rank_of_n": [
+        144,
+        8160
+      ],
+      "rank_percentile": 0.01764705882352941,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "temsirolimus",
+      "binder_node_index": 15100,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9239078164100647,
+      "rank_of_n": [
+        2679,
+        8160
+      ],
+      "rank_percentile": 0.32830882352941176,
+      "status": "ok"
+    },
+    {
+      "gene": "MTOR",
+      "binder": "temsirolimus",
+      "binder_node_index": 15100,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8461418747901917,
+      "rank_of_n": [
+        51,
+        8160
+      ],
+      "rank_percentile": 0.00625,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "propranolol",
+      "binder_node_index": 14211,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9989033937454224,
+      "rank_of_n": [
+        602,
+        8160
+      ],
+      "rank_percentile": 0.07377450980392157,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "propranolol",
+      "binder_node_index": 14211,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.84464430809021,
+      "rank_of_n": [
+        338,
+        8160
+      ],
+      "rank_percentile": 0.04142156862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "salbutamol",
+      "binder_node_index": 15573,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9992551207542419,
+      "rank_of_n": [
+        253,
+        8160
+      ],
+      "rank_percentile": 0.031004901960784315,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "salbutamol",
+      "binder_node_index": 15573,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8398539423942566,
+      "rank_of_n": [
+        377,
+        8160
+      ],
+      "rank_percentile": 0.046200980392156865,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "formoterol",
+      "binder_node_index": 14297,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9983481168746948,
+      "rank_of_n": [
+        1016,
+        8160
+      ],
+      "rank_percentile": 0.12450980392156863,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "formoterol",
+      "binder_node_index": 14297,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8410044312477112,
+      "rank_of_n": [
+        364,
+        8160
+      ],
+      "rank_percentile": 0.0446078431372549,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "salmeterol",
+      "binder_node_index": 14287,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9992493987083435,
+      "rank_of_n": [
+        261,
+        8160
+      ],
+      "rank_percentile": 0.031985294117647056,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "salmeterol",
+      "binder_node_index": 14287,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8709121346473694,
+      "rank_of_n": [
+        117,
+        8160
+      ],
+      "rank_percentile": 0.014338235294117646,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "isoproterenol",
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "isoproterenol",
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "status": "binder_not_in_kg"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "metoprolol",
+      "binder_node_index": 14145,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9986969828605652,
+      "rank_of_n": [
+        768,
+        8160
+      ],
+      "rank_percentile": 0.09411764705882353,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "metoprolol",
+      "binder_node_index": 14145,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8446348905563354,
+      "rank_of_n": [
+        339,
+        8160
+      ],
+      "rank_percentile": 0.04154411764705882,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "atenolol",
+      "binder_node_index": 14166,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9989442229270935,
+      "rank_of_n": [
+        560,
+        8160
+      ],
+      "rank_percentile": 0.06862745098039216,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "atenolol",
+      "binder_node_index": 14166,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8489509224891663,
+      "rank_of_n": [
+        308,
+        8160
+      ],
+      "rank_percentile": 0.037745098039215684,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "nadolol",
+      "binder_node_index": 14661,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9989603757858276,
+      "rank_of_n": [
+        547,
+        8160
+      ],
+      "rank_percentile": 0.0670343137254902,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "nadolol",
+      "binder_node_index": 14661,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8098129630088806,
+      "rank_of_n": [
+        676,
+        8160
+      ],
+      "rank_percentile": 0.08284313725490196,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "bisoprolol",
+      "binder_node_index": 15545,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9989328980445862,
+      "rank_of_n": [
+        578,
+        8160
+      ],
+      "rank_percentile": 0.07083333333333333,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "bisoprolol",
+      "binder_node_index": 15545,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8421206474304199,
+      "rank_of_n": [
+        357,
+        8160
+      ],
+      "rank_percentile": 0.04375,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "isoprenaline",
+      "binder_node_index": 14320,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9991493225097656,
+      "rank_of_n": [
+        371,
+        8160
+      ],
+      "rank_percentile": 0.0454656862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "ADRB2",
+      "binder": "isoprenaline",
+      "binder_node_index": 14320,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.7396736741065979,
+      "rank_of_n": [
+        1234,
+        8160
+      ],
+      "rank_percentile": 0.15122549019607842,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "haloperidol",
+      "binder_node_index": 15040,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9993625283241272,
+      "rank_of_n": [
+        56,
+        8160
+      ],
+      "rank_percentile": 0.006862745098039216,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "haloperidol",
+      "binder_node_index": 15040,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9191990494728088,
+      "rank_of_n": [
+        48,
+        8160
+      ],
+      "rank_percentile": 0.0058823529411764705,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "risperidone",
+      "binder_node_index": 14241,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9989112615585327,
+      "rank_of_n": [
+        484,
+        8160
+      ],
+      "rank_percentile": 0.059313725490196076,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "risperidone",
+      "binder_node_index": 14241,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9137630462646484,
+      "rank_of_n": [
+        72,
+        8160
+      ],
+      "rank_percentile": 0.008823529411764706,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "clozapine",
+      "binder_node_index": 15190,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9987478256225586,
+      "rank_of_n": [
+        659,
+        8160
+      ],
+      "rank_percentile": 0.08075980392156863,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "clozapine",
+      "binder_node_index": 15190,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9133350253105164,
+      "rank_of_n": [
+        78,
+        8160
+      ],
+      "rank_percentile": 0.009558823529411765,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "olanzapine",
+      "binder_node_index": 14165,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9990617632865906,
+      "rank_of_n": [
+        349,
+        8160
+      ],
+      "rank_percentile": 0.042769607843137256,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "olanzapine",
+      "binder_node_index": 14165,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9129779934883118,
+      "rank_of_n": [
+        79,
+        8160
+      ],
+      "rank_percentile": 0.009681372549019608,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "aripiprazole",
+      "binder_node_index": 14355,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9991708993911743,
+      "rank_of_n": [
+        211,
+        8160
+      ],
+      "rank_percentile": 0.0258578431372549,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "aripiprazole",
+      "binder_node_index": 14355,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9242335557937622,
+      "rank_of_n": [
+        25,
+        8160
+      ],
+      "rank_percentile": 0.0030637254901960784,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "sulpiride",
+      "binder_node_index": 14172,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9986492991447449,
+      "rank_of_n": [
+        745,
+        8160
+      ],
+      "rank_percentile": 0.09129901960784313,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "sulpiride",
+      "binder_node_index": 14172,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8536947965621948,
+      "rank_of_n": [
+        506,
+        8160
+      ],
+      "rank_percentile": 0.06200980392156863,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "quetiapine",
+      "binder_node_index": 15084,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.999106228351593,
+      "rank_of_n": [
+        279,
+        8160
+      ],
+      "rank_percentile": 0.03419117647058824,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "quetiapine",
+      "binder_node_index": 15084,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.911846935749054,
+      "rank_of_n": [
+        86,
+        8160
+      ],
+      "rank_percentile": 0.01053921568627451,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "chlorpromazine",
+      "binder_node_index": 14190,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9988335967063904,
+      "rank_of_n": [
+        571,
+        8160
+      ],
+      "rank_percentile": 0.06997549019607843,
+      "status": "ok"
+    },
+    {
+      "gene": "DRD2",
+      "binder": "chlorpromazine",
+      "binder_node_index": 14190,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8970543146133423,
+      "rank_of_n": [
+        207,
+        8160
+      ],
+      "rank_percentile": 0.02536764705882353,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "erlotinib",
+      "binder_node_index": 14201,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.8788824081420898,
+      "rank_of_n": [
+        4258,
+        8160
+      ],
+      "rank_percentile": 0.5218137254901961,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "erlotinib",
+      "binder_node_index": 14201,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8647529482841492,
+      "rank_of_n": [
+        54,
+        8160
+      ],
+      "rank_percentile": 0.006617647058823529,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "gefitinib",
+      "binder_node_index": 14159,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.8914867639541626,
+      "rank_of_n": [
+        3760,
+        8160
+      ],
+      "rank_percentile": 0.46078431372549017,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "gefitinib",
+      "binder_node_index": 14159,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.847865104675293,
+      "rank_of_n": [
+        77,
+        8160
+      ],
+      "rank_percentile": 0.009436274509803921,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "lapatinib",
+      "binder_node_index": 15085,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9077980518341064,
+      "rank_of_n": [
+        3092,
+        8160
+      ],
+      "rank_percentile": 0.37892156862745097,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "lapatinib",
+      "binder_node_index": 15085,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8769579529762268,
+      "rank_of_n": [
+        24,
+        8160
+      ],
+      "rank_percentile": 0.0029411764705882353,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "afatinib",
+      "binder_node_index": 17422,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9774320125579834,
+      "rank_of_n": [
+        286,
+        8160
+      ],
+      "rank_percentile": 0.03504901960784314,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "afatinib",
+      "binder_node_index": 17422,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8263569474220276,
+      "rank_of_n": [
+        127,
+        8160
+      ],
+      "rank_percentile": 0.015563725490196079,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "osimertinib",
+      "binder_node_index": 15470,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9352606534957886,
+      "rank_of_n": [
+        2036,
+        8160
+      ],
+      "rank_percentile": 0.24950980392156863,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "osimertinib",
+      "binder_node_index": 15470,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8760886192321777,
+      "rank_of_n": [
+        26,
+        8160
+      ],
+      "rank_percentile": 0.0031862745098039215,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "cetuximab",
+      "binder_node_index": 17672,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9764989018440247,
+      "rank_of_n": [
+        320,
+        8160
+      ],
+      "rank_percentile": 0.0392156862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "EGFR",
+      "binder": "cetuximab",
+      "binder_node_index": 17672,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.7984476685523987,
+      "rank_of_n": [
+        189,
+        8160
+      ],
+      "rank_percentile": 0.023161764705882354,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "vemurafenib",
+      "binder_node_index": 14449,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.974341630935669,
+      "rank_of_n": [
+        2231,
+        8160
+      ],
+      "rank_percentile": 0.273406862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "vemurafenib",
+      "binder_node_index": 14449,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8764402866363525,
+      "rank_of_n": [
+        159,
+        8160
+      ],
+      "rank_percentile": 0.01948529411764706,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "dabrafenib",
+      "binder_node_index": 14453,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9872567653656006,
+      "rank_of_n": [
+        677,
+        8160
+      ],
+      "rank_percentile": 0.0829656862745098,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "dabrafenib",
+      "binder_node_index": 14453,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9443070292472839,
+      "rank_of_n": [
+        19,
+        8160
+      ],
+      "rank_percentile": 0.0023284313725490196,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "encorafenib",
+      "binder_node_index": 15334,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9821950793266296,
+      "rank_of_n": [
+        1252,
+        8160
+      ],
+      "rank_percentile": 0.15343137254901962,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "encorafenib",
+      "binder_node_index": 15334,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9085425734519958,
+      "rank_of_n": [
+        93,
+        8160
+      ],
+      "rank_percentile": 0.011397058823529411,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "sorafenib",
+      "binder_node_index": 15033,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9816557765007019,
+      "rank_of_n": [
+        1324,
+        8160
+      ],
+      "rank_percentile": 0.16225490196078432,
+      "status": "ok"
+    },
+    {
+      "gene": "BRAF",
+      "binder": "sorafenib",
+      "binder_node_index": 15033,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9239940047264099,
+      "rank_of_n": [
+        60,
+        8160
+      ],
+      "rank_percentile": 0.007352941176470588,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "ketanserin",
+      "binder_node_index": 17344,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9956789612770081,
+      "rank_of_n": [
+        2464,
+        8160
+      ],
+      "rank_percentile": 0.30196078431372547,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "ketanserin",
+      "binder_node_index": 17344,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.30725839734077454,
+      "rank_of_n": [
+        2663,
+        8160
+      ],
+      "rank_percentile": 0.3263480392156863,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "risperidone",
+      "binder_node_index": 14241,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9991868138313293,
+      "rank_of_n": [
+        418,
+        8160
+      ],
+      "rank_percentile": 0.05122549019607843,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "risperidone",
+      "binder_node_index": 14241,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8889359831809998,
+      "rank_of_n": [
+        152,
+        8160
+      ],
+      "rank_percentile": 0.018627450980392157,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "olanzapine",
+      "binder_node_index": 14165,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.999254047870636,
+      "rank_of_n": [
+        350,
+        8160
+      ],
+      "rank_percentile": 0.0428921568627451,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "olanzapine",
+      "binder_node_index": 14165,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8952894806861877,
+      "rank_of_n": [
+        100,
+        8160
+      ],
+      "rank_percentile": 0.012254901960784314,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "aripiprazole",
+      "binder_node_index": 14355,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9993525147438049,
+      "rank_of_n": [
+        221,
+        8160
+      ],
+      "rank_percentile": 0.027083333333333334,
+      "status": "ok"
+    },
+    {
+      "gene": "HTR2A",
+      "binder": "aripiprazole",
+      "binder_node_index": 14355,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.901982843875885,
+      "rank_of_n": [
+        67,
+        8160
+      ],
+      "rank_percentile": 0.00821078431372549,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "morphine",
+      "binder_node_index": 14153,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9984288811683655,
+      "rank_of_n": [
+        597,
+        8160
+      ],
+      "rank_percentile": 0.07316176470588236,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "morphine",
+      "binder_node_index": 14153,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9205442070960999,
+      "rank_of_n": [
+        314,
+        8160
+      ],
+      "rank_percentile": 0.03848039215686275,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "naloxone",
+      "binder_node_index": 14346,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9980027079582214,
+      "rank_of_n": [
+        838,
+        8160
+      ],
+      "rank_percentile": 0.10269607843137254,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "naloxone",
+      "binder_node_index": 14346,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.8918572068214417,
+      "rank_of_n": [
+        597,
+        8160
+      ],
+      "rank_percentile": 0.07316176470588236,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "fentanyl",
+      "binder_node_index": 14262,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9975784420967102,
+      "rank_of_n": [
+        1061,
+        8160
+      ],
+      "rank_percentile": 0.13002450980392158,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "fentanyl",
+      "binder_node_index": 14262,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.880141019821167,
+      "rank_of_n": [
+        701,
+        8160
+      ],
+      "rank_percentile": 0.08590686274509804,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "methadone",
+      "binder_node_index": 14164,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9988526105880737,
+      "rank_of_n": [
+        284,
+        8160
+      ],
+      "rank_percentile": 0.03480392156862745,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "methadone",
+      "binder_node_index": 14164,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.936314582824707,
+      "rank_of_n": [
+        135,
+        8160
+      ],
+      "rank_percentile": 0.016544117647058824,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "buprenorphine",
+      "binder_node_index": 15066,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "drug",
+        "drug_protein",
+        "gene/protein"
+      ],
+      "etype_index": 45,
+      "score": 0.9978448152542114,
+      "rank_of_n": [
+        929,
+        8160
+      ],
+      "rank_percentile": 0.11384803921568627,
+      "status": "ok"
+    },
+    {
+      "gene": "OPRM1",
+      "binder": "buprenorphine",
+      "binder_node_index": 15066,
+      "binder_node_type": "drug",
+      "binder_in_drug_pool": true,
+      "post_cutoff": false,
+      "etype": [
+        "gene/protein",
+        "rev_drug_protein",
+        "drug"
+      ],
+      "etype_index": 83,
+      "score": 0.9331652522087097,
+      "rank_of_n": [
+        173,
+        8160
+      ],
+      "rank_percentile": 0.021200980392156864,
+      "status": "ok"
+    }
+  ],
+  "n_drugs_in_kg": 8160
+}

@@ -1,0 +1,9 @@
+{
+  "timestamp": "20260528_200455",
+  "n": 25,
+  "n_classes": 5,
+  "mammal_nn_same_class": 0.72,
+  "tanimoto_nn_same_class": 0.96,
+  "mammal_vs_tanimoto_spearman": 0.332,
+  "mammal_sameclass_minus_crossclass_cosine": 0.132
+}

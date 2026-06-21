@@ -1,0 +1,176 @@
+{
+  "phase": "phase6_generation_probe2",
+  "timestamp": "20260601_132930",
+  "device": "cpu",
+  "device_actual": "cpu",
+  "classifier_check": {
+    "diazepam_BBBP": {
+      "decode": "<SENTINEL_ID_0>1c2ccccc2<EOS>",
+      "P1_raw": 0.0,
+      "P0_raw": 0.0,
+      "P1_norm": 0.6328
+    },
+    "ethanol_BBBP": {
+      "decode": "<SENTINEL_ID_0>)(<EOS>",
+      "P1_raw": 0.0,
+      "P0_raw": 0.0,
+      "P1_norm": 0.515
+    }
+  },
+  "denovo_forced": [
+    {
+      "trial": "sentinel_only_greedy",
+      "decoded": "<SENTINEL_ID_0>P<EOS>",
+      "candidate": "P",
+      "canonical": "P",
+      "valid": true,
+      "heavy_atoms": 1
+    },
+    {
+      "trial": "sentinel_only_min20",
+      "decoded": "<SENTINEL_ID_0>PP1P1OP1OP1OP1OP1OP<EOS>",
+      "candidate": "PP1P1OP1OP1OP1OP1OP",
+      "canonical": null,
+      "valid": false,
+      "heavy_atoms": 0
+    },
+    {
+      "trial": "sentinel_only_beam5",
+      "decoded": "<SENTINEL_ID_0>P<EOS>",
+      "candidate": "P",
+      "canonical": "P",
+      "valid": true,
+      "heavy_atoms": 1
+    },
+    {
+      "trial": "sentinel_only_beam5_min20",
+      "decoded": "<SENTINEL_ID_0>CP<SENTINEL_ID_1>PP1PP1P1P1P1P1P1<EOS>",
+      "candidate": "CP",
+      "canonical": "CP",
+      "valid": true,
+      "heavy_atoms": 2
+    },
+    {
+      "trial": "scaffold_c1ccccc1_ext",
+      "decoded": "<SENTINEL_ID_0>P=OP1]CI12<EOS>",
+      "candidate": "P=OP1]CI12",
+      "canonical": null,
+      "valid": false,
+      "heavy_atoms": 0
+    },
+    {
+      "trial": "scaffold_CCO_ext",
+      "decoded": "<SENTINEL_ID_0>NNN1OOOOO<EOS>",
+      "candidate": "NNN1OOOOO",
+      "canonical": null,
+      "valid": false,
+      "heavy_atoms": 0
+    },
+    {
+      "trial": "sample_T1.2_min20",
+      "decoded": "<SENTINEL_ID_0>N=p1F1SccS<SENTINEL_ID_1>CI1NOP1P1<EOS>",
+      "candidate": "N=p1F1SccS",
+      "canonical": null,
+      "valid": false,
+      "heavy_atoms": 0
+    }
+  ],
+  "smiles_short_span_infill": {
+    "parent": "CC(=O)Oc1ccccc1C(=O)O",
+    "held": "cc",
+    "greedy": {
+      "fill": "c(Cl)c",
+      "recon_canonical": "CC(=O)Oc1ccc(Cl)cc1C(=O)O",
+      "exact": false,
+      "equals_parent": false
+    },
+    "samples": [
+      {
+        "fill": "c(O)c",
+        "recon_canonical": "CC(=O)Oc1ccc(O)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "c(O)c",
+        "recon_canonical": "CC(=O)Oc1ccc(O)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "(OC)cc",
+        "recon_canonical": "COc1ccc(C(=O)O)c(OC(C)=O)c1",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "c(Cl)c",
+        "recon_canonical": "CC(=O)Oc1ccc(Cl)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "c(Cl)c",
+        "recon_canonical": "CC(=O)Oc1ccc(Cl)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "c(CO)c",
+        "recon_canonical": "CC(=O)Oc1ccc(CO)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "c(Br)c",
+        "recon_canonical": "CC(=O)Oc1ccc(Br)cc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      },
+      {
+        "fill": "(Cl)cc",
+        "recon_canonical": "CC(=O)Oc1cc(Cl)ccc1C(=O)O",
+        "exact": false,
+        "equals_parent": false
+      }
+    ],
+    "any_sample_recovers_parent": false
+  },
+  "protein_sampling_infill": {
+    "held": "GNWVCAAKFE",
+    "samples": [
+      {
+        "fill": "SNASEST",
+        "aar": 0.1,
+        "homopolymer": false
+      },
+      {
+        "fill": "PSIQQDL",
+        "aar": 0.0,
+        "homopolymer": false
+      },
+      {
+        "fill": "TIEHFGGYL",
+        "aar": 0.0,
+        "homopolymer": false
+      },
+      {
+        "fill": "YNLKFG",
+        "aar": 0.1,
+        "homopolymer": false
+      },
+      {
+        "fill": "NTSGQATT",
+        "aar": 0.1,
+        "homopolymer": false
+      },
+      {
+        "fill": "GGFEKNF",
+        "aar": 0.1,
+        "homopolymer": false
+      }
+    ],
+    "mean_sample_aar": 0.067,
+    "any_non_homopolymer": true
+  }
+}

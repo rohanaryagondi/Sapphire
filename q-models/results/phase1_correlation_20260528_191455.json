@@ -1,0 +1,131 @@
+{
+  "timestamp": "20260528_191455",
+  "model": "ibm/biomed.omics.bl.sm.ma-ted-458m.dti_bindingdb_pkd",
+  "device": "mps",
+  "n_pairs": 10,
+  "spearman": -0.0303,
+  "pearson": 0.1985,
+  "verdict": "FAIL",
+  "pairs": [
+    {
+      "drug": "imatinib",
+      "target": "ABL1",
+      "accession": "P00519",
+      "mol_id": "CHEMBL941",
+      "tgt_id": "CHEMBL1862",
+      "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+      "seq_len": 1130,
+      "truncated": false,
+      "exp_pchembl": 6.66,
+      "pred_pKd": 6.9369
+    },
+    {
+      "drug": "dasatinib",
+      "target": "ABL1",
+      "accession": "P00519",
+      "mol_id": "CHEMBL5416410",
+      "tgt_id": "CHEMBL1862",
+      "smiles": "Cc1nc(Nc2ncc(C(=O)Nc3c(C)cccc3Cl)s2)cc(N2CCN(CCO)CC2)n1.O",
+      "seq_len": 1130,
+      "truncated": false,
+      "exp_pchembl": 9.0,
+      "pred_pKd": 6.9852
+    },
+    {
+      "drug": "gefitinib",
+      "target": "EGFR",
+      "accession": "P00533",
+      "mol_id": "CHEMBL939",
+      "tgt_id": "CHEMBL203",
+      "smiles": "COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1",
+      "seq_len": 1210,
+      "truncated": false,
+      "exp_pchembl": 7.81,
+      "pred_pKd": 6.5923
+    },
+    {
+      "drug": "erlotinib",
+      "target": "EGFR",
+      "accession": "P00533",
+      "mol_id": "CHEMBL553",
+      "tgt_id": "CHEMBL203",
+      "smiles": "C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
+      "seq_len": 1210,
+      "truncated": false,
+      "exp_pchembl": 7.63,
+      "pred_pKd": 6.5485
+    },
+    {
+      "drug": "fluoxetine",
+      "target": "SERT",
+      "accession": "P31645",
+      "mol_id": "CHEMBL41",
+      "tgt_id": "CHEMBL228",
+      "smiles": "CNCCC(Oc1ccc(C(F)(F)F)cc1)c1ccccc1",
+      "seq_len": 630,
+      "truncated": false,
+      "exp_pchembl": 8.03,
+      "pred_pKd": 6.5205
+    },
+    {
+      "drug": "paroxetine",
+      "target": "SERT",
+      "accession": "P31645",
+      "mol_id": "CHEMBL490",
+      "tgt_id": "CHEMBL228",
+      "smiles": "Fc1ccc([C@@H]2CCNC[C@H]2COc2ccc3c(c2)OCO3)cc1",
+      "seq_len": 630,
+      "truncated": false,
+      "exp_pchembl": 9.42,
+      "pred_pKd": 6.5422
+    },
+    {
+      "drug": "haloperidol",
+      "target": "DRD2",
+      "accession": "P14416",
+      "mol_id": "CHEMBL54",
+      "tgt_id": "CHEMBL217",
+      "smiles": "O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1",
+      "seq_len": 443,
+      "truncated": false,
+      "exp_pchembl": 8.8,
+      "pred_pKd": 6.2182
+    },
+    {
+      "drug": "risperidone",
+      "target": "DRD2",
+      "accession": "P14416",
+      "mol_id": "CHEMBL85",
+      "tgt_id": "CHEMBL217",
+      "smiles": "Cc1nc2n(c(=O)c1CCN1CCC(c3noc4cc(F)ccc34)CC1)CCCC2",
+      "seq_len": 443,
+      "truncated": false,
+      "exp_pchembl": 8.22,
+      "pred_pKd": 6.3215
+    },
+    {
+      "drug": "propranolol",
+      "target": "ADRB2",
+      "accession": "P07550",
+      "mol_id": "CHEMBL27",
+      "tgt_id": "CHEMBL210",
+      "smiles": "CC(C)NCC(O)COc1cccc2ccccc12",
+      "seq_len": 413,
+      "truncated": false,
+      "exp_pchembl": 9.12,
+      "pred_pKd": 6.0483
+    },
+    {
+      "drug": "lidocaine",
+      "target": "Nav1.5",
+      "accession": "Q14524",
+      "mol_id": "CHEMBL79",
+      "tgt_id": "CHEMBL1980",
+      "smiles": "CCN(CC)CC(=O)Nc1c(C)cccc1C",
+      "seq_len": 2016,
+      "truncated": true,
+      "exp_pchembl": 4.3,
+      "pred_pKd": 6.0245
+    }
+  ]
+}

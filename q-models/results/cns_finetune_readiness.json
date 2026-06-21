@@ -1,0 +1,212 @@
+{
+  "targets": [
+    {
+      "gene": "MTOR",
+      "alias": "mTOR",
+      "chembl": "CHEMBL2842",
+      "family": "mtor_pathway",
+      "chembl_actives_pchembl6": 4846,
+      "zeroshot_family_auroc": 0.72,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "4846 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.72"
+    },
+    {
+      "gene": "PKM",
+      "alias": "PKM2",
+      "chembl": "CHEMBL2107",
+      "family": "mtor_pathway",
+      "chembl_actives_pchembl6": 821,
+      "zeroshot_family_auroc": 0.72,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "821 actives -> ~0.9+ expected; zero-shot ~0.72"
+    },
+    {
+      "gene": "PPARD",
+      "alias": "PPARD",
+      "chembl": "CHEMBL3979",
+      "family": "mtor_pathway",
+      "chembl_actives_pchembl6": 1886,
+      "zeroshot_family_auroc": 0.72,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "1886 actives -> ~0.9+ expected; zero-shot ~0.72"
+    },
+    {
+      "gene": "AKT1",
+      "alias": "AKT1",
+      "chembl": "CHEMBL4282",
+      "family": "mtor_pathway",
+      "chembl_actives_pchembl6": 5016,
+      "zeroshot_family_auroc": 0.72,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "5016 actives -> ~0.9+ expected; zero-shot ~0.72"
+    },
+    {
+      "gene": "RPS6KB1",
+      "alias": "S6K1",
+      "chembl": "CHEMBL4501",
+      "family": "mtor_pathway",
+      "chembl_actives_pchembl6": 1866,
+      "zeroshot_family_auroc": 0.72,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "1866 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.72"
+    },
+    {
+      "gene": "SCN1A",
+      "alias": "Nav1.1",
+      "chembl": "CHEMBL5277",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 21,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "BUILD / QUIVER DATA",
+      "rationale": "21 actives -> too sparse for a reliable public fine-tune; generate Quiver screening data (transfer from other targets fails)"
+    },
+    {
+      "gene": "SCN2A",
+      "alias": "Nav1.2",
+      "chembl": "CHEMBL4076",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 308,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "308 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "SCN8A",
+      "alias": "Nav1.6",
+      "chembl": "CHEMBL4960",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 0,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "BUILD / QUIVER DATA",
+      "rationale": "0 actives -> too sparse for a reliable public fine-tune; generate Quiver screening data (transfer from other targets fails)"
+    },
+    {
+      "gene": "SCN9A",
+      "alias": "Nav1.7",
+      "chembl": "CHEMBL4296",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 7038,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "7038 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "SCN10A",
+      "alias": "Nav1.8",
+      "chembl": "CHEMBL5451",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 552,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "552 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "SCN5A",
+      "alias": "Nav1.5",
+      "chembl": "CHEMBL1980",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 308,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "308 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "CACNA1C",
+      "alias": "Cav1.2",
+      "chembl": "CHEMBL1940",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 91,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE (marginal)",
+      "rationale": "91 actives -> small per-target probe (~0.7-0.9); supplement w/ GtoPdb/PubChem or Quiver data"
+    },
+    {
+      "gene": "KCNQ2",
+      "alias": "Kv7.2",
+      "chembl": "CHEMBL4304",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 20,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "BUILD / QUIVER DATA",
+      "rationale": "20 actives -> too sparse for a reliable public fine-tune; generate Quiver screening data (transfer from other targets fails)"
+    },
+    {
+      "gene": "GRIN1",
+      "alias": "NMDA-NR1",
+      "chembl": "CHEMBL1907594",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 573,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "573 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "GRIN2B",
+      "alias": "NMDA-NR2B",
+      "chembl": "CHEMBL1907600",
+      "family": "ion_channel",
+      "chembl_actives_pchembl6": 985,
+      "zeroshot_family_auroc": 0.5,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "985 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.5"
+    },
+    {
+      "gene": "DRD2",
+      "alias": "DRD2",
+      "chembl": "CHEMBL217",
+      "family": "gpcr",
+      "chembl_actives_pchembl6": 11896,
+      "zeroshot_family_auroc": 0.58,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "11896 actives -> per-target fine-tune expected ~0.9+ (proven lever); off-the-shelf zero-shot ~0.58"
+    },
+    {
+      "gene": "HTR2A",
+      "alias": "5HT2A",
+      "chembl": "CHEMBL224",
+      "family": "gpcr",
+      "chembl_actives_pchembl6": 7738,
+      "zeroshot_family_auroc": 0.58,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "7738 actives -> ~0.9+ expected; zero-shot ~0.58"
+    },
+    {
+      "gene": "GSK3B",
+      "alias": "GSK3B",
+      "chembl": "CHEMBL262",
+      "family": "kinase",
+      "chembl_actives_pchembl6": 5748,
+      "zeroshot_family_auroc": 0.8,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "5748 actives -> ~0.9+ expected; zero-shot ~0.8"
+    },
+    {
+      "gene": "LRRK2",
+      "alias": "LRRK2",
+      "chembl": "CHEMBL1075104",
+      "family": "kinase",
+      "chembl_actives_pchembl6": 5099,
+      "zeroshot_family_auroc": 0.8,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "5099 actives -> ~0.9+ expected; zero-shot ~0.8"
+    },
+    {
+      "gene": "BACE1",
+      "alias": "BACE1",
+      "chembl": "CHEMBL4822",
+      "family": "kinase",
+      "chembl_actives_pchembl6": 11858,
+      "zeroshot_family_auroc": 0.8,
+      "recommendation": "FINE-TUNE NOW",
+      "rationale": "11858 actives -> ~0.9+ expected; zero-shot ~0.8"
+    }
+  ],
+  "zeroshot_family_auroc": {
+    "kinase": 0.8,
+    "mtor_pathway": 0.72,
+    "gpcr": 0.58,
+    "ion_channel": 0.5
+  },
+  "thresholds": "actives>=200 fine-tune-now; 50-199 marginal; <50 build/Quiver-data",
+  "basis": "per-target fine-tune ~0.92-0.98 where data exists (trunc_test, ionchannel_finetune); cross-target transfer fails (LOCO 0/4)"
+}

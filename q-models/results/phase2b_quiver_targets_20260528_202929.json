@@ -1,0 +1,158 @@
+{
+  "timestamp": "20260528_202929",
+  "checkpoint": "dti_bindingdb_pkd_peer",
+  "device": "mps",
+  "dti": {
+    "nav1.8_full": {
+      "mean_pos": 7.112,
+      "mean_decoy": 7.107,
+      "separation": 0.004,
+      "pos": [
+        7.005,
+        6.942,
+        7.231,
+        7.341,
+        7.3,
+        7.143,
+        6.822
+      ],
+      "decoy": [
+        6.472,
+        6.955,
+        7.601,
+        7.401
+      ]
+    },
+    "nav1.8_window_1000_1956": {
+      "mean_pos": 7.158,
+      "mean_decoy": 7.05,
+      "separation": 0.108,
+      "pos": [
+        7.17,
+        7.172,
+        7.394,
+        7.273,
+        7.228,
+        7.062,
+        6.807
+      ],
+      "decoy": [
+        6.343,
+        6.654,
+        7.538,
+        7.665
+      ]
+    },
+    "mtor_full": {
+      "mean_pos": 6.464,
+      "mean_decoy": 6.359,
+      "separation": 0.105,
+      "pos": [
+        6.837,
+        6.78,
+        6.808,
+        6.25,
+        6.117,
+        5.993
+      ],
+      "decoy": [
+        5.686,
+        5.667,
+        7.259,
+        6.825
+      ]
+    },
+    "mtor_FRB_kinase_1975_2549": {
+      "mean_pos": 6.247,
+      "mean_decoy": 6.301,
+      "separation": -0.053,
+      "pos": [
+        6.339,
+        6.338,
+        6.328,
+        6.224,
+        6.205,
+        6.049
+      ],
+      "decoy": [
+        5.926,
+        6.022,
+        6.822,
+        6.432
+      ]
+    },
+    "mtor_kinase_2100_2549": {
+      "mean_pos": 6.161,
+      "mean_decoy": 6.242,
+      "separation": -0.082,
+      "pos": [
+        6.304,
+        6.289,
+        6.297,
+        6.079,
+        6.17,
+        5.825
+      ],
+      "decoy": [
+        5.787,
+        5.991,
+        6.737,
+        6.454
+      ]
+    }
+  },
+  "derisk": {
+    "suzetrigine": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "A-803467": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "lidocaine": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "mexiletine": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "ranolazine": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "carbamazepine": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "lacosamide": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "sirolimus": {
+      "BBBP": 0.02,
+      "CT_TOX": 0.103
+    },
+    "everolimus": {
+      "BBBP": 0.002,
+      "CT_TOX": 1.0
+    },
+    "temsirolimus": {
+      "BBBP": 0.0,
+      "CT_TOX": 0.151
+    },
+    "dactolisib": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "sapanisertib": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    },
+    "AZD8055": {
+      "BBBP": 1.0,
+      "CT_TOX": 1.0
+    }
+  }
+}

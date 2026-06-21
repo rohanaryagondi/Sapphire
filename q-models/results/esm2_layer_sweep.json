@@ -1,0 +1,238 @@
+{
+  "test": "esm2_650m_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T14:48:59.365851",
+  "model": "facebook/esm2_t33_650M_UR50D",
+  "n_hidden_states": 34,
+  "n_proteins": 40,
+  "truncate_aa": 1022,
+  "last_layer_nn": {
+    "raw": 0.725,
+    "centered": 0.75
+  },
+  "per_layer": [
+    {
+      "hidden_state_index": 0,
+      "nn_raw": 0.625,
+      "nn_centered": 0.625,
+      "best": 0.625
+    },
+    {
+      "hidden_state_index": 1,
+      "nn_raw": 0.7,
+      "nn_centered": 0.675,
+      "best": 0.7
+    },
+    {
+      "hidden_state_index": 2,
+      "nn_raw": 0.7,
+      "nn_centered": 0.7,
+      "best": 0.7
+    },
+    {
+      "hidden_state_index": 3,
+      "nn_raw": 0.725,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "hidden_state_index": 4,
+      "nn_raw": 0.75,
+      "nn_centered": 0.725,
+      "best": 0.75
+    },
+    {
+      "hidden_state_index": 5,
+      "nn_raw": 0.75,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "hidden_state_index": 6,
+      "nn_raw": 0.75,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "hidden_state_index": 7,
+      "nn_raw": 0.8,
+      "nn_centered": 0.85,
+      "best": 0.85
+    },
+    {
+      "hidden_state_index": 8,
+      "nn_raw": 0.8,
+      "nn_centered": 0.875,
+      "best": 0.875
+    },
+    {
+      "hidden_state_index": 9,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 10,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "hidden_state_index": 11,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 12,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 13,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 14,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 15,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 16,
+      "nn_raw": 0.775,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "hidden_state_index": 17,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 18,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "hidden_state_index": 19,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "hidden_state_index": 20,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "hidden_state_index": 21,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 22,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 23,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "hidden_state_index": 24,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "hidden_state_index": 25,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 26,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 27,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 28,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 29,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 30,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 31,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "hidden_state_index": 32,
+      "nn_raw": 0.75,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "hidden_state_index": 33,
+      "nn_raw": 0.725,
+      "nn_centered": 0.75,
+      "best": 0.75
+    }
+  ],
+  "best_layer": {
+    "hidden_state_index": 8,
+    "nn_raw": 0.8,
+    "nn_centered": 0.875,
+    "used": "centered",
+    "per_family_nn_recall": {
+      "kinase": 1.0,
+      "gpcr": 1.0,
+      "ion_channel": 0.875,
+      "nuclear_receptor": 0.8333333333333334,
+      "e3_ligase": 0.75,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    }
+  },
+  "references": {
+    "esmc_600m_best_layer5": 0.825,
+    "mammal_458M": 0.75,
+    "bar": 0.8
+  }
+}

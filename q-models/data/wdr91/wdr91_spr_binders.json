@@ -1,0 +1,224 @@
+[
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O",
+    "compound": "1",
+    "kd_uM": 6.0,
+    "rmax": 91.0
+  },
+  {
+    "smiles": "O[C@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1",
+    "compound": "(R)-1",
+    "kd_uM": 6.0,
+    "rmax": 61.0
+  },
+  {
+    "smiles": "O[C@@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1",
+    "compound": "(S)-1",
+    "kd_uM": 6.0,
+    "rmax": 65.0
+  },
+  {
+    "smiles": "C1CN(CCC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O",
+    "compound": "2",
+    "kd_uM": 6.0,
+    "rmax": 103.0
+  },
+  {
+    "smiles": "CN1CCc2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2C1",
+    "compound": "3",
+    "kd_uM": 8.0,
+    "rmax": 99.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(c2cc[nH]n2)s1)=O",
+    "compound": "4",
+    "kd_uM": 8.0,
+    "rmax": 104.0
+  },
+  {
+    "smiles": "Cc1cn2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2n1",
+    "compound": "5",
+    "kd_uM": 11.0,
+    "rmax": 87.0
+  },
+  {
+    "smiles": "C1CC(N(C1)Cc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O",
+    "compound": "6",
+    "kd_uM": 11.0,
+    "rmax": 75.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(c1)nns2)=O",
+    "compound": "7",
+    "kd_uM": 14.0,
+    "rmax": 93.0
+  },
+  {
+    "smiles": "C(CO)C(c1ccc(cc1)[Cl])NC(c1ccc(cc1)N1CCC(C1)O)=O",
+    "compound": "8",
+    "kd_uM": 14.0,
+    "rmax": 98.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O",
+    "compound": "9",
+    "kd_uM": 15.0,
+    "rmax": 66.0
+  },
+  {
+    "smiles": "C1CC(CN(C1)c1ccc(cc1)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)C(N)=O",
+    "compound": "10",
+    "kd_uM": 16.0,
+    "rmax": 79.0
+  },
+  {
+    "smiles": "CC(NCc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O",
+    "compound": "11",
+    "kd_uM": 20.0,
+    "rmax": 68.0
+  },
+  {
+    "smiles": "C1CC(CN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)C(N)=O",
+    "compound": "12",
+    "kd_uM": 22.0,
+    "rmax": 82.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(N)ncnc2c1)=O",
+    "compound": "13",
+    "kd_uM": 37.0,
+    "rmax": 90.0
+  },
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(N1CC(C1)(c1ccc(cc1)[Cl])O)=O",
+    "compound": "14",
+    "kd_uM": 42.0,
+    "rmax": 85.0
+  },
+  {
+    "smiles": "C1C(Nc2cccc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)c12)=O",
+    "compound": "15",
+    "kd_uM": 97.0,
+    "rmax": 91.0
+  },
+  {
+    "smiles": "C1CC(N(C1)Cc1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)=O",
+    "compound": "16",
+    "kd_uM": 99.0,
+    "rmax": 68.0
+  },
+  {
+    "smiles": "C=CC(N1CCCc2c(cccc12)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O",
+    "compound": "18",
+    "kd_uM": 36.0,
+    "rmax": 72.0
+  },
+  {
+    "smiles": "C=CC(N1CCCc2c(cccc12)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)=O",
+    "compound": "19",
+    "kd_uM": 43.0,
+    "rmax": 76.0
+  },
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(NCc1cc(cc2COCOc12)F)=O",
+    "compound": "21",
+    "kd_uM": 4.0,
+    "rmax": 45.0
+  },
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(NC(c1ccccc1)c1ccco1)=O",
+    "compound": "22",
+    "kd_uM": 5.0,
+    "rmax": 34.0
+  },
+  {
+    "smiles": "C1CCN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O",
+    "compound": "24",
+    "kd_uM": 7.0,
+    "rmax": 47.0
+  },
+  {
+    "smiles": "C1CC1c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O",
+    "compound": "25",
+    "kd_uM": 7.0,
+    "rmax": 50.0
+  },
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(NCc1ccc2c(c1)nsn2)=O",
+    "compound": "26",
+    "kd_uM": 12.0,
+    "rmax": 49.0
+  },
+  {
+    "smiles": "C(c1ccc2c(c1)OCO2)NC(c1ccc2c(c1)nns2)=O",
+    "compound": "27",
+    "kd_uM": 17.0,
+    "rmax": 54.0
+  },
+  {
+    "smiles": "CCC(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O",
+    "compound": "28",
+    "kd_uM": 35.0,
+    "rmax": 52.0
+  },
+  {
+    "smiles": "CC(c1cccc(c1)[Cl])NC(c1ccc2c(c1)NC(CO2)=O)=O",
+    "compound": "29",
+    "kd_uM": 36.0,
+    "rmax": 32.0
+  },
+  {
+    "smiles": "COC(c1ccc(C(NC2(COC2)c2ccc(cc2)[Cl])=O)nc1)=O",
+    "compound": "30",
+    "kd_uM": 82.0,
+    "rmax": 49.0
+  },
+  {
+    "smiles": "CC(c1ccc(c(c1)[Cl])[Cl])NC(c1ccc(CNC(N)=O)cc1)=O",
+    "compound": "31",
+    "kd_uM": 95.0,
+    "rmax": 54.0
+  },
+  {
+    "smiles": "C1CC2C(Nc3cc(ccc3N2C1)C(NC(CCO)c1ccc(c(c1)[Cl])[Cl])=O)=O",
+    "compound": "32",
+    "kd_uM": 113.0,
+    "rmax": 82.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccnc(c1)C(N)=O)=O",
+    "compound": "33",
+    "kd_uM": 130.0,
+    "rmax": 60.0
+  },
+  {
+    "smiles": "C1C(CO1)(c1ccc(cc1)[Cl])NC(c1c(c(ns1)O)[Cl])=O",
+    "compound": "34",
+    "kd_uM": 135.0,
+    "rmax": 61.0
+  },
+  {
+    "smiles": "CC(c1ccc(cc1)[Cl])NC(c1ccc2C(N3CCCC3=Nc2c1)=O)=O",
+    "compound": "35",
+    "kd_uM": 270.0,
+    "rmax": 93.0
+  },
+  {
+    "smiles": "C1CN(CC1O)c1ccc(cc1)C(NC1(CC1)c1ccc(cc1)[Cl])=O",
+    "compound": "36",
+    "kd_uM": 10.0,
+    "rmax": 45.0
+  },
+  {
+    "smiles": "Cc1cc(c(cc1C(NC1(CCC1)c1cccc(C#N)c1)=O)O)O",
+    "compound": "37",
+    "kd_uM": 217.0,
+    "rmax": 159.0
+  },
+  {
+    "smiles": "C(c1ccc2cnccc2c1)NC(c1c(c(ns1)O)[Cl])=O",
+    "compound": "38",
+    "kd_uM": 581.0,
+    "rmax": 256.0
+  }
+]

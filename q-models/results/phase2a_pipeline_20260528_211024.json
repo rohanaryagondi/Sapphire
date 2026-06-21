@@ -1,0 +1,12 @@
+{
+  "timestamp": "20260528_211024",
+  "library": 2039,
+  "topk": 150,
+  "seed": "diazepam",
+  "expanded_true_penetrant_frac": 0.987,
+  "bbb_pass": 149,
+  "bbb_precision_vs_label": 0.993,
+  "final_after_tox": 43,
+  "inference_s": 47.9,
+  "tox_caveat": "ClinTox head over-predicts toxicity; absolute threshold unreliable"
+}

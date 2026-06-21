@@ -1,0 +1,11 @@
+{
+  "qs_smiles": {
+    "QS0113172": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+    "QS0069567": "O=S(N1CCN(C2=CC=CC=N2)CC1)(C3=CC=C(Cl)C=C3)=O"
+  },
+  "top_similar_per_qs": {
+    "QS0113172": [],
+    "QS0069567": []
+  },
+  "pubchem_smiles_map_size": 77
+}

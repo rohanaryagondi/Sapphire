@@ -1,0 +1,21 @@
+{
+  "test": "unimol2_admet",
+  "timestamp": "2026-06-12T22:22:26.204035",
+  "model": "unimolv2-84m",
+  "in_distribution": {
+    "BBB_Martins": {
+      "auroc": 0.784741580954212,
+      "n": 406
+    },
+    "DILI": {
+      "auroc": 0.8120567375886525,
+      "n": 95
+    }
+  },
+  "refs": {
+    "BBB_MolFormer": 0.889,
+    "BBB_ChemBERTa": 0.873,
+    "hERG_ChemBERTa_balacc": 0.726,
+    "DILI_ChemBERTa_ext": 0.773
+  }
+}

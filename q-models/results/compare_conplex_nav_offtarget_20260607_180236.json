@@ -1,0 +1,314 @@
+{
+  "timestamp": "20260607_180236",
+  "model": "ConPLex_v1_BindingDB (zero-shot)",
+  "nav_family": {
+    "n_pos": 7,
+    "n_neg": 4,
+    "per_paralog": [
+      {
+        "paralog": "Nav1.1",
+        "accession": "P35498",
+        "gene": "SCN1A",
+        "seq_len": 2009,
+        "auroc": 0.393,
+        "separation": 0.043,
+        "mean_pos": 0.188,
+        "mean_neg": 0.145,
+        "per_drug": {
+          "suzetrigine": 0.058,
+          "A-803467": 0.116,
+          "lidocaine": 0.09,
+          "mexiletine": 0.049,
+          "ranolazine": 0.147,
+          "carbamazepine": 0.33,
+          "lacosamide": 0.528,
+          "metformin": 0.15,
+          "caffeine": 0.098,
+          "ibuprofen": 0.213,
+          "atenolol": 0.118
+        }
+      },
+      {
+        "paralog": "Nav1.2",
+        "accession": "Q99250",
+        "gene": "SCN2A",
+        "seq_len": 2005,
+        "auroc": 0.429,
+        "separation": 0.042,
+        "mean_pos": 0.164,
+        "mean_neg": 0.122,
+        "per_drug": {
+          "suzetrigine": 0.051,
+          "A-803467": 0.099,
+          "lidocaine": 0.075,
+          "mexiletine": 0.056,
+          "ranolazine": 0.128,
+          "carbamazepine": 0.284,
+          "lacosamide": 0.456,
+          "metformin": 0.133,
+          "caffeine": 0.094,
+          "ibuprofen": 0.162,
+          "atenolol": 0.098
+        }
+      },
+      {
+        "paralog": "Nav1.3",
+        "accession": "Q9NY46",
+        "gene": "SCN3A",
+        "seq_len": 2000,
+        "auroc": 0.393,
+        "separation": 0.04,
+        "mean_pos": 0.182,
+        "mean_neg": 0.142,
+        "per_drug": {
+          "suzetrigine": 0.051,
+          "A-803467": 0.118,
+          "lidocaine": 0.08,
+          "mexiletine": 0.053,
+          "ranolazine": 0.138,
+          "carbamazepine": 0.315,
+          "lacosamide": 0.522,
+          "metformin": 0.145,
+          "caffeine": 0.092,
+          "ibuprofen": 0.209,
+          "atenolol": 0.122
+        }
+      },
+      {
+        "paralog": "Nav1.4",
+        "accession": "P35499",
+        "gene": "SCN4A",
+        "seq_len": 1836,
+        "auroc": 0.5,
+        "separation": 0.027,
+        "mean_pos": 0.213,
+        "mean_neg": 0.186,
+        "per_drug": {
+          "suzetrigine": 0.068,
+          "A-803467": 0.183,
+          "lidocaine": 0.11,
+          "mexiletine": 0.025,
+          "ranolazine": 0.198,
+          "carbamazepine": 0.347,
+          "lacosamide": 0.561,
+          "metformin": 0.156,
+          "caffeine": 0.103,
+          "ibuprofen": 0.299,
+          "atenolol": 0.188
+        }
+      },
+      {
+        "paralog": "Nav1.5",
+        "accession": "Q14524",
+        "gene": "SCN5A",
+        "seq_len": 2016,
+        "auroc": 0.5,
+        "separation": 0.025,
+        "mean_pos": 0.151,
+        "mean_neg": 0.126,
+        "per_drug": {
+          "suzetrigine": 0.058,
+          "A-803467": 0.099,
+          "lidocaine": 0.092,
+          "mexiletine": 0.059,
+          "ranolazine": 0.131,
+          "carbamazepine": 0.239,
+          "lacosamide": 0.38,
+          "metformin": 0.112,
+          "caffeine": 0.087,
+          "ibuprofen": 0.207,
+          "atenolol": 0.098
+        }
+      },
+      {
+        "paralog": "Nav1.6",
+        "accession": "Q9UQD0",
+        "gene": "SCN8A",
+        "seq_len": 1980,
+        "auroc": 0.429,
+        "separation": 0.04,
+        "mean_pos": 0.156,
+        "mean_neg": 0.116,
+        "per_drug": {
+          "suzetrigine": 0.053,
+          "A-803467": 0.097,
+          "lidocaine": 0.083,
+          "mexiletine": 0.047,
+          "ranolazine": 0.144,
+          "carbamazepine": 0.253,
+          "lacosamide": 0.418,
+          "metformin": 0.117,
+          "caffeine": 0.091,
+          "ibuprofen": 0.159,
+          "atenolol": 0.098
+        }
+      },
+      {
+        "paralog": "Nav1.7",
+        "accession": "Q15858",
+        "gene": "SCN9A",
+        "seq_len": 1988,
+        "auroc": 0.464,
+        "separation": 0.035,
+        "mean_pos": 0.201,
+        "mean_neg": 0.166,
+        "per_drug": {
+          "suzetrigine": 0.059,
+          "A-803467": 0.145,
+          "lidocaine": 0.102,
+          "mexiletine": 0.037,
+          "ranolazine": 0.163,
+          "carbamazepine": 0.336,
+          "lacosamide": 0.563,
+          "metformin": 0.147,
+          "caffeine": 0.099,
+          "ibuprofen": 0.266,
+          "atenolol": 0.15
+        }
+      },
+      {
+        "paralog": "Nav1.8",
+        "accession": "Q9Y5Y9",
+        "gene": "SCN10A",
+        "seq_len": 1956,
+        "auroc": 0.393,
+        "separation": 0.015,
+        "mean_pos": 0.17,
+        "mean_neg": 0.155,
+        "per_drug": {
+          "suzetrigine": 0.047,
+          "A-803467": 0.135,
+          "lidocaine": 0.086,
+          "mexiletine": 0.038,
+          "ranolazine": 0.138,
+          "carbamazepine": 0.278,
+          "lacosamide": 0.468,
+          "metformin": 0.14,
+          "caffeine": 0.078,
+          "ibuprofen": 0.261,
+          "atenolol": 0.141
+        }
+      },
+      {
+        "paralog": "Nav1.9",
+        "accession": "Q9UI33",
+        "gene": "SCN11A",
+        "seq_len": 1791,
+        "auroc": 0.429,
+        "separation": 0.009,
+        "mean_pos": 0.113,
+        "mean_neg": 0.104,
+        "per_drug": {
+          "suzetrigine": 0.034,
+          "A-803467": 0.097,
+          "lidocaine": 0.051,
+          "mexiletine": 0.04,
+          "ranolazine": 0.09,
+          "carbamazepine": 0.212,
+          "lacosamide": 0.269,
+          "metformin": 0.124,
+          "caffeine": 0.063,
+          "ibuprofen": 0.149,
+          "atenolol": 0.081
+        }
+      }
+    ],
+    "summary": {
+      "n_paralogs_tested": 9,
+      "n_auroc_ge_0.70_STRONG": 0,
+      "n_auroc_0.60_to_0.70_USEFUL": 0,
+      "n_auroc_below_0.60_CHANCE": 9,
+      "mean_auroc_across_family": 0.437,
+      "max_auroc": 0.5,
+      "min_auroc": 0.393
+    },
+    "verdict": "ConPLex is pan-Nav blind (every paralog at chance)"
+  },
+  "offtarget_sanity": {
+    "n_drugs": 5,
+    "n_targets": 3,
+    "per_target_scores": [
+      {
+        "target": "UBE3A",
+        "accession": "Q05086",
+        "drugs": {
+          "suzetrigine": 0.0,
+          "vixotrigine": 0.0,
+          "metformin": 0.0032,
+          "caffeine": 0.0823,
+          "ibuprofen": 0.0
+        },
+        "max": 0.0823,
+        "min": 0.0,
+        "mean": 0.0171,
+        "spread_max_minus_min": 0.0823,
+        "std": 0.0326
+      },
+      {
+        "target": "Nav1.8",
+        "accession": "Q9Y5Y9",
+        "drugs": {
+          "suzetrigine": 0.0472,
+          "vixotrigine": 0.1457,
+          "metformin": 0.14,
+          "caffeine": 0.0778,
+          "ibuprofen": 0.261
+        },
+        "max": 0.261,
+        "min": 0.0472,
+        "mean": 0.1344,
+        "spread_max_minus_min": 0.2138,
+        "std": 0.0735
+      },
+      {
+        "target": "TUBB",
+        "accession": "P07437",
+        "drugs": {
+          "suzetrigine": 0.0,
+          "vixotrigine": 0.0269,
+          "metformin": 0.0256,
+          "caffeine": 0.0139,
+          "ibuprofen": 0.0
+        },
+        "max": 0.0269,
+        "min": 0.0,
+        "mean": 0.0133,
+        "spread_max_minus_min": 0.0269,
+        "std": 0.0117
+      }
+    ],
+    "per_drug_specificity": [
+      {
+        "drug": "suzetrigine",
+        "on_target_Nav1.8": 0.0472,
+        "mean_offtarget": 0.0,
+        "delta_on_minus_off": 0.0472
+      },
+      {
+        "drug": "vixotrigine",
+        "on_target_Nav1.8": 0.1457,
+        "mean_offtarget": 0.0135,
+        "delta_on_minus_off": 0.1323
+      },
+      {
+        "drug": "metformin",
+        "on_target_Nav1.8": 0.14,
+        "mean_offtarget": 0.0144,
+        "delta_on_minus_off": 0.1257
+      },
+      {
+        "drug": "caffeine",
+        "on_target_Nav1.8": 0.0778,
+        "mean_offtarget": 0.0481,
+        "delta_on_minus_off": 0.0297
+      },
+      {
+        "drug": "ibuprofen",
+        "on_target_Nav1.8": 0.261,
+        "mean_offtarget": 0.0,
+        "delta_on_minus_off": 0.261
+      }
+    ],
+    "verdict": "ConPLex shows weak/inconsistent target specificity off-the-shelf"
+  }
+}

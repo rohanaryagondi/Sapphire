@@ -1,0 +1,86 @@
+{
+  "timestamp": "20260607_005109",
+  "checkpoint": "dti_bindingdb_pkd_peer",
+  "norm_constants": [
+    6.286291085593906,
+    1.5422950906208512
+  ],
+  "device": "mps",
+  "vixotrigine_smiles": "C1C[C@H](N[C@H]1C2=CC=C(C=C2)OCC3=CC=CC=C3F)C(=O)N",
+  "vixotrigine_formula": "C18H19FN2O2",
+  "vixotrigine_mw": 314.4,
+  "drug_smiles": {
+    "suzetrigine": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=C(C(=C(C=C3)F)F)OC",
+    "vixotrigine": "C1C[C@H](N[C@H]1C2=CC=C(C=C2)OCC3=CC=CC=C3F)C(=O)N",
+    "metformin": "CN(C)C(=N)N=C(N)N",
+    "caffeine": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "ibuprofen": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
+  },
+  "targets": {
+    "UBE3A": {
+      "accession": "Q05086",
+      "gene": "UBE3A",
+      "len": 875,
+      "truncated": false,
+      "note": "E3 ubiquitin ligase \u2014 primary OFF-target (~875 aa, FITS 1250 cap, no truncation)"
+    },
+    "Nav1.8": {
+      "accession": "Q9Y5Y9",
+      "gene": "SCN10A",
+      "len": 1956,
+      "truncated": true,
+      "note": "voltage-gated Na channel \u2014 ON-target baseline (1956 aa, truncated to 1250)"
+    },
+    "TUBB": {
+      "accession": "P07437",
+      "gene": "TUBB",
+      "len": 444,
+      "truncated": false,
+      "note": "tubulin beta \u2014 secondary OFF-target (~444 aa, fully visible)"
+    }
+  },
+  "pkd_matrix": {
+    "UBE3A": {
+      "suzetrigine": 6.477,
+      "vixotrigine": 6.373,
+      "metformin": 5.705,
+      "caffeine": 5.911,
+      "ibuprofen": 6.762
+    },
+    "Nav1.8": {
+      "suzetrigine": 7.005,
+      "vixotrigine": 7.694,
+      "metformin": 6.472,
+      "caffeine": 6.955,
+      "ibuprofen": 7.601
+    },
+    "TUBB": {
+      "suzetrigine": 6.742,
+      "vixotrigine": 6.701,
+      "metformin": 6.058,
+      "caffeine": 6.083,
+      "ibuprofen": 6.822
+    }
+  },
+  "deltas": {
+    "suzetrigine": {
+      "nav1.8_on": 7.005,
+      "ube3a_off": 6.477,
+      "tubb_off": 6.742,
+      "delta_nav_minus_ube3a": 0.528,
+      "delta_nav_minus_tubb": 0.263
+    },
+    "vixotrigine": {
+      "nav1.8_on": 7.694,
+      "ube3a_off": 6.373,
+      "tubb_off": 6.701,
+      "delta_nav_minus_ube3a": 1.321,
+      "delta_nav_minus_tubb": 0.993
+    }
+  },
+  "pkd_spread": {
+    "min": 5.705,
+    "max": 7.694,
+    "range": 1.989
+  }
+}

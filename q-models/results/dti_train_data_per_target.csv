@@ -1,0 +1,1091 @@
+accession,pairs,gene,protein,seq_len,class,is_ion_channel
+P15056,532,BRAF,Serine/threonine-protein kinase B-raf (EC 2.7.11.1) (Proto-oncogene B-Raf) (p94) (v-Raf murine sarcoma viral oncogene homolog B1),766,kinase,False
+P51449,374,RORC,Nuclear receptor ROR-gamma (Nuclear receptor RZR-gamma) (Nuclear receptor subfamily 1 group F member 3) (RAR-related orphan receptor C) (Retinoid-related orphan receptor-gamma),518,nuclear_receptor,False
+P36888,317,FLT3,Receptor-type tyrosine-protein kinase FLT3 (EC 2.7.10.1) (FL cytokine receptor) (Fetal liver kinase-2) (FLK-2) (Fms-like tyrosine kinase 3) (FLT-3) (Stem cell tyrosine kinase 1) (STK-1) (CD antigen CD135),993,kinase,False
+P10721,300,KIT,Mast/stem cell growth factor receptor Kit (SCFR) (EC 2.7.10.1) (Piebald trait protein) (PBT) (Proto-oncogene c-Kit) (Tyrosine-protein kinase Kit) (p145 c-kit) (v-kit Hardy-Zuckerman 4 feline sarcoma viral oncogene homolog) (CD antigen CD117),976,kinase,False
+P00918,269,CA2,Carbonic anhydrase 2 (EC 4.2.1.1) (Carbonate dehydratase II) (Carbonic anhydrase C) (CAC) (Carbonic anhydrase II) (CA-II) (Cyanamide hydratase CA2) (EC 4.2.1.69),260,other,False
+P24941,239,CDK2,Cyclin-dependent kinase 2 (EC 2.7.11.22) (Cell division protein kinase 2) (p33 protein kinase),298,kinase,False
+Q8K4Z4,211,Adrb2,Beta-2 adrenergic receptor (Beta-2 adrenoreceptor) (Beta-2 adrenoceptor),418,gpcr,False
+Q9JI35,211,HRH3,Histamine H3 receptor (H3R) (HH3R),445,gpcr,False
+P42345,192,MTOR,Serine/threonine-protein kinase mTOR (EC 2.7.11.1) (FK506-binding protein 12-rapamycin complex-associated protein 1) (FKBP12-rapamycin complex-associated protein) (Mammalian target of rapamycin) (mTOR) (Mechanistic target of rapamycin) (Rapamycin and FKBP12 target 1) (Rapamycin target protein 1) (Tyrosine-protein kinase mTOR) (EC 2.7.10.2),2549,kinase,False
+P31389,184,HRH1,Histamine H1 receptor (H1R) (HH1R),488,gpcr,False
+P48736,177,PIK3CG,"Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit gamma isoform (PI3-kinase subunit gamma) (PI3K-gamma) (PI3Kgamma) (PtdIns-3-kinase subunit gamma) (EC 2.7.1.137) (EC 2.7.1.153) (EC 2.7.1.154) (Phosphatidylinositol 4,5-bisphosphate 3-kinase 110 kDa catalytic subunit gamma) (PtdIns-3-kinase subunit p110-gamma) (p110gamma) (Phosphoinositide-3-kinase catalytic gamma polypeptide) (Serine/threonine protein kinase PIK3CG) (EC 2.7.11.1) (p120-PI3K)",1102,kinase,False
+O00329,172,PIK3CD,"Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta isoform (PI3-kinase subunit delta) (PI3K-delta) (PI3Kdelta) (PtdIns-3-kinase subunit delta) (EC 2.7.1.137) (EC 2.7.1.153) (Phosphatidylinositol 4,5-bisphosphate 3-kinase 110 kDa catalytic subunit delta) (PtdIns-3-kinase subunit p110-delta) (p110delta)",1044,kinase,False
+O00750,169,PIK3C2B,Phosphatidylinositol 4-phosphate 3-kinase C2 domain-containing subunit beta (PI3K-C2-beta) (PtdIns-3-kinase C2 subunit beta) (EC 2.7.1.137) (EC 2.7.1.154) (C2-PI3K) (Phosphoinositide 3-kinase-C2-beta),1634,kinase,False
+P55899,166,FCGRT,IgG receptor FcRn large subunit p51 (FcRn) (IgG Fc fragment receptor transporter alpha chain) (Neonatal Fc receptor),365,other,False
+P07900,157,HSP90AA1,Heat shock protein HSP 90-alpha (EC 3.6.4.10) (Heat shock 86 kDa) (HSP 86) (HSP86) (Heat shock protein family C member 1) (Lipopolysaccharide-associated protein 2) (LAP-2) (LPS-associated protein 2) (Renal carcinoma antigen NY-REN-38),732,other,False
+P06239,154,LCK,Tyrosine-protein kinase Lck (EC 2.7.10.2) (Leukocyte C-terminal Src kinase) (LSK) (Lymphocyte cell-specific protein-tyrosine kinase) (Protein YT16) (Proto-oncogene Lck) (T cell-specific protein-tyrosine kinase) (p56-LCK),509,kinase,False
+Q96GD4,149,AURKB,Aurora kinase B (EC 2.7.11.1) (Aurora 1) (Aurora- and IPL1-like midbody-associated protein 1) (AIM-1) (Aurora/IPL1-related kinase 2) (ARK-2) (Aurora-related kinase 2) (STK-1) (Serine/threonine-protein kinase 12) (Serine/threonine-protein kinase 5) (Serine/threonine-protein kinase aurora-B),344,kinase,False
+P27694,147,RPA1,"Replication protein A 70 kDa DNA-binding subunit (RP-A p70) (Replication factor A protein 1) (RF-A protein 1) (Single-stranded DNA-binding protein) [Cleaved into: Replication protein A 70 kDa DNA-binding subunit, N-terminally processed]",616,other,False
+P21731,144,TBXA2R,Thromboxane A2 receptor (TXA2-R) (Prostanoid TP receptor),343,gpcr,False
+P17931,134,LGALS3,Galectin-3 (Gal-3) (35 kDa lectin) (Carbohydrate-binding protein 35) (CBP 35) (Galactose-specific lectin 3) (Galactoside-binding protein) (GALBP) (IgE-binding protein) (L-31) (Laminin-binding protein) (Lectin L-29) (Mac-2 antigen),250,other,False
+Q05397,133,PTK2,Focal adhesion kinase 1 (FADK 1) (EC 2.7.10.2) (Focal adhesion kinase-related nonkinase) (FRNK) (Protein phosphatase 1 regulatory subunit 71) (PPP1R71) (Protein-tyrosine kinase 2) (p125FAK) (pp125FAK),1052,kinase,False
+P49841,129,GSK3B,Glycogen synthase kinase-3 beta (GSK-3 beta) (EC 2.7.11.26) (Serine/threonine-protein kinase GSK3B) (EC 2.7.11.1),420,kinase,False
+P47747,127,HRH2,Histamine H2 receptor (H2R) (HH2R) (Gastric receptor I),359,gpcr,False
+O60674,125,JAK2,Tyrosine-protein kinase JAK2 (EC 2.7.10.2) (Janus kinase 2) (JAK-2),1132,kinase,False
+P09874,123,PARP1,"Poly [ADP-ribose] polymerase 1 (PARP-1) (EC 2.4.2.30) (ADP-ribosyltransferase diphtheria toxin-like 1) (ARTD1) (DNA ADP-ribosyltransferase PARP1) (EC 2.4.2.-) (NAD(+) ADP-ribosyltransferase 1) (ADPRT 1) (Poly[ADP-ribose] synthase 1) (Protein poly-ADP-ribosyltransferase PARP1) (EC 2.4.2.-) [Cleaved into: Poly [ADP-ribose] polymerase 1, processed C-terminus (Poly [ADP-ribose] polymerase 1, 89-kDa form); Poly [ADP-ribose] polymerase 1, processed N-terminus (NT-PARP-1) (Poly [ADP-ribose] polymerase 1, 24-kDa form) (Poly [ADP-ribose] polymerase 1, 28-kDa form)]",1014,other,False
+O14976,122,GAK,Cyclin-G-associated kinase (EC 2.7.11.1) (DnaJ homolog subfamily C member 26),1311,kinase,False
+P53779,115,MAPK10,Mitogen-activated protein kinase 10 (MAP kinase 10) (MAPK 10) (EC 2.7.11.24) (MAP kinase p49 3F12) (Stress-activated protein kinase 1b) (SAPK1b) (Stress-activated protein kinase JNK3) (c-Jun N-terminal kinase 3),464,kinase,False
+P07550,114,ADRB2,Beta-2 adrenergic receptor (Beta-2 adrenoreceptor) (Beta-2 adrenoceptor),413,gpcr,False
+P28646,111,Sstr1,Somatostatin receptor type 1 (SS-1-R) (SS1-R) (SS1R) (SRIF-2),391,gpcr,False
+P31749,111,AKT1,RAC-alpha serine/threonine-protein kinase (EC 2.7.11.1) (Protein kinase B) (PKB) (Protein kinase B alpha) (PKB alpha) (Proto-oncogene c-Akt) (RAC-PK-alpha),480,kinase,False
+Q16832,110,DDR2,"Discoidin domain-containing receptor 2 (Discoidin domain receptor 2) (EC 2.7.10.1) (CD167 antigen-like family member B) (Discoidin domain-containing receptor tyrosine kinase 2) (Neurotrophic tyrosine kinase, receptor-related 3) (Receptor protein-tyrosine kinase TKT) (Tyrosine-protein kinase TYRO10) (CD antigen CD167b)",855,kinase,False
+P30994,108,Htr2b,5-hydroxytryptamine receptor 2B (5-HT-2B) (5-HT2B) (5-HT-2F) (Serotonin receptor 2B) (Stomach fundus serotonin receptor),479,gpcr,False
+P30680,106,Sstr2,Somatostatin receptor type 2 (SS-2-R) (SS2-R) (SS2R) (SRIF-1),369,gpcr,False
+P42338,105,PIK3CB,"Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit beta isoform (PI3-kinase subunit beta) (PI3K-beta) (PI3Kbeta) (PtdIns-3-kinase subunit beta) (EC 2.7.1.153) (Phosphatidylinositol 4,5-bisphosphate 3-kinase 110 kDa catalytic subunit beta) (PtdIns-3-kinase subunit p110-beta) (p110beta) (Serine/threonine protein kinase PIK3CB) (EC 2.7.11.1)",1070,kinase,False
+P35968,103,KDR,Vascular endothelial growth factor receptor 2 (VEGFR-2) (EC 2.7.10.1) (Fetal liver kinase 1) (FLK-1) (Kinase insert domain receptor) (KDR) (Protein-tyrosine kinase receptor flk-1) (CD antigen CD309),1356,kinase,False
+P48730,103,CSNK1D,Casein kinase I isoform delta (CKI-delta) (CKId) (EC 2.7.11.1) (Tau-protein kinase CSNK1D) (EC 2.7.11.26),415,kinase,False
+O14965,102,AURKA,Aurora kinase A (EC 2.7.11.1) (Aurora 2) (Aurora/IPL1-related kinase 1) (ARK-1) (Aurora-related kinase 1) (Breast tumor-amplified kinase) (Ipl1- and aurora-related kinase 1) (Serine/threonine-protein kinase 15) (Serine/threonine-protein kinase 6) (Serine/threonine-protein kinase Ayk1) (Serine/threonine-protein kinase aurora-A),403,kinase,False
+P42336,102,PIK3CA,"Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit alpha isoform (PI3-kinase subunit alpha) (PI3K-alpha) (PI3Kalpha) (PtdIns-3-kinase subunit alpha) (EC 2.7.1.137) (EC 2.7.1.153) (Phosphatidylinositol 4,5-bisphosphate 3-kinase 110 kDa catalytic subunit alpha) (PtdIns-3-kinase subunit p110-alpha) (p110alpha) (Phosphoinositide 3-kinase alpha) (Phosphoinositide-3-kinase catalytic alpha polypeptide) (Serine/threonine protein kinase PIK3CA) (EC 2.7.11.1)",1068,kinase,False
+P62942,101,FKBP1A,Peptidyl-prolyl cis-trans isomerase FKBP1A (PPIase FKBP1A) (EC 5.2.1.8) (12 kDa FK506-binding protein) (12 kDa FKBP) (FKBP-12) (Calstabin-1) (FK506-binding protein 1A) (FKBP-1A) (Immunophilin FKBP12) (Rotamase),108,other,False
+O15530,101,PDPK1,3-phosphoinositide-dependent protein kinase 1 (hPDK1) (EC 2.7.11.1),556,kinase,False
+P05230,101,FGF1,Fibroblast growth factor 1 (FGF-1) (Acidic fibroblast growth factor) (aFGF) (Endothelial cell growth factor) (ECGF) (Heparin-binding growth factor 1) (HBGF-1),155,other,False
+P28482,101,MAPK1,Mitogen-activated protein kinase 1 (MAP kinase 1) (MAPK 1) (EC 2.7.11.24) (ERT1) (Extracellular signal-regulated kinase 2) (ERK-2) (MAP kinase isoform p42) (p42-MAPK) (Mitogen-activated protein kinase 2) (MAP kinase 2) (MAPK 2),360,kinase,False
+P00533,101,EGFR,Epidermal growth factor receptor (EC 2.7.10.1) (Proto-oncogene c-ErbB-1) (Receptor tyrosine-protein kinase erbB-1),1210,kinase,False
+P13631,99,RARG,Retinoic acid receptor gamma (RAR-gamma) (Nuclear receptor subfamily 1 group B member 3),454,nuclear_receptor,False
+Q15746,98,MYLK,"Myosin light chain kinase, smooth muscle (MLCK) (smMLCK) (EC 2.7.11.18) (Kinase-related protein) (KRP) (Telokin) [Cleaved into: Myosin light chain kinase, smooth muscle, deglutamylated form]",1914,kinase,False
+P09038,98,FGF2,Fibroblast growth factor 2 (FGF-2) (Basic fibroblast growth factor) (bFGF) (Heparin-binding growth factor 2) (HBGF-2),288,other,False
+Q9UM73,96,ALK,ALK tyrosine kinase receptor (EC 2.7.10.1) (Anaplastic lymphoma kinase) (CD antigen CD246),1620,kinase,False
+O75116,96,ROCK2,"Rho-associated protein kinase 2 (EC 2.7.11.39) (Rho kinase 2) (Rho-associated, coiled-coil-containing protein kinase 2) (Rho-associated, coiled-coil-containing protein kinase II) (ROCK-II) (p164 ROCK-2)",1388,kinase,False
+P34976,96,AGTR1,Type-1 angiotensin II receptor (Angiotensin II type-1 receptor) (AT1 receptor),359,gpcr,False
+P52333,96,JAK3,Tyrosine-protein kinase JAK3 (EC 2.7.10.2) (Janus kinase 3) (JAK-3) (Leukocyte janus kinase) (L-JAK),1124,kinase,False
+O95819,95,MAP4K4,Mitogen-activated protein kinase kinase kinase kinase 4 (EC 2.7.11.1) (HPK/GCK-like kinase HGK) (MAPK/ERK kinase kinase kinase 4) (MEK kinase kinase 4) (MEKKK 4) (Nck-interacting kinase),1239,kinase,False
+P10826,94,RARB,Retinoic acid receptor beta (RAR-beta) (HBV-activated protein) (Nuclear receptor subfamily 1 group B member 2) (RAR-epsilon),455,nuclear_receptor,False
+O43924,93,PDE6D,"Retinal rod rhodopsin-sensitive cGMP 3',5'-cyclic phosphodiesterase subunit delta (GMP-PDE delta) (Protein p17)",150,other,False
+P04629,93,NTRK1,High affinity nerve growth factor receptor (EC 2.7.10.1) (Neurotrophic tyrosine kinase receptor type 1) (TRK1-transforming tyrosine kinase protein) (Tropomyosin-related kinase A) (Tyrosine kinase receptor) (Tyrosine kinase receptor A) (Trk-A) (gp140trk) (p140-TrkA),796,kinase,False
+P10276,93,RARA,Retinoic acid receptor alpha (RAR-alpha) (Nuclear receptor subfamily 1 group B member 1),462,nuclear_receptor,False
+P68400,93,CSNK2A1,Casein kinase II subunit alpha (CK II alpha) (EC 2.7.11.1),391,kinase,False
+P09619,92,PDGFRB,Platelet-derived growth factor receptor beta (PDGF-R-beta) (PDGFR-beta) (EC 2.7.10.1) (Beta platelet-derived growth factor receptor) (Beta-type platelet-derived growth factor receptor) (CD140 antigen-like family member B) (Platelet-derived growth factor receptor 1) (PDGFR-1) (CD antigen CD140b),1106,kinase,False
+P29323,91,EPHB2,Ephrin type-B receptor 2 (EC 2.7.10.1) (Developmentally-regulated Eph-related tyrosine kinase) (ELK-related tyrosine kinase) (EPH tyrosine kinase 3) (EPH-like kinase 5) (EK5) (hEK5) (Renal carcinoma antigen NY-REN-47) (Tyrosine-protein kinase TYRO5) (Tyrosine-protein kinase receptor EPH-3) [Cleaved into: EphB2/CTF1; EphB2/CTF2],1055,kinase,False
+Q13164,91,MAPK7,Mitogen-activated protein kinase 7 (MAP kinase 7) (MAPK 7) (EC 2.7.11.24) (Big MAP kinase 1) (BMK-1) (Extracellular signal-regulated kinase 5) (ERK-5),816,kinase,False
+O00443,91,PIK3C2A,Phosphatidylinositol 4-phosphate 3-kinase C2 domain-containing subunit alpha (PI3K-C2-alpha) (PtdIns-3-kinase C2 subunit alpha) (EC 2.7.1.137) (EC 2.7.1.153) (EC 2.7.1.154) (Phosphoinositide 3-kinase-C2-alpha),1686,kinase,False
+P45984,91,MAPK9,Mitogen-activated protein kinase 9 (MAP kinase 9) (MAPK 9) (EC 2.7.11.24) (JNK-55) (Stress-activated protein kinase 1a) (SAPK1a) (Stress-activated protein kinase JNK2) (c-Jun N-terminal kinase 2),424,kinase,False
+P53350,91,PLK1,Serine/threonine-protein kinase PLK1 (EC 2.7.11.21) (Polo-like kinase 1) (PLK-1) (Serine/threonine-protein kinase 13) (STPK13),603,kinase,False
+P23458,91,JAK1,Tyrosine-protein kinase JAK1 (EC 2.7.10.2) (Janus kinase 1) (JAK-1),1154,kinase,False
+P04278,90,SHBG,Sex hormone-binding globulin (SHBG) (Sex steroid-binding protein) (SBP) (Testis-specific androgen-binding protein) (ABP) (Testosterone-estradiol-binding globulin) (TeBG) (Testosterone-estrogen-binding globulin),402,other,False
+P04626,90,ERBB2,Receptor tyrosine-protein kinase erbB-2 (EC 2.7.10.1) (Metastatic lymph node gene 19 protein) (MLN 19) (Proto-oncogene Neu) (Proto-oncogene c-ErbB-2) (Tyrosine kinase-type cell surface receptor HER2) (p185erbB2) (CD antigen CD340),1255,kinase,False
+P09382,89,LGALS1,Galectin-1 (Gal-1) (14 kDa laminin-binding protein) (HLBP14) (14 kDa lectin) (Beta-galactoside-binding lectin L-14-I) (Galaptin) (HBL) (HPL) (Lactose-binding lectin 1) (Lectin galactoside-binding soluble 1) (Putative MAPK-activating protein PM12) (S-Lac lectin 1),135,other,False
+P22455,89,FGFR4,Fibroblast growth factor receptor 4 (FGFR-4) (EC 2.7.10.1) (CD antigen CD334),802,kinase,False
+P21802,89,FGFR2,Fibroblast growth factor receptor 2 (FGFR-2) (EC 2.7.10.1) (K-sam) (KGFR) (Keratinocyte growth factor receptor) (CD antigen CD332),821,kinase,False
+P00519,89,ABL1,Tyrosine-protein kinase ABL1 (EC 2.7.10.2) (Abelson murine leukemia viral oncogene homolog 1) (Abelson tyrosine-protein kinase 1) (Proto-oncogene c-Abl) (p150),1130,kinase,False
+P11362,88,FGFR1,Fibroblast growth factor receptor 1 (FGFR-1) (EC 2.7.10.1) (Basic fibroblast growth factor receptor 1) (BFGFR) (bFGF-R-1) (Fms-like tyrosine kinase 2) (FLT-2) (N-sam) (Proto-oncogene c-Fgr) (CD antigen CD331),822,kinase,False
+P22607,88,FGFR3,Fibroblast growth factor receptor 3 (FGFR-3) (EC 2.7.10.1) (CD antigen CD333),806,kinase,False
+P08581,88,MET,Hepatocyte growth factor receptor (HGF receptor) (EC 2.7.10.1) (HGF/SF receptor) (Proto-oncogene c-Met) (Scatter factor receptor) (SF receptor) (Tyrosine-protein kinase Met),1390,kinase,False
+P16234,88,PDGFRA,Platelet-derived growth factor receptor alpha (PDGF-R-alpha) (PDGFR-alpha) (EC 2.7.10.1) (Alpha platelet-derived growth factor receptor) (Alpha-type platelet-derived growth factor receptor) (CD140 antigen-like family member A) (CD140a antigen) (Platelet-derived growth factor alpha receptor) (Platelet-derived growth factor receptor 2) (PDGFR-2) (CD antigen CD140a),1089,kinase,False
+P30530,88,AXL,Tyrosine-protein kinase receptor UFO (EC 2.7.10.1) (AXL oncogene),894,kinase,False
+P45983,87,MAPK8,Mitogen-activated protein kinase 8 (MAP kinase 8) (MAPK 8) (EC 2.7.11.24) (JNK-46) (Stress-activated protein kinase 1c) (SAPK1c) (Stress-activated protein kinase JNK1) (c-Jun N-terminal kinase 1),427,kinase,False
+P43405,87,SYK,Tyrosine-protein kinase SYK (EC 2.7.10.2) (Spleen tyrosine kinase) (p72-Syk),635,kinase,False
+P50613,86,CDK7,Cyclin-dependent kinase 7 (EC 2.7.11.22) (EC 2.7.11.23) (39 kDa protein kinase) (p39 Mo15) (CDK-activating kinase 1) (Cell division protein kinase 7) (Serine/threonine-protein kinase 1) (TFIIH basal transcription factor complex kinase subunit),346,kinase,False
+Q9UQB9,86,AURKC,Aurora kinase C (EC 2.7.11.1) (Aurora 3) (Aurora/IPL1-related kinase 3) (ARK-3) (Aurora-related kinase 3) (Aurora/IPL1/Eg2 protein 2) (Serine/threonine-protein kinase 13) (Serine/threonine-protein kinase aurora-C),309,kinase,False
+O60341,86,KDM1A,Lysine-specific histone demethylase 1A (EC 1.14.11.-) (EC 1.14.11.65) (EC 1.14.99.66) (BRAF35-HDAC complex protein BHC110) (Flavin-containing amine oxidase domain-containing protein 2) ([histone H3]-dimethyl-L-lysine(4) FAD-dependent demethylase 1A),852,other,False
+P07333,86,CSF1R,Macrophage colony-stimulating factor 1 receptor (CSF-1 receptor) (CSF-1-R) (CSF-1R) (M-CSF-R) (EC 2.7.10.1) (Proto-oncogene c-Fms) (CD antigen CD115),972,kinase,False
+P49760,86,CLK2,Dual specificity protein kinase CLK2 (EC 2.7.12.1) (CDC-like kinase 2),499,kinase,False
+P42680,85,TEC,Tyrosine-protein kinase Tec (EC 2.7.10.2),631,kinase,False
+Q9HAZ1,85,CLK4,Dual specificity protein kinase CLK4 (EC 2.7.12.1) (CDC-like kinase 4),481,kinase,False
+P30291,85,WEE1,Wee1-like protein kinase (WEE1hu) (EC 2.7.10.2) (Wee1A kinase),646,kinase,False
+P07949,85,RET,Proto-oncogene tyrosine-protein kinase receptor Ret (EC 2.7.10.1) (Cadherin family member 12) (Proto-oncogene c-Ret) [Cleaved into: Soluble RET kinase fragment; Extracellular cell-membrane anchored RET cadherin 120 kDa fragment],1114,kinase,False
+Q13177,85,PAK2,Serine/threonine-protein kinase PAK 2 (EC 2.7.11.1) (Gamma-PAK) (PAK65) (S6/H4 kinase) (p21-activated kinase 2) (PAK-2) (p58) [Cleaved into: PAK-2p27 (p27); PAK-2p34 (p34) (C-t-PAK2)],524,kinase,False
+Q9HBH9,85,MKNK2,MAP kinase-interacting serine/threonine-protein kinase 2 (EC 2.7.11.1) (MAP kinase signal-integrating kinase 2) (MAPK signal-integrating kinase 2) (Mnk2),465,kinase,False
+Q02156,85,PRKCE,Protein kinase C epsilon type (EC 2.7.11.13) (nPKC-epsilon),737,kinase,False
+P29320,85,EPHA3,Ephrin type-A receptor 3 (EC 2.7.10.1) (EPH-like kinase 4) (EK4) (hEK4) (HEK) (Human embryo kinase) (Tyrosine-protein kinase TYRO4) (Tyrosine-protein kinase receptor ETK1) (Eph-like tyrosine kinase 1),983,kinase,False
+Q13153,85,PAK1,Serine/threonine-protein kinase PAK 1 (EC 2.7.11.1) (Alpha-PAK) (p21-activated kinase 1) (PAK-1) (p65-PAK),545,kinase,False
+Q05655,84,PRKCD,Protein kinase C delta type (EC 2.7.11.13) (Tyrosine-protein kinase PRKCD) (EC 2.7.10.2) (nPKC-delta) [Cleaved into: Protein kinase C delta type regulatory subunit; Protein kinase C delta type catalytic subunit (Sphingosine-dependent protein kinase-1) (SDK1)],676,kinase,False
+O96013,84,PAK4,Serine/threonine-protein kinase PAK 4 (EC 2.7.11.1) (p21-activated kinase 4) (PAK-4),591,kinase,False
+P49674,84,CSNK1E,Casein kinase I isoform epsilon (CKI-epsilon) (CKIe) (EC 2.7.11.1),416,kinase,False
+P19793,84,RXRA,Retinoic acid receptor RXR-alpha (Nuclear receptor subfamily 2 group B member 1) (Retinoid X receptor alpha),462,nuclear_receptor,False
+Q08345,84,DDR1,Epithelial discoidin domain-containing receptor 1 (Epithelial discoidin domain receptor 1) (EC 2.7.10.1) (CD167 antigen-like family member A) (Cell adhesion kinase) (Discoidin receptor tyrosine kinase) (HGK2) (Mammary carcinoma kinase 10) (MCK-10) (Protein-tyrosine kinase 3A) (Protein-tyrosine kinase RTK-6) (TRK E) (Tyrosine kinase DDR) (Tyrosine-protein kinase CAK) (CD antigen CD167a),913,kinase,False
+P53778,84,MAPK12,Mitogen-activated protein kinase 12 (MAP kinase 12) (MAPK 12) (EC 2.7.11.24) (Extracellular signal-regulated kinase 6) (ERK-6) (Mitogen-activated protein kinase p38 gamma) (MAP kinase p38 gamma) (Stress-activated protein kinase 3),367,kinase,False
+O75716,84,STK16,Serine/threonine-protein kinase 16 (EC 2.7.11.1) (Myristoylated and palmitoylated serine/threonine-protein kinase) (MPSK) (Protein kinase PKL12) (TGF-beta-stimulated factor 1) (TSF-1) (Tyrosine-protein kinase STK16) (EC 2.7.10.2) (hPSK),305,kinase,False
+Q99640,84,PKMYT1,Membrane-associated tyrosine- and threonine-specific cdc2-inhibitory kinase (EC 2.7.11.1) (Myt1 kinase),499,kinase,False
+P49840,83,GSK3A,Glycogen synthase kinase-3 alpha (GSK-3 alpha) (EC 2.7.11.26) (Serine/threonine-protein kinase GSK3A) (EC 2.7.11.1),483,kinase,False
+P33981,83,TTK,Dual specificity protein kinase TTK (EC 2.7.12.1) (Phosphotyrosine picked threonine-protein kinase) (PYT),857,kinase,False
+P50750,83,CDK9,Cyclin-dependent kinase 9 (EC 2.7.11.22) (EC 2.7.11.23) (C-2K) (Cell division cycle 2-like protein kinase 4) (Cell division protein kinase 9) (Serine/threonine-protein kinase PITALRE) (Tat-associated kinase complex catalytic subunit),372,kinase,False
+Q12866,83,MERTK,Tyrosine-protein kinase Mer (EC 2.7.10.1) (Proto-oncogene c-Mer) (Receptor tyrosine kinase MerTK),999,kinase,False
+Q06418,83,TYRO3,Tyrosine-protein kinase receptor TYRO3 (EC 2.7.10.1) (Tyrosine-protein kinase BYK) (Tyrosine-protein kinase DTK) (Tyrosine-protein kinase RSE) (Tyrosine-protein kinase SKY) (Tyrosine-protein kinase TIF),890,kinase,False
+Q9UKE5,83,TNIK,TRAF2 and NCK-interacting protein kinase (EC 2.7.11.1),1360,kinase,False
+Q9NQU5,83,PAK6,Serine/threonine-protein kinase PAK 6 (EC 2.7.11.1) (PAK-5) (p21-activated kinase 6) (PAK-6),681,kinase,False
+Q9UEE5,83,STK17A,Serine/threonine-protein kinase 17A (EC 2.7.11.1) (DAP kinase-related apoptosis-inducing protein kinase 1),414,kinase,False
+P49759,83,CLK1,Dual specificity protein kinase CLK1 (EC 2.7.12.1) (CDC-like kinase 1),484,kinase,False
+Q9UIK4,83,DAPK2,Death-associated protein kinase 2 (DAP kinase 2) (EC 2.7.11.1) (DAP-kinase-related protein 1) (DRP-1),370,kinase,False
+Q9Y463,83,DYRK1B,Dual specificity tyrosine-phosphorylation-regulated kinase 1B (EC 2.7.12.1) (Minibrain-related kinase) (Mirk protein kinase),629,kinase,False
+P29597,83,TYK2,Non-receptor tyrosine-protein kinase TYK2 (EC 2.7.10.2),1187,kinase,False
+Q9H2G2,82,SLK,STE20-like serine/threonine-protein kinase (STE20-like kinase) (hSLK) (EC 2.7.11.1) (CTCL tumor antigen se20-9) (STE20-related serine/threonine-protein kinase) (STE20-related kinase) (Serine/threonine-protein kinase 2),1235,kinase,False
+Q99683,82,MAP3K5,Mitogen-activated protein kinase kinase kinase 5 (EC 2.7.11.25) (Apoptosis signal-regulating kinase 1) (ASK-1) (MAPK/ERK kinase kinase 5) (MEK kinase 5) (MEKK 5),1374,kinase,False
+P49761,82,CLK3,Dual specificity protein kinase CLK3 (EC 2.7.12.1) (CDC-like kinase 3),638,kinase,False
+P25103,82,TACR1,Substance-P receptor (SPR) (NK-1 receptor) (NK-1R) (Tachykinin receptor 1),407,gpcr,False
+P42681,82,TXK,Tyrosine-protein kinase TXK (EC 2.7.10.2) (Protein-tyrosine kinase 4) (Resting lymphocyte kinase),527,kinase,False
+P08238,82,HSP90AB1,Heat shock protein HSP 90-beta (HSP 90) (Heat shock 84 kDa) (HSP 84) (HSP84) (Heat shock protein family C member 3),724,other,False
+Q02750,82,MAP2K1,Dual specificity mitogen-activated protein kinase kinase 1 (MAP kinase kinase 1) (MAPKK 1) (MKK1) (EC 2.7.12.2) (ERK activator kinase 1) (MAPK/ERK kinase 1) (MEK 1),393,kinase,False
+P12931,82,SRC,Proto-oncogene tyrosine-protein kinase Src (EC 2.7.10.2) (Proto-oncogene c-Src) (pp60c-src) (p60-Src),536,kinase,False
+P11309,82,PIM1,Serine/threonine-protein kinase pim-1 (EC 2.7.11.1),313,kinase,False
+Q8NI60,82,COQ8A,"Atypical kinase COQ8A, mitochondrial (EC 2.7.-.-) (Chaperone activity of bc1 complex-like) (Chaperone-ABC1-like) (Coenzyme Q protein 8A) (aarF domain-containing protein kinase 3)",647,kinase,False
+P53671,82,LIMK2,LIM domain kinase 2 (LIMK-2) (EC 2.7.11.1),638,kinase,False
+Q2M2I8,82,AAK1,AP2-associated protein kinase 1 (EC 2.7.11.1) (Adaptor-associated kinase 1),961,kinase,False
+P08631,82,HCK,Tyrosine-protein kinase HCK (EC 2.7.10.2) (Hematopoietic cell kinase) (Hemopoietic cell kinase) (p59-HCK/p60-HCK) (p59Hck) (p61Hck),526,kinase,False
+P17612,82,PRKACA,cAMP-dependent protein kinase catalytic subunit alpha (PKA C-alpha) (EC 2.7.11.11),351,kinase,False
+P29317,82,EPHA2,Ephrin type-A receptor 2 (EC 2.7.10.1) (Epithelial cell kinase) (Tyrosine-protein kinase receptor ECK),976,kinase,False
+O75914,82,PAK3,Serine/threonine-protein kinase PAK 3 (EC 2.7.11.1) (Beta-PAK) (Oligophrenin-3) (p21-activated kinase 3) (PAK-3),559,kinase,False
+Q16584,82,MAP3K11,Mitogen-activated protein kinase kinase kinase 11 (EC 2.7.11.25) (Mixed lineage kinase 3) (Src-homology 3 domain-containing proline-rich kinase),847,kinase,False
+O43293,82,DAPK3,Death-associated protein kinase 3 (DAP kinase 3) (EC 2.7.11.1) (DAP-like kinase) (Dlk) (MYPT1 kinase) (Zipper-interacting protein kinase) (ZIP-kinase),454,kinase,False
+P51451,82,BLK,Tyrosine-protein kinase Blk (EC 2.7.10.2) (B lymphocyte kinase) (p55-Blk),505,kinase,False
+Q15759,82,MAPK11,Mitogen-activated protein kinase 11 (MAP kinase 11) (MAPK 11) (EC 2.7.11.24) (Mitogen-activated protein kinase p38 beta) (MAP kinase p38 beta) (p38b) (Stress-activated protein kinase 2b) (SAPK2b) (p38-2),364,kinase,False
+Q9UBF8,82,PI4KB,Phosphatidylinositol 4-kinase beta (PI4K-beta) (PI4Kbeta) (PtdIns 4-kinase beta) (EC 2.7.1.67) (NPIK) (PI4K92) (PI4KIII),816,kinase,False
+O00444,82,PLK4,Serine/threonine-protein kinase PLK4 (EC 2.7.11.21) (Polo-like kinase 4) (PLK-4) (Serine/threonine-protein kinase 18) (Serine/threonine-protein kinase Sak),970,kinase,False
+P24723,82,PRKCH,Protein kinase C eta type (EC 2.7.11.13) (PKC-L) (nPKC-eta),683,kinase,False
+Q14012,81,CAMK1,Calcium/calmodulin-dependent protein kinase type 1 (EC 2.7.11.17) (CaM kinase I) (CaM-KI) (CaM kinase I alpha) (CaMKI-alpha),370,kinase,False
+Q16620,81,NTRK2,BDNF/NT-3 growth factors receptor (EC 2.7.10.1) (GP145-TrkB) (Trk-B) (Neurotrophic tyrosine kinase receptor type 2) (TrkB tyrosine kinase) (Tropomyosin-related kinase B),822,kinase,False
+P19525,81,EIF2AK2,"Interferon-induced, double-stranded RNA-activated protein kinase (EC 2.7.11.1) (Eukaryotic translation initiation factor 2-alpha kinase 2) (eIF-2A protein kinase 2) (Interferon-inducible RNA-dependent protein kinase) (P1/eIF-2A protein kinase) (Protein kinase RNA-activated) (PKR) (Protein kinase R) (Tyrosine-protein kinase EIF2AK2) (EC 2.7.10.2) (p68 kinase)",551,kinase,False
+Q13976,81,PRKG1,cGMP-dependent protein kinase 1 (cGK 1) (cGK1) (EC 2.7.11.12) (cGMP-dependent protein kinase I) (cGKI),671,kinase,False
+P21709,81,EPHA1,Ephrin type-A receptor 1 (hEpha1) (EC 2.7.10.1) (EPH tyrosine kinase) (EPH tyrosine kinase 1) (Erythropoietin-producing hepatoma receptor) (Tyrosine-protein kinase receptor EPH),976,kinase,False
+Q16659,81,MAPK6,Mitogen-activated protein kinase 6 (MAP kinase 6) (MAPK 6) (EC 2.7.11.24) (Extracellular signal-regulated kinase 3) (ERK-3) (MAP kinase isoform p97) (p97-MAPK),721,kinase,False
+Q13882,81,PTK6,Protein-tyrosine kinase 6 (EC 2.7.10.2) (Breast tumor kinase) (Tyrosine-protein kinase BRK),451,kinase,False
+Q15418,81,RPS6KA1,Ribosomal protein S6 kinase alpha-1 (S6K-alpha-1) (EC 2.7.11.1) (90 kDa ribosomal protein S6 kinase 1) (p90-RSK 1) (p90RSK1) (p90S6K) (MAP kinase-activated protein kinase 1a) (MAPK-activated protein kinase 1a) (MAPKAP kinase 1a) (MAPKAPK-1a) (Ribosomal S6 kinase 1) (RSK-1),735,kinase,False
+P27361,81,MAPK3,Mitogen-activated protein kinase 3 (MAP kinase 3) (MAPK 3) (EC 2.7.11.24) (ERT2) (Extracellular signal-regulated kinase 1) (ERK-1) (Insulin-stimulated MAP2 kinase) (MAP kinase isoform p44) (p44-MAPK) (Microtubule-associated protein 2 kinase) (p44-ERK1),379,kinase,False
+Q96RR4,81,CAMKK2,Calcium/calmodulin-dependent protein kinase kinase 2 (CaM-KK 2) (CaM-kinase kinase 2) (CaMKK 2) (EC 2.7.11.17) (Calcium/calmodulin-dependent protein kinase kinase beta) (CaM-KK beta) (CaM-kinase kinase beta) (CaMKK beta),588,kinase,False
+P08588,81,ADRB1,Beta-1 adrenergic receptor (Beta-1 adrenoreceptor) (Beta-1 adrenoceptor),477,gpcr,False
+P17948,81,FLT1,Vascular endothelial growth factor receptor 1 (VEGFR-1) (EC 2.7.10.1) (Fms-like tyrosine kinase 1) (FLT-1) (Tyrosine-protein kinase FRT) (Tyrosine-protein kinase receptor FLT) (FLT) (Vascular permeability factor receptor),1338,kinase,False
+Q5VT25,81,CDC42BPA,Serine/threonine-protein kinase MRCK alpha (EC 2.7.11.1) (CDC42-binding protein kinase alpha) (DMPK-like alpha) (Myotonic dystrophy kinase-related CDC42-binding kinase alpha) (MRCK alpha) (Myotonic dystrophy protein kinase-like alpha),1732,kinase,False
+P31152,81,MAPK4,Mitogen-activated protein kinase 4 (MAP kinase 4) (MAPK 4) (EC 2.7.11.24) (Extracellular signal-regulated kinase 4) (ERK-4) (MAP kinase isoform p63) (p63-MAPK),587,kinase,False
+Q13188,81,STK3,Serine/threonine-protein kinase 3 (EC 2.7.11.1) (Mammalian STE20-like protein kinase 2) (MST-2) (STE20-like kinase MST2) (Serine/threonine-protein kinase Krs-1) [Cleaved into: Serine/threonine-protein kinase 3 36kDa subunit (MST2/N); Serine/threonine-protein kinase 3 20kDa subunit (MST2/C)],491,kinase,False
+Q86V86,81,PIM3,Serine/threonine-protein kinase pim-3 (EC 2.7.11.1),326,kinase,False
+Q86YV6,81,MYLK4,Myosin light chain kinase family member 4 (EC 2.7.11.1) (Sugen kinase 85) (SgK085),388,kinase,False
+Q13043,81,STK4,Serine/threonine-protein kinase 4 (EC 2.7.11.1) (Mammalian STE20-like protein kinase 1) (MST-1) (STE20-like kinase MST1) (Serine/threonine-protein kinase Krs-2) [Cleaved into: Serine/threonine-protein kinase 4 37kDa subunit (MST1/N); Serine/threonine-protein kinase 4 18kDa subunit (MST1/C)],487,kinase,False
+Q8IU85,81,CAMK1D,Calcium/calmodulin-dependent protein kinase type 1D (EC 2.7.11.17) (CaM kinase I delta) (CaM kinase ID) (CaM-KI delta) (CaMKI delta) (CaMKID) (CaMKI-like protein kinase) (CKLiK),385,kinase,False
+Q96D53,81,COQ8B,"Atypical kinase COQ8B, mitochondrial (EC 2.7.-.-) (AarF domain-containing protein kinase 4) (Coenzyme Q protein 8B)",544,kinase,False
+P35916,81,FLT4,Vascular endothelial growth factor receptor 3 (VEGFR-3) (EC 2.7.10.1) (Fms-like tyrosine kinase 4) (FLT-4) (Tyrosine-protein kinase receptor FLT4),1363,kinase,False
+Q06187,81,BTK,Tyrosine-protein kinase BTK (EC 2.7.10.2) (Agammaglobulinemia tyrosine kinase) (ATK) (B-cell progenitor kinase) (BPK) (Bruton tyrosine kinase),659,kinase,False
+Q00536,81,CDK16,Cyclin-dependent kinase 16 (EC 2.7.11.22) (Cell division protein kinase 16) (PCTAIRE-motif protein kinase 1) (Serine/threonine-protein kinase PCTAIRE-1),496,kinase,False
+Q8TDX7,81,NEK7,Serine/threonine-protein kinase Nek7 (EC 2.7.11.34) (Never in mitosis A-related kinase 7) (NimA-related protein kinase 7),302,kinase,False
+P41240,81,CSK,Tyrosine-protein kinase CSK (EC 2.7.10.2) (C-Src kinase) (Protein-tyrosine kinase CYL),450,kinase,False
+P09769,81,FGR,Tyrosine-protein kinase Fgr (EC 2.7.10.2) (Gardner-Rasheed feline sarcoma viral (v-fgr) oncogene homolog) (Proto-oncogene c-Fgr) (p55-Fgr) (p58-Fgr) (p58c-Fgr),529,kinase,False
+P08922,81,ROS1,Proto-oncogene tyrosine-protein kinase ROS (EC 2.7.10.1) (Proto-oncogene c-Ros) (Proto-oncogene c-Ros-1) (Receptor tyrosine kinase c-ros oncogene 1) (c-Ros receptor tyrosine kinase),2347,kinase,False
+P42684,81,ABL2,Tyrosine-protein kinase ABL2 (EC 2.7.10.2) (Abelson murine leukemia viral oncogene homolog 2) (Abelson tyrosine-protein kinase 2) (Abelson-related gene protein) (Tyrosine-protein kinase ARG),1182,kinase,False
+P42685,81,FRK,Tyrosine-protein kinase FRK (EC 2.7.10.2) (FYN-related kinase) (Nuclear tyrosine protein kinase RAK) (Protein-tyrosine kinase 5),505,kinase,False
+P45985,81,MAP2K4,Dual specificity mitogen-activated protein kinase kinase 4 (MAP kinase kinase 4) (MAPKK 4) (EC 2.7.12.2) (JNK-activating kinase 1) (MAPK/ERK kinase 4) (MEK 4) (SAPK/ERK kinase 1) (SEK1) (Stress-activated protein kinase kinase 1) (SAPK kinase 1) (SAPKK-1) (SAPKK1) (c-Jun N-terminal kinase kinase 1) (JNKK),399,kinase,False
+P53355,81,DAPK1,Death-associated protein kinase 1 (DAP kinase 1) (EC 2.7.11.1),1430,kinase,False
+Q9P0L2,81,MARK1,Serine/threonine-protein kinase MARK1 (EC 2.7.11.1) (EC 2.7.11.26) (MAP/microtubule affinity-regulating kinase 1) (PAR1 homolog c) (Par-1c) (Par1c),795,kinase,False
+P51812,81,RPS6KA3,Ribosomal protein S6 kinase alpha-3 (S6K-alpha-3) (EC 2.7.11.1) (90 kDa ribosomal protein S6 kinase 3) (p90-RSK 3) (p90RSK3) (Insulin-stimulated protein kinase 1) (ISPK-1) (MAP kinase-activated protein kinase 1b) (MAPK-activated protein kinase 1b) (MAPKAP kinase 1b) (MAPKAPK-1b) (Ribosomal S6 kinase 2) (RSK-2) (pp90RSK2),740,kinase,False
+P51813,81,BMX,Cytoplasmic tyrosine-protein kinase BMX (EC 2.7.10.2) (Bone marrow tyrosine kinase gene in chromosome X protein) (Epithelial and endothelial tyrosine kinase) (ETK) (NTK38),675,kinase,False
+Q9Y616,81,IRAK3,Interleukin-1 receptor-associated kinase 3 (IRAK-3) (IL-1 receptor-associated kinase M) (IRAK-M) (Inactive IL-1 receptor-associated kinase 3),596,kinase,False
+Q9C098,81,DCLK3,Serine/threonine-protein kinase DCLK3 (EC 2.7.11.1) (Doublecortin domain-containing protein 3C) (Doublecortin-like and CAM kinase-like 3) (Doublecortin-like kinase 3),648,kinase,False
+Q9NRP7,81,STK36,Serine/threonine-protein kinase 36 (EC 2.7.11.1) (Fused homolog),1315,kinase,False
+Q9UBE8,81,NLK,Serine/threonine-protein kinase NLK (EC 2.7.11.24) (Nemo-like kinase) (Protein LAK1),527,kinase,False
+Q9HCP0,81,CSNK1G1,Casein kinase I isoform gamma-1 (CKI-gamma 1) (EC 2.7.11.1),422,kinase,False
+O75582,81,RPS6KA5,Ribosomal protein S6 kinase alpha-5 (S6K-alpha-5) (EC 2.7.11.1) (90 kDa ribosomal protein S6 kinase 5) (Nuclear mitogen- and stress-activated protein kinase 1) (RSK-like protein kinase) (RSKL),802,kinase,False
+Q9UF33,80,EPHA6,Ephrin type-A receptor 6 (EC 2.7.10.1) (EPH homology kinase 2) (EHK-2) (EPH-like kinase 12) (EK12),1036,kinase,False
+Q00537,80,CDK17,Cyclin-dependent kinase 17 (EC 2.7.11.22) (Cell division protein kinase 17) (PCTAIRE-motif protein kinase 2) (Serine/threonine-protein kinase PCTAIRE-2),523,kinase,False
+P36507,80,MAP2K2,Dual specificity mitogen-activated protein kinase kinase 2 (MAP kinase kinase 2) (MAPKK 2) (EC 2.7.12.2) (ERK activator kinase 2) (MAPK/ERK kinase 2) (MEK 2),400,kinase,False
+Q9NSY1,80,BMP2K,BMP-2-inducible protein kinase (BIKe) (EC 2.7.11.1),1161,kinase,False
+Q9Y2H1,80,STK38L,Serine/threonine-protein kinase 38-like (EC 2.7.11.1) (NDR2 protein kinase) (Nuclear Dbf2-related kinase 2),464,kinase,False
+Q9NY57,80,STK32B,Serine/threonine-protein kinase 32B (EC 2.7.11.1) (Yet another novel kinase 2),414,kinase,False
+P29376,80,LTK,Leukocyte tyrosine kinase receptor (EC 2.7.10.1) (Protein tyrosine kinase 1),864,kinase,False
+O15075,80,DCLK1,Serine/threonine-protein kinase DCLK1 (EC 2.7.11.1) (Doublecortin domain-containing protein 3A) (Doublecortin-like and CAM kinase-like 1) (Doublecortin-like kinase 1),740,kinase,False
+O94768,80,STK17B,Serine/threonine-protein kinase 17B (EC 2.7.11.1) (DAP kinase-related apoptosis-inducing protein kinase 2),372,kinase,False
+P51955,80,NEK2,Serine/threonine-protein kinase Nek2 (EC 2.7.11.1) (HSPK 21) (Never in mitosis A-related kinase 2) (NimA-related protein kinase 2) (NimA-like protein kinase 1),445,kinase,False
+P54764,80,EPHA4,Ephrin type-A receptor 4 (EC 2.7.10.1) (EPH-like kinase 8) (EK8) (hEK8) (Tyrosine-protein kinase TYRO1) (Tyrosine-protein kinase receptor SEK),986,kinase,False
+Q9Y243,80,AKT3,RAC-gamma serine/threonine-protein kinase (EC 2.7.11.1) (Protein kinase Akt-3) (Protein kinase B gamma) (PKB gamma) (RAC-PK-gamma) (STK-2),479,kinase,False
+P54756,80,EPHA5,Ephrin type-A receptor 5 (EC 2.7.10.1) (Brain-specific kinase) (EPH homology kinase 1) (EHK-1) (EPH-like kinase 7) (EK7) (hEK7),1037,kinase,False
+Q00526,80,CDK3,Cyclin-dependent kinase 3 (EC 2.7.11.22) (Cell division protein kinase 3),305,kinase,False
+P15735,80,PHKG2,"Phosphorylase b kinase gamma catalytic chain, liver/testis isoform (PHK-gamma-LT) (PHK-gamma-T) (EC 2.7.11.19) (PSK-C3) (Phosphorylase kinase subunit gamma-2)",406,kinase,False
+Q9P286,80,PAK5,Serine/threonine-protein kinase PAK 5 (EC 2.7.11.1) (p21-activated kinase 5) (PAK-5) (p21-activated kinase 7) (PAK-7),719,kinase,False
+Q04759,80,PRKCQ,Protein kinase C theta type (EC 2.7.11.13) (nPKC-theta),706,kinase,False
+P54753,80,EPHB3,Ephrin type-B receptor 3 (EC 2.7.10.1) (EPH-like tyrosine kinase 2) (EPH-like kinase 2) (Embryonic kinase 2) (EK2) (hEK2) (Tyrosine-protein kinase TYRO6),998,kinase,False
+P52564,80,MAP2K6,Dual specificity mitogen-activated protein kinase kinase 6 (MAP kinase kinase 6) (MAPKK 6) (EC 2.7.12.2) (MAPK/ERK kinase 6) (MEK 6) (Stress-activated protein kinase kinase 3) (SAPK kinase 3) (SAPKK-3) (SAPKK3),334,kinase,False
+P78368,80,CSNK1G2,Casein kinase I isoform gamma-2 (CKI-gamma 2) (EC 2.7.11.1),415,kinase,False
+Q7KZI7,80,MARK2,Serine/threonine-protein kinase MARK2 (EC 2.7.11.1) (EC 2.7.11.26) (ELKL motif kinase 1) (EMK-1) (MAP/microtubule affinity-regulating kinase 2) (PAR1 homolog) (PAR1 homolog b) (Par-1b) (Par1b),788,kinase,False
+Q13546,80,RIPK1,Receptor-interacting serine/threonine-protein kinase 1 (EC 2.7.11.1) (Cell death protein RIP) (Receptor-interacting protein 1) (RIP-1),671,kinase,False
+Q13470,80,TNK1,Non-receptor tyrosine-protein kinase TNK1 (EC 2.7.10.2) (CD38 negative kinase 1),666,kinase,False
+Q9UQ88,80,CDK11A,Cyclin-dependent kinase 11A (EC 2.7.11.22) (EC 2.7.11.23) (Cell division cycle 2-like protein kinase 2) (Cell division protein kinase 11A) (Galactosyltransferase-associated protein kinase p58/GTA) (PITSLRE serine/threonine-protein kinase CDC2L2),783,kinase,False
+Q6P3R8,80,NEK5,Serine/threonine-protein kinase Nek5 (EC 2.7.11.1) (Never in mitosis A-related kinase 5) (NimA-related protein kinase 5),708,kinase,False
+Q00535,80,CDK5,Cyclin-dependent kinase 5 (EC 2.7.11.1) (Cell division protein kinase 5) (Cyclin-dependent-like kinase 5) (Serine/threonine-protein kinase PSSALRE) (Tau protein kinase II catalytic subunit) (TPKII catalytic subunit),292,kinase,False
+P53667,80,LIMK1,LIM domain kinase 1 (LIMK-1) (EC 2.7.11.1),647,kinase,False
+P46734,80,MAP2K3,Dual specificity mitogen-activated protein kinase kinase 3 (MAP kinase kinase 3) (MAPKK 3) (EC 2.7.12.2) (MAPK/ERK kinase 3) (MEK 3) (Stress-activated protein kinase kinase 2) (SAPK kinase 2) (SAPKK-2) (SAPKK2),347,kinase,False
+Q14289,80,PTK2B,Protein-tyrosine kinase 2-beta (EC 2.7.10.2) (Calcium-dependent tyrosine kinase) (CADTK) (Calcium-regulated non-receptor proline-rich tyrosine kinase) (Cell adhesion kinase beta) (CAK-beta) (CAKB) (Focal adhesion kinase 2) (FADK 2) (Proline-rich tyrosine kinase 2) (Related adhesion focal tyrosine kinase) (RAFTK),1009,kinase,False
+Q9Y6M4,80,CSNK1G3,Casein kinase I isoform gamma-3 (CKI-gamma 3) (EC 2.7.11.1),447,kinase,False
+Q8IVH8,80,MAP4K3,Mitogen-activated protein kinase kinase kinase kinase 3 (EC 2.7.11.1) (Germinal center kinase-related protein kinase) (GLK) (MAPK/ERK kinase kinase kinase 3) (MEK kinase kinase 3) (MEKKK 3),894,kinase,False
+Q15349,80,RPS6KA2,Ribosomal protein S6 kinase alpha-2 (S6K-alpha-2) (EC 2.7.11.1) (90 kDa ribosomal protein S6 kinase 2) (p90-RSK 2) (p90RSK2) (MAP kinase-activated protein kinase 1c) (MAPK-activated protein kinase 1c) (MAPKAP kinase 1c) (MAPKAPK-1c) (Ribosomal S6 kinase 3) (RSK-3) (pp90RSK3),733,kinase,False
+Q8N568,80,DCLK2,Serine/threonine-protein kinase DCLK2 (EC 2.7.11.1) (CaMK-like CREB regulatory kinase 2) (CL2) (CLICK-II) (CLICK2) (Doublecortin domain-containing protein 3B) (Doublecortin-like and CAM kinase-like 2) (Doublecortin-like kinase 2),766,kinase,False
+P06213,80,INSR,Insulin receptor (IR) (EC 2.7.10.1) (CD antigen CD220) [Cleaved into: Insulin receptor subunit alpha; Insulin receptor subunit beta],1382,kinase,False
+Q15831,80,STK11,Serine/threonine-protein kinase STK11 (EC 2.7.11.1) (Liver kinase B1) (LKB1) (hLKB1) (Renal carcinoma antigen NY-REN-19),433,kinase,False
+P06241,80,FYN,Tyrosine-protein kinase Fyn (EC 2.7.10.2) (Proto-oncogene Syn) (Proto-oncogene c-Fyn) (Src-like kinase) (SLK) (p59-Fyn),537,kinase,False
+Q9Y5S2,80,CDC42BPB,Serine/threonine-protein kinase MRCK beta (EC 2.7.11.1) (CDC42-binding protein kinase beta) (CDC42BP-beta) (DMPK-like beta) (Myotonic dystrophy kinase-related CDC42-binding kinase beta) (MRCK beta) (Myotonic dystrophy protein kinase-like beta),1711,kinase,False
+Q96SB4,80,SRPK1,SRSF protein kinase 1 (EC 2.7.11.1) (SFRS protein kinase 1) (Serine/arginine-rich protein-specific kinase 1) (SR-protein-specific kinase 1),655,kinase,False
+P07332,80,FES,Tyrosine-protein kinase Fes/Fps (EC 2.7.10.2) (Feline sarcoma/Fujinami avian sarcoma oncogene homolog) (Proto-oncogene c-Fes) (Proto-oncogene c-Fps) (p93c-fes),822,kinase,False
+P43403,80,ZAP70,Tyrosine-protein kinase ZAP-70 (EC 2.7.10.2) (70 kDa zeta-chain associated protein) (Syk-related tyrosine kinase),619,kinase,False
+Q16288,80,NTRK3,NT-3 growth factor receptor (EC 2.7.10.1) (GP145-TrkC) (Trk-C) (Neurotrophic tyrosine kinase receptor type 3) (TrkC tyrosine kinase),839,kinase,False
+Q07912,80,TNK2,Activated CDC42 kinase 1 (ACK-1) (EC 2.7.10.2) (EC 2.7.11.1) (Tyrosine kinase non-receptor protein 2),1038,kinase,False
+Q96PY6,80,NEK1,Serine/threonine-protein kinase Nek1 (EC 2.7.11.1) (Never in mitosis A-related kinase 1) (NimA-related protein kinase 1) (Renal carcinoma antigen NY-REN-55),1258,kinase,False
+Q96NX5,80,CAMK1G,Calcium/calmodulin-dependent protein kinase type 1G (EC 2.7.11.17) (CaM kinase I gamma) (CaM kinase IG) (CaM-KI gamma) (CaMKI gamma) (CaMKIG) (CaMK-like CREB kinase III) (CLICK III),476,kinase,False
+O14578,80,CIT,Citron Rho-interacting kinase (CRIK) (EC 2.7.11.1) (Serine/threonine-protein kinase 21),2027,kinase,False
+Q13131,80,PRKAA1,5'-AMP-activated protein kinase catalytic subunit alpha-1 (AMPK subunit alpha-1) (EC 2.7.11.1) (Acetyl-CoA carboxylase kinase) (ACACA kinase) (Hydroxymethylglutaryl-CoA reductase kinase) (HMGCR kinase) (EC 2.7.11.31) (Tau-protein kinase PRKAA1) (EC 2.7.11.26),559,kinase,False
+P07947,80,YES1,Tyrosine-protein kinase Yes (EC 2.7.10.2) (Proto-oncogene c-Yes) (p61-Yes),543,kinase,False
+Q9BUB5,80,MKNK1,MAP kinase-interacting serine/threonine-protein kinase 1 (EC 2.7.11.1) (MAP kinase signal-integrating kinase 1) (MAPK signal-integrating kinase 1) (Mnk1),465,kinase,False
+Q8N5S9,80,CAMKK1,Calcium/calmodulin-dependent protein kinase kinase 1 (CaM-KK 1) (CaM-kinase kinase 1) (CaMKK 1) (EC 2.7.11.17) (CaM-kinase IV kinase) (Calcium/calmodulin-dependent protein kinase kinase alpha) (CaM-KK alpha) (CaM-kinase kinase alpha) (CaMKK alpha),505,kinase,False
+Q8IWQ3,80,BRSK2,Serine/threonine-protein kinase BRSK2 (EC 2.7.11.1) (Brain-selective kinase 2) (EC 2.7.11.26) (Brain-specific serine/threonine-protein kinase 2) (BR serine/threonine-protein kinase 2) (Serine/threonine-protein kinase 29) (Serine/threonine-protein kinase SAD-A),736,kinase,False
+O14757,80,CHEK1,Serine/threonine-protein kinase Chk1 (EC 2.7.11.1) (CHK1 checkpoint homolog) (Cell cycle checkpoint kinase) (Checkpoint kinase-1),476,kinase,False
+Q9H4B4,80,PLK3,Serine/threonine-protein kinase PLK3 (EC 2.7.11.21) (Cytokine-inducible serine/threonine-protein kinase) (FGF-inducible kinase) (Polo-like kinase 3) (PLK-3) (Proliferation-related kinase),646,kinase,False
+Q9H093,80,NUAK2,NUAK family SNF1-like kinase 2 (EC 2.7.11.1) (Omphalocele kinase 2) (SNF1/AMP kinase-related kinase) (SNARK),628,kinase,False
+P16591,79,FER,Tyrosine-protein kinase Fer (EC 2.7.10.2) (Feline encephalitis virus-related kinase FER) (Fujinami poultry sarcoma/Feline sarcoma-related protein Fer) (Proto-oncogene c-Fer) (Tyrosine kinase 3) (p94-Fer),822,kinase,False
+Q8IW41,79,MAPKAPK5,MAP kinase-activated protein kinase 5 (MAPK-activated protein kinase 5) (MAPKAP kinase 5) (MAPKAP-K5) (MAPKAPK-5) (MK-5) (MK5) (EC 2.7.11.1) (p38-regulated/activated protein kinase) (PRAK),473,kinase,False
+Q6DT37,79,CDC42BPG,Serine/threonine-protein kinase MRCK gamma (EC 2.7.11.1) (CDC42-binding protein kinase gamma) (DMPK-like gamma) (Myotonic dystrophy kinase-related CDC42-binding kinase gamma) (MRCK gamma) (MRCKG) (Myotonic dystrophy protein kinase-like gamma) (Myotonic dystrophy protein kinase-like alpha),1551,kinase,False
+P31751,79,AKT2,RAC-beta serine/threonine-protein kinase (EC 2.7.11.1) (Protein kinase Akt-2) (Protein kinase B beta) (PKB beta) (RAC protein kinase beta) (RAC-PK-beta),481,kinase,False
+Q13237,79,PRKG2,cGMP-dependent protein kinase 2 (cGK 2) (cGK2) (EC 2.7.11.12) (cGMP-dependent protein kinase II) (cGKII),762,kinase,False
+P14616,79,INSRR,Insulin receptor-related protein (IRR) (EC 2.7.10.1) (IR-related receptor) [Cleaved into: Insulin receptor-related protein alpha chain; Insulin receptor-related protein beta chain],1297,kinase,False
+Q86UE8,79,TLK2,Serine/threonine-protein kinase tousled-like 2 (EC 2.7.11.1) (HsHPK) (PKU-alpha) (Tousled-like kinase 2),772,kinase,False
+Q86UX6,79,STK32C,Serine/threonine-protein kinase 32C (EC 2.7.11.1) (PKE) (Yet another novel kinase 3),486,kinase,False
+P51817,79,PRKX,cAMP-dependent protein kinase catalytic subunit PRKX (PrKX) (Protein kinase X) (Protein kinase X-linked) (Serine/threonine-protein kinase PRKX) (EC 2.7.11.1) (Protein kinase PKX1),358,kinase,False
+Q9UKI8,79,TLK1,Serine/threonine-protein kinase tousled-like 1 (EC 2.7.11.1) (PKU-beta) (Tousled-like kinase 1),766,kinase,False
+Q9BXA7,79,TSSK1B,Testis-specific serine/threonine-protein kinase 1 (TSK-1) (TSK1) (TSSK-1) (Testis-specific kinase 1) (EC 2.7.11.1) (Serine/threonine-protein kinase 22A),367,kinase,False
+Q13873,79,BMPR2,Bone morphogenetic protein receptor type-2 (BMP type-2 receptor) (BMPR-2) (EC 2.7.11.30) (Bone morphogenetic protein receptor type II) (BMP type II receptor) (BMPR-II),1038,kinase,False
+O60285,79,NUAK1,NUAK family SNF1-like kinase 1 (EC 2.7.11.1) (AMPK-related protein kinase 5) (ARK5) (Omphalocele kinase 1),661,kinase,False
+O14730,79,RIOK3,Serine/threonine-protein kinase RIO3 (EC 2.7.11.1) (RIO kinase 3) (sudD homolog),519,kinase,False
+P27037,79,ACVR2A,Activin receptor type-2A (EC 2.7.11.30) (Activin receptor type IIA) (ACTR-IIA) (ACTRIIA),513,kinase,False
+Q15139,79,PRKD1,Serine/threonine-protein kinase D1 (EC 2.7.11.13) (Protein kinase C mu type) (Protein kinase D) (nPKC-D1) (nPKC-mu),912,kinase,False
+P57059,79,SIK1,Serine/threonine-protein kinase SIK1 (EC 2.7.11.1) (Salt-inducible kinase 1) (SIK-1) (Serine/threonine-protein kinase SNF1-like kinase 1) (Serine/threonine-protein kinase SNF1LK),783,kinase,False
+Q9Y6R4,79,MAP3K4,Mitogen-activated protein kinase kinase kinase 4 (EC 2.7.11.25) (MAP three kinase 1) (MAPK/ERK kinase kinase 4) (MEK kinase 4) (MEKK 4),1608,kinase,False
+Q15569,79,TESK1,Dual specificity testis-specific protein kinase 1 (EC 2.7.12.1) (Testicular protein kinase 1),626,kinase,False
+O00506,79,STK25,Serine/threonine-protein kinase 25 (EC 2.7.11.1) (Ste20-like kinase) (Sterile 20/oxidant stress-response kinase 1) (SOK-1) (Ste20/oxidant stress response kinase 1),426,kinase,False
+Q9Y6E0,79,STK24,Serine/threonine-protein kinase 24 (EC 2.7.11.1) (Mammalian STE20-like protein kinase 3) (MST-3) (STE20-like kinase MST3) [Cleaved into: Serine/threonine-protein kinase 24 36 kDa subunit (Mammalian STE20-like protein kinase 3 N-terminal) (MST3/N); Serine/threonine-protein kinase 24 12 kDa subunit (Mammalian STE20-like protein kinase 3 C-terminal) (MST3/C)],443,kinase,False
+Q14164,79,IKBKE,Inhibitor of nuclear factor kappa-B kinase subunit epsilon (I-kappa-B kinase epsilon) (IKK-E) (IKK-epsilon) (IkBKE) (EC 2.7.11.10) (Inducible I kappa-B kinase) (IKK-i),716,kinase,False
+P22694,79,PRKACB,cAMP-dependent protein kinase catalytic subunit beta (PKA C-beta) (EC 2.7.11.11),351,kinase,False
+Q16512,79,PKN1,Serine/threonine-protein kinase N1 (EC 2.7.11.13) (Protease-activated kinase 1) (PAK-1) (Protein kinase C-like 1) (Protein kinase C-like PKN) (Protein kinase PKN-alpha) (Protein-kinase C-related kinase 1) (Serine-threonine protein kinase N),942,kinase,False
+Q16513,79,PKN2,Serine/threonine-protein kinase N2 (EC 2.7.11.13) (PKN gamma) (Protein kinase C-like 2) (Protein-kinase C-related kinase 2),984,kinase,False
+Q16566,79,CAMK4,Calcium/calmodulin-dependent protein kinase type IV (CaMK IV) (EC 2.7.11.17) (CaM kinase-GR),473,kinase,False
+O15146,79,MUSK,"Muscle, skeletal receptor tyrosine-protein kinase (EC 2.7.10.1) (Muscle-specific tyrosine-protein kinase receptor) (MuSK) (Muscle-specific kinase receptor)",869,kinase,False
+O43353,79,RIPK2,Receptor-interacting serine/threonine-protein kinase 2 (EC 2.7.11.1) (CARD-containing interleukin-1 beta-converting enzyme-associated kinase) (CARD-containing IL-1 beta ICE-kinase) (RIP-like-interacting CLARP kinase) (Receptor-interacting protein 2) (RIP-2) (Tyrosine-protein kinase RIPK2) (EC 2.7.10.2),540,kinase,False
+P29322,79,EPHA8,Ephrin type-A receptor 8 (EC 2.7.10.1) (EPH- and ELK-related kinase) (EPH-like kinase 3) (EK3) (hEK3) (Tyrosine-protein kinase receptor EEK),1005,kinase,False
+Q16816,79,PHKG1,"Phosphorylase b kinase gamma catalytic chain, skeletal muscle/heart isoform (PHK-gamma-M) (EC 2.7.11.19) (Phosphorylase kinase subunit gamma-1) (Serine/threonine-protein kinase PHKG1) (EC 2.7.11.1, EC 2.7.11.26)",387,kinase,False
+P54762,79,EPHB1,Ephrin type-B receptor 1 (EC 2.7.10.1) (ELK) (EPH tyrosine kinase 2) (EPH-like kinase 6) (EK6) (hEK6) (Neuronally-expressed EPH-related tyrosine kinase) (NET) (Tyrosine-protein kinase receptor EPH-2),984,kinase,False
+P54760,79,EPHB4,Ephrin type-B receptor 4 (EC 2.7.10.1) (Hepatoma transmembrane kinase) (Tyrosine-protein kinase TYRO11),987,kinase,False
+Q13705,79,ACVR2B,Activin receptor type-2B (EC 2.7.11.30) (Activin receptor type IIB) (ACTR-IIB),512,kinase,False
+Q13557,79,CAMK2D,Calcium/calmodulin-dependent protein kinase type II subunit delta (CaM kinase II subunit delta) (CaMK-II subunit delta) (EC 2.7.11.17),499,kinase,False
+P19784,79,CSNK2A2,Casein kinase II subunit alpha' (CK II alpha') (EC 2.7.11.1),350,kinase,False
+P54646,79,PRKAA2,5'-AMP-activated protein kinase catalytic subunit alpha-2 (AMPK subunit alpha-2) (EC 2.7.11.1) (Acetyl-CoA carboxylase kinase) (ACACA kinase) (Hydroxymethylglutaryl-CoA reductase kinase) (HMGCR kinase) (EC 2.7.11.31),552,kinase,False
+Q9UQM7,79,CAMK2A,Calcium/calmodulin-dependent protein kinase type II subunit alpha (CaM kinase II subunit alpha) (CaMK-II subunit alpha) (EC 2.7.11.17),478,kinase,False
+Q13554,79,CAMK2B,Calcium/calmodulin-dependent protein kinase type II subunit beta (CaM kinase II subunit beta) (CaMK-II subunit beta) (EC 2.7.11.17),666,kinase,False
+Q59H18,79,TNNI3K,Serine/threonine-protein kinase TNNI3K (EC 2.7.11.1) (Cardiac ankyrin repeat kinase) (Cardiac troponin I-interacting kinase) (TNNI3-interacting kinase),835,kinase,False
+O43318,79,MAP3K7,Mitogen-activated protein kinase kinase kinase 7 (EC 2.7.11.25) (Transforming growth factor-beta-activated kinase 1) (TGF-beta-activated kinase 1),606,kinase,False
+Q9UK32,79,RPS6KA6,Ribosomal protein S6 kinase alpha-6 (S6K-alpha-6) (EC 2.7.11.1) (90 kDa ribosomal protein S6 kinase 6) (p90-RSK 6) (p90RSK6) (Ribosomal S6 kinase 4) (RSK-4) (pp90RSK4),745,kinase,False
+Q14680,79,MELK,Maternal embryonic leucine zipper kinase (hMELK) (EC 2.7.11.1) (Protein kinase Eg3) (pEg3 kinase) (Protein kinase PK38) (hPK38) (Tyrosine-protein kinase MELK) (EC 2.7.10.2),651,kinase,False
+Q04771,79,ACVR1,Activin receptor type-1 (EC 2.7.11.30) (Activin receptor type I) (ACTR-I) (Activin receptor-like kinase 2) (ALK-2) (Serine/threonine-protein kinase receptor R1) (SKR1) (TGF-B superfamily receptor type I) (TSR-I),509,kinase,False
+Q9HC98,79,NEK6,Serine/threonine-protein kinase Nek6 (EC 2.7.11.34) (Never in mitosis A-related kinase 6) (NimA-related protein kinase 6) (Protein kinase SID6-1512),313,kinase,False
+P37023,79,ACVRL1,Activin receptor type-1-like (EC 2.7.11.30) (Activin receptor-like kinase 1) (ALK-1) (Serine/threonine-protein kinase receptor R3) (SKR3) (TGF-B superfamily receptor type I) (TSR-I),503,kinase,False
+Q9NRM7,79,LATS2,Serine/threonine-protein kinase LATS2 (EC 2.7.11.1) (Kinase phosphorylated during mitosis protein) (Large tumor suppressor homolog 2) (Serine/threonine-protein kinase kpm) (Warts-like kinase),1088,kinase,False
+Q02763,79,TEK,Angiopoietin-1 receptor (EC 2.7.10.1) (Endothelial tyrosine kinase) (Tunica interna endothelial cell kinase) (Tyrosine kinase with Ig and EGF homology domains-2) (Tyrosine-protein kinase receptor TEK) (Tyrosine-protein kinase receptor TIE-2) (hTIE2) (p140 TEK) (CD antigen CD202b),1124,kinase,False
+Q02779,79,MAP3K10,Mitogen-activated protein kinase kinase kinase 10 (EC 2.7.11.25) (Mixed lineage kinase 2) (Protein kinase MST),954,kinase,False
+Q9NYL2,79,MAP3K20,Mitogen-activated protein kinase kinase kinase 20 (EC 2.7.11.25) (Human cervical cancer suppressor gene 4 protein) (HCCS-4) (Leucine zipper- and sterile alpha motif-containing kinase) (MLK-like mitogen-activated protein triple kinase) (Mitogen-activated protein kinase kinase kinase MLT) (Mixed lineage kinase 7) (Mixed lineage kinase-related kinase) (MLK-related kinase) (MRK) (Sterile alpha motif- and leucine zipper-containing kinase AZK),800,kinase,False
+Q8WXR4,79,MYO3B,Myosin-IIIb (EC 2.7.11.1),1341,kinase,False
+Q9P289,79,STK26,Serine/threonine-protein kinase 26 (EC 2.7.11.1) (MST3 and SOK1-related kinase) (Mammalian STE20-like protein kinase 4) (MST-4) (STE20-like kinase MST4) (Serine/threonine-protein kinase MASK),416,kinase,False
+O95835,79,LATS1,Serine/threonine-protein kinase LATS1 (EC 2.7.11.1) (Large tumor suppressor homolog 1) (WARTS protein kinase) (h-warts),1130,kinase,False
+Q8NEV4,79,MYO3A,Myosin-IIIa (EC 2.7.11.1),1616,kinase,False
+Q8NFD2,79,ANKK1,Ankyrin repeat and protein kinase domain-containing protein 1 (EC 2.7.11.1) (Protein kinase PKK2) (Sugen kinase 288) (SgK288) (X-kinase),765,kinase,False
+P78356,79,PIP4K2B,Phosphatidylinositol 5-phosphate 4-kinase type-2 beta (EC 2.7.1.149) (1-phosphatidylinositol 5-phosphate 4-kinase 2-beta) (Diphosphoinositide kinase 2-beta) (Phosphatidylinositol 5-phosphate 4-kinase type II beta) (PI(5)P 4-kinase type II beta) (PIP4KII-beta) (PtdIns(5)P-4-kinase isoform 2-beta),416,other,False
+P36894,79,BMPR1A,Bone morphogenetic protein receptor type-1A (BMP type-1A receptor) (BMPR-1A) (EC 2.7.11.30) (Activin receptor-like kinase 3) (ALK-3) (Serine/threonine-protein kinase receptor R5) (SKR5) (CD antigen CD292),532,kinase,False
+P36896,79,ACVR1B,Activin receptor type-1B (EC 2.7.11.30) (Activin receptor type IB) (ACTR-IB) (Activin receptor-like kinase 4) (ALK-4) (Serine/threonine-protein kinase receptor R2) (SKR2),505,kinase,False
+Q8TDC3,79,BRSK1,Serine/threonine-protein kinase BRSK1 (EC 2.7.11.1) (Brain-selective kinase 1) (EC 2.7.11.26) (Brain-specific serine/threonine-protein kinase 1) (BR serine/threonine-protein kinase 1) (Serine/threonine-protein kinase SAD-B) (Synapses of Amphids Defective homolog 1) (SAD1 homolog) (hSAD1),778,kinase,False
+P37173,79,TGFBR2,TGF-beta receptor type-2 (TGFR-2) (EC 2.7.11.30) (TGF-beta type II receptor) (Transforming growth factor-beta receptor type II) (TGF-beta receptor type II) (TbetaR-II),567,kinase,False
+Q8TD19,79,NEK9,Serine/threonine-protein kinase Nek9 (EC 2.7.11.38) (Nercc1 kinase) (Never in mitosis A-related kinase 9) (NimA-related protein kinase 9) (NimA-related kinase 8) (Nek8),979,kinase,False
+P78362,79,SRPK2,SRSF protein kinase 2 (EC 2.7.11.1) (SFRS protein kinase 2) (Serine/arginine-rich protein-specific kinase 2) (SR-protein-specific kinase 2) [Cleaved into: SRSF protein kinase 2 N-terminal; SRSF protein kinase 2 C-terminal],688,kinase,False
+Q92918,79,MAP4K1,Mitogen-activated protein kinase kinase kinase kinase 1 (EC 2.7.11.1) (Hematopoietic progenitor kinase) (MAPK/ERK kinase kinase kinase 1) (MEK kinase kinase 1) (MEKKK 1),833,kinase,False
+P80192,79,MAP3K9,Mitogen-activated protein kinase kinase kinase 9 (EC 2.7.11.25) (Mixed lineage kinase 1),1104,kinase,False
+P49137,79,MAPKAPK2,MAP kinase-activated protein kinase 2 (MAPK-activated protein kinase 2) (MAPKAP kinase 2) (MAPKAP-K2) (MAPKAPK-2) (MK-2) (MK2) (EC 2.7.11.1),400,kinase,False
+Q99755,79,PIP5K1A,Phosphatidylinositol 4-phosphate 5-kinase type-1 alpha (PIP5K1-alpha) (PtdIns(4)P-5-kinase 1 alpha) (EC 2.7.1.68) (68 kDa type I phosphatidylinositol 4-phosphate 5-kinase alpha) (Phosphatidylinositol 4-phosphate 5-kinase type I alpha) (PIP5KIalpha),562,other,False
+Q9BRS2,79,RIOK1,Serine/threonine-protein kinase RIO1 (EC 2.7.11.1) (EC 3.6.1.-) (RIO kinase 1),568,kinase,False
+O94804,79,STK10,Serine/threonine-protein kinase 10 (EC 2.7.11.1) (Lymphocyte-oriented kinase),968,kinase,False
+Q09013,79,DMPK,Myotonin-protein kinase (MT-PK) (EC 2.7.11.1) (DM-kinase) (DMK) (DM1 protein kinase) (DMPK) (Myotonic dystrophy protein kinase),629,kinase,False
+Q08881,79,ITK,Tyrosine-protein kinase ITK/TSK (EC 2.7.10.2) (Interleukin-2-inducible T-cell kinase) (IL-2-inducible T-cell kinase) (Kinase EMT) (T-cell-specific kinase) (Tyrosine-protein kinase Lyk),620,kinase,False
+Q9BYT3,79,STK33,Serine/threonine-protein kinase 33 (EC 2.7.11.1),514,kinase,False
+Q9BZL6,79,PRKD2,Serine/threonine-protein kinase D2 (EC 2.7.11.13) (nPKC-D2),878,kinase,False
+P08069,79,IGF1R,Insulin-like growth factor 1 receptor (EC 2.7.10.1) (Insulin-like growth factor I receptor) (IGF-I receptor) (CD antigen CD221) [Cleaved into: Insulin-like growth factor 1 receptor alpha chain; Insulin-like growth factor 1 receptor beta chain],1367,kinase,False
+O94806,79,PRKD3,Serine/threonine-protein kinase D3 (EC 2.7.11.13) (Protein kinase C nu type) (Protein kinase EPK2) (nPKC-nu),890,kinase,False
+Q9H0K1,79,SIK2,Serine/threonine-protein kinase SIK2 (EC 2.7.11.1) (Qin-induced kinase) (Salt-inducible kinase 2) (SIK-2) (Serine/threonine-protein kinase SNF1-like kinase 2),926,kinase,False
+O94921,79,CDK14,Cyclin-dependent kinase 14 (EC 2.7.11.22) (Cell division protein kinase 14) (Serine/threonine-protein kinase PFTAIRE-1) (hPFTAIRE1),469,kinase,False
+Q9H1R3,79,MYLK2,"Myosin light chain kinase 2, skeletal/cardiac muscle (MLCK2) (EC 2.7.11.18)",596,kinase,False
+Q96L34,79,MARK4,MAP/microtubule affinity-regulating kinase 4 (EC 2.7.11.1) (MAP/microtubule affinity-regulating kinase-like 1),752,kinase,False
+Q9H3Y6,79,SRMS,Tyrosine-protein kinase Srms (EC 2.7.10.2),488,kinase,False
+P35590,79,TIE1,Tyrosine-protein kinase receptor Tie-1 (EC 2.7.10.1),1138,kinase,False
+P07948,79,LYN,Tyrosine-protein kinase Lyn (EC 2.7.10.2) (Lck/Yes-related novel protein tyrosine kinase) (V-yes-1 Yamaguchi sarcoma viral related oncogene homolog) (p53Lyn) (p56Lyn),512,kinase,False
+P0C1S8,79,WEE2,Wee1-like protein kinase 2 (EC 2.7.10.2) (Wee1-like protein kinase 1B) (Wee1B kinase),567,kinase,False
+Q9P2K8,78,EIF2AK4,eIF-2-alpha kinase GCN2 (EC 2.7.11.1) (Eukaryotic translation initiation factor 2-alpha kinase 4) (GCN2-like protein),1649,kinase,False
+Q8N752,78,CSNK1A1L,Casein kinase I isoform alpha-like (CKI-alpha-like) (EC 2.7.11.1) (CK1),337,kinase,False
+Q13627,77,DYRK1A,Dual specificity tyrosine-phosphorylation-regulated kinase 1A (EC 2.7.11.23) (EC 2.7.12.1) (Dual specificity YAK1-related kinase) (HP86) (Protein kinase minibrain homolog) (MNBH) (hMNB),763,kinase,False
+Q8N1Q1,77,CA13,Carbonic anhydrase 13 (EC 4.2.1.1) (Carbonate dehydratase XIII) (Carbonic anhydrase XIII) (CA-XIII),262,other,False
+Q56UN5,77,MAP3K19,"Mitogen-activated protein kinase kinase kinase 19 (EC 2.7.11.1) (Regulated in COPD, protein kinase) (SPS1/STE20-related protein kinase YSK4)",1328,kinase,False
+P43166,77,CA7,Carbonic anhydrase 7 (EC 4.2.1.1) (Carbonate dehydratase VII) (Carbonic anhydrase VII) (CA-VII),264,other,False
+Q12851,77,MAP4K2,Mitogen-activated protein kinase kinase kinase kinase 2 (EC 2.7.11.1) (B lymphocyte serine/threonine-protein kinase) (Germinal center kinase) (GC kinase) (MAPK/ERK kinase kinase kinase 2) (MEK kinase kinase 2) (MEKKK 2) (Rab8-interacting protein),820,kinase,False
+P00915,76,CA1,Carbonic anhydrase 1 (EC 4.2.1.1) (Carbonate dehydratase I) (Carbonic anhydrase B) (CAB) (Carbonic anhydrase I) (CA-I) (Cyanamide hydratase CA1) (EC 4.2.1.69),261,other,False
+P70536,76,Oxtr,Oxytocin receptor (OT-R),388,gpcr,False
+P51617,76,IRAK1,Interleukin-1 receptor-associated kinase 1 (IRAK-1) (EC 2.7.11.1),712,kinase,False
+P23944,75,Adra1d,Alpha-1D adrenergic receptor (Alpha-1A adrenergic receptor) (Alpha-1D adrenoreceptor) (Alpha-1D adrenoceptor) (RA42),561,gpcr,False
+P14625,75,HSP90B1,Endoplasmin (EC 3.6.4.-) (94 kDa glucose-regulated protein) (GRP-94) (Heat shock protein 90 kDa beta member 1) (Heat shock protein family C member 4) (Tumor rejection antigen 1) (gp96 homolog),803,other,False
+O00238,75,BMPR1B,Bone morphogenetic protein receptor type-1B (BMP type-1B receptor) (BMPR-1B) (EC 2.7.11.30) (CD antigen CDw293),502,kinase,False
+Q9H2X6,74,HIPK2,Homeodomain-interacting protein kinase 2 (hHIPk2) (EC 2.7.11.1),1198,kinase,False
+Q92772,74,CDKL2,Cyclin-dependent kinase-like 2 (EC 2.7.11.22) (Protein kinase p56 KKIAMRE) (Serine/threonine-protein kinase KKIAMRE),493,kinase,False
+O14920,74,IKBKB,Inhibitor of nuclear factor kappa-B kinase subunit beta (I-kappa-B-kinase beta) (IKK-B) (IKK-beta) (IkBKB) (EC 2.7.11.10) (I-kappa-B kinase 2) (IKK-2) (IKK2) (Nuclear factor NF-kappa-B inhibitor kinase beta) (NFKBIKB) (Serine/threonine protein kinase IKBKB) (EC 2.7.11.1),756,kinase,False
+P23443,74,RPS6KB1,Ribosomal protein S6 kinase beta-1 (S6K-beta-1) (S6K1) (EC 2.7.11.1) (70 kDa ribosomal protein S6 kinase 1) (P70S6K1) (p70-S6K 1) (Ribosomal protein S6 kinase I) (Serine/threonine-protein kinase 14A) (p70 ribosomal S6 kinase alpha) (p70 S6 kinase alpha) (p70 S6K-alpha) (p70 S6KA),525,kinase,False
+Q86Z02,74,HIPK1,Homeodomain-interacting protein kinase 1 (EC 2.7.11.1) (Nuclear body-associated kinase 2),1210,kinase,False
+P48729,74,CSNK1A1,Casein kinase I isoform alpha (CKI-alpha) (EC 2.7.11.1) (CK1),337,kinase,False
+O75747,74,PIK3C2G,Phosphatidylinositol 3-kinase C2 domain-containing subunit gamma (PI3K-C2-gamma) (PtdIns-3-kinase C2 subunit gamma) (EC 2.7.1.137) (EC 2.7.1.154) (Phosphoinositide 3-kinase-C2-gamma),1445,kinase,False
+Q9Y2U5,74,MAP3K2,Mitogen-activated protein kinase kinase kinase 2 (EC 2.7.11.25) (MAPK/ERK kinase kinase 2) (MEK kinase 2) (MEKK 2),619,kinase,False
+O76039,74,CDKL5,Cyclin-dependent kinase-like 5 (EC 2.7.11.22) (Serine/threonine-protein kinase 9),1030,kinase,False
+O75385,74,ULK1,Serine/threonine-protein kinase ULK1 (EC 2.7.11.1) (Autophagy-related protein 1 homolog) (ATG1) (hATG1) (Unc-51-like kinase 1),1050,kinase,False
+Q9BVS4,74,RIOK2,Serine/threonine-protein kinase RIO2 (EC 2.7.11.1) (RIO kinase 2),552,kinase,False
+O15264,74,MAPK13,Mitogen-activated protein kinase 13 (MAP kinase 13) (MAPK 13) (EC 2.7.11.24) (Mitogen-activated protein kinase p38 delta) (MAP kinase p38 delta) (Stress-activated protein kinase 4),365,kinase,False
+P62937,73,PPIA,"Peptidyl-prolyl cis-trans isomerase A (PPIase A) (EC 5.2.1.8) (Cyclophilin A) (Cyclosporin A-binding protein) (Rotamase A) [Cleaved into: Peptidyl-prolyl cis-trans isomerase A, N-terminally processed]",165,other,False
+Q96Q40,73,CDK15,Cyclin-dependent kinase 15 (EC 2.7.11.22) (Amyotrophic lateral sclerosis 2 chromosomal region candidate gene 7 protein) (Cell division protein kinase 15) (Serine/threonine-protein kinase ALS2CR7) (Serine/threonine-protein kinase PFTAIRE-2),435,kinase,False
+O75460,73,ERN1,Serine/threonine-protein kinase/endoribonuclease IRE1 (Endoplasmic reticulum-to-nucleus signaling 1) (Inositol-requiring protein 1) (hIRE1p) (Ire1-alpha) (IRE1a) [Includes: Serine/threonine-protein kinase (EC 2.7.11.1); Endoribonuclease (EC 3.1.26.-)],977,kinase,False
+Q9H422,73,HIPK3,Homeodomain-interacting protein kinase 3 (EC 2.7.11.1) (Androgen receptor-interacting nuclear protein kinase) (ANPK) (Fas-interacting serine/threonine-protein kinase) (FIST) (Homolog of protein kinase YAK1),1215,kinase,False
+Q9UHD2,73,TBK1,Serine/threonine-protein kinase TBK1 (EC 2.7.11.1) (NF-kappa-B-activating kinase) (T2K) (TANK-binding kinase 1),729,kinase,False
+Q9UPZ9,73,CILK1,Serine/threonine-protein kinase ICK (EC 2.7.11.1) (Ciliogenesis associated kinase 1) (Intestinal cell kinase) (hICK) (Laryngeal cancer kinase 2) (LCK2) (MAK-related kinase) (MRK),632,kinase,False
+Q15835,73,GRK1,Rhodopsin kinase GRK1 (RK) (EC 2.7.11.14) (G protein-coupled receptor kinase 1),563,kinase,False
+Q9H2K8,73,TAOK3,Serine/threonine-protein kinase TAO3 (EC 2.7.11.1) (Cutaneous T-cell lymphoma-associated antigen HD-CL-09) (CTCL-associated antigen HD-CL-09) (Dendritic cell-derived protein kinase) (JNK/SAPK-inhibitory kinase) (Jun kinase-inhibitory kinase) (Kinase from chicken homolog A) (hKFC-A) (Thousand and one amino acid protein 3),898,kinase,False
+P57058,73,HUNK,Hormonally up-regulated neu tumor-associated kinase (EC 2.7.11.1) (B19) (Serine/threonine-protein kinase MAK-V),714,kinase,False
+Q8N4C8,73,MINK1,Misshapen-like kinase 1 (EC 2.7.11.1) (GCK family kinase MiNK) (MAPK/ERK kinase kinase kinase 6) (MEK kinase kinase 6) (MEKKK 6) (Misshapen/NIK-related kinase) (Mitogen-activated protein kinase kinase kinase kinase 6),1332,kinase,False
+Q99759,73,MAP3K3,Mitogen-activated protein kinase kinase kinase 3 (EC 2.7.11.25) (MAPK/ERK kinase kinase 3) (MEK kinase 3) (MEKK 3),626,kinase,False
+P42679,73,MATK,Megakaryocyte-associated tyrosine-protein kinase (EC 2.7.10.2) (CSK homologous kinase) (CHK) (Hematopoietic consensus tyrosine-lacking kinase) (Protein kinase HYL) (Tyrosine-protein kinase CTK),507,kinase,False
+Q8IVW4,73,CDKL3,Cyclin-dependent kinase-like 3 (EC 2.7.11.22) (Serine/threonine-protein kinase NKIAMRE),592,kinase,False
+P43140,73,Adra1a,Alpha-1A adrenergic receptor (Alpha-1A adrenoreceptor) (Alpha-1A adrenoceptor) (Alpha-1C adrenergic receptor),466,gpcr,False
+Q15303,73,ERBB4,Receptor tyrosine-protein kinase erbB-4 (EC 2.7.10.1) (Proto-oncogene-like protein c-ErbB-4) (Tyrosine kinase-type cell surface receptor HER4) (p180erbB4) [Cleaved into: ERBB4 intracellular domain (4ICD) (E4ICD) (s80HER4)],1308,kinase,False
+P57078,73,RIPK4,Receptor-interacting serine/threonine-protein kinase 4 (EC 2.7.11.1) (Ankyrin repeat domain-containing protein 3) (PKC-delta-interacting protein kinase),832,kinase,False
+Q15208,73,STK38,Serine/threonine-protein kinase 38 (EC 2.7.11.1) (NDR1 protein kinase) (Nuclear Dbf2-related kinase 1),465,kinase,False
+Q8IY84,73,NIM1K,Serine/threonine-protein kinase NIM1 (EC 2.7.11.1) (NIM1 serine/threonine-protein kinase),436,kinase,False
+O95382,73,MAP3K6,Mitogen-activated protein kinase kinase kinase 6 (EC 2.7.11.25) (Apoptosis signal-regulating kinase 2),1288,kinase,False
+P32298,73,GRK4,G protein-coupled receptor kinase 4 (EC 2.7.11.16) (G protein-coupled receptor kinase GRK4) (ITI1),578,kinase,False
+P21860,73,ERBB3,Receptor tyrosine-protein kinase erbB-3 (EC 2.7.10.1) (Proto-oncogene-like protein c-ErbB-3) (Tyrosine kinase-type cell surface receptor HER3),1342,kinase,False
+Q9NYY3,73,PLK2,Serine/threonine-protein kinase PLK2 (EC 2.7.11.21) (Polo-like kinase 2) (PLK-2) (hPlk2) (Serine/threonine-protein kinase SNK) (hSNK) (Serum-inducible kinase),685,kinase,False
+Q9UPE1,73,SRPK3,SRSF protein kinase 3 (EC 2.7.11.1) (Muscle-specific serine kinase 1) (MSSK-1) (Serine/arginine-rich protein-specific kinase 3) (SR-protein-specific kinase 3) (Serine/threonine-protein kinase 23),567,kinase,False
+Q8TBX8,73,PIP4K2C,Phosphatidylinositol 5-phosphate 4-kinase type-2 gamma (EC 2.7.1.149) (Phosphatidylinositol 5-phosphate 4-kinase type II gamma) (PI(5)P 4-kinase type II gamma) (PIP4KII-gamma),421,other,False
+Q6PHR2,73,ULK3,Serine/threonine-protein kinase ULK3 (EC 2.7.11.1) (Unc-51-like kinase 3),472,kinase,False
+Q8TDR2,73,STK35,Serine/threonine-protein kinase 35 (EC 2.7.11.1) (CLP-36-interacting kinase 1) (CLIK-1) (PDLIM1-interacting kinase 1) (Serine/threonine-protein kinase 35 L1),534,kinase,False
+P0C264,73,SBK3,Uncharacterized serine/threonine-protein kinase SBK3 (EC 2.7.11.1) (SH3 domain-binding kinase family member 3) (Sugen kinase 110),359,kinase,False
+O43283,73,MAP3K13,Mitogen-activated protein kinase kinase kinase 13 (EC 2.7.11.25) (Leucine zipper-bearing kinase) (Mixed lineage kinase) (MLK),966,kinase,False
+Q04912,73,MST1R,Macrophage-stimulating protein receptor (MSP receptor) (EC 2.7.10.1) (CDw136) (Protein-tyrosine kinase 8) (p185-Ron) (CD antigen CD136) [Cleaved into: Macrophage-stimulating protein receptor alpha chain; Macrophage-stimulating protein receptor beta chain],1400,kinase,False
+Q8WTQ7,73,GRK7,Rhodopsin kinase GRK7 (EC 2.7.11.14) (G protein-coupled receptor kinase 7) (G protein-coupled receptor kinase GRK7),553,kinase,False
+Q13464,73,ROCK1,"Rho-associated protein kinase 1 (EC 2.7.11.39) (Renal carcinoma antigen NY-REN-35) (Rho-associated, coiled-coil-containing protein kinase 1) (Rho-associated, coiled-coil-containing protein kinase I) (ROCK-I) (p160 ROCK-1) (p160ROCK)",1354,kinase,False
+Q6ZN16,73,MAP3K15,Mitogen-activated protein kinase kinase kinase 15 (EC 2.7.11.25) (Apoptosis signal-regulating kinase 3) (MAPK/ERK kinase kinase 15) (MEK kinase 15) (MEKK 15),1313,kinase,False
+Q7L7X3,73,TAOK1,Serine/threonine-protein kinase TAO1 (EC 2.7.11.1) (Kinase from chicken homolog B) (hKFC-B) (MARK Kinase) (MARKK) (Prostate-derived sterile 20-like kinase 2) (PSK-2) (PSK2) (Prostate-derived STE20-like kinase 2) (Thousand and one amino acid protein kinase 1) (TAOK1) (hTAOK1),1001,kinase,False
+O96017,73,CHEK2,Serine/threonine-protein kinase Chk2 (EC 2.7.11.1) (CHK2 checkpoint homolog) (Cds1 homolog) (Hucds1) (hCds1) (Checkpoint kinase 2),543,kinase,False
+Q8IYT8,73,ULK2,Serine/threonine-protein kinase ULK2 (EC 2.7.11.1) (Unc-51-like kinase 2),1036,kinase,False
+O95747,73,OXSR1,Serine/threonine-protein kinase OSR1 (EC 2.7.11.1) (Oxidative stress-responsive 1 protein),527,kinase,False
+Q9NWZ3,73,IRAK4,Interleukin-1 receptor-associated kinase 4 (IRAK-4) (EC 2.7.11.1) (Renal carcinoma antigen NY-REN-64),460,kinase,False
+O15111,73,CHUK,Inhibitor of nuclear factor kappa-B kinase subunit alpha (I-kappa-B kinase alpha) (IKK-A) (IKK-alpha) (IkBKA) (IkappaB kinase) (EC 2.7.11.10) (Conserved helix-loop-helix ubiquitous kinase) (I-kappa-B kinase 1) (IKK-1) (IKK1) (Nuclear factor NF-kappa-B inhibitor kinase alpha) (NFKBIKA) (Transcription factor 16) (TCF-16),745,kinase,False
+O15197,73,EPHB6,Ephrin type-B receptor 6 (HEP) (Tyrosine-protein kinase-defective receptor EPH-6),1021,kinase,False
+Q9Y2H9,73,MAST1,Microtubule-associated serine/threonine-protein kinase 1 (EC 2.7.11.1) (Syntrophin-associated serine/threonine-protein kinase),1570,kinase,False
+Q92630,73,DYRK2,Dual specificity tyrosine-phosphorylation-regulated kinase 2 (EC 2.7.12.1),601,kinase,False
+Q9UEW8,73,STK39,STE20/SPS1-related proline-alanine-rich protein kinase (Ste-20-related kinase) (EC 2.7.11.1) (DCHT) (Serine/threonine-protein kinase 39),545,kinase,False
+Q13163,73,MAP2K5,Dual specificity mitogen-activated protein kinase kinase 5 (MAP kinase kinase 5) (MAPKK 5) (EC 2.7.12.2) (MAPK/ERK kinase 5) (MEK 5),448,kinase,False
+P20794,73,MAK,Serine/threonine-protein kinase MAK (EC 2.7.11.1) (Male germ cell-associated kinase),623,kinase,False
+Q8NE63,73,HIPK4,Homeodomain-interacting protein kinase 4 (EC 2.7.11.1),616,kinase,False
+Q12852,72,MAP3K12,Mitogen-activated protein kinase kinase kinase 12 (EC 2.7.11.25) (Dual leucine zipper bearing kinase) (DLK) (Leucine-zipper protein kinase) (ZPK) (MAPK-upstream kinase) (MUK) (Mixed lineage kinase),859,kinase,False
+P9WI81,72,pknB,Serine/threonine-protein kinase PknB (EC 2.7.11.1),626,kinase,False
+P41743,72,PRKCI,Protein kinase C iota type (EC 2.7.11.13) (Atypical protein kinase C-lambda/iota) (PRKC-lambda/iota) (aPKC-lambda/iota) (nPKC-iota),596,kinase,False
+Q13523,72,PRP4K,Serine/threonine-protein kinase PRP4 homolog (EC 2.7.11.1) (PRP4 kinase) (PRP4 pre-mRNA-processing factor 4 homolog),1007,kinase,False
+Q14004,72,CDK13,Cyclin-dependent kinase 13 (EC 2.7.11.22) (EC 2.7.11.23) (CDC2-related protein kinase 5) (Cell division cycle 2-like protein kinase 5) (Cell division protein kinase 13) (hCDK13) (Cholinesterase-related cell division controller),1512,kinase,False
+Q13526,72,PIN1,Peptidyl-prolyl cis-trans isomerase NIMA-interacting 1 (EC 5.2.1.8) (Peptidyl-prolyl cis-trans isomerase Pin1) (PPIase Pin1) (Rotamase Pin1),163,other,False
+P51957,72,NEK4,Serine/threonine-protein kinase Nek4 (EC 2.7.11.1) (Never in mitosis A-related kinase 4) (NimA-related protein kinase 4) (Serine/threonine-protein kinase 2) (Serine/threonine-protein kinase NRK2),841,kinase,False
+P51956,72,NEK3,Serine/threonine-protein kinase Nek3 (EC 2.7.11.1) (HSPK 36) (Never in mitosis A-related kinase 3) (NimA-related protein kinase 3),506,kinase,False
+Q52WX2,72,SBK1,Serine/threonine-protein kinase SBK1 (EC 2.7.11.1) (SH3 domain-binding kinase 1),424,kinase,False
+Q5S007,72,LRRK2,Leucine-rich repeat serine/threonine-protein kinase 2 (EC 2.7.11.1) (EC 3.6.5.-) (Dardarin),2527,kinase,False
+Q9NRH2,72,SNRK,SNF-related serine/threonine-protein kinase (EC 2.7.11.1) (SNF1-related kinase),765,kinase,False
+Q6XUX3,72,DSTYK,Dual serine/threonine and tyrosine protein kinase (EC 2.7.12.1) (Dusty protein kinase) (Dusty PK) (RIP-homologous kinase) (Receptor-interacting serine/threonine-protein kinase 5) (Sugen kinase 496) (SgK496),929,kinase,False
+Q9UL54,72,TAOK2,Serine/threonine-protein kinase TAO2 (EC 2.7.11.1) (Kinase from chicken homolog C) (hKFC-C) (Prostate-derived sterile 20-like kinase 1) (PSK-1) (PSK1) (Prostate-derived STE20-like kinase 1) (Thousand and one amino acid protein kinase 2),1235,kinase,False
+O43613,72,HCRTR1,Orexin/Hypocretin receptor type 1 (Hypocretin receptor type 1) (Orexin receptor type 1) (Ox-1-R) (Ox1-R) (Ox1R),425,gpcr,False
+Q32MK0,72,MYLK3,Myosin light chain kinase 3 (EC 2.7.11.18) (Cardiac-MyBP-C-associated Ca/CaM kinase) (Cardiac-MLCK),819,kinase,False
+O14936,72,CASK,Peripheral plasma membrane protein CASK (hCASK) (EC 2.7.11.1) (Calcium/calmodulin-dependent serine protein kinase) (Protein lin-2 homolog),926,kinase,False
+O60331,72,PIP5K1C,Phosphatidylinositol 4-phosphate 5-kinase type-1 gamma (PIP5K1gamma) (PtdIns(4)P-5-kinase 1 gamma) (EC 2.7.1.68) (Type I phosphatidylinositol 4-phosphate 5-kinase gamma),668,other,False
+Q8NG66,72,NEK11,Serine/threonine-protein kinase Nek11 (EC 2.7.11.1) (Never in mitosis A-related kinase 11) (NimA-related protein kinase 11),645,kinase,False
+P11802,72,CDK4,Cyclin-dependent kinase 4 (EC 2.7.11.22) (Cell division protein kinase 4) (PSK-J3),303,kinase,False
+P61075,72,CRK2,Cyclin-dependent kinase 2 homolog (EC 2.7.11.22) (EC 2.7.11.23) (Cell division control protein 2 homolog) (Protein kinase 5) (PfPK5) (cdc2-related kinase 2),288,kinase,False
+Q8WU08,72,STK32A,Serine/threonine-protein kinase 32A (EC 2.7.11.1) (Yet another novel kinase 1),396,kinase,False
+Q9BQI3,72,EIF2AK1,Eukaryotic translation initiation factor 2-alpha kinase 1 (EC 2.7.11.1) (Heme-controlled repressor) (HCR) (Heme-regulated eukaryotic initiation factor eIF-2-alpha kinase) (Heme-regulated inhibitor) (hHRI) (Hemin-sensitive initiation factor 2-alpha kinase),630,kinase,False
+O14733,72,MAP2K7,Dual specificity mitogen-activated protein kinase kinase 7 (MAP kinase kinase 7) (MAPKK 7) (EC 2.7.12.2) (JNK-activating kinase 2) (MAPK/ERK kinase 7) (MEK 7) (Stress-activated protein kinase kinase 4) (SAPK kinase 4) (SAPKK-4) (SAPKK4) (c-Jun N-terminal kinase kinase 2) (JNK kinase 2) (JNKK 2),419,kinase,False
+P14842,72,Htr2a,5-hydroxytryptamine receptor 2A (5-HT-2) (5-HT-2A) (Serotonin receptor 2A),471,gpcr,False
+Q9BX84,72,TRPM6,"Transient receptor potential cation channel subfamily M member 6 (EC 2.7.11.1) (Channel kinase 2) (Melastatin-related TRP cation channel 6) [Cleaved into: TRPM6 kinase, cleaved form]",2022,ion_channel,True
+Q86Y07,72,VRK2,Serine/threonine-protein kinase VRK2 (EC 2.7.11.1) (Vaccinia-related kinase 2),508,kinase,False
+Q96BR1,72,SGK3,Serine/threonine-protein kinase Sgk3 (EC 2.7.11.1) (Cytokine-independent survival kinase) (Serum/glucocorticoid-regulated kinase 3) (Serum/glucocorticoid-regulated kinase-like),496,kinase,False
+P30411,71,BDKRB2,B2 bradykinin receptor (B2R) (BK-2 receptor),391,gpcr,False
+P00338,69,LDHA,L-lactate dehydrogenase A chain (LDH-A) (EC 1.1.1.27) (Cell proliferation-inducing gene 19 protein) (LDH muscle subunit) (LDH-M) (Renal carcinoma antigen NY-REN-59),332,other,False
+O00182,68,LGALS9,Galectin-9 (Gal-9) (Ecalectin) (Tumor antigen HOM-HD-21),355,other,False
+O43614,67,HCRTR2,Orexin receptor type 2 (Ox-2-R) (Ox2-R) (Ox2R) (Hypocretin receptor type 2),444,gpcr,False
+Q99814,66,EPAS1,Endothelial PAS domain-containing protein 1 (EPAS-1) (Basic-helix-loop-helix-PAS protein MOP2) (Class E basic helix-loop-helix protein 73) (bHLHe73) (HIF-1-alpha-like factor) (HLF) (Hypoxia-inducible factor 2-alpha) (HIF-2-alpha) (HIF2-alpha) (Member of PAS protein 2) (PAS domain-containing protein 2),870,other,False
+P47929,66,LGALS7; LGALS7B,Galectin-7 (Gal-7) (HKL-14) (PI7) (p53-induced gene 1 protein),136,other,False
+P08172,64,CHRM2,Muscarinic acetylcholine receptor M2,466,gpcr,False
+Q9UGN5,63,PARP2,Poly [ADP-ribose] polymerase 2 (PARP-2) (hPARP-2) (EC 2.4.2.30) (ADP-ribosyltransferase diphtheria toxin-like 2) (ARTD2) (DNA ADP-ribosyltransferase PARP2) (EC 2.4.2.-) (NAD(+) ADP-ribosyltransferase 2) (ADPRT-2) (Poly[ADP-ribose] synthase 2) (pADPRT-2) (Protein poly-ADP-ribosyltransferase PARP2) (EC 2.4.2.-),583,other,False
+O00214,61,LGALS8,Galectin-8 (Gal-8) (Po66 carbohydrate-binding protein) (Po66-CBP) (Prostate carcinoma tumor antigen 1) (PCTA-1),317,other,False
+P30553,58,Cckbr,Gastrin/cholecystokinin type B receptor (CCK-B receptor) (CCK-BR) (Cholecystokinin-2 receptor) (CCK2-R),452,gpcr,False
+O70212,58,HTR3A,5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor 3) (5-HT-3) (5-HT3R) (Serotonin receptor 3A) (Serotonin-gated ion channel receptor),490,ion_channel,True
+O60885,58,BRD4,Bromodomain-containing protein 4 (Protein HUNK1),1362,other,False
+P15692,57,VEGFA,"Vascular endothelial growth factor A, long form (L-VEGF) (Vascular permeability factor) (VPF) [Cleaved into: N-VEGF; VEGFA]",232,other,False
+P00734,54,F2,Prothrombin (EC 3.4.21.5) (Coagulation factor II) [Cleaved into: Activation peptide fragment 1; Activation peptide fragment 2; Thrombin light chain; Thrombin heavy chain],622,protease,False
+P22303,53,ACHE,Acetylcholinesterase (AChE) (EC 3.1.1.7),614,other,False
+P79218,53,TACR2,Substance-K receptor (SKR) (NK-2 receptor) (NK-2R) (Neurokinin A receptor) (Tachykinin receptor 2),384,gpcr,False
+P02768,50,ALB,Albumin,609,other,False
+P62993,50,GRB2,Growth factor receptor-bound protein 2 (Adapter protein GRB2) (Protein Ash) (SH2/SH3 adapter GRB2),217,other,False
+P11103,48,Parp1,"Poly [ADP-ribose] polymerase 1 (PARP-1) (EC 2.4.2.30) (ADP-ribosyltransferase diphtheria toxin-like 1) (ARTD1) (DNA ADP-ribosyltransferase PARP1) (EC 2.4.2.-) (NAD(+) ADP-ribosyltransferase 1) (ADPRT 1) (Poly[ADP-ribose] synthase 1) (msPARP) (Protein poly-ADP-ribosyltransferase PARP1) (EC 2.4.2.-) [Cleaved into: Poly [ADP-ribose] polymerase 1, processed C-terminus (Poly [ADP-ribose] polymerase 1, 89-kDa form); Poly [ADP-ribose] polymerase 1, processed N-terminus (Poly [ADP-ribose] polymerase 1, 24-kDa form)]",1013,other,False
+P25774,48,CTSS,Cathepsin S (EC 3.4.22.27),331,protease,False
+P28704,47,Rxrb,Retinoic acid receptor RXR-beta (MHC class I regulatory element-binding protein H-2RIIBP) (Nuclear receptor subfamily 2 group B member 2) (Retinoid X receptor beta),520,nuclear_receptor,False
+Q99816,47,TSG101,Tumor susceptibility gene 101 protein (ESCRT-I complex subunit TSG101),390,other,False
+P42227,46,Stat3,Signal transducer and activator of transcription 3 (Acute-phase response factor),770,other,False
+O43570,46,CA12,Carbonic anhydrase 12 (EC 4.2.1.1) (Carbonate dehydratase XII) (Carbonic anhydrase XII) (CA-XII) (Tumor antigen HOM-RCC-3.1.3),354,other,False
+P61964,46,WDR5,WD repeat-containing protein 5 (BMP2-induced 3-kb gene protein),334,other,False
+Q12809,45,KCNH2,Voltage-gated inwardly rectifying potassium channel KCNH2 (Eag homolog) (Ether-a-go-go-related gene potassium channel 1) (ERG-1) (Eag-related protein 1) (Ether-a-go-go-related protein 1) (H-ERG) (hERG-1) (hERG1) (Potassium voltage-gated channel subfamily H member 2) (Voltage-gated potassium channel subunit Kv11.1),1159,ion_channel,True
+P26281,45,folK,"2-amino-4-hydroxy-6-hydroxymethyldihydropteridine pyrophosphokinase (EC 2.7.6.3) (6-hydroxymethyl-7,8-dihydropterin pyrophosphokinase) (PPPK) (7,8-dihydro-6-hydroxymethylpterin-pyrophosphokinase) (HPPK)",159,other,False
+P13945,45,ADRB3,Beta-3 adrenergic receptor (Beta-3 adrenoreceptor) (Beta-3 adrenoceptor),408,gpcr,False
+O67648,44,lpxC,UDP-3-O-acyl-N-acetylglucosamine deacetylase (UDP-3-O-acyl-GlcNAc deacetylase) (EC 3.5.1.108) (UDP-3-O-[R-3-hydroxymyristoyl]-N-acetylglucosamine deacetylase),282,other,False
+P16610,43,Tacr2,Substance-K receptor (SKR) (NK-2 receptor) (NK-2R) (Neurokinin A receptor) (Tachykinin receptor 2),390,gpcr,False
+P34978,42,Tbxa2r,Thromboxane A2 receptor (TXA2-R) (Prostanoid TP receptor) (TXR2),341,gpcr,False
+P22392,42,NME2,Nucleoside diphosphate kinase B (NDP kinase B) (NDPK B) (EC 2.7.4.6) (C-myc purine-binding transcription factor PUF) (Histidine protein kinase NDKB) (EC 2.7.13.3) (Nucleoside diphoshate kinase 2) (NDK2) (nm23-H2),152,kinase,False
+P30560,42,Avpr1a,Vasopressin V1a receptor (V1aR) (AVPR V1a) (Antidiuretic hormone receptor 1a) (Vascular/hepatic-type arginine vasopressin receptor),424,gpcr,False
+P28705,42,Rxrg,Retinoic acid receptor RXR-gamma (Nuclear receptor subfamily 2 group B member 3) (Retinoid X receptor gamma),463,nuclear_receptor,False
+P08183,41,ABCB1,ATP-dependent translocase ABCB1 (ATP-binding cassette sub-family B member 1) (Multidrug resistance protein 1) (EC 7.6.2.2) (P-glycoprotein 1) (Phospholipid transporter ABCB1) (EC 7.6.2.1) (CD antigen CD243),1280,other,False
+P70605,40,Kcnn3,Small conductance calcium-activated potassium channel protein 3 (SK3) (SKCa 3) (SKCa3) (KCa2.3),732,ion_channel,True
+Q07817,39,BCL2L1,Bcl-2-like protein 1 (Bcl2-L-1) (Apoptosis regulator Bcl-X),233,other,False
+P30542,39,ADORA1,Adenosine receptor A1,326,gpcr,False
+P51144,39,TACR2,Substance-K receptor (SKR) (NK-2 receptor) (NK-2R) (Neurokinin A receptor) (Tachykinin receptor 2),384,gpcr,False
+P21462,39,FPR1,N-formyl peptide receptor 1 (N-formylpeptide chemoattractant receptor) (fMet-Leu-Phe receptor) (fMLP receptor),350,gpcr,False
+P11229,39,CHRM1,Muscarinic acetylcholine receptor M1,460,gpcr,False
+P56817,38,BACE1,Beta-secretase 1 (EC 3.4.23.46) (Aspartyl protease 2) (ASP2) (Asp 2) (Beta-site amyloid precursor protein cleaving enzyme 1) (Beta-site APP cleaving enzyme 1) (Memapsin-2) (Membrane-associated aspartic protease 2),501,protease,False
+P68370,38,Tuba1a,Tubulin alpha-1A chain (EC 3.6.5.-) (Alpha-tubulin 1) (Tubulin alpha-1 chain) [Cleaved into: Detyrosinated tubulin alpha-1A chain],451,other,False
+Q92793,38,CREBBP,CREB-binding protein (Histone lysine acetyltransferase CREBBP) (EC 2.3.1.48) (Protein lactyltransferas CREBBP) (EC 2.3.1.-) (Protein-lysine acetyltransferase CREBBP) (EC 2.3.1.-),2442,other,False
+P03120,38,E2,Regulatory protein E2,365,other,False
+P29401,38,TKT,Transketolase (TK) (EC 2.2.1.1),623,other,False
+P11799,38,Mylk,"Myosin light chain kinase, smooth muscle (MLCK) (EC 2.7.11.18) (Telokin) [Cleaved into: Myosin light chain kinase, smooth muscle, deglutamylated form]",1906,kinase,False
+P21554,38,CNR1,Cannabinoid receptor 1 (CB-R) (CB1) (CANN6),472,gpcr,False
+P37231,36,PPARG,Peroxisome proliferator-activated receptor gamma (PPAR-gamma) (Nuclear receptor subfamily 1 group C member 3),505,nuclear_receptor,False
+Q28044,35,ADRB2,Beta-2 adrenergic receptor (Beta-2 adrenoreceptor) (Beta-2 adrenoceptor),418,gpcr,False
+P11142,35,HSPA8,Heat shock cognate 71 kDa protein (EC 3.6.4.10) (Heat shock 70 kDa protein 8) (Heat shock protein family A member 8) (Lipopolysaccharide-associated protein 1) (LAP-1) (LPS-associated protein 1),646,other,False
+Q99572,34,P2RX7,P2X purinoceptor 7 (P2X7) (ATP receptor) (P2Z receptor) (Purinergic receptor),595,ion_channel,True
+Q7Z1V1,33,CYP51,Sterol 14-alpha demethylase (Tc14DM) (EC 1.14.14.154) (Cytochrome P450 51) (Lanosterol 14-alpha demethylase),481,other,False
+Q9Y251,33,HPSE,Heparanase (EC 3.2.1.166) (Endo-glucoronidase) (Heparanase-1) (Hpa1) [Cleaved into: Heparanase 8 kDa subunit; Heparanase 50 kDa subunit],543,other,False
+P47205,32,lpxC,UDP-3-O-acyl-N-acetylglucosamine deacetylase (UDP-3-O-acyl-GlcNAc deacetylase) (EC 3.5.1.108) (UDP-3-O-[R-3-hydroxymyristoyl]-N-acetylglucosamine deacetylase),303,other,False
+P58154,32,,Acetylcholine-binding protein (ACh-binding protein) (AchBP),229,other,False
+P20309,32,CHRM3,Muscarinic acetylcholine receptor M3,590,gpcr,False
+Q9Y5N1,32,HRH3,Histamine H3 receptor (H3R) (HH3R) (G-protein coupled receptor 97),445,gpcr,False
+O15392,32,BIRC5,Baculoviral IAP repeat-containing protein 5 (Apoptosis inhibitor 4) (Apoptosis inhibitor survivin),142,other,False
+P03428,30,PB2,Polymerase basic protein 2 (RNA-directed RNA polymerase subunit P3),759,other,False
+P63085,30,Mapk1,Mitogen-activated protein kinase 1 (MAP kinase 1) (MAPK 1) (EC 2.7.11.24) (ERT1) (Extracellular signal-regulated kinase 2) (ERK-2) (MAP kinase isoform p42) (p42-MAPK) (Mitogen-activated protein kinase 2) (MAP kinase 2) (MAPK 2),358,kinase,False
+Q2NNR5,29,CYSLTR1,Cysteinyl leukotriene receptor 1 (CysLTR1) (Cysteinyl leukotriene D4 receptor) (LTD4 receptor),340,gpcr,False
+P30968,28,GNRHR,Gonadotropin-releasing hormone receptor (GnRH receptor) (GnRH-R),328,gpcr,False
+P05132,27,Prkaca,cAMP-dependent protein kinase catalytic subunit alpha (PKA C-alpha) (EC 2.7.11.11),351,kinase,False
+P04191,27,ATP2A1,"Sarcoplasmic/endoplasmic reticulum calcium ATPase 1 (SERCA1) (SR Ca(2+)-ATPase 1) (EC 7.2.2.10) (Calcium pump 1) (Calcium-transporting ATPase sarcoplasmic reticulum type, fast twitch skeletal muscle isoform) (Endoplasmic reticulum class 1/2 Ca(2+) ATPase)",1001,other,False
+P02766,27,TTR,Transthyretin (ATTR) (Prealbumin) (TBPA),147,other,False
+P22001,27,KCNA3,Potassium voltage-gated channel subfamily A member 3 (HGK5) (HLK3) (HPCN3) (Voltage-gated K(+) channel HuKIII) (Voltage-gated potassium channel subunit Kv1.3),575,ion_channel,True
+P30559,26,OXTR,Oxytocin receptor (OT-R),389,gpcr,False
+O60760,26,HPGDS,Hematopoietic prostaglandin D synthase (H-PGDS) (EC 5.3.99.2) (GST class-sigma) (Glutathione S-transferase) (EC 2.5.1.18) (Glutathione-dependent PGD synthase) (Glutathione-requiring prostaglandin D synthase) (Prostaglandin-H2 D-isomerase),199,other,False
+Q13547,26,HDAC1,Histone deacetylase 1 (HD1) (EC 3.5.1.98) (Protein deacetylase HDAC1) (EC 3.5.1.-) (Protein deacylase HDAC1) (EC 3.5.1.-),482,other,False
+P43490,26,NAMPT,Nicotinamide phosphoribosyltransferase (NAmPRTase) (Nampt) (EC 2.4.2.12) (Pre-B-cell colony-enhancing factor 1) (Pre-B cell-enhancing factor) (Visfatin),491,other,False
+P49763,26,PGF,Placenta growth factor (PlGF),221,other,False
+P40337,25,VHL,von Hippel-Lindau disease tumor suppressor (Protein G7) (pVHL),213,other,False
+O75530,25,EED,Polycomb protein EED (hEED) (Embryonic ectoderm development protein) (WD protein associating with integrin cytoplasmic tails 1) (WAIT-1),441,other,False
+Q9UBN7,25,HDAC6,Protein deacetylase HDAC6 (EC 3.5.1.-) (E3 ubiquitin-protein ligase HDAC6) (EC 2.3.2.-) (Tubulin-lysine deacetylase HDAC6) (EC 3.5.1.-),1215,other,False
+Q00788,25,Avpr2,Vasopressin V2 receptor (V2R) (AVPR V2) (Antidiuretic hormone receptor) (Renal-type arginine vasopressin receptor),371,gpcr,False
+P30874,25,SSTR2,Somatostatin receptor type 2 (SS-2-R) (SS2-R) (SS2R) (SST2) (SRIF-1),369,gpcr,False
+P55201,24,BRPF1,Peregrin (Bromodomain and PHD finger-containing protein 1) (Protein Br140),1214,other,False
+Q6PL18,24,ATAD2,ATPase family AAA domain-containing protein 2 (EC 3.6.1.-) (AAA nuclear coregulator cancer-associated protein) (ANCCA),1390,other,False
+P32745,24,SSTR3,Somatostatin receptor type 3 (SS-3-R) (SS3-R) (SS3R) (SST3) (SSR-28),418,gpcr,False
+P18090,24,Adrb1,Beta-1 adrenergic receptor (Beta-1 adrenoreceptor) (Beta-1 adrenoceptor),466,gpcr,False
+P30872,23,SSTR1,Somatostatin receptor type 1 (SS-1-R) (SS1-R) (SS1R) (SST1) (SRIF-2),391,gpcr,False
+P0A881,23,trpR,Trp operon repressor,108,other,False
+Q28642,23,BDKRB2,B2 bradykinin receptor (B2R) (BK-2 receptor),367,gpcr,False
+P10415,23,BCL2,Apoptosis regulator Bcl-2,239,other,False
+Q9BY41,23,HDAC8,Histone deacetylase 8 (HD8) (EC 3.5.1.98) (Protein deacetylase HDAC8) (EC 3.5.1.-) (Protein decrotonylase HDAC8) (EC 3.5.1.-),377,other,False
+P10980,23,Chrm2,Muscarinic acetylcholine receptor M2,466,gpcr,False
+P21728,23,DRD1,D(1A) dopamine receptor (Dopamine D1 receptor),446,gpcr,False
+P35346,23,SSTR5,Somatostatin receptor type 5 (SS-5-R) (SS5-R) (SS5R) (SST5),364,gpcr,False
+P9WIQ1,22,glf,UDP-galactopyranose mutase (UGM) (EC 5.4.99.9) (UDP-GALP mutase) (Uridine 5-diphosphate galactopyranose mutase),399,other,False
+Q8WUI4,22,HDAC7,Histone deacetylase 7 (HD7) (EC 3.5.1.98) (Histone deacetylase 7A) (HD7a) (Protein deacetylase HDAC7) (EC 3.5.1.-),952,other,False
+Q86U86,22,PBRM1,Protein polybromo-1 (hPB1) (BRG1-associated factor 180) (BAF180) (Polybromo-1D),1689,other,False
+P29274,22,ADORA2A,Adenosine receptor A2a,412,gpcr,False
+Q13936,22,CACNA1C,"Voltage-dependent L-type calcium channel subunit alpha-1C (Calcium channel, L type, alpha-1 polypeptide, isoform 1, cardiac muscle) (Voltage-gated calcium channel subunit alpha Cav1.2)",2221,ion_channel,True
+P97583,22,Bdkrb1,B1 bradykinin receptor (B1R) (BK-1 receptor) (Kinin B1 receptor) (KB1),337,gpcr,False
+Q70I53,22,hdaH,Histone deacetylase-like amidohydrolase (HDAC-like amidohydrolase) (HDAH) (EC 3.5.1.-),369,other,False
+P34158,22,Cftr,Cystic fibrosis transmembrane conductance regulator (CFTR) (ATP-binding cassette sub-family C member 7) (Channel conductance-controlling ATPase) (EC 5.6.1.6) (cAMP-dependent chloride channel),1476,ion_channel,True
+P29353,21,SHC1,SHC-transforming protein 1 (SHC-transforming protein 3) (SHC-transforming protein A) (Src homology 2 domain-containing-transforming protein C1) (SH2 domain protein C1),583,other,False
+P10828,21,THRB,Thyroid hormone receptor beta (Nuclear receptor subfamily 1 group A member 2) (c-erbA-2) (c-erbA-beta),461,nuclear_receptor,False
+P10827,21,THRA,Thyroid hormone receptor alpha (Nuclear receptor subfamily 1 group A member 1) (V-erbA-related protein 7) (EAR-7) (c-erbA-1) (c-erbA-alpha),490,nuclear_receptor,False
+P25095,20,Agtr1,Type-1 angiotensin II receptor A (Angiotensin II type-1 receptor A) (AT1 receptor A),359,gpcr,False
+P48443,20,RXRG,Retinoic acid receptor RXR-gamma (Nuclear receptor subfamily 2 group B member 3) (Retinoid X receptor gamma),463,nuclear_receptor,False
+P31645,20,SLC6A4,Sodium-dependent serotonin transporter (SERT) (5HT transporter) (5HTT) (Solute carrier family 6 member 4),630,other,False
+Q01959,19,SLC6A3,Sodium-dependent dopamine transporter (DA transporter) (DAT) (Solute carrier family 6 member 3),620,other,False
+Q9Y233,19,PDE10A,"cAMP and cAMP-inhibited cGMP 3',5'-cyclic phosphodiesterase 10A (EC 3.1.4.17)",779,other,False
+O70526,19,BDKRB2,B2 bradykinin receptor (B2R) (BK-2 receptor),372,gpcr,False
+Q15118,19,PDK1,"[Pyruvate dehydrogenase (acetyl-transferring)] kinase isozyme 1, mitochondrial (EC 2.7.11.2) (Pyruvate dehydrogenase kinase isoform 1) (PDH kinase 1)",436,kinase,False
+Q16790,19,CA9,Carbonic anhydrase 9 (EC 4.2.1.1) (Carbonate dehydratase IX) (Carbonic anhydrase IX) (CA-IX) (CAIX) (Membrane antigen MN) (P54/58N) (Renal cell carcinoma-associated antigen G250) (RCC-associated antigen G250) (pMW1),459,other,False
+P23975,19,SLC6A2,Sodium-dependent noradrenaline transporter (Norepinephrine transporter) (NET) (Solute carrier family 6 member 2),617,other,False
+P9WQD9,18,kasA,3-oxoacyl-[acyl-carrier-protein] synthase 1 (EC 2.3.1.293) (Beta-ketoacyl-ACP synthase 1) (KAS 1) (Beta-ketoacyl-acyl carrier protein synthase KasA) (Meromycolic acid 3-oxoacyl-(acyl carrier protein) synthase I),416,other,False
+Q9H8M2,18,BRD9,Bromodomain-containing protein 9 (Rhabdomyosarcoma antigen MU-RMS-40.8),597,other,False
+P14416,18,DRD2,D(2) dopamine receptor (Dopamine D2 receptor),443,gpcr,False
+Q8NG68,18,TTL,Tubulin--tyrosine ligase (TTL) (EC 6.3.2.25),377,other,False
+Q15465,18,SHH,Sonic hedgehog protein (SHH) (EC 3.1.-.-) (HHG-1) (Shh unprocessed N-terminal signaling and C-terminal autoprocessing domains) (ShhNC) [Cleaved into: Sonic hedgehog protein N-product (ShhN) (Shh N-terminal processed signaling domains) (ShhNp)],462,protease,False
+Q48481,17,rfbD,Probable UDP-galactopyranose mutase (UGM) (EC 5.4.99.9) (UDP-GALP mutase) (Uridine 5-diphosphate galactopyranose mutase),384,other,False
+P25440,17,BRD2,Bromodomain-containing protein 2 (O27.1.1),801,other,False
+P11166,17,SLC2A1,"Solute carrier family 2, facilitated glucose transporter member 1 (Glucose transporter type 1, erythrocyte/brain) (GLUT-1) (HepG2 glucose transporter)",492,other,False
+P19754,17,ADCY1,Adenylate cyclase type 1 (EC 4.6.1.1) (ATP pyrophosphate-lyase 1) (Adenylate cyclase type I) (Adenylyl cyclase 1) (AC1) (Ca(2+)/calmodulin-activated adenylyl cyclase),1134,other,False
+P14920,17,DAO,D-amino-acid oxidase (DAAO) (DAMOX) (DAO) (EC 1.4.3.3),347,other,False
+P20916,17,MAG,Myelin-associated glycoprotein (Siglec-4a),626,other,False
+P30969,17,Gnrhr,Gonadotropin-releasing hormone receptor (GnRH receptor) (GnRH-R),327,gpcr,False
+P31391,17,SSTR4,Somatostatin receptor type 4 (SS-4-R) (SS4-R) (SS4R) (SST4),388,gpcr,False
+P00797,16,REN,Renin (EC 3.4.23.15) (Angiotensinogenase),406,protease,False
+P00374,16,DHFR,Dihydrofolate reductase (EC 1.5.1.3),187,other,False
+P25929,16,NPY1R,Neuropeptide Y receptor type 1 (NPY1-R),384,gpcr,False
+P28867,15,Prkcd,Protein kinase C delta type (EC 2.7.11.13) (Tyrosine-protein kinase PRKCD) (EC 2.7.10.2) (nPKC-delta) [Cleaved into: Protein kinase C delta type regulatory subunit; Protein kinase C delta type catalytic subunit (Sphingosine-dependent protein kinase-1) (SDK1)],674,kinase,False
+P26684,15,Ednra,Endothelin-1 receptor (Endothelin receptor type A) (ET-A) (ET-AR),426,gpcr,False
+P49146,15,NPY2R,Neuropeptide Y receptor type 2 (NPY2-R) (NPY-Y2 receptor) (Y2 receptor),381,gpcr,False
+O95931,15,CBX7,Chromobox protein homolog 7,251,other,False
+P25023,15,Bdkrb2,B2 bradykinin receptor (B2R) (BK-2 receptor),396,gpcr,False
+P34995,14,PTGER1,Prostaglandin E2 receptor EP1 subtype (PGE receptor EP1 subtype) (PGE2 receptor EP1 subtype) (Prostanoid EP1 receptor),402,gpcr,False
+P30547,14,TACR1,Substance-P receptor (SPR) (NK-1 receptor) (NK-1R) (Tachykinin receptor 1),407,gpcr,False
+P22935,14,Crabp2,Cellular retinoic acid-binding protein 2 (Cellular retinoic acid-binding protein II) (CRABP-II),138,other,False
+P16110,14,Lgals3,Galectin-3 (Gal-3) (35 kDa lectin) (Carbohydrate-binding protein 35) (CBP 35) (Galactose-specific lectin 3) (IgE-binding protein) (L-34 galactoside-binding lectin) (Laminin-binding protein) (Lectin L-29) (Mac-2 antigen),264,other,False
+P63104,14,YWHAZ,14-3-3 protein zeta/delta (Protein kinase C inhibitor protein 1) (KCIP-1),245,kinase,False
+P25104,14,AGTR1,Type-1 angiotensin II receptor (Angiotensin II type-1 receptor) (AT1 receptor),359,gpcr,False
+Q15109,14,AGER,Advanced glycosylation end product-specific receptor (Receptor for advanced glycosylation end products),404,other,False
+Q07869,14,PPARA,Peroxisome proliferator-activated receptor alpha (PPAR-alpha) (Nuclear receptor subfamily 1 group C member 1),468,nuclear_receptor,False
+P35375,14,Ptger1,Prostaglandin E2 receptor EP1 subtype (PGE receptor EP1 subtype) (PGE2 receptor EP1 subtype) (Prostanoid EP1 receptor),405,gpcr,False
+P08482,14,Chrm1,Muscarinic acetylcholine receptor M1,460,gpcr,False
+Q04609,14,FOLH1,Glutamate carboxypeptidase 2 (EC 3.4.17.21) (Cell growth-inhibiting gene 27 protein) (Folate hydrolase 1) (Folylpoly-gamma-glutamate carboxypeptidase) (FGCP) (Glutamate carboxypeptidase II) (GCPII) (Membrane glutamate carboxypeptidase) (mGCP) (N-acetylated-alpha-linked acidic dipeptidase I) (NAALADase I) (Prostate-specific membrane antigen) (PSM) (PSMA) (Pteroylpoly-gamma-glutamate carboxypeptidase),750,protease,False
+P35354,13,PTGS2,Prostaglandin G/H synthase 2 (EC 1.14.99.1) (Cyclooxygenase-2) (COX-2) (PHS II) (Prostaglandin H2 synthase 2) (PGH synthase 2) (PGHS-2) (Prostaglandin-endoperoxide synthase 2),604,other,False
+P17252,13,PRKCA,Protein kinase C alpha type (PKC-A) (PKC-alpha) (EC 2.7.11.13),672,kinase,False
+P30082,13,Gcgr,Glucagon receptor (GL-R),485,gpcr,False
+P15311,13,EZR,Ezrin (Cytovillin) (Villin-2) (p81),586,other,False
+P62965,13,Crabp1,Cellular retinoic acid-binding protein 1 (Cellular retinoic acid-binding protein I) (CRABP-I),137,other,False
+P08254,13,MMP3,Stromelysin-1 (SL-1) (EC 3.4.24.17) (Matrix metalloproteinase-3) (MMP-3) (Transin-1),477,protease,False
+Q14145,13,KEAP1,Kelch-like ECH-associated protein 1 (Cytosolic inhibitor of Nrf2) (INrf2) (Kelch-like protein 19),624,other,False
+P35368,13,ADRA1B,Alpha-1B adrenergic receptor (Alpha-1B adrenoreceptor) (Alpha-1B adrenoceptor),520,gpcr,False
+Q9GZT9,13,EGLN1,Egl nine homolog 1 (EC 1.14.11.29) (Hypoxia-inducible factor prolyl hydroxylase 2) (HIF-PH2) (HIF-prolyl hydroxylase 2) (HPH-2) (Prolyl hydroxylase domain-containing protein 2) (PHD2) (SM-20),426,other,False
+P0AC13,12,folP,Dihydropteroate synthase (DHPS) (EC 2.5.1.15) (Dihydropteroate pyrophosphorylase),282,other,False
+P48044,12,AVPR2,Vasopressin V2 receptor (V2R) (AVPR V2) (Antidiuretic hormone receptor) (Renal-type arginine vasopressin receptor),370,gpcr,False
+P98170,12,XIAP,E3 ubiquitin-protein ligase XIAP (EC 2.3.2.27) (Baculoviral IAP repeat-containing protein 4) (IAP-like protein) (ILP) (hILP) (Inhibitor of apoptosis protein 3) (IAP-3) (hIAP-3) (hIAP3) (RING-type E3 ubiquitin transferase XIAP) (X-linked inhibitor of apoptosis protein) (X-linked IAP),497,other,False
+Q16850,12,CYP51A1,Lanosterol 14-alpha demethylase (LDM) (EC 1.14.14.154) (CYPLI) (Cytochrome P450 51A1) (CYP51A1) (Cytochrome P450-14DM) (Cytochrome P45014DM) (Cytochrome P450LI) (Sterol 14-alpha demethylase),503,other,False
+P0A9J4,12,panE,2-dehydropantoate 2-reductase (EC 1.1.1.169) (Ketopantoate reductase) (KPA reductase) (KPR),303,other,False
+Q9UIF8,12,BAZ2B,Bromodomain adjacent to zinc finger domain protein 2B (hWALp4),2168,other,False
+P45040,12,cysK,Cysteine synthase (CSase) (EC 2.5.1.47) (O-acetylserine (thiol)-lyase) (OAS-TL) (O-acetylserine sulfhydrylase),316,other,False
+P29375,12,KDM5A,Lysine-specific demethylase 5A (EC 1.14.11.67) (Histone demethylase JARID1A) (Jumonji/ARID domain-containing protein 1A) (Retinoblastoma-binding protein 2) (RBBP-2) ([histone H3]-trimethyl-L-lysine(4) demethylase 5A),1690,other,False
+P41144,12,OPRK1,Kappa-type opioid receptor (K-OR-1) (KOR-1),380,gpcr,False
+Q9HC52,12,CBX8,Chromobox protein homolog 8 (Polycomb 3 homolog) (Pc3) (hPc3) (Rectachrome 1),389,other,False
+P08684,12,CYP3A4,"Cytochrome P450 3A4 (EC 1.14.14.1) (1,4-cineole 2-exo-monooxygenase) (1,8-cineole 2-exo-monooxygenase) (EC 1.14.14.56) (Albendazole monooxygenase (sulfoxide-forming)) (EC 1.14.14.73) (Albendazole sulfoxidase) (CYPIIIA3) (CYPIIIA4) (Cholesterol 25-hydroxylase) (Cytochrome P450 3A3) (Cytochrome P450 HLp) (Cytochrome P450 NF-25) (Cytochrome P450-PCN1) (Nifedipine oxidase) (Quinine 3-monooxygenase) (EC 1.14.14.55)",503,other,False
+P22756,12,Grik1,"Glutamate receptor ionotropic, kainate 1 (GluK1) (Glutamate receptor 5) (GluR-5) (GluR5)",949,ion_channel,True
+P00916,11,CA1,Carbonic anhydrase 1 (EC 4.2.1.1) (Carbonate dehydratase I) (Carbonic anhydrase I) (CA-I) (Cyanamide hydratase CA1) (EC 4.2.1.69),261,other,False
+P0DMS8,11,ADORA3,Adenosine receptor A3,318,gpcr,False
+P00917,11,CA1,Carbonic anhydrase 1 (EC 4.2.1.1) (Carbonate dehydratase I) (Carbonic anhydrase I) (CA-I) (Cyanamide hydratase CA1) (EC 4.2.1.69),260,other,False
+O14640,11,DVL1,Segment polarity protein dishevelled homolog DVL-1 (Dishevelled-1) (DSH homolog 1),695,other,False
+P08483,11,Chrm3,Muscarinic acetylcholine receptor M3,589,gpcr,False
+Q15059,11,BRD3,Bromodomain-containing protein 3 (RING3-like protein),726,other,False
+O43175,11,PHGDH,D-3-phosphoglycerate dehydrogenase (3-PGDH) (EC 1.1.1.95) (2-oxoglutarate reductase) (EC 1.1.1.399) (Malate dehydrogenase) (EC 1.1.1.37),533,other,False
+P50129,11,HTR2A,5-hydroxytryptamine receptor 2A (5-HT-2) (5-HT-2A) (5-HT2A) (Serotonin receptor 2A),470,gpcr,False
+P05181,11,CYP2E1,Cytochrome P450 2E1 (EC 1.14.14.1) (4-nitrophenol 2-hydroxylase) (EC 1.14.13.n7) (CYPIIE1) (Cytochrome P450-J),493,other,False
+P16070,11,CD44,CD44 antigen (CDw44) (Epican) (Extracellular matrix receptor III) (ECMR-III) (GP90 lymphocyte homing/adhesion receptor) (HUTCH-I) (Heparan sulfate proteoglycan) (Hermes antigen) (Hyaluronate receptor) (Phagocytic glycoprotein 1) (PGP-1) (Phagocytic glycoprotein I) (PGP-I) (CD antigen CD44),742,other,False
+Q9QYN8,11,Hrh3,Histamine H3 receptor (H3R) (HH3R),445,gpcr,False
+P9WPL4,11,cyp142,Steroid C26-monooxygenase (EC 1.14.15.28) (Cholest-4-en-3-one C26-monooxygenase) (Cholest-4-en-3-one C26-monooxygenase [(25R)-3-oxocholest-4-en-26-oate forming]) (Cholesterol C26-monooxygenase) (Cholesterol C26-monooxygenase [(25R)-3beta-hydroxycholest-5-en-26-oate forming]) (Cytochrome P450 142) (Steroid C27-monooxygenase),372,other,False
+P01730,11,CD4,T-cell surface glycoprotein CD4 (T-cell surface antigen T4/Leu-3) (CD antigen CD4),458,other,False
+Q14451,10,GRB7,Growth factor receptor-bound protein 7 (B47) (Epidermal growth factor receptor GRB-7) (GRB7 adapter protein),532,other,False
+P30556,10,AGTR1,Type-1 angiotensin II receptor (AT1AR) (AT1BR) (Angiotensin II type-1 receptor) (AT1 receptor),359,gpcr,False
+O75936,10,BBOX1,"Gamma-butyrobetaine dioxygenase (EC 1.14.11.1) (Gamma-butyrobetaine hydroxylase) (Gamma-BBH) (Gamma-butyrobetaine,2-oxoglutarate dioxygenase)",387,other,False
+P28702,10,RXRB,Retinoic acid receptor RXR-beta (Nuclear receptor subfamily 2 group B member 2) (Retinoid X receptor beta),533,nuclear_receptor,False
+P29371,10,TACR3,Neuromedin-K receptor (NKR) (NK-3 receptor) (NK-3R) (Neurokinin B receptor) (Tachykinin receptor 3),465,gpcr,False
+O00625,10,PIR,"Pirin (EC 1.13.11.24) (Probable quercetin 2,3-dioxygenase PIR) (Probable quercetinase)",290,other,False
+Q9HYR3,10,,Uncharacterized PhzA/B-like protein PA3332,141,other,False
+P39900,10,MMP12,Macrophage metalloelastase (MME) (EC 3.4.24.65) (Macrophage elastase) (ME) (hME) (Matrix metalloproteinase-12) (MMP-12),470,protease,False
+P16177,10,Tacr3,Neuromedin-K receptor (NKR) (NK-3 receptor) (NK-3R) (Neurokinin B receptor) (Tachykinin receptor 3),452,gpcr,False
+P05413,10,FABP3,"Fatty acid-binding protein, heart (Fatty acid-binding protein 3) (Heart-type fatty acid-binding protein) (H-FABP) (Mammary-derived growth inhibitor) (MDGI) (Muscle fatty acid-binding protein) (M-FABP)",133,other,False
+P32300,10,Oprd1,Delta-type opioid receptor (D-OR-1) (DOR-1) (K56) (MSL-2),372,gpcr,False
+P9WIK2,10,cysH,Adenosine 5'-phosphosulfate reductase (APS reductase) (EC 1.8.4.10) (5'-adenylylsulfate reductase) (Thioredoxin-dependent 5'-adenylylsulfate reductase),254,other,False
+P9WNS1,10,dxr,1-deoxy-D-xylulose 5-phosphate reductoisomerase (DXP reductoisomerase) (EC 1.1.1.267) (1-deoxyxylulose-5-phosphate reductoisomerase) (2-C-methyl-D-erythritol 4-phosphate synthase),413,other,False
+P08246,9,ELANE,Neutrophil elastase (EC 3.4.21.37) (Bone marrow serine protease) (Elastase-2) (Human leukocyte elastase) (HLE) (Medullasin) (PMN elastase),267,protease,False
+P35367,9,HRH1,Histamine H1 receptor (H1-R) (H1R) (HH1R),487,gpcr,False
+P53041,9,PPP5C,Serine/threonine-protein phosphatase 5 (PP5) (EC 3.1.3.16) (Protein phosphatase T) (PP-T) (PPT),499,phosphatase,False
+P33535,9,Oprm1,Mu-type opioid receptor (M-OR-1) (MOR-1) (Opioid receptor B),398,gpcr,False
+Q8CFK4,9,Tec,Tyrosine-protein kinase (EC 2.7.10.2),608,kinase,False
+P9WPP0,9,cyp125,Steroid C26-monooxygenase (EC 1.14.15.29) (Cholest-4-en-3-one 26-monooxygenase) (Cholest-4-en-3-one C26-monooxygenase [(25S)-3-oxocholest-4-en-26-oate forming]) (Cholesterol C26-monooxygenase) (Cholesterol C26-monooxygenase [(25S)-3beta-hydroxycholest-5-en-26-oate forming]) (Cytochrome P450 125) (Steroid C27-monooxygenase),433,other,False
+P11473,9,VDR,"Vitamin D3 receptor (VDR) (1,25-dihydroxyvitamin D3 receptor) (Nuclear receptor subfamily 1 group I member 1)",427,nuclear_receptor,False
+P51681,9,CCR5,C-C chemokine receptor type 5 (C-C CKR-5) (CC-CKR-5) (CCR-5) (CCR5) (CHEMR13) (HIV-1 fusion coreceptor) (CD antigen CD195),352,gpcr,False
+Q08722,9,CD47,Leukocyte surface antigen CD47 (Antigenic surface determinant protein OA3) (Integrin-associated protein) (IAP) (Protein MER6) (CD antigen CD47),323,other,False
+P21836,9,Ache,Acetylcholinesterase (AChE) (EC 3.1.1.7),614,other,False
+P0A6D3,9,aroA,3-phosphoshikimate 1-carboxyvinyltransferase (EC 2.5.1.19) (5-enolpyruvylshikimate-3-phosphate synthase) (EPSP synthase) (EPSPS),427,other,False
+P08908,9,HTR1A,5-hydroxytryptamine receptor 1A (5-HT-1A) (5-HT1A) (G-21) (Serotonin receptor 1A),422,gpcr,False
+P15379,9,Cd44,CD44 antigen (Extracellular matrix receptor III) (ECMR-III) (GP90 lymphocyte homing/adhesion receptor) (HUTCH-I) (Hermes antigen) (Hyaluronate receptor) (Lymphocyte antigen 24) (Ly-24) (Phagocytic glycoprotein 1) (PGP-1) (Phagocytic glycoprotein I) (PGP-I) (CD antigen CD44),778,other,False
+P30543,9,Adora2a,Adenosine receptor A2a,410,gpcr,False
+Q03181,9,PPARD,Peroxisome proliferator-activated receptor delta (PPAR-delta) (NUCI) (Nuclear hormone receptor 1) (NUC1) (Nuclear receptor subfamily 1 group C member 2) (Peroxisome proliferator-activated receptor beta) (PPAR-beta),441,nuclear_receptor,False
+P03372,9,ESR1,Estrogen receptor (ER) (ER-alpha) (Estradiol receptor) (Nuclear receptor subfamily 3 group A member 1),595,nuclear_receptor,False
+Q61337,9,Bad,Bcl2-associated agonist of cell death (BAD) (Bcl-2-binding component 6) (Bcl-xL/Bcl-2-associated death promoter) (Bcl2 antagonist of cell death),204,other,False
+P25116,9,F2R,Proteinase-activated receptor 1 (PAR-1) (Coagulation factor II receptor) (Thrombin receptor),425,gpcr,False
+Q15119,9,PDK2,"[Pyruvate dehydrogenase (acetyl-transferring)] kinase isozyme 2, mitochondrial (EC 2.7.11.2) (Pyruvate dehydrogenase kinase isoform 2) (PDH kinase 2) (PDKII)",407,kinase,False
+P35218,8,CA5A,"Carbonic anhydrase 5A, mitochondrial (EC 4.2.1.1) (Carbonate dehydratase VA) (Carbonic anhydrase VA) (CA-VA)",305,other,False
+P28700,8,Rxra,Retinoic acid receptor RXR-alpha (Nuclear receptor subfamily 2 group B member 1) (Retinoid X receptor alpha),467,nuclear_receptor,False
+P34998,8,CRHR1,Corticotropin-releasing factor receptor 1 (CRF-R-1) (CRF-R1) (CRFR-1) (Corticotropin-releasing hormone receptor 1) (CRH-R-1) (CRH-R1),444,gpcr,False
+P25098,8,GRK2,Beta-adrenergic receptor kinase 1 (Beta-ARK-1) (EC 2.7.11.15) (G-protein coupled receptor kinase 2),689,kinase,False
+P42535,8,pcpB,Pentachlorophenol 4-monooxygenase (EC 1.14.13.50) (Pentachlorophenol hydroxylase),538,other,False
+P0A722,8,lpxA,Acyl-[acyl-carrier-protein]--UDP-N-acetylglucosamine O-acyltransferase (UDP-N-acetylglucosamine acyltransferase) (EC 2.3.1.129),262,other,False
+Q09472,8,EP300,Histone acetyltransferase p300 (p300 HAT) (EC 2.3.1.48) (E1A-associated protein p300) (Histone butyryltransferase p300) (EC 2.3.1.-) (Histone crotonyltransferase p300) (EC 2.3.1.-) (Protein 2-hydroxyisobutyryltransferase p300) (EC 2.3.1.-) (Protein isonicotinyltransferase p300) (EC 2.3.1.-) (Protein lactyltransferas p300) (EC 2.3.1.-) (Protein propionyltransferase p300) (EC 2.3.1.-),2414,other,False
+O42275,8,ache,Acetylcholinesterase (AChE) (EC 3.1.1.7),633,other,False
+P80370,8,DLK1,Protein delta homolog 1 (DLK-1) (pG2) [Cleaved into: Fetal antigen 1 (FA1)],383,other,False
+O66809,8,ftsZ,Cell division protein FtsZ,367,other,False
+P9WP01,8,punA,Purine nucleoside phosphorylase (PNP) (Pu-NPase) (EC 2.4.2.1) (Inosine phosphorylase) (Inosine-guanosine phosphorylase),268,other,False
+P30561,8,Ahr,Aryl hydrocarbon receptor (Ah receptor) (AhR),848,other,False
+P97287,8,Mcl1,Induced myeloid leukemia cell differentiation protein Mcl-1 homolog (Bcl-2-related protein EAT/mcl1),331,other,False
+P43144,8,Chrna9,Neuronal acetylcholine receptor subunit alpha-9 (Nicotinic acetylcholine receptor subunit alpha-9) (NACHR alpha-9),479,ion_channel,True
+O74036,8,radA,DNA repair and recombination protein RadA,349,other,False
+P48061,8,CXCL12,Stromal cell-derived factor 1 (SDF-1) (hSDF-1) (C-X-C motif chemokine 12) (Intercrine reduced in hepatomas) (IRH) (hIRH) (Pre-B cell growth-stimulating factor) (PBSF) [Cleaved into: SDF-1-beta(3-72); SDF-1-alpha(3-67)],93,other,False
+O95622,8,ADCY5,Adenylate cyclase type 5 (EC 4.6.1.1) (ATP pyrophosphate-lyase 5) (Adenylate cyclase type V) (Adenylyl cyclase 5) (AC5),1261,other,False
+P51532,8,SMARCA4,SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily A member 4 (SMARCA4) (EC 3.6.4.-) (BRG1-associated factor 190A) (BAF190A) (Mitotic growth and transcription activator) (Protein BRG-1) (Protein brahma homolog 1) (SNF2-beta) (Transcription activator BRG1),1647,other,False
+P52732,8,KIF11,Kinesin-like protein KIF11 (Kinesin-like protein 1) (Kinesin-like spindle protein HKSP) (Kinesin-related motor protein Eg5) (Thyroid receptor-interacting protein 5) (TR-interacting protein 5) (TRIP-5),1056,other,False
+P9WMC1,8,ethR,HTH-type transcriptional regulator EthR,216,other,False
+Q00194,7,CNGA1,"Cyclic nucleotide-gated channel alpha-1 (CNG channel alpha-1) (CNG-1) (CNG1) (Cyclic nucleotide-gated cation channel 1) (Cyclic nucleotide-gated channel, photoreceptor) (Rod photoreceptor cGMP-gated cation channel subunit alpha) (cGMP-gated cation channel alpha-1)",690,ion_channel,True
+Q9Y6Y9,7,LY96,Lymphocyte antigen 96 (Ly-96) (ESOP-1) (Protein MD-2),160,other,False
+Q63T71,7,ispF,"2-C-methyl-D-erythritol 2,4-cyclodiphosphate synthase (MECDP-synthase) (MECPP-synthase) (MECPS) (EC 4.6.1.12)",162,other,False
+P9WH75,7,nrdE,Ribonucleoside-diphosphate reductase subunit alpha (EC 1.17.4.1) (Ribonucleotide reductase R1 subunit),725,other,False
+Q02790,7,FKBP4,"Peptidyl-prolyl cis-trans isomerase FKBP4 (PPIase FKBP4) (EC 5.2.1.8) (51 kDa FK506-binding protein) (FKBP51) (52 kDa FK506-binding protein) (52 kDa FKBP) (FKBP-52) (59 kDa immunophilin) (p59) (FK506-binding protein 4) (FKBP-4) (FKBP59) (HSP-binding immunophilin) (HBI) (Immunophilin FKBP52) (Rotamase) [Cleaved into: Peptidyl-prolyl cis-trans isomerase FKBP4, N-terminally processed]",459,other,False
+Q92831,7,KAT2B,Histone acetyltransferase KAT2B (EC 2.3.1.48) (Histone acetyltransferase PCAF) (Histone acetylase PCAF) (Lysine acetyltransferase 2B) (P300/CBP-associated factor) (P/CAF) (Spermidine acetyltransferase KAT2B) (EC 2.3.1.57),832,other,False
+Q08209,7,PPP3CA,Protein phosphatase 3 catalytic subunit alpha (EC 3.1.3.16) (CAM-PRP catalytic subunit) (Calcineurin A alpha) (Calmodulin-dependent calcineurin A subunit alpha isoform) (CNA alpha) (Serine/threonine-protein phosphatase 2B catalytic subunit alpha isoform),521,phosphatase,False
+Q08499,7,PDE4D,"3',5'-cyclic-AMP phosphodiesterase 4D (EC 3.1.4.53) (DPDE3) (PDE43) (cAMP-specific phosphodiesterase 4D)",809,other,False
+Q9H2K2,7,TNKS2,Poly [ADP-ribose] polymerase tankyrase-2 (EC 2.4.2.30) (ADP-ribosyltransferase diphtheria toxin-like 6) (ARTD6) (Poly [ADP-ribose] polymerase 5B) (Protein poly-ADP-ribosyltransferase tankyrase-2) (EC 2.4.2.-) (TNKS-2) (TRF1-interacting ankyrin-related ADP-ribose polymerase 2) (Tankyrase II) (Tankyrase-2) (TANK2) (Tankyrase-like protein) (Tankyrase-related protein),1166,other,False
+P9WPN4,7,cyp130,Cytochrome P450 130 (EC 1.14.-.-),405,other,False
+Q9H2J4,7,PDCL3,Phosducin-like protein 3 (HTPHLP) (PhPL3) (Viral IAP-associated factor 1) (VIAF-1),239,other,False
+P9WPN5,7,cyp130,Cytochrome P450 130 (EC 1.14.-.-),405,other,False
+Q16831,7,UPP1,Uridine phosphorylase 1 (UPase 1) (UrdPase 1) (EC 2.4.2.3),310,other,False
+Q99895,7,CTRC,Chymotrypsin-C (EC 3.4.21.2) (Caldecrin),268,protease,False
+Q9H4B7,7,TUBB1,Tubulin beta-1 chain,451,other,False
+Q9Z429,7,nahY,Methyl-accepting chemotaxis protein NahY,538,other,False
+P33033,7,Mc3r,Melanocortin receptor 3 (MC3-R),323,gpcr,False
+P29275,7,ADORA2B,Adenosine receptor A2b,332,gpcr,False
+P15121,7,AKR1B1,Aldo-keto reductase family 1 member B1 (EC 1.1.1.21) (EC 1.1.1.300) (EC 1.1.1.372) (EC 1.1.1.54) (Aldehyde reductase) (Aldose reductase) (AR),316,other,False
+P18911,7,Rarg,Retinoic acid receptor gamma (RAR-gamma) (Nuclear receptor subfamily 1 group B member 3),458,nuclear_receptor,False
+P47211,7,GALR1,Galanin receptor type 1 (GAL1-R) (GALR-1),349,gpcr,False
+P05162,7,LGALS2,Galectin-2 (Gal-2) (Beta-galactoside-binding lectin L-14-II) (HL14) (Lactose-binding lectin 2) (S-Lac lectin 2),132,other,False
+P05067,7,APP,Amyloid-beta precursor protein (APP) (ABPP) (APPI) (Alzheimer disease amyloid A4 protein homolog) (Alzheimer disease amyloid protein) (Amyloid precursor protein) (Amyloid-beta (A4) precursor protein) (Amyloid-beta A4 protein) (Cerebral vascular amyloid peptide) (CVAP) (PreA4) (Protease nexin-II) (PN-II) [Cleaved into: N-APP; Soluble APP-alpha (S-APP-alpha); Soluble APP-beta (S-APP-beta); C99 (Beta-secretase C-terminal fragment) (Beta-CTF); Amyloid-beta protein 42 (Abeta42) (Beta-APP42); Amyloid-beta protein 40 (Abeta40) (Beta-APP40); C83 (Alpha-secretase C-terminal fragment) (Alpha-CTF); P3(42); P3(40); C80; Gamma-secretase C-terminal fragment 59 (Amyloid intracellular domain 59) (AICD-59) (AID(59)) (Gamma-CTF(59)); Gamma-secretase C-terminal fragment 57 (Amyloid intracellular domain 57) (AICD-57) (AID(57)) (Gamma-CTF(57)); Gamma-secretase C-terminal fragment 50 (Amyloid intracellular domain 50) (AICD-50) (AID(50)) (Gamma-CTF(50)); C31],770,protease,False
+P04271,7,S100B,Protein S100-B (S-100 protein beta chain) (S-100 protein subunit beta) (S100 calcium-binding protein B),92,other,False
+P36544,7,CHRNA7,Neuronal acetylcholine receptor subunit alpha-7 (nAChR7) (Nicotinic acetylcholine receptor subunit alpha-7),502,ion_channel,True
+P22605,7,Rarb,Retinoic acid receptor beta (RAR-beta) (Nuclear receptor subfamily 1 group B member 2),482,nuclear_receptor,False
+P01024,7,C3,Complement C3 (C3 and PZP-like alpha-2-macroglobulin domain-containing protein 1) [Cleaved into: Complement C3 beta chain; C3-beta-c (C3bc); Complement C3 alpha chain; C3a anaphylatoxin; Acylation stimulating protein (ASP) (C3adesArg); Complement C3b (Complement C3b-alpha' chain); Complement C3c alpha' chain fragment 1; Complement C3dg fragment; Complement C3g fragment; Complement C3d fragment; Complement C3f fragment; Complement C3c alpha' chain fragment 2],1663,other,False
+P11416,7,Rara,Retinoic acid receptor alpha (RAR-alpha) (Nuclear receptor subfamily 1 group B member 1),462,nuclear_receptor,False
+P00746,7,CFD,Complement factor D (EC 3.4.21.46) (Adipsin) (C3 convertase activator) (Properdin factor D),253,protease,False
+P28222,7,HTR1B,5-hydroxytryptamine receptor 1B (5-HT-1B) (5-HT1B) (S12) (Serotonin 1D beta receptor) (5-HT-1D-beta) (Serotonin receptor 1B),390,gpcr,False
+P18031,7,PTPN1,Tyrosine-protein phosphatase non-receptor type 1 (EC 3.1.3.48) (Protein-tyrosine phosphatase 1B) (PTP-1B),435,phosphatase,False
+O43172,7,PRPF4,U4/U6 small nuclear ribonucleoprotein Prp4 (PRP4 homolog) (hPrp4) (U4/U6 snRNP 60 kDa protein) (WD splicing factor Prp4),522,other,False
+O43603,7,GALR2,Galanin receptor type 2 (GAL2-R) (GALR-2),387,gpcr,False
+P31390,7,Hrh1,Histamine H1 receptor (H1R) (HH1R),486,gpcr,False
+P30987,7,Tbxa2r,Thromboxane A2 receptor (TXA2-R) (Prostanoid TP receptor),341,gpcr,False
+P37288,6,AVPR1A,Vasopressin V1a receptor (V1aR) (AVPR V1a) (Antidiuretic hormone receptor 1a) (Vascular/hepatic-type arginine vasopressin receptor),418,gpcr,False
+P47900,6,P2RY1,P2Y purinoceptor 1 (P2Y1) (ADP receptor) (Purinergic receptor),373,gpcr,False
+P21645,6,lpxD,UDP-3-O-(3-hydroxymyristoyl)glucosamine N-acyltransferase (UDP-3-O-(3-OHC14)-GlcN N-acyltransferase) (EC 2.3.1.191) (Protein FirA) (Rifampicin resistance protein) (UDP-3-O-(3-hydroxytetradecanoyl)glucosamine N-acyltransferase),341,other,False
+Q9Y2D0,6,CA5B,"Carbonic anhydrase 5B, mitochondrial (EC 4.2.1.1) (Carbonate dehydratase VB) (Carbonic anhydrase VB) (CA-VB)",317,other,False
+P21452,6,TACR2,Substance-K receptor (SKR) (NK-2 receptor) (NK-2R) (Neurokinin A receptor) (Tachykinin receptor 2),398,gpcr,False
+P05121,6,SERPINE1,Plasminogen activator inhibitor 1 (PAI) (PAI-1) (Endothelial plasminogen activator inhibitor) (Serpin E1),402,other,False
+P15090,6,FABP4,"Fatty acid-binding protein, adipocyte (Adipocyte lipid-binding protein) (ALBP) (Adipocyte-type fatty acid-binding protein) (A-FABP) (AFABP) (Fatty acid-binding protein 4)",132,other,False
+P21675,6,TAF1,Transcription initiation factor TFIID subunit 1 (EC 2.3.1.48) (EC 2.7.11.1) (Cell cycle gene 1 protein) (TBP-associated factor 250 kDa) (p250) (Transcription initiation factor TFIID 250 kDa subunit) (TAF(II)250) (TAFII-250) (TAFII250),1872,other,False
+P0AES6,6,gyrB,DNA gyrase subunit B (EC 5.6.2.2) (Type IIA topoisomerase subunit GyrB),804,other,False
+P06401,6,PGR,Progesterone receptor (PR) (Nuclear receptor subfamily 3 group C member 3),933,nuclear_receptor,False
+P9WPL0,6,cyp144,Cytochrome P450 144 (EC 1.14.-.-),434,other,False
+P07382,6,,Bifunctional dihydrofolate reductase-thymidylate synthase (DHFR-TS) [Includes: Dihydrofolate reductase (EC 1.5.1.3); Thymidylate synthase (EC 2.1.1.45)],520,other,False
+P07445,6,ksi,Steroid Delta-isomerase (EC 5.3.3.1) (Delta(5)-3-ketosteroid isomerase),131,other,False
+O00257,6,CBX4,E3 SUMO-protein ligase CBX4 (EC 2.3.2.-) (Chromobox protein homolog 4) (Polycomb 2 homolog) (Pc2) (hPc2),560,other,False
+P47901,6,AVPR1B,Vasopressin V1b receptor (V1bR) (AVPR V1b) (AVPR V3) (Antidiuretic hormone receptor 1b) (Vasopressin V3 receptor),424,gpcr,False
+Q9UIF9,6,BAZ2A,Bromodomain adjacent to zinc finger domain protein 2A (Transcription termination factor I-interacting protein 5) (TTF-I-interacting protein 5) (Tip5) (hWALp3),1905,other,False
+P23280,6,CA6,Carbonic anhydrase 6 (EC 4.2.1.1) (Carbonate dehydratase VI) (Carbonic anhydrase VI) (CA-VI) (Salivary carbonic anhydrase) (Secreted carbonic anhydrase),308,other,False
+P03951,6,F11,Coagulation factor XI (FXI) (EC 3.4.21.27) (Plasma thromboplastin antecedent) (PTA) [Cleaved into: Coagulation factor XIa heavy chain; Coagulation factor XIa light chain],625,protease,False
+O95503,6,CBX6,Chromobox protein homolog 6,412,other,False
+P09960,6,LTA4H,Leukotriene A-4 hydrolase (LTA-4 hydrolase) (EC 3.3.2.6) (Leukotriene A(4) hydrolase) (Tripeptide aminopeptidase LTA4H) (EC 3.4.11.4),611,protease,False
+Q9UKP6,6,UTS2R,Urotensin-2 receptor (UR-2-R) (G-protein coupled receptor 14) (Urotensin II receptor) (UR-II-R),389,gpcr,False
+P00747,6,PLG,"Plasminogen (EC 3.4.21.7) [Cleaved into: Plasmin heavy chain A; Activation peptide; Angiostatin; Plasmin heavy chain A, short form; Plasmin light chain B]",810,protease,False
+P00749,6,PLAU,Urokinase-type plasminogen activator (U-plasminogen activator) (uPA) (EC 3.4.21.73) [Cleaved into: Urokinase-type plasminogen activator long chain A; Urokinase-type plasminogen activator short chain A; Urokinase-type plasminogen activator chain B],431,protease,False
+Q8N884,6,CGAS,Cyclic GMP-AMP synthase (cGAMP synthase) (cGAS) (h-cGAS) (EC 2.7.7.86) (2'3'-cGAMP synthase) (Mab-21 domain-containing protein 1),522,other,False
+P83916,6,CBX1,Chromobox protein homolog 1 (HP1Hsbeta) (Heterochromatin protein 1 homolog beta) (HP1 beta) (Heterochromatin protein p25) (M31) (Modifier 1 protein) (p25beta),185,other,False
+Q9ULX7,6,CA14,Carbonic anhydrase 14 (EC 4.2.1.1) (Carbonate dehydratase XIV) (Carbonic anhydrase XIV) (CA-XIV),337,other,False
+P08235,6,NR3C2,Mineralocorticoid receptor (MR) (Nuclear receptor subfamily 3 group C member 2),984,nuclear_receptor,False
+Q9NPI1,6,BRD7,Bromodomain-containing protein 7 (75 kDa bromodomain protein) (Protein CELTIX-1),651,other,False
+P22748,6,CA4,Carbonic anhydrase 4 (EC 4.2.1.1) (Carbonate dehydratase IV) (Carbonic anhydrase IV) (CA-IV),312,other,False
+P30518,6,AVPR2,Vasopressin V2 receptor (V2R) (AVPR V2) (Antidiuretic hormone receptor) (Renal-type arginine vasopressin receptor),371,gpcr,False
+Q01782,6,PTR1,Pteridine reductase 1 (EC 1.5.1.33) (H region methotrexate resistance protein),288,other,False
+P14867,5,GABRA1,Gamma-aminobutyric acid receptor subunit alpha-1 (GABA(A) receptor subunit alpha-1) (GABAAR subunit alpha-1),456,ion_channel,True
+P41182,5,BCL6,B-cell lymphoma 6 protein (BCL-6) (B-cell lymphoma 5 protein) (BCL-5) (Protein LAZ-3) (Zinc finger and BTB domain-containing protein 27) (Zinc finger protein 51),706,other,False
+Q16602,5,CALCRL,Calcitonin gene-related peptide type 1 receptor (CGRP type 1 receptor) (Calcitonin receptor-like receptor) (CRLR),461,gpcr,False
+P16390,5,Kcna3,Potassium voltage-gated channel subfamily A member 3 (MK3) (Voltage-gated potassium channel subunit Kv1.3),528,ion_channel,True
+P18089,5,ADRA2B,Alpha-2B adrenergic receptor (Alpha-2 adrenergic receptor subtype C2) (Alpha-2B adrenoreceptor) (Alpha-2B adrenoceptor) (Alpha-2BAR),450,gpcr,False
+Q05320,5,GP,"Envelope glycoprotein (GP1,2) (GP) [Cleaved into: Shed GP (GP1,2-delta); GP1; GP2]",676,other,False
+P23977,5,Slc6a3,Sodium-dependent dopamine transporter (DA transporter) (DAT) (Solute carrier family 6 member 3),619,other,False
+P24593,5,IGFBP5,Insulin-like growth factor-binding protein 5 (IBP-5) (IGF-binding protein 5) (IGFBP-5),272,other,False
+P35222,5,CTNNB1,Catenin beta-1 (Beta-catenin),781,other,False
+P30098,5,TACR3,Neuromedin-K receptor (NKR) (NK-3 receptor) (NK-3R) (Neurokinin B receptor) (Tachykinin receptor 3),440,gpcr,False
+P30405,5,PPIF,"Peptidyl-prolyl cis-trans isomerase F, mitochondrial (PPIase F) (EC 5.2.1.8) (Cyclophilin D) (CyP-D) (CypD) (Cyclophilin F) (Mitochondrial cyclophilin) (CyP-M) (Rotamase F)",207,other,False
+P30989,5,NTSR1,Neurotensin receptor type 1 (NT-R-1) (NTR1) (High-affinity levocabastine-insensitive neurotensin receptor) (NTRH),418,gpcr,False
+Q8NEB9,5,PIK3C3,Phosphatidylinositol 3-kinase catalytic subunit type 3 (PI3-kinase type 3) (PI3K type 3) (PtdIns-3-kinase type 3) (EC 2.7.1.137) (Phosphatidylinositol 3-kinase p100 subunit) (Phosphoinositide-3-kinase class 3) (hVps34),887,kinase,False
+P61077,5,UBE2D3,Ubiquitin-conjugating enzyme E2 D3 (EC 2.3.2.23) ((E3-independent) E2 ubiquitin-conjugating enzyme D3) (EC 2.3.2.24) (E2 ubiquitin-conjugating enzyme D3) (Ubiquitin carrier protein D3) (Ubiquitin-conjugating enzyme E2(17)KB 3) (Ubiquitin-conjugating enzyme E2-17 kDa 3) (Ubiquitin-protein ligase D3),147,other,False
+Q92769,5,HDAC2,Histone deacetylase 2 (HD2) (EC 3.5.1.98) (Protein deacylase HDAC2) (EC 3.5.1.-),488,other,False
+Q93YN9,5,IPK1,"Inositol-pentakisphosphate 2-kinase (EC 2.7.1.158) (Inositol-1,3,4,5,6-pentakisphosphate 2-kinase) (Ins(1,3,4,5,6)P5 2-kinase) (AtIPK1) (InsP5 2-kinase)",451,other,False
+P97266,5,OPRM1,Mu-type opioid receptor (M-OR-1) (MOR-1),98,gpcr,False
+P02724,5,GYPA,Glycophorin-A (MN sialoglycoprotein) (PAS-2) (Sialoglycoprotein alpha) (CD antigen CD235a),150,other,False
+P02752,5,,"Riboflavin-binding protein (RBP) [Cleaved into: Riboflavin-binding protein, plasma form; Riboflavin-binding protein, yolk major form; Riboflavin-binding protein, yolk minor form]",238,other,False
+P03452,5,HA,Hemagglutinin [Cleaved into: Hemagglutinin HA1 chain; Hemagglutinin HA2 chain],565,other,False
+P10275,5,AR,Androgen receptor (Dihydrotestosterone receptor) (Nuclear receptor subfamily 3 group C member 4),920,nuclear_receptor,False
+Q9BXF3,5,CECR2,Chromatin remodeling regulator CECR2 (Cat eye syndrome critical region protein 2),1484,other,False
+P47811,5,Mapk14,Mitogen-activated protein kinase 14 (MAP kinase 14) (MAPK 14) (EC 2.7.11.24) (CRK1) (Mitogen-activated protein kinase p38 alpha) (MAP kinase p38 alpha),360,kinase,False
+P07306,5,ASGR1,Asialoglycoprotein receptor 1 (ASGP-R 1) (ASGPR 1) (C-type lectin domain family 4 member H1) (Hepatic lectin H1) (HL-1),291,other,False
+P00491,5,PNP,Purine nucleoside phosphorylase (PNP) (EC 2.4.2.1) (Inosine phosphorylase) (Inosine-guanosine phosphorylase),289,other,False
+P01008,5,SERPINC1,Antithrombin-III (ATIII) (Serpin C1),464,other,False
+O76074,5,PDE5A,"cGMP-specific 3',5'-cyclic phosphodiesterase (EC 3.1.4.35) (cGMP-binding cGMP-specific phosphodiesterase) (CGB-PDE)",875,other,False
+Q9Y5Y4,5,PTGDR2,Prostaglandin D2 receptor 2 (Chemoattractant receptor-homologous molecule expressed on Th2 cells) (G-protein coupled receptor 44) (CD antigen CD294),395,gpcr,False
+Q8TEK3,5,DOT1L,"Histone-lysine N-methyltransferase, H3 lysine-79 specific (EC 2.1.1.360) (DOT1-like protein) (Disruptor of telomeric silencing 1-like histone lysine methyltransferase) (Histone H3-K79 methyltransferase) (H3-K79-HMTase) (Lysine N-methyltransferase 4)",1537,other,False
+P32239,5,CCKBR,Gastrin/cholecystokinin type B receptor (CCK-B receptor) (CCK-BR) (Cholecystokinin-2 receptor) (CCK2-R),447,gpcr,False
+O95372,4,LYPLA2,Acyl-protein thioesterase 2 (APT-2) (EC 3.1.2.-) (Lysophospholipase II) (LPL-II) (LysoPLA II) (Palmitoyl-protein hydrolase) (EC 3.1.2.22),231,other,False
+P31652,4,Slc6a4,Sodium-dependent serotonin transporter (SERT) (5HT transporter) (5HTT) (Solute carrier family 6 member 4),630,other,False
+Q9Y4K3,4,TRAF6,TNF receptor-associated factor 6 (EC 2.3.2.27) (E3 ubiquitin-protein ligase TRAF6) (Interleukin-1 signal transducer) (RING finger protein 85) (RING-type E3 ubiquitin transferase TRAF6),522,other,False
+O15164,4,TRIM24,Transcription intermediary factor 1-alpha (TIF1-alpha) (EC 2.3.2.27) (E3 ubiquitin-protein ligase TRIM24) (RING finger protein 82) (RING-type E3 ubiquitin transferase TIF1-alpha) (Tripartite motif-containing protein 24),1050,other,False
+Q9NYB0,4,TERF2IP,Telomeric repeat-binding factor 2-interacting protein 1 (TERF2-interacting telomeric protein 1) (TRF2-interacting telomeric protein 1) (Dopamine receptor-interacting protein 5) (Repressor/activator protein 1 homolog) (RAP1 homolog) (hRap1),399,other,False
+O60755,4,GALR3,Galanin receptor type 3 (GAL3-R) (GALR-3),368,gpcr,False
+P00760,4,PRSS1,Serine protease 1 (EC 3.4.21.4) (Anionic trypsin I) (Anionic trypsin-I) (Beta-trypsin) (Cationic trypsin) (Pretrypsinogen I) (Trypsin I) (Trypsin-I) [Cleaved into: Alpha-trypsin chain 1; Alpha-trypsin chain 2],246,protease,False
+Q14781,4,CBX2,Chromobox protein homolog 2,532,other,False
+Q14573,4,ITPR3,"Inositol 1,4,5-trisphosphate-gated calcium channel ITPR3 (IP3 receptor isoform 3) (IP3R-3) (InsP3R3) (Type 3 inositol 1,4,5-trisphosphate receptor) (Type 3 InsP3 receptor)",2671,ion_channel,True
+P27487,4,DPP4,Dipeptidyl peptidase 4 (EC 3.4.14.5) (ADABP) (Adenosine deaminase complexing protein 2) (ADCP-2) (Dipeptidyl peptidase IV) (DPP IV) (T-cell activation antigen CD26) (TP103) (CD antigen CD26) [Cleaved into: Dipeptidyl peptidase 4 membrane form (Dipeptidyl peptidase IV membrane form); Dipeptidyl peptidase 4 soluble form (Dipeptidyl peptidase IV soluble form)],766,protease,False
+Q9ULD4,4,BRPF3,Bromodomain and PHD finger-containing protein 3,1205,other,False
+P23284,4,PPIB,Peptidyl-prolyl cis-trans isomerase B (PPIase B) (EC 5.2.1.8) (CYP-S1) (Cyclophilin B) (Rotamase B) (S-cyclophilin) (SCYLP),216,other,False
+O75311,4,GLRA3,Glycine receptor subunit alpha-3,464,ion_channel,True
+P28221,4,HTR1D,5-hydroxytryptamine receptor 1D (5-HT-1D) (5-HT1D) (Serotonin 1D alpha receptor) (5-HT-1D-alpha) (Serotonin receptor 1D),377,gpcr,False
+Q8NER1,4,TRPV1,Transient receptor potential cation channel subfamily V member 1 (TrpV1) (Capsaicin receptor) (Osm-9-like TRP channel 1) (OTRPC1) (Vanilloid receptor 1),839,ion_channel,True
+P04608,4,tat,Protein Tat (Transactivating regulatory protein),86,other,False
+P16257,4,Tspo,Translocator protein (Mitochondrial benzodiazepine receptor) (PKBS) (Peripheral-type benzodiazepine receptor) (PBR),169,other,False
+P0A988,4,dnaN,Beta sliding clamp (Beta clamp) (Sliding clamp) (Beta-clamp processivity factor) (DNA polymerase III beta sliding clamp subunit),366,other,False
+P11387,4,TOP1,DNA topoisomerase 1 (EC 5.6.2.1) (DNA topoisomerase I),765,other,False
+Q92731,4,ESR2,Estrogen receptor beta (ER-beta) (Nuclear receptor subfamily 3 group A member 2),530,nuclear_receptor,False
+P12497,4,gag-pol,Gag-Pol polyprotein (Pr160Gag-Pol) [Cleaved into: Matrix protein p17 (MA); Capsid protein p24 (CA); Spacer peptide 1 (SP1) (p2); Nucleocapsid protein p7 (NC); Transframe peptide (TF); p6-pol (p6*); Protease (EC 3.4.23.16) (PR) (Retropepsin); Reverse transcriptase/ribonuclease H (EC 2.7.7.49) (EC 2.7.7.7) (EC 3.1.26.13) (Exoribonuclease H) (EC 3.1.13.2) (p66 RT); p51 RT; p15; Integrase (IN) (EC 2.7.7.-) (EC 3.1.-.-)],1435,protease,False
+Q92830,4,KAT2A,Histone acetyltransferase KAT2A (EC 2.3.1.48) (General control of amino acid synthesis protein 5-like 2) (Histone acetyltransferase GCN5) (hGCN5) (Histone glutaryltransferase KAT2A) (EC 2.3.1.-) (Histone succinyltransferase KAT2A) (EC 2.3.1.-) (Lysine acetyltransferase 2A) (STAF97),837,other,False
+Q92843,4,BCL2L2,Bcl-2-like protein 2 (Bcl2-L-2) (Apoptosis regulator Bcl-W),193,other,False
+P16389,4,KCNA2,Potassium voltage-gated channel subfamily A member 2 (NGK1) (Voltage-gated K(+) channel HuKIV) (Voltage-gated potassium channel HBK5) (Voltage-gated potassium channel subunit Kv1.2),499,ion_channel,True
+P20701,4,ITGAL,Integrin alpha-L (CD11 antigen-like family member A) (Leukocyte adhesion glycoprotein LFA-1 alpha chain) (LFA-1A) (Leukocyte function-associated molecule 1 alpha chain) (CD antigen CD11a),1170,other,False
+Q63931,4,CCKAR,Cholecystokinin receptor type A (CCK-A receptor) (CCK-AR) (Cholecystokinin-1 receptor) (CCK1-R),430,gpcr,False
+Q96JM7,4,L3MBTL3,Lethal(3)malignant brain tumor-like protein 3 (H-l(3)mbt-like protein 3) (L(3)mbt-like protein 3) (L3mbt-like 3) (MBT-1),780,other,False
+P07477,4,PRSS1,Serine protease 1 (EC 3.4.21.4) (Anionic trypsin I) (Anionic trypsin-I) (Beta-trypsin) (Cationic trypsinogen) (Pretrypsinogen I) (Trypsin I) (Trypsin-1) [Cleaved into: Alpha-trypsin chain 1; Alpha-trypsin chain 2],247,protease,False
+Q99720,4,SIGMAR1,Sigma non-opioid intracellular receptor 1 (Aging-associated gene 8 protein) (SR31747-binding protein) (SR-BP) (Sigma 1-type opioid receptor) (SIG-1R) (Sigma1-receptor) (Sigma1R) (hSigmaR1),223,other,False
+P05771,4,PRKCB,Protein kinase C beta type (PKC-B) (PKC-beta) (EC 2.7.11.13),671,kinase,False
+Q29010,4,EDNRA,Endothelin-1 receptor (Endothelin receptor type A) (ET-A) (ET-AR),427,gpcr,False
+P21964,4,COMT,Catechol O-methyltransferase (EC 2.1.1.6),271,other,False
+Q6V1X1,4,DPP8,Dipeptidyl peptidase 8 (DP8) (EC 3.4.14.5) (Dipeptidyl peptidase IV-related protein 1) (DPRP-1) (Dipeptidyl peptidase VIII) (DPP VIII) (Prolyl dipeptidase DPP8),898,protease,False
+P97696,4,Cyth3,"Cytohesin-3 (PH, SEC7 and coiled-coil domain-containing protein 3) (SEC7 homolog C) (rSec7-3)",400,other,False
+P46098,4,HTR3A,5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor 3) (5-HT-3) (5-HT3R) (Serotonin receptor 3A) (Serotonin-gated ion channel receptor),478,ion_channel,True
+P42262,4,GRIA2,"Glutamate receptor 2 (GluR-2) (AMPA-selective glutamate receptor 2) (GluR-B) (GluR-K2) (Glutamate receptor ionotropic, AMPA 2)",883,ion_channel,True
+P43116,4,PTGER2,Prostaglandin E2 receptor EP2 subtype (PGE receptor EP2 subtype) (PGE2 receptor EP2 subtype) (Prostanoid EP2 receptor),358,gpcr,False
+P35348,4,ADRA1A,Alpha-1A adrenergic receptor (Alpha-1A adrenoreceptor) (Alpha-1A adrenoceptor) (Alpha-1C adrenergic receptor) (Alpha-adrenergic receptor 1c),466,gpcr,False
+P49684,4,Uts2r,Urotensin-2 receptor (UR-2-R) (G-protein coupled receptor 14) (G-protein coupled sensory epithelial neuropeptide-like receptor) (SENR) (Urotensin II receptor) (UR-II-R),386,gpcr,False
+P48547,4,KCNC1,Voltage-gated potassium channel KCNC1 (NGK2) (Potassium voltage-gated channel subfamily C member 1) (Voltage-gated potassium channel subunit Kv3.1) (Voltage-gated potassium channel subunit Kv4),511,ion_channel,True
+Q09470,4,KCNA1,Potassium voltage-gated channel subfamily A member 1 (Voltage-gated K(+) channel HuKI) (Voltage-gated potassium channel HBK1) (Voltage-gated potassium channel subunit Kv1.1),495,ion_channel,True
+P42224,4,STAT1,Signal transducer and activator of transcription 1-alpha/beta (Transcription factor ISGF-3 components p91/p84),750,other,False
+P35372,4,OPRM1,Mu-type opioid receptor (M-OR-1) (MOR-1) (Mu opiate receptor) (Mu opioid receptor) (MOP) (hMOP),400,gpcr,False
+P9WGI5,4,sigB,RNA polymerase sigma factor SigB,323,other,False
+Q12830,4,BPTF,Nucleosome-remodeling factor subunit BPTF (Bromodomain and PHD finger-containing transcription factor) (Fetal Alz-50 clone 1 protein) (Fetal Alzheimer antigen),3046,other,False
+P56450,4,Mc4r,Melanocortin receptor 4 (MC4-R),332,gpcr,False
+Q05097,4,lecA,PA-I galactophilic lectin (PA-IL) (Galactose-binding lectin),122,other,False
+P50053,4,KHK,Ketohexokinase (EC 2.7.1.3) (Hepatic fructokinase),298,kinase,False
+P41586,4,ADCYAP1R1,Pituitary adenylate cyclase-activating polypeptide type I receptor (PAC1 receptor) (PAC1R) (PACAP type I receptor) (PACAP-R-1) (PACAP-R1),468,gpcr,False
+P54833,4,ADRB2,Beta-2 adrenergic receptor (Beta-2 adrenoreceptor) (Beta-2 adrenoceptor),415,gpcr,False
+P35790,3,CHKA,Choline kinase alpha (CK) (EC 2.7.1.32) (CHETK-alpha) (Ethanolamine kinase) (EK) (EC 2.7.1.82),457,kinase,False
+O95696,3,BRD1,Bromodomain-containing protein 1 (BR140-like protein) (Bromodomain and PHD finger-containing protein 2),1058,other,False
+P42226,3,STAT6,Signal transducer and activator of transcription 6 (IL-4 Stat),847,other,False
+Q05639,3,EEF1A2,Elongation factor 1-alpha 2 (EF-1-alpha-2) (EC 3.6.5.-) (Eukaryotic elongation factor 1 A-2) (eEF1A-2) (Statin-S1),463,other,False
+Q8N474,3,SFRP1,Secreted frizzled-related protein 1 (FRP-1) (sFRP-1) (Secreted apoptosis-related protein 2) (SARP-2),314,other,False
+P41148,3,HSP90B1,Endoplasmin (EC 3.6.4.-) (94 kDa glucose-regulated protein) (GRP-94) (Heat shock protein 90 kDa beta member 1),804,other,False
+P41145,3,OPRK1,Kappa-type opioid receptor (K-OR-1) (KOR-1),380,gpcr,False
+Q05816,3,Fabp5,"Fatty acid-binding protein 5 (Epidermal-type fatty acid-binding protein) (E-FABP) (Fatty acid-binding protein, epidermal) (Keratinocyte lipid-binding protein) (Psoriasis-associated fatty acid-binding protein homolog) (PA-FABP)",135,other,False
+P10688,3,Plcd1,"1-phosphatidylinositol 4,5-bisphosphate phosphodiesterase delta-1 (EC 3.1.4.11) (Phosphoinositide phospholipase C-delta-1) (Phospholipase C-III) (PLC-III) (Phospholipase C-delta-1) (PLC-delta-1)",756,other,False
+Q05823,3,RNASEL,2-5A-dependent ribonuclease (2-5A-dependent RNase) (EC 3.1.26.-) (Ribonuclease 4) (Ribonuclease L) (RNase L),741,kinase,False
+P68104,3,EEF1A1,Elongation factor 1-alpha 1 (EF-1-alpha-1) (EC 3.6.5.-) (Elongation factor Tu) (EF-Tu) (Eukaryotic elongation factor 1 A-1) (eEF1A-1) (Leukocyte receptor cluster member 7),462,other,False
+Q9JI10,3,Stk3,Serine/threonine-protein kinase 3 (EC 2.7.11.1) (Mammalian STE20-like protein kinase 2) (MST-2) (STE20-like kinase MST2) [Cleaved into: Serine/threonine-protein kinase 3 36kDa subunit (MST2/N); Serine/threonine-protein kinase 3 20kDa subunit (MST2/C)],497,kinase,False
+P35563,3,Htr3a,5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor 3) (5-HT-3) (5-HT3R) (Serotonin receptor 3A) (Serotonin-gated ion channel receptor),483,ion_channel,True
+O60346,3,PHLPP1,PH domain leucine-rich repeat-containing protein phosphatase 1 (EC 3.1.3.16) (Pleckstrin homology domain-containing family E member 1) (PH domain-containing family E member 1) (Suprachiasmatic nucleus circadian oscillatory protein) (hSCOP),1717,phosphatase,False
+P61586,3,RHOA,Transforming protein RhoA (EC 3.6.5.2) (Rho cDNA clone 12) (h12),193,other,False
+P35377,3,Oprl1,Nociceptin receptor (K3 opiate receptor) (Kappa-type 3 opioid receptor) (KOR-3) (ORGC) (Orphanin FQ receptor),367,gpcr,False
+P49682,3,CXCR3,C-X-C chemokine receptor type 3 (CXC-R3) (CXCR-3) (CKR-L2) (G protein-coupled receptor 9) (Interferon-inducible protein 10 receptor) (IP-10 receptor) (CD antigen CD183),368,gpcr,False
+P01375,3,TNF,"Tumor necrosis factor (Cachectin) (TNF-alpha) (Tumor necrosis factor ligand superfamily member 2) (TNF-a) [Cleaved into: Tumor necrosis factor, membrane form (N-terminal fragment) (NTF); Intracellular domain 1 (ICD1); Intracellular domain 2 (ICD2); C-domain 1; C-domain 2; Tumor necrosis factor, soluble form]",233,other,False
+Q15717,3,ELAVL1,ELAV-like protein 1 (Hu-antigen R) (HuR),326,other,False
+Q06609,3,RAD51,DNA repair protein RAD51 homolog 1 (HsRAD51) (hRAD51) (EC 3.6.4.-) (RAD51 homolog A),339,other,False
+Q3U3Q1,3,Ulk3,Serine/threonine-protein kinase ULK3 (EC 2.7.11.1) (Unc-51-like kinase 3),472,kinase,False
+Q48255,3,aroQ,3-dehydroquinate dehydratase (3-dehydroquinase) (EC 4.2.1.10) (Type II DHQase),167,other,False
+P55055,3,NR1H2,Oxysterols receptor LXR-beta (Liver X receptor beta) (Nuclear receptor NER) (Nuclear receptor subfamily 1 group H member 2) (Ubiquitously-expressed nuclear receptor),460,nuclear_receptor,False
+P25102,3,Hrh2,Histamine H2 receptor (H2R) (HH2R) (Gastric receptor I),358,gpcr,False
+P12643,3,BMP2,Bone morphogenetic protein 2 (BMP-2) (Bone morphogenetic protein 2A) (BMP-2A),396,other,False
+Q13451,3,FKBP5,Peptidyl-prolyl cis-trans isomerase FKBP5 (PPIase FKBP5) (EC 5.2.1.8) (51 kDa FK506-binding protein) (51 kDa FKBP) (FKBP-51) (54 kDa progesterone receptor-associated immunophilin) (Androgen-regulated protein 6) (FF1 antigen) (FK506-binding protein 5) (FKBP-5) (FKBP54) (p54) (HSP90-binding immunophilin) (Rotamase),457,other,False
+P16050,3,ALOX15,"Polyunsaturated fatty acid lipoxygenase ALOX15 (12/15-lipoxygenase) (Arachidonate 12-lipoxygenase, leukocyte-type) (12-LOX) (EC 1.13.11.31) (Arachidonate 15-lipoxygenase) (15-LOX) (15-LOX-1) (EC 1.13.11.33) (Arachidonate omega-6 lipoxygenase) (Hepoxilin A3 synthase Alox15) (EC 1.13.11.-) (Linoleate 13S-lipoxygenase) (EC 1.13.11.12)",662,other,False
+Q9BZP6,3,CHIA,Acidic mammalian chitinase (AMCase) (EC 3.2.1.14) (Lung-specific protein TSA1902),476,other,False
+P41143,3,OPRD1,Delta-type opioid receptor (D-OR-1) (DOR-1),372,gpcr,False
+O00255,3,MEN1,Menin,615,other,False
+P62157,3,CALM,Calmodulin (CaM),149,other,False
+O14793,3,MSTN,Growth/differentiation factor 8 (GDF-8) (Myostatin),375,other,False
+P04798,3,CYP1A1,Cytochrome P450 1A1 (CYPIA1) (EC 1.14.14.1) (Cytochrome P450 form 6) (Cytochrome P450-C) (Cytochrome P450-P1) (Hydroperoxy icosatetraenoate dehydratase) (EC 4.2.1.152),512,other,False
+Q13418,3,ILK,Scaffold protein ILK (ILK-1) (ILK-2) (Inactive integrin-linked kinase) (p59ILK),452,kinase,False
+P15474,3,aroQ,3-dehydroquinate dehydratase (3-dehydroquinase) (EC 4.2.1.10) (Type II DHQase),157,other,False
+Q12931,3,TRAP1,"Heat shock protein 75 kDa, mitochondrial (HSP 75) (Heat shock protein family C member 5) (TNFR-associated protein 1) (Tumor necrosis factor type 1 receptor-associated protein) (TRAP-1)",704,other,False
+P31550,3,thiB,Thiamine-binding periplasmic protein,327,other,False
+P51531,3,SMARCA2,SWI/SNF-related matrix-associated actin-dependent regulator of chromatin subfamily A member 2 (SAMRCA2) (EC 3.6.4.-) (BRG1-associated factor 190B) (BAF190B) (Probable global transcription activator SNF2L2) (Protein brahma homolog) (hBRM) (SNF2-alpha),1590,other,False
+P40763,3,STAT3,Signal transducer and activator of transcription 3 (Acute-phase response factor),770,other,False
+P47824,3,P2rx1,P2X purinoceptor 1 (P2X1) (ATP receptor) (Purinergic receptor) (RP-2 protein),399,ion_channel,True
+P9WPP7,3,cyp121,Mycocyclosin synthase (EC 1.14.19.70) (Cytochrome P450 121) (Cytochrome P450 MT2),396,other,False
+P05164,3,MPO,Myeloperoxidase (MPO) (EC 1.11.2.2) [Cleaved into: Myeloperoxidase; 89 kDa myeloperoxidase; 84 kDa myeloperoxidase; Myeloperoxidase light chain; Myeloperoxidase heavy chain],745,other,False
+P34971,3,Adrb1,Beta-1 adrenergic receptor (Beta-1 adrenoreceptor) (Beta-1 adrenoceptor),466,gpcr,False
+Q62758,3,Htr4,5-hydroxytryptamine receptor 4 (5-HT-4) (5-HT4) (Serotonin receptor 4),406,gpcr,False
+Q62666,3,Slc18a3,Vesicular acetylcholine transporter (VAChT) (rVAT) (Solute carrier family 18 member 3),530,other,False
+P38919,3,EIF4A3,"Eukaryotic initiation factor 4A-III (eIF-4A-III) (eIF4A-III) (EC 3.6.4.13) (ATP-dependent RNA helicase DDX48) (ATP-dependent RNA helicase eIF4A-3) (DEAD box protein 48) (Eukaryotic initiation factor 4A-like NUK-34) (Eukaryotic translation initiation factor 4A isoform 3) (Nuclear matrix protein 265) (NMP 265) (hNMP 265) [Cleaved into: Eukaryotic initiation factor 4A-III, N-terminally processed]",411,other,False
+Q9AIU7,3,ligA,DNA ligase (EC 6.5.1.2) (Polydeoxyribonucleotide synthase [NAD(+)]),667,other,False
+P28335,3,HTR2C,5-hydroxytryptamine receptor 2C (5-HT-2C) (5-HT2C) (5-HTR2C) (5-hydroxytryptamine receptor 1C) (5-HT-1C) (5-HT1C) (Serotonin receptor 2C),458,gpcr,False
+Q09428,3,ABCC8,ATP-binding cassette sub-family C member 8 (Sulfonylurea receptor 1),1581,other,False
+Q8IZX4,3,TAF1L,Transcription initiation factor TFIID subunit 1-like (TAF(II)210) (TBP-associated factor 1-like) (TBP-associated factor 210 kDa) (Transcription initiation factor TFIID 210 kDa subunit),1826,other,False
+P06730,3,EIF4E,Eukaryotic translation initiation factor 4E (eIF-4E) (eIF4E) (eIF-4F 25 kDa subunit) (mRNA cap-binding protein),217,other,False
+Q9NZQ7,2,CD274,Programmed cell death 1 ligand 1 (PD-L1) (PDCD1 ligand 1) (Programmed death ligand 1) (hPD-L1) (B7 homolog 1) (B7-H1) (CD antigen CD274),290,other,False
+P49764,2,Pgf,Placenta growth factor (PlGF),158,other,False
+P13500,2,CCL2,C-C motif chemokine 2 (HC11) (Monocyte chemoattractant protein 1) (Monocyte chemotactic and activating factor) (MCAF) (Monocyte chemotactic protein 1) (MCP-1) (Monocyte secretory protein JE) (Small-inducible cytokine A2),99,other,False
+P13864,2,Dnmt1,DNA (cytosine-5)-methyltransferase 1 (Dnmt1) (Met-1) (EC 2.1.1.37) (DNA methyltransferase MmuI) (DNA MTase MmuI) (M.MmuI) (MCMT),1620,other,False
+Q9NRG4,2,SMYD2,N-lysine methyltransferase SMYD2 (EC 2.1.1.-) (HSKM-B) (Histone methyltransferase SMYD2) (EC 2.1.1.354) (Lysine N-methyltransferase 3C) (SET and MYND domain-containing protein 2),433,other,False
+P79400,2,HTR1D,5-hydroxytryptamine receptor 1D (5-HT-1D) (5-HT1D) (Serotonin receptor 1D),291,gpcr,False
+P01116,2,KRAS,"GTPase KRas (EC 3.6.5.2) (K-Ras 2) (Ki-Ras) (c-K-ras) (c-Ki-ras) [Cleaved into: GTPase KRas, N-terminally processed]",189,other,False
+P00800,2,npr,Thermolysin (EC 3.4.24.27) (Thermostable neutral proteinase),548,protease,False
+Q9NXA8,2,SIRT5,"NAD-dependent protein deacylase sirtuin-5, mitochondrial (EC 2.3.1.-) (Regulatory protein SIR2 homolog 5) (SIR2-like protein 5)",310,other,False
+P32307,2,AVPR2,Vasopressin V2 receptor (V2R) (AVPR V2) (Antidiuretic hormone receptor) (Renal-type arginine vasopressin receptor),370,gpcr,False
+P0A6G7,2,clpP,ATP-dependent Clp protease proteolytic subunit (EC 3.4.21.92) (Caseinolytic protease) (Endopeptidase Clp) (Heat shock protein F21.5) (Protease Ti),207,protease,False
+P41146,2,OPRL1,Nociceptin receptor (Kappa-type 3 opioid receptor) (KOR-3) (Orphanin FQ receptor),370,gpcr,False
+P41597,2,CCR2,C-C chemokine receptor type 2 (C-C CKR-2) (CC-CKR-2) (CCR-2) (CCR2) (Monocyte chemoattractant protein 1 receptor) (MCP-1-R) (CD antigen CD192),374,gpcr,False
+P05129,2,PRKCG,Protein kinase C gamma type (PKC-gamma) (EC 2.7.11.13),697,kinase,False
+P05364,2,ampC,Beta-lactamase (EC 3.5.2.6) (Cephalosporinase),381,other,False
+Q99062,2,CSF3R,Granulocyte colony-stimulating factor receptor (G-CSF receptor) (G-CSF-R) (CD antigen CD114),836,other,False
+P07339,2,CTSD,Cathepsin D (EC 3.4.23.5) [Cleaved into: Cathepsin D light chain; Cathepsin D heavy chain],412,protease,False
+Q96LA8,2,PRMT6,Protein arginine N-methyltransferase 6 (EC 2.1.1.319) (Heterogeneous nuclear ribonucleoprotein methyltransferase-like protein 6) (Histone-arginine N-methyltransferase PRMT6),375,other,False
+P04406,2,GAPDH,Glyceraldehyde-3-phosphate dehydrogenase (GAPDH) (EC 1.2.1.12) (Peptidyl-cysteine S-nitrosylase GAPDH) (EC 2.6.99.-),335,other,False
+Q9H0E9,2,BRD8,Bromodomain-containing protein 8 (Skeletal muscle abundant protein) (Skeletal muscle abundant protein 2) (Thyroid hormone receptor coactivating protein of 120 kDa) (TrCP120) (p120),1235,other,False
+Q96EB6,2,SIRT1,NAD-dependent protein deacetylase sirtuin-1 (hSIRT1) (EC 2.3.1.286) (NAD-dependent protein deacylase sirtuin-1) (EC 2.3.1.-) (Regulatory protein SIR2 homolog 1) (SIR2-like protein 1) (hSIR2) [Cleaved into: SirtT1 75 kDa fragment (75SirT1)],747,other,False
+Q969R2,2,OSBP2,Oxysterol-binding protein 2 (ORP2) (Oxysterol-binding protein-related protein 4) (ORP-4) (OSBP-related protein 4),916,other,False
+P04054,2,PLA2G1B,Phospholipase A2 (EC 3.1.1.4) (Group IB phospholipase A2) (Phosphatidylcholine 2-acylhydrolase 1B),148,other,False
+Q92934,2,BAD,Bcl2-associated agonist of cell death (BAD) (Bcl-2-binding component 6) (Bcl-2-like protein 8) (Bcl2-L-8) (Bcl-xL/Bcl-2-associated death promoter) (Bcl2 antagonist of cell death),168,other,False
+P08909,2,Htr2c,5-hydroxytryptamine receptor 2C (5-HT-2C) (5-HT2C) (5-HTR2C) (5-hydroxytryptamine receptor 1C) (5-HT-1C) (5-HT1C) (Serotonin receptor 2C),460,gpcr,False
+Q9H3N8,2,HRH4,Histamine H4 receptor (H4R) (HH4R) (AXOR35) (G-protein coupled receptor 105) (GPRv53) (Pfi-013) (SP9144),390,gpcr,False
+P03118,2,E2,Regulatory protein E2,401,other,False
+Q13133,2,NR1H3,Oxysterols receptor LXR-alpha (Liver X receptor alpha) (Nuclear receptor subfamily 1 group H member 3),447,nuclear_receptor,False
+P0A031,2,ftsZ,Cell division protein FtsZ,390,other,False
+P02769,2,ALB,Albumin (BSA) (allergen Bos d 6),607,other,False
+P02754,2,LGB,Beta-lactoglobulin (Beta-LG) (allergen Bos d 5),178,other,False
+Q8RN04,2,cyp165B3,Cytochrome P450 165B3 (EC 1.14.-.-) (Vancomycin biosynthesis protein OxyB),398,other,False
+Q01469,2,FABP5,"Fatty acid-binding protein 5 (Epidermal-type fatty acid-binding protein) (E-FABP) (Fatty acid-binding protein, epidermal) (Psoriasis-associated fatty acid-binding protein homolog) (PA-FABP)",135,other,False
+"P0DP25,P0DP24,P0DP23",2,,,149,other,False
+P01579,2,IFNG,Interferon gamma (IFN-gamma) (Immune interferon),166,other,False
+P41968,2,MC3R,Melanocortin receptor 3 (MC3-R),323,gpcr,False
+P16442,2,ABO,Histo-blood group ABO system transferase (Fucosylglycoprotein 3-alpha-galactosyltransferase) (Fucosylglycoprotein alpha-N-acetylgalactosaminyltransferase) (Glycoprotein-fucosylgalactoside alpha-N-acetylgalactosaminyltransferase) (EC 2.4.1.40) (Glycoprotein-fucosylgalactoside alpha-galactosyltransferase) (EC 2.4.1.37) (Histo-blood group A transferase) (A transferase) (GTA) (Histo-blood group B transferase) (B transferase) (GTB) (NAGAT) [Cleaved into: Fucosylglycoprotein alpha-N-acetylgalactosaminyltransferase soluble form],354,other,False
+P47748,2,OPRL1,Nociceptin receptor (Kappa-type 3 opioid receptor) (KOR-3) (Orphanin FQ receptor) (XOR),370,gpcr,False
+Q15382,2,RHEB,GTP-binding protein Rheb (EC 3.6.5.-) (Ras homolog enriched in brain),184,other,False
+Q9ULI0,2,ATAD2B,ATPase family AAA domain-containing protein 2B,1458,other,False
+P55212,2,CASP6,Caspase-6 (CASP-6) (CSP-6) (EC 3.4.22.59) (Apoptotic protease Mch-2) [Cleaved into: Caspase-6 subunit p18 (Caspase-6 subunit p20); Caspase-6 subunit p11 (Caspase-6 subunit p10)],293,protease,False
+P19921,2,coxS,Carbon monoxide dehydrogenase small chain (CO dehydrogenase subunit S) (CO-DH S) (EC 1.2.5.3),166,other,False
+Q15910,2,EZH2,Histone-lysine N-methyltransferase EZH2 (EC 2.1.1.356) (ENX-1) (Enhancer of zeste homolog 2) (Lysine N-methyltransferase 6),746,other,False
+P29473,2,NOS3,"Nitric oxide synthase 3 (EC 1.14.13.39) (Constitutive NOS) (cNOS) (EC-NOS) (NOS type III) (NOSIII) (Nitric oxide synthase, endothelial) (Endothelial NOS) (eNOS)",1205,other,False
+P77173,2,zipA,Cell division protein ZipA (FtsZ interacting protein A),328,other,False
+P62834,2,RAP1A,Ras-related protein Rap-1A (EC 3.6.5.2) (C21KG) (G-22K) (GTP-binding protein smg p21A) (Ras-related protein Krev-1),184,other,False
+P35370,2,Oprl1,Nociceptin receptor (Kappa-type 3 opioid receptor) (KOR-3) (Orphanin FQ receptor) (ROR-C) (XOR1),367,gpcr,False
+P56068,2,murI,Glutamate racemase (EC 5.1.1.3),255,other,False
+Q9UIG0,2,BAZ1B,Tyrosine-protein kinase BAZ1B (EC 2.7.10.2) (Bromodomain adjacent to zinc finger domain protein 1B) (Williams syndrome transcription factor) (Williams-Beuren syndrome chromosomal region 10 protein) (Williams-Beuren syndrome chromosomal region 9 protein) (hWALp2),1483,kinase,False
+P33527,2,ABCC1,Multidrug resistance-associated protein 1 (EC 7.6.2.2) (ATP-binding cassette sub-family C member 1) (Glutathione-S-conjugate-translocating ATPase ABCC1) (EC 7.6.2.3) (Leukotriene C(4) transporter) (LTC4 transporter),1531,other,False
+P22460,2,KCNA5,Potassium voltage-gated channel subfamily A member 5 (HPCN1) (Voltage-gated potassium channel HK2) (Voltage-gated potassium channel subunit Kv1.5),613,ion_channel,True
+Q16548,2,BCL2A1,Bcl-2-related protein A1 (Bcl-2-like protein 5) (Bcl2-L-5) (Hemopoietic-specific early response protein) (Protein BFL-1) (Protein GRS),175,other,False
+P37136,2,Ache,Acetylcholinesterase (AChE) (EC 3.1.1.7),614,other,False
+Q13639,2,HTR4,5-hydroxytryptamine receptor 4 (5-HT-4) (5-HT4) (Serotonin receptor 4),388,gpcr,False
+O60671,2,RAD1,Cell cycle checkpoint protein RAD1 (hRAD1) (Rad1-like DNA damage checkpoint protein),282,other,False
+P34972,2,CNR2,Cannabinoid receptor 2 (CB-2) (CB2) (hCB2) (CX5),360,gpcr,False
+P00176,2,Cyp2b1,Cytochrome P450 2B1 (EC 1.14.14.1) (CYPIIB1) (Cytochrome P450-B) (Cytochrome P450b) (Cytochrome P450-LM2) (Cytochrome P450-PB1) (Cytochrome P450-PB2),491,other,False
+Q64077,2,TACR2,Substance-K receptor (SKR) (NK-2 receptor) (NK-2R) (Neurokinin A receptor) (Tachykinin receptor 2),402,gpcr,False
+Q58F21,2,BRDT,Bromodomain testis-specific protein (Cancer/testis antigen 9) (CT9) (RING3-like protein),947,other,False
+Q9Y286,2,SIGLEC7,Sialic acid-binding Ig-like lectin 7 (Siglec-7) (Adhesion inhibitory receptor molecule 1) (AIRM-1) (CDw328) (D-siglec) (QA79 membrane protein) (p75) (CD antigen CD328),467,other,False
+Q08752,2,PPID,Peptidyl-prolyl cis-trans isomerase D (PPIase D) (EC 5.2.1.8) (40 kDa peptidyl-prolyl cis-trans isomerase) (Cyclophilin-40) (CYP-40) (Cyclophilin-related protein) (Rotamase D),370,other,False
+P32245,2,MC4R,Melanocortin receptor 4 (MC4-R),332,gpcr,False
+Q13093,2,PLA2G7,Platelet-activating factor acetylhydrolase (PAF acetylhydrolase) (EC 3.1.1.47) (1-alkyl-2-acetylglycerophosphocholine esterase) (2-acetyl-1-alkylglycerophosphocholine esterase) (Group-VIIA phospholipase A2) (gVIIA-PLA2) (LDL-associated phospholipase A2) (LDL-PLA(2)) (PAF 2-acylhydrolase),441,other,False
+P00488,2,F13A1,Coagulation factor XIII A chain (Coagulation factor XIIIa) (EC 2.3.2.13) (Protein-glutamine gamma-glutamyltransferase A chain) (Transglutaminase A chain),732,other,False
+P55263,2,ADK,"Adenosine kinase (AK) (EC 2.7.1.20) (Adenosine 5'-phosphotransferase) (N6,N6-dimethyladenosine kinase) (EC 2.7.1.-) (N6-isopentenyladenosine kinase) (EC 2.7.1.-) (N6-methyladenosine kinase) (EC 2.7.1.-)",362,kinase,False
+P62959,2,Hint1,Adenosine 5'-monophosphoramidase HINT1 (EC 3.9.1.-) (17 kDa inhibitor of protein kinase C) (Desumoylating isopeptidase HINT1) (EC 3.4.22.-) (Histidine triad nucleotide-binding protein 1) (Protein kinase C inhibitor 1) (Protein kinase C-interacting protein 1) (PKCI-1),126,kinase,False
+Q64663,2,P2rx7,P2X purinoceptor 7 (P2X7) (ATP receptor) (P2Z receptor) (Purinergic receptor),595,ion_channel,True
+P40261,2,NNMT,Nicotinamide N-methyltransferase (EC 2.1.1.1),264,other,False
+P04058,1,ache,Acetylcholinesterase (AChE) (EC 3.1.1.7),586,other,False
+O35433,1,Trpv1,Transient receptor potential cation channel subfamily V member 1 (TrpV1) (Capsaicin receptor) (Osm-9-like TRP channel 1) (OTRPC1) (Vanilloid receptor 1) (Vanilloid receptor type 1-like),838,ion_channel,True
+O35820,1,Dnph1,5-hydroxymethyl-dUMP N-hydrolase (EC 3.2.2.-) (2'-deoxynucleoside 5'-phosphate N-hydrolase 1) (Deoxyribonucleoside 5'-monophosphate N-glycosidase) (c-Myc-responsive protein Rcl),163,other,False
+Q9H244,1,P2RY12,P2Y purinoceptor 12 (P2Y12) (ADP-glucose receptor) (ADPG-R) (P2T(AC)) (P2Y(AC)) (P2Y(cyc)) (P2Y12 platelet ADP receptor) (P2Y(ADP)) (SP1999),342,gpcr,False
+Q9Y259,1,CHKB,Choline/ethanolamine kinase (Choline kinase beta) (CK) (CKB) (EC 2.7.1.32) (Choline kinase-like protein) (Ethanolamine kinase) (EK) (EC 2.7.1.82) (Ethanolamine kinase beta) (EKB) (choline/ethanolamine kinase beta) (CKEKB),395,kinase,False
+O15550,1,KDM6A,Lysine-specific demethylase 6A (EC 1.14.11.68) (Histone demethylase UTX) (Ubiquitously-transcribed TPR protein on the X chromosome) (Ubiquitously-transcribed X chromosome tetratricopeptide repeat protein) ([histone H3]-trimethyl-L-lysine(27) demethylase 6A),1401,other,False
+Q9H2S1,1,KCNN2,Small conductance calcium-activated potassium channel protein 2 (SK2) (SKCa 2) (SKCa2) (KCa2.2),579,ion_channel,True
+P04015,1,E2,Regulatory protein E2,367,other,False
+O15054,1,KDM6B,Lysine-specific demethylase 6B (EC 1.14.11.68) (JmjC domain-containing protein 3) (Jumonji domain-containing protein 3) (Lysine demethylase 6B) ([histone H3]-trimethyl-L-lysine(27) demethylase 6B),1643,other,False
+P04326,1,tat,Protein Tat (Transactivating regulatory protein),86,other,False
+O15379,1,HDAC3,Histone deacetylase 3 (HD3) (EC 3.5.1.98) (Protein deacetylase HDAC3) (EC 3.5.1.-) (Protein deacylase HDAC3) (EC 3.5.1.-) (RPD3-2) (SMAP45),428,other,False
+P04818,1,TYMS,Thymidylate synthase (TS) (TSase) (EC 2.1.1.45),313,other,False
+Q9Z2X8,1,Keap1,Kelch-like ECH-associated protein 1 (Cytosolic inhibitor of Nrf2) (INrf2),624,other,False
+Q9Z148,1,Ehmt2,Histone-lysine N-methyltransferase EHMT2 (EC 2.1.1.-) (EC 2.1.1.367) (Euchromatic histone-lysine N-methyltransferase 2) (HLA-B-associated transcript 8) (Histone H3-K9 methyltransferase 3) (H3-K9-HMTase 3) (Protein G9a),1263,other,False
+O00222,1,GRM8,Metabotropic glutamate receptor 8 (mGluR8),908,gpcr,False
+P56704,1,WNT3A,Protein Wnt-3a,352,other,False
+P04775,1,Scn2a,Sodium channel protein type 2 subunit alpha (Sodium channel protein brain II subunit alpha) (Sodium channel protein type II subunit alpha) (Voltage-gated sodium channel subunit alpha Nav1.2),2005,ion_channel,True
+P04774,1,Scn1a,Sodium channel protein type 1 subunit alpha (Sodium channel protein brain I subunit alpha) (Sodium channel protein type I subunit alpha) (Voltage-gated sodium channel subunit alpha Nav1.1),2009,ion_channel,True
+Q9Y6F8,1,CDY1; CDY1B,Testis-specific chromodomain protein Y 1 (EC 2.3.1.48),540,other,False
+P9WGR1,1,inhA,Enoyl-[acyl-carrier-protein] reductase [NADH] (ENR) (Enoyl-ACP reductase) (EC 1.3.1.9) (FAS-II enoyl-ACP reductase) (NADH-dependent 2-trans-enoyl-ACP reductase),269,other,False
+O08562,1,Scn9a,Sodium channel protein type 9 subunit alpha (Peripheral sodium channel 1) (PN1) (Sodium channel protein type IX subunit alpha) (Voltage-gated sodium channel subunit alpha Nav1.7),1984,ion_channel,True
+O08790,1,Fpr-s1,Formyl peptide receptor-related sequence 1 (FMLP-related receptor I) (FMLP-R-I) (Formyl peptide receptor related sequence 1) (Formyl peptide receptor-like 1) (Lipoxin A4 receptor) (LXA4 receptor) (N-formyl peptide receptor 2) (N-formyl peptide receptor 3),351,gpcr,False
+P04585,1,gag-pol,Gag-Pol polyprotein (Pr160Gag-Pol) [Cleaved into: Matrix protein p17 (MA); Capsid protein p24 (CA); Spacer peptide 1 (SP1) (p2); Nucleocapsid protein p7 (NC); Transframe peptide (TF); p6-pol (p6*); Protease (EC 3.4.23.16) (PR) (Retropepsin); Reverse transcriptase/ribonuclease H (EC 2.7.7.49) (EC 2.7.7.7) (EC 3.1.26.13) (Exoribonuclease H) (EC 3.1.13.2) (p66 RT); p51 RT; p15; Integrase (IN) (EC 2.7.7.-) (EC 3.1.-.-)],1435,protease,False
+Q9C0B1,1,FTO,Alpha-ketoglutarate-dependent dioxygenase FTO (Fat mass and obesity-associated protein) (U6 small nuclear RNA (2'-O-methyladenosine-N(6)-)-demethylase FTO) (EC 1.14.11.-) (U6 small nuclear RNA N(6)-methyladenosine-demethylase FTO) (EC 1.14.11.-) (mRNA (2'-O-methyladenosine-N(6)-)-demethylase FTO) (m6A(m)-demethylase FTO) (EC 1.14.11.-) (mRNA N(6)-methyladenosine demethylase FTO) (EC 1.14.11.53) (tRNA N1-methyl adenine demethylase FTO) (EC 1.14.11.-),505,other,False
+Q9FBI2,1,stxA,Shiga toxin subunit A (EC 3.2.2.22),315,other,False
+O14842,1,FFAR1,Free fatty acid receptor 1 (G-protein coupled receptor 40),300,gpcr,False
+P04578,1,env,Envelope glycoprotein gp160 (Env polyprotein) [Cleaved into: Surface protein gp120 (SU) (Glycoprotein 120) (gp120); Transmembrane protein gp41 (TM) (Glycoprotein 41) (gp41)],856,other,False
+Q9Y2K7,1,KDM2A,Lysine-specific demethylase 2A (EC 1.14.11.27) (CXXC-type zinc finger protein 8) (F-box and leucine-rich repeat protein 11) (F-box protein FBL7) (F-box protein Lilina) (F-box/LRR-repeat protein 11) (JmjC domain-containing histone demethylation protein 1A) ([Histone-H3]-lysine-36 demethylase 1A),1162,other,False
+P03300,1,,Genome polyprotein [Cleaved into: P1; Capsid protein VP0 (VP4-VP2); Capsid protein VP4 (P1A) (Virion protein 4); Capsid protein VP2 (P1B) (Virion protein 2); Capsid protein VP3 (P1C) (Virion protein 3); Capsid protein VP1 (P1D) (Virion protein 1); P2; Protease 2A (P2A) (EC 3.4.22.29) (Picornain 2A) (Protein 2A); Protein 2B (P2B); Protein 2C (P2C) (EC 3.6.1.15); P3; Protein 3AB; Protein 3A (P3A); Viral protein genome-linked (VPg) (Protein 3B) (P3B); Protein 3CD (EC 3.4.22.28); Protease 3C (EC 3.4.22.28) (Picornain 3C) (P3C); RNA-directed RNA polymerase (RdRp) (EC 2.7.7.48) (3D polymerase) (3Dpol) (Protein 3D) (3D)],2209,ion_channel,True
+P51178,1,PLCD1,"1-phosphatidylinositol 4,5-bisphosphate phosphodiesterase delta-1 (EC 3.1.4.11) (Phosphoinositide phospholipase C-delta-1) (Phospholipase C-III) (PLC-III) (Phospholipase C-delta-1) (PLC-delta-1)",756,other,False
+Q9Y232,1,CDYL,Chromodomain Y-like protein (CDY-like) (Crotonyl-CoA hydratase) (EC 4.2.1.-),598,other,False
+Q9NUW8,1,TDP1,Tyrosyl-DNA phosphodiesterase 1 (Tyr-DNA phosphodiesterase 1) (EC 3.1.4.-),608,other,False
+P51671,1,CCL11,Eotaxin (C-C motif chemokine 11) (Eosinophil chemotactic protein) (Small-inducible cytokine A11),97,other,False
+P84077,1,ARF1,ADP-ribosylation factor 1 (EC 3.6.5.2),181,other,False
+Q9NQR1,1,KMT5A,N-lysine methyltransferase KMT5A (EC 2.1.1.-) (H4-K20-HMTase KMT5A) (Histone-lysine N-methyltransferase KMT5A) (EC 2.1.1.361) (Lysine N-methyltransferase 5A) (Lysine-specific methylase 5A) (PR/SET domain-containing protein 07) (PR-Set7) (PR/SET07) (SET domain-containing protein 8),393,other,False
+P01127,1,PDGFB,Platelet-derived growth factor subunit B (PDGF subunit B) (PDGF-2) (Platelet-derived growth factor B chain) (Platelet-derived growth factor beta polypeptide) (Proto-oncogene c-Sis) (Becaplermin),241,other,False
+O95665,1,NTSR2,Neurotensin receptor type 2 (NT-R-2) (NTR2) (Levocabastine-sensitive neurotensin receptor),410,gpcr,False
+P01112,1,HRAS,"GTPase HRas (EC 3.6.5.2) (H-Ras-1) (Ha-Ras) (Transforming protein p21) (c-H-ras) (p21ras) [Cleaved into: GTPase HRas, N-terminally processed]",189,other,False
+P01106,1,MYC,Myc proto-oncogene protein (Class E basic helix-loop-helix protein 39) (bHLHe39) (Proto-oncogene c-Myc) (Transcription factor p64),439,other,False
+Q9NSI6,1,BRWD1,Bromodomain and WD repeat-containing protein 1 (WD repeat-containing protein 9),2320,other,False
+P00371,1,DAO,D-amino-acid oxidase (DAAO) (DAMOX) (DAO) (EC 1.4.3.3),347,other,False
+P02776,1,PF4,"Platelet factor 4 (PF-4) (C-X-C motif chemokine 4) (Iroplact) (Oncostatin-A) [Cleaved into: Platelet factor 4, short form (Endothelial cell growth inhibitor)]",101,other,False
+Q9UBM7,1,DHCR7,"7-dehydrocholesterol reductase (7-DHC reductase) (EC 1.3.1.21) (Cholesterol-5,6-epoxide hydrolase subunit DHCR7) (EC 3.3.2.11) (Delta7-sterol reductase) (Sterol Delta(7)-reductase) (Sterol reductase SR-2)",475,other,False
+P00378,1,DHFR,Dihydrofolate reductase (EC 1.5.1.3),189,other,False
+Q9RUB5,1,dxs,1-deoxy-D-xylulose-5-phosphate synthase (EC 2.2.1.7) (1-deoxyxylulose-5-phosphate synthase) (DXP synthase) (DXPS),629,other,False
+Q9R0C9,1,Sigmar1,Sigma non-opioid intracellular receptor 1 (Sigma 1-type opioid receptor) (Sigma1-receptor) (Sigma1R),223,other,False
+P79350,1,OPRM1,Mu-type opioid receptor (M-OR-1) (MOR-1),401,gpcr,False
+Q9QYJ6,1,Pde10a,"cAMP and cAMP-inhibited cGMP 3',5'-cyclic phosphodiesterase 10A (EC 3.1.4.17)",794,other,False
+P9WIL5,1,panC,Pantothenate synthetase (PS) (EC 6.3.2.1) (Pantoate--beta-alanine ligase) (Pantoate-activating enzyme),309,other,False
+P00742,1,F10,Coagulation factor X (EC 3.4.21.6) (Stuart factor) (Stuart-Prower factor) [Cleaved into: Factor X light chain; Factor X heavy chain; Activated factor Xa heavy chain],488,protease,False
+O94925,1,GLS,"Glutaminase kidney isoform, mitochondrial (GLS) (EC 3.5.1.2) (K-glutaminase) (L-glutamine amidohydrolase) [Cleaved into: Glutaminase kidney isoform, mitochondrial 68 kDa chain; Glutaminase kidney isoform, mitochondrial 65 kDa chain]",669,other,False
+P51682,1,Ccr5,C-C chemokine receptor type 5 (C-C CKR-5) (CC-CKR-5) (CCR-5) (MIP-1 alpha receptor) (CD antigen CD195),354,gpcr,False
+Q9NPD8,1,UBE2T,Ubiquitin-conjugating enzyme E2 T (EC 2.3.2.23) (Cell proliferation-inducing gene 50 protein) (E2 ubiquitin-conjugating enzyme T) (Ubiquitin carrier protein T) (Ubiquitin-protein ligase T),197,other,False
+O88554,1,Parp2,Poly [ADP-ribose] polymerase 2 (PARP-2) (mPARP-2) (EC 2.4.2.30) (ADP-ribosyltransferase diphtheria toxin-like 2) (ARTD2) (DNA ADP-ribosyltransferase PARP2) (EC 2.4.2.-) (NAD(+) ADP-ribosyltransferase 2) (ADPRT-2) (Poly[ADP-ribose] synthase 2) (pADPRT-2) (Protein poly-ADP-ribosyltransferase PARP2) (EC 2.4.2.-),559,other,False
+Q9WV60,1,Gsk3b,Glycogen synthase kinase-3 beta (GSK-3 beta) (EC 2.7.11.26) (Serine/threonine-protein kinase GSK3B) (EC 2.7.11.1),420,kinase,False
+Q9WV26,1,AGTR1,Type-1 angiotensin II receptor (Angiotensin II type-1 receptor) (AT1 receptor),359,gpcr,False
+O43187,1,IRAK2,Interleukin-1 receptor-associated kinase-like 2 (IRAK-2),625,kinase,False
+Q9H665,1,IGFLR1,IGF-like family receptor 1 (Transmembrane protein 149) (U2 small nuclear RNA auxiliary factor 1-like 4),355,other,False
+O43683,1,BUB1,Mitotic checkpoint serine/threonine-protein kinase BUB1 (hBUB1) (EC 2.7.11.1) (BUB1A),1085,kinase,False
+P51141,1,Dvl1,Segment polarity protein dishevelled homolog DVL-1 (Dishevelled-1) (DSH homolog 1),695,other,False
+Q9H9B1,1,EHMT1,Histone-lysine N-methyltransferase EHMT1 (EC 2.1.1.-) (EC 2.1.1.367) (Euchromatic histone-lysine N-methyltransferase 1) (Eu-HMTase1) (G9a-like protein 1) (GLP) (GLP1) (Histone H3-K9 methyltransferase 5) (H3-K9-HMTase 5) (Lysine N-methyltransferase 1D),1298,other,False
+P49286,1,MTNR1B,Melatonin receptor type 1B (Mel-1B-R) (Mel1b receptor),362,gpcr,False
+Q9UPN9,1,TRIM33,E3 ubiquitin-protein ligase TRIM33 (EC 2.3.2.27) (Ectodermin homolog) (RET-fused gene 7 protein) (Protein Rfg7) (RING-type E3 ubiquitin transferase TRIM33) (Transcription intermediary factor 1-gamma) (TIF1-gamma) (Tripartite motif-containing protein 33),1127,other,False
+P02554,1,,Tubulin beta chain (Beta-tubulin),445,other,False
+Q9HC97,1,GPR35,G-protein coupled receptor 35 (Kynurenic acid receptor) (KYNA receptor),309,gpcr,False
+P01374,1,LTA,Lymphotoxin-alpha (LT-alpha) (TNF-beta) (Tumor necrosis factor ligand superfamily member 1),205,other,False
+O70528,1,HTR4,5-hydroxytryptamine receptor 4 (5-HT-4) (5-HT4) (Serotonin receptor 4),388,gpcr,False
+P53634,1,CTSC,Dipeptidyl peptidase 1 (EC 3.4.14.1) (Cathepsin C) (Cathepsin J) (Dipeptidyl peptidase I) (DPP-I) (DPPI) (Dipeptidyl transferase) [Cleaved into: Dipeptidyl peptidase 1 exclusion domain chain (Dipeptidyl peptidase I exclusion domain chain); Dipeptidyl peptidase 1 heavy chain (Dipeptidyl peptidase I heavy chain); Dipeptidyl peptidase 1 light chain (Dipeptidyl peptidase I light chain)],463,protease,False
+O75874,1,IDH1,Isocitrate dehydrogenase [NADP] cytoplasmic (IDH) (IDH1) (EC 1.1.1.42) (Cytosolic NADP-isocitrate dehydrogenase) (IDPc) (NADP(+)-specific ICDH) (Oxalosuccinate decarboxylase),414,other,False
+P01213,1,PDYN,Proenkephalin-B (Beta-neoendorphin-dynorphin) (Preprodynorphin) [Cleaved into: Alpha-neoendorphin; Beta-neoendorphin; Big dynorphin (Big Dyn); Dynorphin A(1-17) (Dyn-A17) (Dynorphin A); Dynorphin A(1-13); Dynorphin A(1-8); Leu-enkephalin; Rimorphin (Dynorphin B) (Dyn-B) (Dynorphin B(1-13)); Leumorphin (Dynorphin B-29)],254,other,False
+P51692,1,STAT5B,Signal transducer and activator of transcription 5B,787,other,False
+P00523,1,SRC,Proto-oncogene tyrosine-protein kinase Src (EC 2.7.10.2) (Proto-oncogene c-Src) (pp60c-src) (p60-Src),533,kinase,False
+P09429,1,HMGB1,High mobility group protein B1 (High mobility group protein 1) (HMG-1),215,other,False
+P05089,1,ARG1,Arginase-1 (EC 3.5.3.1) (Liver-type arginase) (Type I arginase),322,other,False
+P17752,1,TPH1,Tryptophan 5-hydroxylase 1 (EC 1.14.16.4) (Tryptophan 5-monooxygenase 1),444,other,False
+P24046,1,GABRR1,Gamma-aminobutyric acid receptor subunit rho-1 (GABA(A) receptor subunit rho-1) (GABAAR subunit rho-1) (GABA(C) receptor),479,ion_channel,True
+P23921,1,RRM1,Ribonucleoside-diphosphate reductase large subunit (EC 1.17.4.1) (Ribonucleoside-diphosphate reductase subunit M1) (Ribonucleotide reductase large subunit),792,other,False
+P23574,1,Gabrg1,Gamma-aminobutyric acid receptor subunit gamma-1 (GABA(A) receptor subunit gamma-1) (GABAAR subunit gamma-1),465,ion_channel,True
+P35439,1,Grin1,"Glutamate receptor ionotropic, NMDA 1 (GluN1) (Glutamate [NMDA] receptor subunit zeta-1) (N-methyl-D-aspartate receptor subunit NR1) (NMD-R1)",938,ion_channel,True
+P22736,1,NR4A1,Nuclear receptor subfamily 4immunitygroup A member 1 (Early response protein NAK1) (Nuclear hormone receptor NUR/77) (Nur77) (Orphan nuclear receptor HMR) (Orphan nuclear receptor TR3) (ST-59) (Testicular receptor 3),598,nuclear_receptor,False
+P22307,1,SCP2,Sterol carrier protein 2 (SCP-2) (Acetyl-CoA C-myristoyltransferase) (EC 2.3.1.155) (Non-specific lipid-transfer protein) (NSL-TP) (Propanoyl-CoA C-acyltransferase) (EC 2.3.1.176) (SCP-2/3-oxoacyl-CoA thiolase) (SCP-2/thiolase) (EC 2.3.1.16) (SCP-chi) (SCPX) (Sterol carrier protein X) (SCP-X),547,other,False
+P22004,1,BMP6,Bone morphogenetic protein 6 (BMP-6) (VG-1-related protein) (VG-1-R) (VGR-1),513,other,False
+P36639,1,NUDT1,"Oxidized purine nucleoside triphosphate hydrolase (EC 3.6.1.56) (2-hydroxy-dATP diphosphatase) (7,8-dihydro-8-oxoguanine triphosphatase) (8-oxo-dGTPase) (Methylated purine nucleoside triphosphate hydrolase) (EC 3.6.1.-) (Nucleoside diphosphate-linked moiety X motif 1) (Nudix motif 1)",197,phosphatase,False
+Q05941,1,Chrna7,Neuronal acetylcholine receptor subunit alpha-7 (nAChR7) (Nicotinic acetylcholine receptor subunit alpha-7),502,ion_channel,True
+Q16665,1,HIF1A,Hypoxia-inducible factor 1-alpha (HIF-1-alpha) (HIF1-alpha) (ARNT-interacting protein) (Basic-helix-loop-helix-PAS protein MOP1) (Class E basic helix-loop-helix protein 78) (bHLHe78) (Member of PAS protein 1) (PAS domain-containing protein 8),826,other,False
+P21447,1,Abcb1a,ATP-dependent translocase ABCB1 (ATP-binding cassette sub-family B member 1A) (MDR1A) (Multidrug resistance protein 1A) (EC 7.6.2.2) (Multidrug resistance protein 3) (P-glycoprotein 3) (Phospholipid transporter ABCB1) (EC 7.6.2.1),1276,other,False
+P20961,1,Serpine1,Plasminogen activator inhibitor 1 (PAI) (PAI-1) (Endothelial plasminogen activator inhibitor) (Serpin E1),402,other,False
+P20393,1,NR1D1,Nuclear receptor subfamily 1 group D member 1 (Rev-erbA-alpha) (V-erbA-related protein 1) (EAR-1),614,nuclear_receptor,False
+P20288,1,DRD2,D(2) dopamine receptor (Dopamine D2 receptor),444,gpcr,False
+Q05586,1,GRIN1,"Glutamate receptor ionotropic, NMDA 1 (GluN1) (Glutamate [NMDA] receptor subunit zeta-1) (N-methyl-D-aspartate receptor subunit NR1) (NMD-R1) (hNR1)",938,ion_channel,True
+P20273,1,CD22,B-cell receptor CD22 (B-lymphocyte cell adhesion molecule) (BL-CAM) (Sialic acid-binding Ig-like lectin 2) (Siglec-2) (T-cell surface antigen Leu-14) (CD antigen CD22),847,other,False
+P20248,1,CCNA2,Cyclin-A2 (Cyclin-A) (Cyclin A),432,other,False
+P19491,1,Gria2,"Glutamate receptor 2 (GluR-2) (AMPA-selective glutamate receptor 2) (GluR-B) (GluR-K2) (Glutamate receptor ionotropic, AMPA 2)",883,ion_channel,True
+P19120,1,HSPA8,Heat shock cognate 71 kDa protein (EC 3.6.4.10) (Heat shock 70 kDa protein 8),650,other,False
+P19020,1,Drd3,D(3) dopamine receptor (Dopamine D3 receptor),446,gpcr,False
+Q5HIH6,1,glmU,Bifunctional protein GlmU [Includes: UDP-N-acetylglucosamine pyrophosphorylase (EC 2.7.7.23) (N-acetylglucosamine-1-phosphate uridyltransferase); Glucosamine-1-phosphate N-acetyltransferase (EC 2.3.1.157)],450,other,False
+P18901,1,Drd1,D(1A) dopamine receptor (Dopamine D1 receptor),446,gpcr,False
+Q04917,1,YWHAH,14-3-3 protein eta (Protein AS1),246,other,False
+Q60492,1,SIGMAR1,Sigma non-opioid intracellular receptor 1 (Sigma 1-type opioid receptor) (Sigma1-receptor) (Sigma1R) (Sterol isomerase-like protein),223,other,False
+Q63495,1,Ager,Advanced glycosylation end product-specific receptor (Receptor for advanced glycosylation end products),402,other,False
+Q63707,1,Dhodh,"Dihydroorotate dehydrogenase (quinone), mitochondrial (DHOdehase) (EC 1.3.5.2) (Dihydroorotate oxidase)",395,other,False
+P17865,1,ftsZ,Cell division protein FtsZ,382,other,False
+Q15369,1,ELOC,Elongin-C (EloC) (Elongin 15 kDa subunit) (RNA polymerase II transcription factor SIII subunit C) (SIII p15) (Transcription elongation factor B polypeptide 1),112,other,False
+P24557,1,TBXAS1,Thromboxane-A synthase (TXA synthase) (TXS) (EC 5.3.99.5) (Cytochrome P450 5A1) (Hydroperoxy icosatetraenoate dehydratase) (EC 4.2.1.152),533,other,False
+P25025,1,CXCR2,C-X-C chemokine receptor type 2 (CXC-R2) (CXCR-2) (CDw128b) (GRO/MGSA receptor) (High affinity interleukin-8 receptor B) (IL-8R B) (IL-8 receptor type 2) (CD antigen CD182),360,gpcr,False
+P31424,1,Grm5,Metabotropic glutamate receptor 5 (mGluR5),1203,gpcr,False
+P32238,1,CCKAR,Cholecystokinin receptor type A (CCK-A receptor) (CCK-AR) (Cholecystokinin-1 receptor) (CCK1-R),428,gpcr,False
+P31947,1,SFN,14-3-3 protein sigma (Epithelial cell marker protein 1) (Stratifin),248,other,False
+Q13185,1,CBX3,Chromobox protein homolog 3 (HECH) (Heterochromatin protein 1 homolog gamma) (HP1 gamma) (Modifier 2 protein),183,other,False
+P31946,1,YWHAB,"14-3-3 protein beta/alpha (Protein 1054) (Protein kinase C inhibitor protein 1) (KCIP-1) [Cleaved into: 14-3-3 protein beta/alpha, N-terminally processed]",246,kinase,False
+Q13224,1,GRIN2B,"Glutamate receptor ionotropic, NMDA 2B (GluN2B) (Glutamate [NMDA] receptor subunit epsilon-2) (N-methyl D-aspartate receptor subtype 2B) (NMDAR2B) (NR2B) (N-methyl-D-aspartate receptor subunit 3) (NR3) (hNR3)",1484,ion_channel,True
+P31939,1,ATIC,"Bifunctional purine biosynthesis protein ATIC (AICAR transformylase/inosine monophosphate cyclohydrolase) (ATIC) [Cleaved into: Bifunctional purine biosynthesis protein ATIC, N-terminally processed] [Includes: Phosphoribosylaminoimidazolecarboxamide formyltransferase (EC 2.1.2.3) (5-aminoimidazole-4-carboxamide ribonucleotide formyltransferase) (AICAR formyltransferase) (AICAR transformylase); Inosine 5'-monophosphate cyclohydrolase (IMP cyclohydrolase) (EC 3.5.4.10) (IMP synthase) (Inosinicase)]",592,other,False
+Q13258,1,PTGDR,Prostaglandin D2 receptor (PGD receptor) (PGD2 receptor) (Prostanoid DP receptor),359,gpcr,False
+Q13304,1,GPR17,Uracil nucleotide/cysteinyl leukotriene receptor (UDP/CysLT receptor) (G-protein coupled receptor 17) (P2Y-like receptor) (R12),367,gpcr,False
+Q13322,1,GRB10,Growth factor receptor-bound protein 10 (GRB10 adapter protein) (Insulin receptor-binding protein Grb-IR),594,other,False
+Q13363,1,CTBP1,C-terminal-binding protein 1 (CtBP1) (EC 1.1.1.-),440,other,False
+Q13489,1,BIRC3,Baculoviral IAP repeat-containing protein 3 (EC 2.3.2.27) (Apoptosis inhibitor 2) (API2) (Cellular inhibitor of apoptosis 2) (C-IAP2) (IAP homolog C) (Inhibitor of apoptosis protein 1) (hIAP-1) (hIAP1) (RING finger protein 49) (RING-type E3 ubiquitin transferase BIRC3) (TNFR2-TRAF-signaling complex protein 1),604,other,False
+Q13490,1,BIRC2,Baculoviral IAP repeat-containing protein 2 (EC 2.3.2.27) (Cellular inhibitor of apoptosis 1) (C-IAP1) (IAP homolog B) (Inhibitor of apoptosis protein 2) (hIAP-2) (hIAP2) (RING finger protein 48) (RING-type E3 ubiquitin transferase BIRC2) (TNFR2-TRAF-signaling complex protein 2),618,other,False
+P34896,1,SHMT1,"Serine hydroxymethyltransferase, cytosolic (SHMT) (cSHMT) (hcSHMT) (EC 2.1.2.1) (Glycine hydroxymethyltransferase) (L-allo-threonine/L-threonine aldolase SHMT1) (Serine methylase)",483,other,False
+P25090,1,FPR2,N-formyl peptide receptor 2 (FMLP-related receptor I) (FMLP-R-I) (Formyl peptide receptor-like 1) (HM63) (Lipoxin A4 receptor) (ALX) (LXA4 receptor) (RFP),351,gpcr,False
+P34969,1,HTR7,5-hydroxytryptamine receptor 7 (5-HT-7) (5-HT7) (5-HT-X) (Serotonin receptor 7),479,gpcr,False
+P30536,1,TSPO,Translocator protein (Mitochondrial benzodiazepine receptor) (PKBS) (Peripheral-type benzodiazepine receptor) (PBR),169,other,False
+P29350,1,PTPN6,Tyrosine-protein phosphatase non-receptor type 6 (EC 3.1.3.48) (Hematopoietic cell protein-tyrosine phosphatase) (Protein-tyrosine phosphatase 1C) (PTP-1C) (Protein-tyrosine phosphatase SHP-1) (SH-PTP1),595,phosphatase,False
+P29276,1,Adora2b,Adenosine receptor A2b,332,gpcr,False
+P28476,1,GABRR2,Gamma-aminobutyric acid receptor subunit rho-2 (GABA(A) receptor subunit rho-2) (GABAAR subunit rho-2) (GABA(C) receptor),465,ion_channel,True
+Q14397,1,GCKR,Glucokinase regulatory protein (GKRP) (Glucokinase regulator),625,other,False
+P27348,1,YWHAQ,14-3-3 protein theta (14-3-3 protein T-cell) (14-3-3 protein tau) (Protein HS1),245,other,False
+P35351,1,Agtr2,Type-2 angiotensin II receptor (Angiotensin II type-2 receptor) (AT2 receptor),363,gpcr,False
+P26637,1,CDC60,"Leucine--tRNA ligase, cytoplasmic (EC 6.1.1.4) (Leucyl-tRNA synthetase) (LeuRS)",1090,other,False
+P26006,1,ITGA3,Integrin alpha-3 (CD49 antigen-like family member C) (FRP-2) (Galactoprotein B3) (GAPB3) (VLA-3 subunit alpha) (CD antigen CD49c) [Cleaved into: Integrin alpha-3 heavy chain; Integrin alpha-3 light chain],1051,other,False
+P25101,1,EDNRA,Endothelin-1 receptor (Endothelin receptor type A) (ET-A) (ETA-R) (hET-AR),427,gpcr,False
+P25099,1,Adora1,Adenosine receptor A1,326,gpcr,False
+Q64737,1,Gart,Trifunctional purine biosynthetic protein adenosine-3 [Includes: Phosphoribosylamine--glycine ligase (EC 6.3.4.13) (Glycinamide ribonucleotide synthetase) (GARS) (Phosphoribosylglycinamide synthetase); Phosphoribosylformylglycinamidine cyclo-ligase (EC 6.3.3.1) (AIR synthase) (AIRS) (Phosphoribosyl-aminoimidazole synthetase); Phosphoribosylglycinamide formyltransferase (EC 2.1.2.2) (5'-phosphoribosylglycinamide transformylase) (GAR transformylase) (GART)],1010,other,False
+P17658,1,KCNA6,Potassium voltage-gated channel subfamily A member 6 (Voltage-gated potassium channel HBK2) (Voltage-gated potassium channel subunit Kv1.6),529,ion_channel,True
+P9WN95,1,ftsZ,Cell division protein FtsZ,379,other,False
+P17181,1,IFNAR1,Interferon alpha/beta receptor 1 (IFN-R-1) (IFN-alpha/beta receptor 1) (Cytokine receptor class-II member 1) (Cytokine receptor family 2 member 1) (CRF2-1) (Type I interferon receptor 1),557,other,False
+P0A2Y6,1,aroC,Chorismate synthase (CS) (EC 4.2.3.5) (5-enolpyruvylshikimate-3-phosphate phospholyase),388,other,False
+Q8TF76,1,HASPIN,Serine/threonine-protein kinase haspin (EC 2.7.11.1) (Germ cell-specific gene 2 protein) (H-haspin) (Haploid germ cell-specific nuclear protein kinase),798,kinase,False
+P09651,1,HNRNPA1,"Heterogeneous nuclear ribonucleoprotein A1 (hnRNP A1) (Helix-destabilizing protein) (Single-strand RNA-binding protein) (hnRNP core protein A1) [Cleaved into: Heterogeneous nuclear ribonucleoprotein A1, N-terminally processed]",372,other,False
+P08913,1,ADRA2A,Alpha-2A adrenergic receptor (Alpha-2 adrenergic receptor subtype C10) (Alpha-2A adrenoreceptor) (Alpha-2A adrenoceptor) (Alpha-2AAR),450,gpcr,False
+P42229,1,STAT5A,Signal transducer and activator of transcription 5A,794,other,False
+P42260,1,Grik2,"Glutamate receptor ionotropic, kainate 2 (GluK2) (Glutamate receptor 6) (GluR-6) (GluR6)",908,ion_channel,True
+P08485,1,Chrm4,Muscarinic acetylcholine receptor M4,477,gpcr,False
+P08253,1,MMP2,72 kDa type IV collagenase (EC 3.4.24.24) (72 kDa gelatinase) (Gelatinase A) (Matrix metalloproteinase-2) (MMP-2) (TBE-1) [Cleaved into: PEX],660,protease,False
+P43220,1,GLP1R,Glucagon-like peptide 1 receptor (GLP-1 receptor) (GLP-1-R) (GLP-1R),463,gpcr,False
+Q92952,1,KCNN1,Small conductance calcium-activated potassium channel protein 1 (SK1) (SKCa 1) (SKCa1) (hSK1) (KCa2.1),543,ion_channel,True
+P9WPX7,1,aroQ,3-dehydroquinate dehydratase (3-dehydroquinase) (EC 4.2.1.10) (Type II DHQase),147,other,False
+Q96A54,1,ADIPOR1,Adiponectin receptor protein 1 (Progestin and adipoQ receptor family member 1) (Progestin and adipoQ receptor family member I),375,other,False
+P08191,1,fimH,Type 1 fimbrin D-mannose specific adhesin (Protein FimH),300,other,False
+P08173,1,CHRM4,Muscarinic acetylcholine receptor M4,479,gpcr,False
+P08104,1,Scn3a,Sodium channel protein type 3 subunit alpha (Sodium channel protein brain III subunit alpha) (Sodium channel protein type III subunit alpha) (Voltage-gated sodium channel subtype III) (Voltage-gated sodium channel subunit alpha Nav1.3),1951,ion_channel,True
+Q96KQ7,1,EHMT2,Histone-lysine N-methyltransferase EHMT2 (EC 2.1.1.-) (EC 2.1.1.367) (Euchromatic histone-lysine N-methyltransferase 2) (HLA-B-associated transcript 8) (Histone H3-K9 methyltransferase 3) (H3-K9-HMTase 3) (Lysine N-methyltransferase 1C) (Protein G9a),1210,other,False
+P45880,1,VDAC2,Non-selective voltage-gated ion channel VDAC2 (VDAC-2) (hVDAC2) (Outer mitochondrial membrane protein porin 2),294,other,False
+P45973,1,CBX5,Chromobox protein homolog 5 (Antigen p25) (Heterochromatin protein 1 homolog alpha) (HP1 alpha),191,other,False
+Q96RI1,1,NR1H4,Bile acid receptor (Farnesoid X-activated receptor) (Farnesol receptor HRR-1) (Nuclear receptor subfamily 1 group H member 4) (Retinoid X receptor-interacting protein 14) (RXR-interacting protein 14),486,nuclear_receptor,False
+P07327,1,ADH1A,Alcohol dehydrogenase 1A (EC 1.1.1.1) (Alcohol dehydrogenase subunit alpha),375,other,False
+P46663,1,BDKRB1,B1 bradykinin receptor (B1R) (BK-1 receptor),353,gpcr,False
+Q99418,1,CYTH2,"Cytohesin-2 (ARF exchange factor) (ARF nucleotide-binding site opener) (Protein ARNO) (PH, SEC7 and coiled-coil domain-containing protein 2)",400,other,False
+P07288,1,KLK3,Prostate-specific antigen (PSA) (EC 3.4.21.77) (Gamma-seminoprotein) (Seminin) (Kallikrein-3) (P-30 antigen) (Semenogelase),261,protease,False
+P9WPC9,1,clpC1,ATP-dependent Clp protease ATP-binding subunit ClpC1,848,protease,False
+P9WNS3,1,dxs,1-deoxy-D-xylulose-5-phosphate synthase (EC 2.2.1.7) (1-deoxyxylulose-5-phosphate synthase) (DXP synthase) (DXPS),638,other,False
+P47712,1,PLA2G4A,Cytosolic phospholipase A2 (cPLA2) (Phospholipase A2 group IVA) [Includes: Phospholipase A2 (EC 3.1.1.4) (Phosphatidylcholine 2-acylhydrolase); Lysophospholipase (EC 3.1.1.5)],749,other,False
+P05412,1,JUN,Transcription factor Jun (Activator protein 1) (AP1) (Proto-oncogene c-Jun) (Transcription factor AP-1 subunit Jun) (V-jun avian sarcoma virus 17 oncogene homolog) (p39),331,other,False
+P0A6F1,1,carA,Carbamoyl phosphate synthase small chain (EC 6.3.5.5) (Carbamoyl phosphate synthetase glutamine chain),382,other,False
+Q01062,1,Pde2a,"cGMP-dependent 3',5'-cyclic phosphodiesterase (EC 3.1.4.17) (Cyclic GMP-stimulated phosphodiesterase) (CGS-PDE) (cGSPDE)",928,other,False
+P0A9A6,1,ftsZ,Cell division protein FtsZ,383,other,False
+Q03135,1,CAV1,Caveolin-1,178,other,False
+P16581,1,SELE,E-selectin (CD62 antigen-like family member E) (Endothelial leukocyte adhesion molecule 1) (ELAM-1) (Leukocyte-endothelial cell adhesion molecule 2) (LECAM2) (CD antigen CD62E),610,other,False
+Q6Y7W6,1,GIGYF2,GRB10-interacting GYF protein 2 (PERQ amino acid-rich with GYF domain-containing protein 2) (Trinucleotide repeat-containing gene 15 protein),1299,other,False
+Q03431,1,PTH1R,Parathyroid hormone/parathyroid hormone-related peptide receptor (PTH/PTHrP type I receptor) (PTH/PTHr receptor) (Parathyroid hormone 1 receptor) (PTH1 receptor),593,gpcr,False
+P16083,1,NQO2,Ribosyldihydronicotinamide dehydrogenase [quinone] (EC 1.10.5.1) (NRH dehydrogenase [quinone] 2) (NRH:quinone oxidoreductase 2) (Quinone reductase 2) (QR2),231,other,False
+Q7Z2W7,1,TRPM8,Transient receptor potential cation channel subfamily M member 8 (Long transient receptor potential channel 6) (LTrpC-6) (LTrpC6) (Transient receptor potential p8) (Trp-p8),1104,ion_channel,True
+P15498,1,VAV1,Proto-oncogene vav,845,other,False
+P15494,1,BETVIA,Major pollen allergen Bet v 1-A (Allergen Bet v I-A) (allergen Bet v 1-A),160,other,False
+Q86V24,1,ADIPOR2,Adiponectin receptor protein 2 (Progestin and adipoQ receptor family member 2) (Progestin and adipoQ receptor family member II),386,other,False
+P15390,1,Scn4a,Sodium channel protein type 4 subunit alpha (Mu-1) (SkM1) (Sodium channel protein skeletal muscle subunit alpha) (Sodium channel protein type IV subunit alpha) (Voltage-gated sodium channel subunit alpha Nav1.4),1840,ion_channel,True
+Q86X55,1,CARM1,Histone-arginine methyltransferase CARM1 (EC 2.1.1.319) (Coactivator-associated arginine methyltransferase 1) (Protein arginine N-methyltransferase 4),608,other,False
+Q03164,1,KMT2A,Histone-lysine N-methyltransferase 2A (Lysine N-methyltransferase 2A) (EC 2.1.1.364) (ALL-1) (CXXC-type zinc finger protein 7) (Cysteine methyltransferase KMT2A) (EC 2.1.1.-) (Myeloid/lymphoid or mixed-lineage leukemia) (Myeloid/lymphoid or mixed-lineage leukemia protein 1) (Trithorax-like protein) (Zinc finger protein HRX) [Cleaved into: MLL cleavage product N320 (N-terminal cleavage product of 320 kDa) (p320); MLL cleavage product C180 (C-terminal cleavage product of 180 kDa) (p180)],3969,other,False
+P14902,1,IDO1,"Indoleamine 2,3-dioxygenase 1 (IDO-1) (EC 1.13.11.52) (Indoleamine-pyrrole 2,3-dioxygenase)",403,other,False
+Q8IL04,1,HDP,Heme ligase (EC 4.99.1.8) (Heme detoxification protein) (PfHDP) (Hemozoin synthase),205,other,False
+Q8R4D5,1,Trpm8,Transient receptor potential cation channel subfamily M member 8 (Long transient receptor potential channel 6) (LTrpC-6) (LTrpC6) (Transient receptor potential p8) (Trp-p8),1104,ion_channel,True
+P14779,1,cyp102A1,Bifunctional cytochrome P450/NADPH--P450 reductase (Cytochrome P450(BM-3)) (Cytochrome P450BM-3) (Fatty acid monooxygenase) (Flavocytochrome P450 BM3) [Includes: Cytochrome P450 102A1 (EC 1.14.14.1); NADPH--cytochrome P450 reductase (EC 1.6.2.4)],1049,other,False
+P14600,1,Tacr1,Substance-P receptor (SPR) (NK-1 receptor) (NK-1R) (Tachykinin receptor 1),407,gpcr,False
+P14210,1,HGF,Hepatocyte growth factor (Hepatopoietin-A) (Scatter factor) (SF) [Cleaved into: Hepatocyte growth factor alpha chain; Hepatocyte growth factor beta chain],728,protease,False
+P14174,1,MIF,Macrophage migration inhibitory factor (MIF) (EC 5.3.2.1) (Glycosylation-inhibiting factor) (GIF) (L-dopachrome isomerase) (L-dopachrome tautomerase) (EC 5.3.3.12) (Phenylpyruvate tautomerase),115,other,False
+P11838,1,EAPA,Endothiapepsin (EC 3.4.23.22) (Aspartate protease),419,protease,False
+P11086,1,PNMT,Phenylethanolamine N-methyltransferase (PNMTase) (EC 2.1.1.28) (Noradrenaline N-methyltransferase),282,other,False
+Q8N8U2,1,CDYL2,Chromodomain Y-like protein 2 (CDY-like 2),506,other,False
+P10636,1,MAPT,Microtubule-associated protein tau (Neurofibrillary tangle protein) (Paired helical filament-tau) (PHF-tau),758,other,False
+Q01827,1,Slc18a2,Synaptic vesicular amine transporter (Monoamine transporter) (Solute carrier family 18 member 2) (Vesicular amine transporter 2) (VAT2) (Vesicular monoamine transporter 2),515,other,False
+Q01726,1,MC1R,Melanocyte-stimulating hormone receptor (MSH-R) (Melanocortin receptor 1) (MC1-R),317,gpcr,False
+P10253,1,GAA,Lysosomal alpha-glucosidase (EC 3.2.1.20) (Acid maltase) (Aglucosidase alfa) [Cleaved into: 76 kDa lysosomal alpha-glucosidase; 70 kDa lysosomal alpha-glucosidase],952,other,False
+P0DPI0,1,botA,Botulinum neurotoxin type A (BoNT/A) (Bontoxilysin-A) (BOTOX) (Botulinum neurotoxin type A1) [Cleaved into: Botulinum neurotoxin A light chain (LC) (EC 3.4.24.69); Botulinum neurotoxin A heavy chain (HC)],1296,protease,False
+A3RGC1,1,VDR,"Vitamin D3 receptor (VDR) (1,25-dihydroxyvitamin D3 receptor) (Nuclear receptor subfamily 1 group I member 1)",427,nuclear_receptor,False

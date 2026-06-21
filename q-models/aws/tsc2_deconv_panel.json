@@ -1,0 +1,184 @@
+{
+  "provenance": {
+    "source": "Ben (Quiver) via Amy E., 'TSC2 target deconvolution hits_6.11.2026_AE.xlsx'",
+    "received": "2026-06-14",
+    "screen": "TSC2 Optopatch phenotype rescue, 30K small-molecule screen",
+    "note": "QS0069567 + QS0113172 rescued the TSC2 Optopatch phenotype; vs the DFP library they functionally matched Dasa-58 (known PKM2 activator) and GSK 3787 (known PPARD antagonist). QS0113172 matched BOTH PKM2 and PPARD. Controls should bind NEITHER PKM2 nor PPARD.",
+    "raw_file": "~/Downloads/TSC2 target deconvolution hits_6.11.2026_AE.xlsx (not committed; structured here)"
+  },
+  "targets": {
+    "PKM2": {
+      "hugo": "PKM",
+      "uniprot": "P14618",
+      "name": "Pyruvate kinase isozyme M2",
+      "binders": [
+        "QS0113172",
+        "QS0321744"
+      ],
+      "reference_confirmed": "QS0321744 (Dasa-58)"
+    },
+    "PPARD": {
+      "hugo": "PPARD",
+      "uniprot": "Q03181",
+      "name": "Peroxisome proliferator-activated receptor delta",
+      "binders": [
+        "QS0069567",
+        "QS0113172",
+        "QS0321760"
+      ],
+      "reference_confirmed": "QS0321760 (GSK 3787)"
+    }
+  },
+  "compounds": [
+    {
+      "qs_id": "QS0113172",
+      "name": "QS0113172",
+      "smiles": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+      "annotations": [
+        {
+          "target_name": "Pyruvate Kinase Isozyme M2",
+          "hugo": "PKM",
+          "status": "Putative",
+          "comment": "Functional Match to Dasa-58 in DFP"
+        },
+        {
+          "target_name": "Peroxisome proliferator-activated receptor delt",
+          "hugo": "PPARD",
+          "status": "Putative",
+          "comment": "Functional Match to GSK 3787 in DFP"
+        }
+      ],
+      "role": "hit_putative",
+      "binds_PKM2": 1,
+      "binds_PPARD": 1
+    },
+    {
+      "qs_id": "QS0321744",
+      "name": "Dasa-58",
+      "smiles": "O=C(O)C[C@@H](C(O)=O)NC(C1=C(N)N([C@H]2[C@@H]([C@@H]([C@@H](COP(O)(O)=O)O2)O)O)C=N1)=O",
+      "annotations": [
+        {
+          "target_name": "Pyruvate Kinase Isozyme M2",
+          "hugo": "PKM",
+          "status": "Confirmed",
+          "comment": "Known PKM2 binder"
+        }
+      ],
+      "role": "reference_confirmed",
+      "binds_PKM2": 1,
+      "binds_PPARD": 0
+    },
+    {
+      "qs_id": "QS0321760",
+      "name": "GSK 3787",
+      "smiles": "O=C(C2=CC=C(Cl)C=C2)NCCS(C1=CC=C(C(F)(F)F)C=N1)(=O)=O",
+      "annotations": [
+        {
+          "target_name": "Peroxisome proliferator-activated receptor delt",
+          "hugo": "PPARD",
+          "status": "Confirmed",
+          "comment": "Known PPARD binder"
+        }
+      ],
+      "role": "reference_confirmed",
+      "binds_PKM2": 0,
+      "binds_PPARD": 1
+    },
+    {
+      "qs_id": "QS0069567",
+      "name": "QS0069567",
+      "smiles": "O=S(N1CCN(C2=CC=CC=N2)CC1)(C3=CC=C(Cl)C=C3)=O",
+      "annotations": [
+        {
+          "target_name": "Peroxisome proliferator-activated receptor delt",
+          "hugo": "PPARD",
+          "status": "Putative",
+          "comment": "Functional Match to GSK 3787 in DFP"
+        }
+      ],
+      "role": "hit_putative",
+      "binds_PKM2": 0,
+      "binds_PPARD": 1
+    },
+    {
+      "qs_id": "QS0141913",
+      "name": "GF 109203X",
+      "smiles": "CN(C)CCCN1C=C(C2=CC=CC=C12)C1=C(C(=O)NC1=O)C1=CNC2=CC=CC=C12",
+      "annotations": [
+        {
+          "target_name": "Protein Kinase C",
+          "hugo": "PRKCA",
+          "status": "Confirmed",
+          "comment": "Use as control"
+        }
+      ],
+      "role": "control",
+      "binds_PKM2": 0,
+      "binds_PPARD": 0
+    },
+    {
+      "qs_id": "QS0061489",
+      "name": "carbamazepine",
+      "smiles": "NC(N1C3=C(C=CC=C3)C=CC2=C1C=CC=C2)=O",
+      "annotations": [
+        {
+          "target_name": "KCNQ2 and Pan Nav",
+          "hugo": "KCNQ2",
+          "status": "Confirmed",
+          "comment": "Use as control"
+        }
+      ],
+      "role": "control",
+      "binds_PKM2": 0,
+      "binds_PPARD": 0
+    },
+    {
+      "qs_id": "QS0214154",
+      "name": "BMS 191011",
+      "smiles": "OC1=CC=C(Cl)C=C1CN1N=C(OC1=O)C1=CC=C(C=C1)C(F)(F)F",
+      "annotations": [
+        {
+          "target_name": "KCNMA1",
+          "hugo": "KCNMA1",
+          "status": "Confirmed",
+          "comment": "Use as control"
+        }
+      ],
+      "role": "control",
+      "binds_PKM2": 0,
+      "binds_PPARD": 0
+    },
+    {
+      "qs_id": "QS0206838",
+      "name": "Biperiden hydrochloride",
+      "smiles": "OC(C1CC2CC1C=C2)(c1ccccc1)CCN1CCCCC1",
+      "annotations": [
+        {
+          "target_name": "cholinergic receptor muscarinic 3",
+          "hugo": "CHRM3",
+          "status": "Confirmed",
+          "comment": "Use as control"
+        }
+      ],
+      "role": "control",
+      "binds_PKM2": 0,
+      "binds_PPARD": 0
+    },
+    {
+      "qs_id": "QS0321864",
+      "name": "BIIB021",
+      "smiles": "ClC1=C2C(N(CC3=NC=C(C)C(OC)=C3C)C=N2)=NC(N)=N1",
+      "annotations": [
+        {
+          "target_name": "heat shock protein 90 alpha family class A member 1",
+          "hugo": "HSP90AA1",
+          "status": "Confirmed",
+          "comment": "Use as control"
+        }
+      ],
+      "role": "control",
+      "binds_PKM2": 0,
+      "binds_PPARD": 0
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "status": "ok",
+  "model": "PROTON (mims-harvard/PROTON, link-prediction strength eval)",
+  "schema": {
+    "n_nodes": 147020,
+    "n_edges": 14733490,
+    "n_node_types": 16,
+    "n_canonical_etypes": 94,
+    "n_gene_drug_etypes": 2,
+    "n_gene_disease_etypes": 8
+  },
+  "quiver_targets": {
+    "n_attempted": 22,
+    "n_resolved": 22,
+    "n_drugs_in_kg": 8160
+  },
+  "known_binder_summary": {
+    "n_attempted": 116,
+    "n_ok": 106,
+    "median_rank_percentile": 0.04307598039215686,
+    "mean_rank_percentile": 0.0904770162782094,
+    "n_top1pct": 15,
+    "n_top5pct": 60
+  },
+  "crispr_hypotheses": {
+    "n_attempted": 25,
+    "n_resolved": 25
+  },
+  "wall_time_sec": 154.6
+}

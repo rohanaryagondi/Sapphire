@@ -1,0 +1,29 @@
+{
+  "timestamp": "20260529_005231",
+  "n_W": 27,
+  "n_P": 500,
+  "n_PGK1": 99,
+  "cross_target": {
+    "wdr91_head_AUROC_W_over_P": 0.1816,
+    "pgk2_head_AUROC_P_over_W": 0.9876
+  },
+  "homolog_selectivity": {
+    "pgk2_head_AUROC_P_over_PGK1": 0.9734
+  },
+  "paired_specificity": {
+    "frac_WDR91actives_prefer_wdr91head": 0.407,
+    "frac_PGK2hits_prefer_pgk2head": 0.988
+  },
+  "median_scores": {
+    "wdr91_head": {
+      "W": 0.0,
+      "P": 0.00195,
+      "PGK1": 0.0
+    },
+    "pgk2_head": {
+      "W": 2e-05,
+      "P": 0.99998,
+      "PGK1": 0.00043
+    }
+  }
+}

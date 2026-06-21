@@ -1,0 +1,206 @@
+{
+  "test": "herg_hepato_tox_alternatives",
+  "herg_panel": {
+    "strict": {
+      "TPR": 0.75,
+      "TNR": 1.0,
+      "TP": 3,
+      "FP": 0,
+      "TN": 6,
+      "FN": 1
+    },
+    "liberal": {
+      "TPR": 1.0,
+      "TNR": 1.0,
+      "TP": 4,
+      "FP": 0,
+      "TN": 6,
+      "FN": 0
+    },
+    "compounds": [
+      {
+        "name": "terfenadine",
+        "herg_toxic": 1,
+        "logp": 5.29,
+        "mw": 351.5,
+        "basic_n": 1,
+        "n_aromatic_rings": 2,
+        "herg_alert_strict": true,
+        "herg_alert_liberal": true
+      },
+      {
+        "name": "cisapride",
+        "herg_toxic": 1,
+        "logp": 4.18,
+        "mw": 389.9,
+        "basic_n": 2,
+        "n_aromatic_rings": 2,
+        "herg_alert_strict": true,
+        "herg_alert_liberal": true
+      },
+      {
+        "name": "astemizole",
+        "herg_toxic": 1,
+        "logp": 4.55,
+        "mw": 430.5,
+        "basic_n": 2,
+        "n_aromatic_rings": 4,
+        "herg_alert_strict": true,
+        "herg_alert_liberal": true
+      },
+      {
+        "name": "sotalol",
+        "herg_toxic": 0,
+        "logp": 1.34,
+        "mw": 242.3,
+        "basic_n": 1,
+        "n_aromatic_rings": 1,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      },
+      {
+        "name": "haloperidol",
+        "herg_toxic": 1,
+        "logp": 3.78,
+        "mw": 335.9,
+        "basic_n": 1,
+        "n_aromatic_rings": 1,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": true
+      },
+      {
+        "name": "aspirin",
+        "herg_toxic": 0,
+        "logp": 1.31,
+        "mw": 180.2,
+        "basic_n": 0,
+        "n_aromatic_rings": 1,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      },
+      {
+        "name": "metformin",
+        "herg_toxic": 0,
+        "logp": -1.03,
+        "mw": 129.2,
+        "basic_n": 3,
+        "n_aromatic_rings": 0,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      },
+      {
+        "name": "gabapentin",
+        "herg_toxic": 0,
+        "logp": 1.37,
+        "mw": 171.2,
+        "basic_n": 1,
+        "n_aromatic_rings": 0,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      },
+      {
+        "name": "levetiracetam",
+        "herg_toxic": 0,
+        "logp": 0.53,
+        "mw": 113.2,
+        "basic_n": 0,
+        "n_aromatic_rings": 0,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      },
+      {
+        "name": "memantine",
+        "herg_toxic": 0,
+        "logp": 2.69,
+        "mw": 167.3,
+        "basic_n": 1,
+        "n_aromatic_rings": 0,
+        "herg_alert_strict": false,
+        "herg_alert_liberal": false
+      }
+    ]
+  },
+  "hepato_panel": {
+    "logp_heuristic": {
+      "TPR": 0.4,
+      "TNR": 0.8,
+      "TP": 2,
+      "FP": 1,
+      "TN": 4,
+      "FN": 3
+    },
+    "compounds": [
+      {
+        "name": "cerivastatin",
+        "hepato": 1,
+        "logp": 3.73,
+        "mw": 447.5,
+        "hepato_flag": true
+      },
+      {
+        "name": "troglitazone",
+        "hepato": 1,
+        "logp": 2.76,
+        "mw": 351.4,
+        "hepato_flag": false
+      },
+      {
+        "name": "bromfenac",
+        "hepato": 1,
+        "logp": 3.59,
+        "mw": 342.2,
+        "hepato_flag": true
+      },
+      {
+        "name": "nefazodone",
+        "hepato": 1,
+        "logp": 1.31,
+        "mw": 301.4,
+        "hepato_flag": false
+      },
+      {
+        "name": "pemoline",
+        "hepato": 1,
+        "logp": 0.6,
+        "mw": 176.2,
+        "hepato_flag": false
+      },
+      {
+        "name": "atorvastatin",
+        "hepato": 0,
+        "logp": 5.38,
+        "mw": 510.6,
+        "hepato_flag": true
+      },
+      {
+        "name": "omeprazole",
+        "hepato": 0,
+        "logp": 2.9,
+        "mw": 345.4,
+        "hepato_flag": false
+      },
+      {
+        "name": "lisinopril",
+        "hepato": 0,
+        "logp": 1.74,
+        "mw": 396.9,
+        "hepato_flag": false
+      },
+      {
+        "name": "metoprolol",
+        "hepato": 0,
+        "logp": 1.61,
+        "mw": 267.4,
+        "hepato_flag": false
+      },
+      {
+        "name": "ibuprofen",
+        "hepato": 0,
+        "logp": 3.07,
+        "mw": 206.3,
+        "hepato_flag": false
+      }
+    ]
+  },
+  "recommendation": "hERG strict SMARTS for QTc risks; pkCSM DILI API for hepatotox; MAMMAL ClinTox discarded"
+}

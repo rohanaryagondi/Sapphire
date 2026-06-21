@@ -1,0 +1,6 @@
+# runtime data + caches (not source)
+__pycache__/
+*.pyc
+_history.jsonl
+backend/_history.jsonl
+.pytest_cache/

@@ -1,0 +1,86 @@
+{
+  "timestamp": "20260528_194833",
+  "head": "moleculenet_bbbp",
+  "n": 11,
+  "accuracy": 0.545,
+  "auroc": 0.633,
+  "rows": [
+    {
+      "compound": "caffeine",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "diazepam",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "haloperidol",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "donepezil",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "carbamazepine",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "nicotine",
+      "true": 1,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 1
+    },
+    {
+      "compound": "atenolol",
+      "true": 0,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 0
+    },
+    {
+      "compound": "domperidone",
+      "true": 0,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 0
+    },
+    {
+      "compound": "loperamide",
+      "true": 0,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 0
+    },
+    {
+      "compound": "cetirizine",
+      "true": 0,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 0
+    },
+    {
+      "compound": "vancomycin",
+      "true": 0,
+      "pred": 1,
+      "score_penetrant": 1.0,
+      "ok": 0
+    }
+  ]
+}

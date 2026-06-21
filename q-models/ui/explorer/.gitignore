@@ -1,0 +1,6 @@
+# server-side prediction history (runtime artifact)
+_history.jsonl
+backend/_history.jsonl
+# python bytecode
+__pycache__/
+*.pyc

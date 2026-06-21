@@ -1,0 +1,210 @@
+{
+  "timestamp": "20260529_013925",
+  "n": 20,
+  "accuracy_all": 0.6,
+  "n_in_training": 15,
+  "n_held_out": 5,
+  "accuracy_held_out": 0.8,
+  "rows": [
+    {
+      "name": "morphine",
+      "group": "opioid",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999997615814209,
+      "correct": 1,
+      "in_training": false,
+      "why": "central opioid analgesic"
+    },
+    {
+      "name": "loperamide",
+      "group": "opioid",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 0,
+      "in_training": true,
+      "why": "anti-diarrheal opioid; P-gp substrate, peripherally restricted"
+    },
+    {
+      "name": "diphenhydramine",
+      "group": "antihistamine",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "1st-gen antihistamine, sedating (CNS)"
+    },
+    {
+      "name": "hydroxyzine",
+      "group": "antihistamine",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "1st-gen antihistamine, sedating (CNS)"
+    },
+    {
+      "name": "cetirizine",
+      "group": "antihistamine",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 0,
+      "in_training": true,
+      "why": "2nd-gen antihistamine, non-sedating (peripheral)"
+    },
+    {
+      "name": "fexofenadine",
+      "group": "antihistamine",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 0,
+      "in_training": true,
+      "why": "2nd-gen antihistamine, non-sedating; P-gp substrate"
+    },
+    {
+      "name": "loratadine",
+      "group": "antihistamine",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999997615814209,
+      "correct": 0,
+      "in_training": true,
+      "why": "2nd-gen antihistamine, non-sedating"
+    },
+    {
+      "name": "metoclopramide",
+      "group": "antiemetic",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": false,
+      "why": "D2 antagonist antiemetic; causes EPS -> crosses BBB"
+    },
+    {
+      "name": "domperidone",
+      "group": "antiemetic",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 0,
+      "in_training": true,
+      "why": "D2 antagonist antiemetic; no EPS -> does not cross"
+    },
+    {
+      "name": "diazepam",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "benzodiazepine, central"
+    },
+    {
+      "name": "caffeine",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "CNS stimulant"
+    },
+    {
+      "name": "haloperidol",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "antipsychotic, central"
+    },
+    {
+      "name": "fluoxetine",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "SSRI, central"
+    },
+    {
+      "name": "donepezil",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": false,
+      "why": "Alzheimer's AChE inhibitor, CNS by design"
+    },
+    {
+      "name": "carbamazepine",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "antiepileptic, central"
+    },
+    {
+      "name": "phenytoin",
+      "group": "control+",
+      "label": 1,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 1,
+      "in_training": true,
+      "why": "antiepileptic, central"
+    },
+    {
+      "name": "atenolol",
+      "group": "control-",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999997615814209,
+      "correct": 0,
+      "in_training": true,
+      "why": "hydrophilic beta-blocker, minimal CNS"
+    },
+    {
+      "name": "sulpiride",
+      "group": "control-",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9999998807907104,
+      "correct": 0,
+      "in_training": true,
+      "why": "hydrophilic antipsychotic, poor CNS penetration"
+    },
+    {
+      "name": "sirolimus",
+      "group": "control-",
+      "label": 0,
+      "pred": 0,
+      "p_bbb_penetrant": 2.4383338313782588e-05,
+      "correct": 1,
+      "in_training": false,
+      "why": "rapalog; large macrocycle, non-penetrant"
+    },
+    {
+      "name": "vancomycin",
+      "group": "control-",
+      "label": 0,
+      "pred": 1,
+      "p_bbb_penetrant": 0.9954146146774292,
+      "correct": 0,
+      "in_training": false,
+      "why": "large glycopeptide, does not cross"
+    }
+  ]
+}

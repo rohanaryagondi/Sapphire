@@ -1,0 +1,85 @@
+{
+  "timestamp": "20260607_125207",
+  "n_targets": 6,
+  "n_binders_max_per_target": 30,
+  "rows": [
+    {
+      "accession": "P42345",
+      "gene": "MTOR",
+      "class": "kinase",
+      "n_pairs_training": 192,
+      "n_binders_used": 12,
+      "mean_pairwise_tanimoto_similarity": 0.204,
+      "mean_pairwise_tanimoto_distance": 0.796,
+      "auc_random": 0.761,
+      "auc_matched": 0.558,
+      "delta_offtarget": -1.124
+    },
+    {
+      "accession": "P15056",
+      "gene": "BRAF",
+      "class": "kinase",
+      "n_pairs_training": 532,
+      "n_binders_used": 30,
+      "mean_pairwise_tanimoto_similarity": 0.158,
+      "mean_pairwise_tanimoto_distance": 0.842,
+      "auc_random": 0.468,
+      "auc_matched": 0.463,
+      "delta_offtarget": 1.179
+    },
+    {
+      "accession": "Q8K4Z4",
+      "gene": "Adrb2",
+      "class": "gpcr",
+      "n_pairs_training": 211,
+      "n_binders_used": 30,
+      "mean_pairwise_tanimoto_similarity": 0.336,
+      "mean_pairwise_tanimoto_distance": 0.664,
+      "auc_random": 0.871,
+      "auc_matched": 0.881,
+      "delta_offtarget": 0.835
+    },
+    {
+      "accession": "P31389",
+      "gene": "HRH1",
+      "class": "gpcr",
+      "n_pairs_training": 184,
+      "n_binders_used": 30,
+      "mean_pairwise_tanimoto_similarity": 0.241,
+      "mean_pairwise_tanimoto_distance": 0.759,
+      "auc_random": 0.4,
+      "auc_matched": 0.33,
+      "delta_offtarget": 0.682
+    },
+    {
+      "accession": "P51449",
+      "gene": "RORC",
+      "class": "nuclear_receptor",
+      "n_pairs_training": 374,
+      "n_binders_used": 30,
+      "mean_pairwise_tanimoto_similarity": 0.477,
+      "mean_pairwise_tanimoto_distance": 0.523,
+      "auc_random": 0.97,
+      "auc_matched": 0.952,
+      "delta_offtarget": 0.685
+    },
+    {
+      "accession": "P00918",
+      "gene": "CA2",
+      "class": "other",
+      "n_pairs_training": 269,
+      "n_binders_used": 30,
+      "mean_pairwise_tanimoto_similarity": 0.254,
+      "mean_pairwise_tanimoto_distance": 0.746,
+      "auc_random": 0.867,
+      "auc_matched": 0.84,
+      "delta_offtarget": 1.975
+    }
+  ],
+  "spearman": {
+    "diversity_vs_auc_random": -0.829,
+    "diversity_vs_auc_matched": -0.829,
+    "diversity_vs_delta_offtarget": -0.086
+  },
+  "verdict": "diversity STRONGLY predicts AUROC (\u03c1>0.7) \u2014 chemotype concentration is the bimodality predictor"
+}

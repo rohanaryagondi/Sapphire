@@ -1,0 +1,236 @@
+{
+  "timestamp": "20260529_014522",
+  "calibration": {
+    "n": 150,
+    "auroc": 0.996,
+    "frac_saturated_0or1": 0.933,
+    "note": "scores are near-deterministic 0/1 -> hard labels, not calibrated probs"
+  },
+  "n_panel": 20,
+  "accuracy_all": 0.7,
+  "n_in_train": 15,
+  "n_fair": 5,
+  "accuracy_fair": 0.8,
+  "rows": [
+    {
+      "name": "morphine",
+      "group": "opioid",
+      "label": 1,
+      "dataset_label": null,
+      "fold": "not_in_set",
+      "pred": 1,
+      "p_bbb": 0.9999996423721313,
+      "correct": 1,
+      "in_train": false
+    },
+    {
+      "name": "loperamide",
+      "group": "opioid",
+      "label": 0,
+      "dataset_label": 0,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999984502792358,
+      "correct": 0,
+      "in_train": true
+    },
+    {
+      "name": "diphenhydramine",
+      "group": "antihistamine",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999990463256836,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "hydroxyzine",
+      "group": "antihistamine",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999994039535522,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "cetirizine",
+      "group": "antihistamine",
+      "label": 0,
+      "dataset_label": 0,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999974966049194,
+      "correct": 0,
+      "in_train": true
+    },
+    {
+      "name": "fexofenadine",
+      "group": "antihistamine",
+      "label": 0,
+      "dataset_label": 0,
+      "fold": "train",
+      "pred": 0,
+      "p_bbb": 2.931571998487925e-07,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "loratadine",
+      "group": "antihistamine",
+      "label": 0,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9353132247924805,
+      "correct": 0,
+      "in_train": true
+    },
+    {
+      "name": "metoclopramide",
+      "group": "antiemetic",
+      "label": 1,
+      "dataset_label": null,
+      "fold": "not_in_set",
+      "pred": 1,
+      "p_bbb": 0.9999978542327881,
+      "correct": 1,
+      "in_train": false
+    },
+    {
+      "name": "domperidone",
+      "group": "antiemetic",
+      "label": 0,
+      "dataset_label": 0,
+      "fold": "test",
+      "pred": 1,
+      "p_bbb": 0.9999148845672607,
+      "correct": 0,
+      "in_train": false
+    },
+    {
+      "name": "diazepam",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999983310699463,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "caffeine",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999983310699463,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "haloperidol",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999984502792358,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "fluoxetine",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999992847442627,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "donepezil",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "valid",
+      "pred": 1,
+      "p_bbb": 0.999997615814209,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "carbamazepine",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999986886978149,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "phenytoin",
+      "group": "control+",
+      "label": 1,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.999991774559021,
+      "correct": 1,
+      "in_train": true
+    },
+    {
+      "name": "atenolol",
+      "group": "control-",
+      "label": 0,
+      "dataset_label": 0,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999918937683105,
+      "correct": 0,
+      "in_train": true
+    },
+    {
+      "name": "sulpiride",
+      "group": "control-",
+      "label": 0,
+      "dataset_label": 1,
+      "fold": "train",
+      "pred": 1,
+      "p_bbb": 0.9999985694885254,
+      "correct": 0,
+      "in_train": true
+    },
+    {
+      "name": "sirolimus",
+      "group": "control-",
+      "label": 0,
+      "dataset_label": null,
+      "fold": "not_in_set",
+      "pred": 0,
+      "p_bbb": 1.9033505793686345e-07,
+      "correct": 1,
+      "in_train": false
+    },
+    {
+      "name": "vancomycin",
+      "group": "control-",
+      "label": 0,
+      "dataset_label": null,
+      "fold": "not_in_set",
+      "pred": 0,
+      "p_bbb": 1.580234254561219e-07,
+      "correct": 1,
+      "in_train": false
+    }
+  ]
+}

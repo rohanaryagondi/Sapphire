@@ -1,0 +1,127 @@
+{
+  "timestamp": "20260607_124012",
+  "test": "correlation_10pair",
+  "metric": "spearman_vs_pchembl",
+  "bar": ">0.4 PASS / >0.6 STRONG",
+  "n": 10,
+  "seed": 0,
+  "pairs": [
+    {
+      "drug": "imatinib",
+      "target": "ABL1",
+      "exp_pchembl": 6.66,
+      "seq_len": 1130
+    },
+    {
+      "drug": "dasatinib",
+      "target": "ABL1",
+      "exp_pchembl": 9.0,
+      "seq_len": 1130
+    },
+    {
+      "drug": "gefitinib",
+      "target": "EGFR",
+      "exp_pchembl": 7.81,
+      "seq_len": 1210
+    },
+    {
+      "drug": "erlotinib",
+      "target": "EGFR",
+      "exp_pchembl": 7.63,
+      "seq_len": 1210
+    },
+    {
+      "drug": "fluoxetine",
+      "target": "SERT",
+      "exp_pchembl": 8.03,
+      "seq_len": 630
+    },
+    {
+      "drug": "paroxetine",
+      "target": "SERT",
+      "exp_pchembl": 9.42,
+      "seq_len": 630
+    },
+    {
+      "drug": "haloperidol",
+      "target": "DRD2",
+      "exp_pchembl": 8.8,
+      "seq_len": 443
+    },
+    {
+      "drug": "risperidone",
+      "target": "DRD2",
+      "exp_pchembl": 8.22,
+      "seq_len": 443
+    },
+    {
+      "drug": "propranolol",
+      "target": "ADRB2",
+      "exp_pchembl": 9.12,
+      "seq_len": 413
+    },
+    {
+      "drug": "lidocaine",
+      "target": "Nav1.5",
+      "exp_pchembl": 4.3,
+      "seq_len": 2016
+    }
+  ],
+  "cells": {
+    "MAMMAL": {
+      "value": 0.4303,
+      "ci95": [
+        -0.2857,
+        0.7922
+      ],
+      "n_scored": 10,
+      "verdict": "PASS",
+      "raw_scores": [
+        6.49426,
+        6.39647,
+        5.31511,
+        5.54385,
+        9.30193,
+        8.25898,
+        7.75142,
+        8.05055,
+        7.55887,
+        6.74985
+      ]
+    },
+    "ConPLex": {
+      "value": -0.0303,
+      "ci95": [
+        -0.7922,
+        0.8634
+      ],
+      "n_scored": 10,
+      "verdict": "FAIL",
+      "raw_scores": [
+        0.60884,
+        0.90541,
+        0.97099,
+        0.98128,
+        0.52463,
+        0.05401,
+        0.72138,
+        0.71769,
+        0.90053,
+        0.09198
+      ],
+      "delta_vs_mammal": {
+        "d_rho": -0.4606,
+        "ci95": [
+          -1.4935,
+          0.9183
+        ],
+        "p_two_sided": 0.4954,
+        "separable": false
+      }
+    },
+    "Boltz-2": {
+      "value": null,
+      "verdict": "N/A \u2014 pending AWS"
+    }
+  }
+}

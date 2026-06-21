@@ -1,0 +1,10 @@
+{
+  "timestamp": "20260528_205148",
+  "dataset": "fda",
+  "task_name": "FDA_APPR",
+  "n_test_scored": 148,
+  "n_errors": 0,
+  "auroc": 1.0,
+  "acc@0.5": 0.9324,
+  "paper_auroc": 0.986
+}

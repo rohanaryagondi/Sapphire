@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mammal_quiver"
+version = "0.1.0"
+description = "Quiver Bioscience exploration of IBM's MAMMAL biomedical foundation model: thin inference wrappers (DTI, embeddings) plus phased evaluation experiments."
+requires-python = ">=3.11"
+dependencies = [
+    "biomed-multi-alignment",
+    "PyTDC",  # tdc.* (dti task dep); rdkit arrives via PyTDC
+]
+
+[tool.setuptools]
+packages = ["mammal_quiver"]

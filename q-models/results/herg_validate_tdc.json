@@ -1,0 +1,21 @@
+{
+  "test": "herg_rule_validation_tdc_hERG_Karim",
+  "timestamp": "2026-06-12T15:52:47.792386",
+  "rule": "(MolLogP>3.0) AND (basic_N>=1) AND (aromatic_rings>=2)",
+  "n_valid": 13445,
+  "label_note": "Y=1 = hERG blocker (positive). TPR = blocker sensitivity.",
+  "boolean_rule": {
+    "tp": 4621,
+    "tn": 4129,
+    "fp": 2598,
+    "fn": 2097,
+    "TPR": 0.6878535278356653,
+    "TNR": 0.6137951538575889,
+    "balanced_acc": 0.6508243408466271,
+    "MCC": 0.30247470800867626
+  },
+  "auroc_ordinal_0to3_conditions": 0.6620937946829777,
+  "auroc_logp_alone": 0.6833887981820493,
+  "target": "TPR>=0.70 AND TNR>=0.70",
+  "verdict": "PARTIAL (TPR 0.69, TNR 0.61)"
+}

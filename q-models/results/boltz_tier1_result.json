@@ -1,0 +1,159 @@
+{
+  "model": "boltz-2.1",
+  "via": "boltz-api hosted (no GPU)",
+  "cost_note": "~$3.55 (29 folds) + ~$0.22 probes",
+  "Q1": {
+    "auroc_binding_confidence": 0.7143,
+    "auroc_ligand_iptm": 0.8929,
+    "baselines": {
+      "our_finetune": 0.987,
+      "BALM": 0.857
+    },
+    "per_compound": [
+      {
+        "drug": "suzetrigine",
+        "label": 1,
+        "binding_confidence": 0.4793799817562103,
+        "optimization_score": 0.30411970615386963,
+        "ligand_iptm": 0.7525607943534851,
+        "structure_confidence": 0.6954025626182556
+      },
+      {
+        "drug": "A-803467",
+        "label": 1,
+        "binding_confidence": 0.5906655192375183,
+        "optimization_score": 0.22311770915985107,
+        "ligand_iptm": 0.7727149128913879,
+        "structure_confidence": 0.7000362873077393
+      },
+      {
+        "drug": "lidocaine",
+        "label": 1,
+        "binding_confidence": 0.16474390029907227,
+        "optimization_score": 0.08786202222108841,
+        "ligand_iptm": 0.8692898154258728,
+        "structure_confidence": 0.7270587086677551
+      },
+      {
+        "drug": "mexiletine",
+        "label": 1,
+        "binding_confidence": 0.44200223684310913,
+        "optimization_score": 0.20806089043617249,
+        "ligand_iptm": 0.7962995171546936,
+        "structure_confidence": 0.7168118357658386
+      },
+      {
+        "drug": "ranolazine",
+        "label": 1,
+        "binding_confidence": 0.3588332235813141,
+        "optimization_score": 0.27702775597572327,
+        "ligand_iptm": 0.9521996974945068,
+        "structure_confidence": 0.7418060302734375
+      },
+      {
+        "drug": "carbamazepine",
+        "label": 1,
+        "binding_confidence": 0.16506105661392212,
+        "optimization_score": 0.011123266071081161,
+        "ligand_iptm": 0.8648175001144409,
+        "structure_confidence": 0.7254616022109985
+      },
+      {
+        "drug": "lacosamide",
+        "label": 1,
+        "binding_confidence": 0.040745191276073456,
+        "optimization_score": 0,
+        "ligand_iptm": 0.8445097208023071,
+        "structure_confidence": 0.7223309874534607
+      },
+      {
+        "drug": "metformin",
+        "label": 0,
+        "binding_confidence": 0.10651486366987228,
+        "optimization_score": 0.04061048477888107,
+        "ligand_iptm": 0.5585194826126099,
+        "structure_confidence": 0.6591355204582214
+      },
+      {
+        "drug": "caffeine",
+        "label": 0,
+        "binding_confidence": 0.21482905745506287,
+        "optimization_score": 0,
+        "ligand_iptm": 0.6008084416389465,
+        "structure_confidence": 0.6732634902000427
+      },
+      {
+        "drug": "ibuprofen",
+        "label": 0,
+        "binding_confidence": 0.25512948632240295,
+        "optimization_score": 0.02531329356133938,
+        "ligand_iptm": 0.650405764579773,
+        "structure_confidence": 0.6800846457481384
+      },
+      {
+        "drug": "atenolol",
+        "label": 0,
+        "binding_confidence": 0.04421193152666092,
+        "optimization_score": 0,
+        "ligand_iptm": 0.8000502586364746,
+        "structure_confidence": 0.7188478112220764
+      }
+    ]
+  },
+  "Q3": {
+    "QS0113172": {
+      "PKM2": 0.22224125266075134,
+      "PPARD": 0.18821629881858826,
+      "truth_PKM2": 1,
+      "truth_PPARD": 1
+    },
+    "Dasa-58": {
+      "PKM2": 0.47860294580459595,
+      "PPARD": 0.5216484069824219,
+      "truth_PKM2": 1,
+      "truth_PPARD": 0
+    },
+    "GSK 3787": {
+      "PKM2": 0.26160937547683716,
+      "PPARD": 0.24961435794830322,
+      "truth_PKM2": 0,
+      "truth_PPARD": 1
+    },
+    "QS0069567": {
+      "PKM2": 0.3428332805633545,
+      "PPARD": 0.17177563905715942,
+      "truth_PKM2": 0,
+      "truth_PPARD": 1
+    },
+    "GF 109203X": {
+      "PKM2": 0.45267149806022644,
+      "PPARD": 0.10627779364585876,
+      "truth_PKM2": 0,
+      "truth_PPARD": 0
+    },
+    "carbamazepine": {
+      "PKM2": 0.3450196385383606,
+      "PPARD": 0.3800967037677765,
+      "truth_PKM2": 0,
+      "truth_PPARD": 0
+    },
+    "BMS 191011": {
+      "PKM2": 0.4587946832180023,
+      "PPARD": 0.4273429214954376,
+      "truth_PKM2": 0,
+      "truth_PPARD": 0
+    },
+    "Biperiden hydrochloride": {
+      "PKM2": 0.1139606237411499,
+      "PPARD": 0.14745987951755524,
+      "truth_PKM2": 0,
+      "truth_PPARD": 0
+    },
+    "BIIB021": {
+      "PKM2": 0.2608394920825958,
+      "PPARD": 0.1516912579536438,
+      "truth_PKM2": 0,
+      "truth_PPARD": 0
+    }
+  }
+}

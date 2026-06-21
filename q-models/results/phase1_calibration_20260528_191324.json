@@ -1,0 +1,80 @@
+{
+  "timestamp": "20260528_191324",
+  "model": "ibm/biomed.omics.bl.sm.ma-ted-458m.dti_bindingdb_pkd",
+  "device": "mps",
+  "named_test": {
+    "drug": "suzetrigine (Jernabix/Journavx/VX-548)",
+    "target": "Nav1.8 (SCN10A)",
+    "pred_pKd": 6.1398
+  },
+  "negatives_pKd": [
+    6.4204,
+    6.1787,
+    5.1448,
+    5.9838,
+    6.0117,
+    5.9874
+  ],
+  "max_negative_pKd": 6.4204,
+  "margin_over_max_negative": -0.2806,
+  "verdict": "FAIL",
+  "truncation_note": "Nav1.8 length=1956 aa; DTI head truncates target to 1250 aa -> 706 C-terminal residues not seen by the model.",
+  "records": [
+    {
+      "kind": "named",
+      "drug": "suzetrigine",
+      "target": "Nav1.8",
+      "target_len": 1956,
+      "pred_pKd": 6.1398,
+      "infer_s": 0.73
+    },
+    {
+      "kind": "neg_target",
+      "drug": "suzetrigine",
+      "target": "CA2",
+      "target_len": 260,
+      "pred_pKd": 6.4204,
+      "infer_s": 0.38
+    },
+    {
+      "kind": "neg_target",
+      "drug": "suzetrigine",
+      "target": "DHFR",
+      "target_len": 187,
+      "pred_pKd": 6.1787,
+      "infer_s": 0.38
+    },
+    {
+      "kind": "neg_target",
+      "drug": "suzetrigine",
+      "target": "ACHE",
+      "target_len": 614,
+      "pred_pKd": 5.1448,
+      "infer_s": 0.38
+    },
+    {
+      "kind": "neg_drug",
+      "drug": "metformin",
+      "target": "Nav1.8",
+      "target_len": 1956,
+      "pred_pKd": 5.9838,
+      "infer_s": 0.39
+    },
+    {
+      "kind": "neg_drug",
+      "drug": "caffeine",
+      "target": "Nav1.8",
+      "target_len": 1956,
+      "pred_pKd": 6.0117,
+      "infer_s": 0.38
+    },
+    {
+      "kind": "neg_drug",
+      "drug": "ibuprofen",
+      "target": "Nav1.8",
+      "target_len": 1956,
+      "pred_pKd": 5.9874,
+      "infer_s": 0.38
+    }
+  ]
+}

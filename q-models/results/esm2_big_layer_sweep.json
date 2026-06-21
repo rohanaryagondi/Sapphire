@@ -1,0 +1,683 @@
+{
+  "test": "esm2_big_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T19:20:56.779924Z",
+  "n_proteins": 40,
+  "names": [
+    "EGFR",
+    "BRAF",
+    "CDK2",
+    "ABL1",
+    "MAPK1",
+    "FLT1",
+    "FLT3",
+    "CDK6",
+    "MAPK9",
+    "INSR",
+    "DRD2",
+    "ADRB2",
+    "HTR2A",
+    "CNR1",
+    "OPRM1",
+    "HTR7",
+    "ADORA1",
+    "ADORA2A",
+    "SCN9A",
+    "SCN10A",
+    "KCNQ2",
+    "HCN1",
+    "TRPV1",
+    "KCNQ5",
+    "SCN1A",
+    "SCN5A",
+    "PPARG",
+    "RXRA",
+    "VDR",
+    "ESR1",
+    "AR",
+    "TP53",
+    "MDM2",
+    "YAP1",
+    "RARA",
+    "SF3B1",
+    "MAPK3",
+    "PIK3CA",
+    "PTEN",
+    "IKBKA"
+  ],
+  "labels": [
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "kinase",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "gpcr",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "ion_channel",
+    "nuclear_receptor",
+    "nuclear_receptor",
+    "nuclear_receptor",
+    "nuclear_receptor",
+    "nuclear_receptor",
+    "nuclear_receptor",
+    "e3_ligase",
+    "e3_ligase",
+    "e3_ligase",
+    "e3_ligase",
+    "kinase",
+    "lipid_kinase",
+    "phosphatase",
+    "kinase"
+  ],
+  "protocol": "mean-pool ex CLS/EOS, cosine, LOO NN same-family recall, per hidden-state layer, raw+centered, 1022-aa truncation",
+  "references_local": {
+    "esm2_650M_last_layer": {
+      "raw": 0.725,
+      "centered": 0.75
+    },
+    "esm2_650M_best_layer": {
+      "idx": 8,
+      "best": 0.875
+    },
+    "esmc_600M_best_layer": {
+      "idx": 5,
+      "best": 0.825
+    },
+    "esmc_600M_default_embeddings": 0.625,
+    "mammal_458M_last_layer": 0.75,
+    "bar": 0.8
+  },
+  "results": {
+    "esm2_3B": {
+      "model_short": "esm2_3B",
+      "repo": "facebook/esm2_t36_3B_UR50D",
+      "embedding_dim": 2560,
+      "n_hidden_states": 37,
+      "truncate_aa": 1022,
+      "last_layer_nn": {
+        "raw": 0.8,
+        "centered": 0.675
+      },
+      "best_layer": {
+        "idx": 33,
+        "nn_raw": 0.85,
+        "nn_centered": 0.85,
+        "used": "centered",
+        "per_family_nn_recall": {
+          "kinase": 0.9166666666666666,
+          "gpcr": 1.0,
+          "ion_channel": 1.0,
+          "nuclear_receptor": 0.8333333333333334,
+          "e3_ligase": 0.5,
+          "lipid_kinase": 0.0,
+          "phosphatase": 0.0
+        }
+      },
+      "per_layer": [
+        {
+          "idx": 0,
+          "nn_raw": 0.625,
+          "nn_centered": 0.625,
+          "best": 0.625
+        },
+        {
+          "idx": 1,
+          "nn_raw": 0.6,
+          "nn_centered": 0.625,
+          "best": 0.625
+        },
+        {
+          "idx": 2,
+          "nn_raw": 0.65,
+          "nn_centered": 0.65,
+          "best": 0.65
+        },
+        {
+          "idx": 3,
+          "nn_raw": 0.7,
+          "nn_centered": 0.65,
+          "best": 0.7
+        },
+        {
+          "idx": 4,
+          "nn_raw": 0.675,
+          "nn_centered": 0.7,
+          "best": 0.7
+        },
+        {
+          "idx": 5,
+          "nn_raw": 0.7,
+          "nn_centered": 0.65,
+          "best": 0.7
+        },
+        {
+          "idx": 6,
+          "nn_raw": 0.725,
+          "nn_centered": 0.75,
+          "best": 0.75
+        },
+        {
+          "idx": 7,
+          "nn_raw": 0.825,
+          "nn_centered": 0.8,
+          "best": 0.825
+        },
+        {
+          "idx": 8,
+          "nn_raw": 0.8,
+          "nn_centered": 0.675,
+          "best": 0.8
+        },
+        {
+          "idx": 9,
+          "nn_raw": 0.8,
+          "nn_centered": 0.7,
+          "best": 0.8
+        },
+        {
+          "idx": 10,
+          "nn_raw": 0.8,
+          "nn_centered": 0.75,
+          "best": 0.8
+        },
+        {
+          "idx": 11,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 12,
+          "nn_raw": 0.75,
+          "nn_centered": 0.75,
+          "best": 0.75
+        },
+        {
+          "idx": 13,
+          "nn_raw": 0.725,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 14,
+          "nn_raw": 0.725,
+          "nn_centered": 0.725,
+          "best": 0.725
+        },
+        {
+          "idx": 15,
+          "nn_raw": 0.725,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 16,
+          "nn_raw": 0.725,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 17,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 18,
+          "nn_raw": 0.75,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 19,
+          "nn_raw": 0.75,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 20,
+          "nn_raw": 0.75,
+          "nn_centered": 0.75,
+          "best": 0.75
+        },
+        {
+          "idx": 21,
+          "nn_raw": 0.725,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 22,
+          "nn_raw": 0.725,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 23,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 24,
+          "nn_raw": 0.75,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 25,
+          "nn_raw": 0.775,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 26,
+          "nn_raw": 0.775,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 27,
+          "nn_raw": 0.775,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 28,
+          "nn_raw": 0.775,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 29,
+          "nn_raw": 0.775,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 30,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 31,
+          "nn_raw": 0.8,
+          "nn_centered": 0.775,
+          "best": 0.8
+        },
+        {
+          "idx": 32,
+          "nn_raw": 0.825,
+          "nn_centered": 0.775,
+          "best": 0.825
+        },
+        {
+          "idx": 33,
+          "nn_raw": 0.85,
+          "nn_centered": 0.85,
+          "best": 0.85
+        },
+        {
+          "idx": 34,
+          "nn_raw": 0.85,
+          "nn_centered": 0.8,
+          "best": 0.85
+        },
+        {
+          "idx": 35,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 36,
+          "nn_raw": 0.8,
+          "nn_centered": 0.675,
+          "best": 0.8
+        }
+      ],
+      "elapsed_s": 26.4
+    },
+    "esm2_15B": {
+      "model_short": "esm2_15B",
+      "repo": "facebook/esm2_t48_15B_UR50D",
+      "embedding_dim": 5120,
+      "n_hidden_states": 49,
+      "truncate_aa": 1022,
+      "last_layer_nn": {
+        "raw": 0.75,
+        "centered": 0.775
+      },
+      "best_layer": {
+        "idx": 14,
+        "nn_raw": 0.775,
+        "nn_centered": 0.85,
+        "used": "centered",
+        "per_family_nn_recall": {
+          "kinase": 1.0,
+          "gpcr": 1.0,
+          "ion_channel": 1.0,
+          "nuclear_receptor": 0.6666666666666666,
+          "e3_ligase": 0.5,
+          "lipid_kinase": 0.0,
+          "phosphatase": 0.0
+        }
+      },
+      "per_layer": [
+        {
+          "idx": 0,
+          "nn_raw": 0.625,
+          "nn_centered": 0.625,
+          "best": 0.625
+        },
+        {
+          "idx": 1,
+          "nn_raw": 0.625,
+          "nn_centered": 0.625,
+          "best": 0.625
+        },
+        {
+          "idx": 2,
+          "nn_raw": 0.65,
+          "nn_centered": 0.625,
+          "best": 0.65
+        },
+        {
+          "idx": 3,
+          "nn_raw": 0.625,
+          "nn_centered": 0.625,
+          "best": 0.625
+        },
+        {
+          "idx": 4,
+          "nn_raw": 0.65,
+          "nn_centered": 0.65,
+          "best": 0.65
+        },
+        {
+          "idx": 5,
+          "nn_raw": 0.675,
+          "nn_centered": 0.65,
+          "best": 0.675
+        },
+        {
+          "idx": 6,
+          "nn_raw": 0.675,
+          "nn_centered": 0.675,
+          "best": 0.675
+        },
+        {
+          "idx": 7,
+          "nn_raw": 0.725,
+          "nn_centered": 0.725,
+          "best": 0.725
+        },
+        {
+          "idx": 8,
+          "nn_raw": 0.65,
+          "nn_centered": 0.675,
+          "best": 0.675
+        },
+        {
+          "idx": 9,
+          "nn_raw": 0.675,
+          "nn_centered": 0.675,
+          "best": 0.675
+        },
+        {
+          "idx": 10,
+          "nn_raw": 0.675,
+          "nn_centered": 0.75,
+          "best": 0.75
+        },
+        {
+          "idx": 11,
+          "nn_raw": 0.75,
+          "nn_centered": 0.75,
+          "best": 0.75
+        },
+        {
+          "idx": 12,
+          "nn_raw": 0.8,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 13,
+          "nn_raw": 0.75,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 14,
+          "nn_raw": 0.775,
+          "nn_centered": 0.85,
+          "best": 0.85
+        },
+        {
+          "idx": 15,
+          "nn_raw": 0.775,
+          "nn_centered": 0.85,
+          "best": 0.85
+        },
+        {
+          "idx": 16,
+          "nn_raw": 0.775,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 17,
+          "nn_raw": 0.775,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 18,
+          "nn_raw": 0.725,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 19,
+          "nn_raw": 0.775,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 20,
+          "nn_raw": 0.75,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 21,
+          "nn_raw": 0.725,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 22,
+          "nn_raw": 0.75,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 23,
+          "nn_raw": 0.725,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 24,
+          "nn_raw": 0.725,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 25,
+          "nn_raw": 0.725,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 26,
+          "nn_raw": 0.725,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 27,
+          "nn_raw": 0.725,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 28,
+          "nn_raw": 0.75,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 29,
+          "nn_raw": 0.775,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 30,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 31,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 32,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 33,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 34,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 35,
+          "nn_raw": 0.8,
+          "nn_centered": 0.825,
+          "best": 0.825
+        },
+        {
+          "idx": 36,
+          "nn_raw": 0.8,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 37,
+          "nn_raw": 0.8,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 38,
+          "nn_raw": 0.8,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 39,
+          "nn_raw": 0.775,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 40,
+          "nn_raw": 0.75,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 41,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 42,
+          "nn_raw": 0.75,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 43,
+          "nn_raw": 0.775,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 44,
+          "nn_raw": 0.8,
+          "nn_centered": 0.8,
+          "best": 0.8
+        },
+        {
+          "idx": 45,
+          "nn_raw": 0.8,
+          "nn_centered": 0.75,
+          "best": 0.8
+        },
+        {
+          "idx": 46,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 47,
+          "nn_raw": 0.775,
+          "nn_centered": 0.775,
+          "best": 0.775
+        },
+        {
+          "idx": 48,
+          "nn_raw": 0.75,
+          "nn_centered": 0.775,
+          "best": 0.775
+        }
+      ],
+      "elapsed_s": 83.8
+    }
+  }
+}

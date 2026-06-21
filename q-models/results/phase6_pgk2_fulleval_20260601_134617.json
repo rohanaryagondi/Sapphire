@@ -1,0 +1,85 @@
+{
+  "test": "pgk2_full_realdata_eval",
+  "timestamp": "20260601_134617",
+  "readout": "generative P(<1>) via <PGK2_DEL>",
+  "smiles_standardization": "neutral_parent (LargestFragment + Uncharger), same as phase5_wdr91_spr",
+  "n_hits": 500,
+  "n_pgk1": 99,
+  "n_decoys": 500,
+  "in_distribution_caveat": "PGK2 DEL hits are very likely the head's own training data; positives measure chemotype RECALL, not novel-hit discovery.",
+  "homolog_test": {
+    "negatives": "PGK1 ChEMBL ligands (CHEMBL2886) \u2014 real homolog/selectivity counter-target",
+    "auroc": 0.9733939393939391,
+    "auroc_ci95": [
+      0.9600196969696968,
+      0.985051515151515
+    ],
+    "avg_precision": 0.9953024760399493,
+    "ef_note": "EF omitted: positives outnumber negatives ~5:1, EF bounded near 1 here"
+  },
+  "decoy_test": {
+    "negatives": "drug-like ChEMBL decoys (wdr91_decoys.json)",
+    "auroc": 0.9820360000000001,
+    "auroc_ci95": [
+      0.9716594000000001,
+      0.9904086
+    ],
+    "avg_precision": 0.98838472000679
+  },
+  "spike_in_test": {
+    "design": "top-50 strongest PGK2 hits (by read count) spiked into 500 drug-like decoys; positives are the minority",
+    "n_spike": 50,
+    "pos_frac": 0.09090909090909091,
+    "auroc": 0.98012,
+    "ef5": 11.0,
+    "ef10": 9.6,
+    "wdr91_spr_ref_ef5": 4.57
+  },
+  "graded_potency": {
+    "spearman_score_vs_DELcount": -0.0703513900110491,
+    "pval": 0.11615600035389871,
+    "note": "expect ~0 if no quantitative ranking (consistent with phase3 in-dist)"
+  },
+  "score_distributions": {
+    "hits": {
+      "n": 500,
+      "mean": 0.9412347850087546,
+      "median": 0.9999749064445496,
+      "max": 0.9999971389770508,
+      "min": 9.802404221659344e-09,
+      "frac_below_0.001": 0.032,
+      "frac_above_0.1": 0.95,
+      "frac_above_0.5": 0.942
+    },
+    "pgk1": {
+      "n": 99,
+      "mean": 0.0031307342382673495,
+      "median": 0.00042861158726736903,
+      "max": 0.02618398703634739,
+      "min": 5.211267648519424e-07,
+      "frac_below_0.001": 0.6060606060606061,
+      "frac_above_0.1": 0.0,
+      "frac_above_0.5": 0.0
+    },
+    "decoys": {
+      "n": 500,
+      "mean": 0.0019878967813138503,
+      "median": 2.9623124646604992e-05,
+      "max": 0.14382940530776978,
+      "min": 4.526929444637062e-07,
+      "frac_below_0.001": 0.796,
+      "frac_above_0.1": 0.004,
+      "frac_above_0.5": 0.0
+    }
+  },
+  "mean_score_hits": 0.9412347850087546,
+  "mean_score_pgk1": 0.0031307342382673495,
+  "mean_score_decoys": 0.0019878967813138503,
+  "top5_pgk1_scores": [
+    0.02618398703634739,
+    0.025351854041218758,
+    0.024923689663410187,
+    0.024144379422068596,
+    0.02059248834848404
+  ]
+}

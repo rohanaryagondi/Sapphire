@@ -1,0 +1,143 @@
+{
+  "track": "structural interaction embedding (ATOMICA, docked) \u2014 CANDIDATE NEW CAPABILITY",
+  "model": "ATOMICA pretrained (ada-f/ATOMICA, geometric interaction model)",
+  "pose_source": "smina (AutoDock-Vina) docking into a real cryo-EM receptor (NO Boltz)",
+  "receptor_pdb": "7WFR",
+  "receptor_desc": "Human Nav1.8 (SCN10A) cryo-EM, A-803467/95T bound, chain A, 1956 aa",
+  "dock_box": "smina --autobox_ligand around bound blocker 95T (A-803467, central pore site); autobox_add=6 A",
+  "target": "Nav1.8",
+  "panel_key": "nav18",
+  "question": "Does ATOMICA's interface embedding carry CNS binder signal BEYOND the raw docking score?",
+  "atomica_auroc": 0.6785714285714286,
+  "atomica_probe": "leave-one-out cosine-to-binder-centroid on graph_embedding",
+  "atomica_knn_auroc": 0.0,
+  "atomica_knn_probe": "leave-one-out cosine kNN (k=3) binder-minus-decoy",
+  "smina_auroc": 0.7857142857142857,
+  "smina_readout": "AUROC of -(best smina affinity, kcal/mol) = docking-score baseline to beat",
+  "n": 11,
+  "n_binders": 7,
+  "n_decoys": 4,
+  "n_compounds_in_panel": 11,
+  "complexes": [
+    {
+      "name": "carbamazepine",
+      "label": 1,
+      "smina_score": -9.2,
+      "atomica_score": 0.999511,
+      "atomica_knn_score": 0.000728,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "atenolol",
+      "label": 0,
+      "smina_score": -6.8,
+      "atomica_score": 0.999261,
+      "atomica_knn_score": 0.004392,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "lidocaine",
+      "label": 1,
+      "smina_score": -6.6,
+      "atomica_score": 0.998972,
+      "atomica_knn_score": 0.002342,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "ranolazine",
+      "label": 1,
+      "smina_score": -8.6,
+      "atomica_score": 0.998955,
+      "atomica_knn_score": 0.002475,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "A-803467",
+      "label": 1,
+      "smina_score": -8.3,
+      "atomica_score": 0.998756,
+      "atomica_knn_score": 0.002684,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "caffeine",
+      "label": 0,
+      "smina_score": -5.5,
+      "atomica_score": 0.998301,
+      "atomica_knn_score": 0.0077,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "suzetrigine",
+      "label": 1,
+      "smina_score": -8.9,
+      "atomica_score": 0.997429,
+      "atomica_knn_score": 0.001063,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "mexiletine",
+      "label": 1,
+      "smina_score": -6.3,
+      "atomica_score": 0.997088,
+      "atomica_knn_score": 0.002106,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "lacosamide",
+      "label": 1,
+      "smina_score": -6.5,
+      "atomica_score": 0.996038,
+      "atomica_knn_score": 0.002343,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "metformin",
+      "label": 0,
+      "smina_score": -4.7,
+      "atomica_score": 0.994956,
+      "atomica_knn_score": 0.003455,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    },
+    {
+      "name": "ibuprofen",
+      "label": 0,
+      "smina_score": -7.1,
+      "atomica_score": 0.993393,
+      "atomica_knn_score": 0.003105,
+      "emb_dim": 32,
+      "lig_code": "LIG",
+      "lig_resi": 1
+    }
+  ],
+  "skipped": [],
+  "caveats": [
+    "n is small (~11 compounds); AUROC has wide CIs at this n.",
+    "Poses are PREDICTED (smina/Vina docking into one cryo-EM receptor), not experimental complexes; ATOMICA was trained on experimental PDB/CSD interfaces.",
+    "All ligands docked into a SINGLE site (the 95T/A-803467 central-pore blocker pocket of 7WFR). Nav1.8 has MULTIPLE drug sites \u2014 the central pore (local anesthetics / A-803467) vs the VSD-II fenestration (suzetrigine). Forcing every compound into the pore is a DIRECTIONAL first look, not a site-aware prediction; drugs that bind elsewhere may be mis-posed.",
+    "Single target (Nav1.8, 1956 aa); not a multi-target generalisation claim.",
+    "ATOMICA graph_embedding is unsupervised here (no binder head); the LOO centroid/kNN probes are label-light proximity readouts, not a trained classifier.",
+    "Rigid-receptor docking (no induced fit); receptor protonation via obabel pH 7.4."
+  ],
+  "wall_time_sec": 123.4
+}

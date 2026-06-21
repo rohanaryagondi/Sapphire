@@ -1,0 +1,241 @@
+Pipeline,Compound,MOLECULE,SMILES,Fingerprint similarity of the most similar DEL PTE to the given compound,Average fingerprint similarity of the top 10 most similar DEL PTEs to the given compound,HPLC-UV (at 280 nM),KD_microM,KD_2_microM,% Rmax,% Rmax_2,SPR sensorgram,DSF_delta_Tm_?C,Comment,Stereochemistry,Catalog_Number,ChemiReg_ID
+Primary predictions,1,C1CN(CC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.46,0.41,>95% ,6,6,91,98,,did not stabilize,co-crystallized,racemate,Z4305885019,MR45279
+confirming that chiral center of 1 is not needed,(R)-1,O[C@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1,O[C@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1,NA,NA,>95%,6,6,61,75,,not tested,"R enantiomer of compound 1. SPR run using Biacore 8K, Multi-cycle kinetics",R-enantiomer of 1,Z8515385889 ,DR03112
+confirming that chiral center of 1 is not needed,(S)-1,O[C@@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1,O[C@@H]1CN(C2=CC=C(C(NC3(C4=CC=C(Cl)C=C4)COC3)=O)C=C2)CC1,NA,NA,>95%,6,6,65,66,,not tested,"S enantiomer of compound 1. SPR run using Biacore 8K, Multi-cycle kinetics",S-enantiomer of 1,Z8515385379 ,DR03111
+SAR-by-ML,2,C1CN(CCC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CN(CCC1O)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.47,0.42,>95%,6,6,103,101,,not tested,,,Z4183610153,DR01977
+SAR-by-ML,3,CN1CCc2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2C1,CN1CCc2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2C1,0.44,0.39,,8,8,99,98,,not tested,,,Z7151300559,DR01978
+SAR-by-ML,4,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(c2cc[nH]n2)s1)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(c2cc[nH]n2)s1)=O,0.56,0.41,>95%,8,8,104,102,,not tested,,,Z7151300573,DR01939
+SAR-by-ML,5,Cc1cn2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2n1,Cc1cn2cc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)sc2n1,0.5,0.44,,11,11,87,87,,not tested,,,Z7151300551,DR01940
+SAR-by-ML,6,C1CC(N(C1)Cc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,C1CC(N(C1)Cc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,0.45,0.41,,11,11,75,75,,not tested,,,Z4183609516,DR01954
+SAR-by-ML,7,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(c1)nns2)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(c1)nns2)=O,0.48,0.46,,14,14,93,91,,not tested,,,Z7151300543,DR01944
+SAR-by-ML,8,C(CO)C(c1ccc(cc1)[Cl])NC(c1ccc(cc1)N1CCC(C1)O)=O,C(CO)C(c1ccc(cc1)[Cl])NC(c1ccc(cc1)N1CCC(C1)O)=O,0.51,0.46,,14,14,98,96,,not tested,,racemate,Z4303836594,DR01961
+SAR-by-ML,9,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O,0.52,0.45,,15,15,66,65,,not tested,,,Z4183612305,DR01949
+SAR-by-ML,10,C1CC(CN(C1)c1ccc(cc1)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)C(N)=O,C1CC(CN(C1)c1ccc(cc1)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)C(N)=O,0.46,0.41,,16,16,79,78,,not tested,,racemate,Z804133980,DR01957
+SAR-by-ML,11,CC(NCc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,CC(NCc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,0.48,0.43,,20,20,68,66,,not tested,,,Z4154517603,DR01942
+SAR-by-ML,12,C1CC(CN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)C(N)=O,C1CC(CN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)C(N)=O,0.48,0.43,,22,22,82,81,,not tested,,racemate,Z2140947981,DR01997
+SAR-by-ML,13,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(N)ncnc2c1)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccc2c(N)ncnc2c1)=O,0.43,0.42,,37,37,90,88,,not tested,,,Z7151300550,DR01943
+SAR-by-ML,14,C1CN(CC1O)c1ccc(cc1)C(N1CC(C1)(c1ccc(cc1)[Cl])O)=O,C1CN(CC1O)c1ccc(cc1)C(N1CC(C1)(c1ccc(cc1)[Cl])O)=O,0.31,0.28,,42,41,85,81,,not tested,,racemate,Z4304261471,DR01974
+SAR-by-ML,15,C1C(Nc2cccc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)c12)=O,C1C(Nc2cccc(C(NC3(COC3)c3ccc(cc3)[Cl])=O)c12)=O,0.39,0.37,,97,98,91,90,,not tested,,,Z7151300560,DR01947
+Primary predictions,16,C1CC(N(C1)Cc1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)=O,C1CC(N(C1)Cc1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O)=O,0.47,0.44,,99,97,68,73,,not tested,,racemate,Z2200611484,MR45272
+SBDD; SAR-by-catalog,17,C=CC(Nc1ccc(CC(NC2(COC2)c2ccccc2)=O)cc1)=O,C=CC(Nc1ccc(CC(NC2(COC2)c2ccccc2)=O)cc1)=O,0.31,0.3,,0,0,0,0,,did not stabilize,"Covalent analog. No MS adduct formed. No significant binding by SPR. SPR run using Biacore 8K, Multi-cycle kinetics",,Z4899562699,MR46653
+SBDD; SAR-by-catalog,18,C=CC(N1CCCc2c(cccc12)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,C=CC(N1CCCc2c(cccc12)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,0.35,0.34,>95%,36,38,72,71,,4,Covalent analog. MS confirms adduct; co-crystallized; predicted but not purchased. SPR run using multi-cycle kinetics,,Z4899441432,MR46654
+SBDD; SAR-by-catalog,19,C=CC(N1CCCc2c(cccc12)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)=O,C=CC(N1CCCc2c(cccc12)C(NC(C1CC1)c1ccc(cc1)[Cl])=O)=O,0.38,0.36,>95%,43,41,76,57,,4,Covalent analog. MS confirms adduct forms. SPR run using multi-cycle kinetics,racemate,Z5002582467,DR02365
+SBDD; SAR-by-catalog,20,C=CC(N1CCCc2c(cccc12)C(NC(C1CCCCC1)c1ccc(cc1)F)=O)=O,C=CC(N1CCCc2c(cccc12)C(NC(C1CCCCC1)c1ccc(cc1)F)=O)=O,0.29,0.26,,0,0,0,0,,did not stabilize,"Covalent analog. No MS adduct formed. No significant binding by SPR. SPR run using Biacore 8K, Multi-cycle kinetics",racemate,Z5002582729,DR02366
+SAR-by-ML,21,C1CN(CC1O)c1ccc(cc1)C(NCc1cc(cc2COCOc12)F)=O,C1CN(CC1O)c1ccc(cc1)C(NCc1cc(cc2COCOc12)F)=O,0.57,0.5,,4,5,45,45,,not tested,"Comparatively low binding, solubility issue at higher compound concentration in SPR buffer",racemate,Z4302640305,DR01999
+SAR-by-ML,22,C1CN(CC1O)c1ccc(cc1)C(NC(c1ccccc1)c1ccco1)=O,C1CN(CC1O)c1ccc(cc1)C(NC(c1ccccc1)c1ccco1)=O,0.51,0.44,,5,4,34,33,,not tested,low binding,racemate,Z7151300570,DR01969
+SAR-by-ML,23,C1Cc2ccc(cc2C1NC(c1ccc(cc1)N1CCC(C1)O)=O)[Cl],C1Cc2ccc(cc2C1NC(c1ccc(cc1)N1CCC(C1)O)=O)[Cl],0.55,0.48,,5,5,17,16,,not tested,low binding,racemate,Z7151300565,DR02004
+SAR-by-ML,24,C1CCN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O,C1CCN(C1)c1ccc(cc1)C(NC(CCO)c1ccc(cc1)[Cl])=O,0.68,0.55,,7,7,47,46,,not tested,"Comparatively low binding, solubility issue at higher compound concentration in SPR buffer",racemate,Z7151300542,DR01941
+SAR-by-ML,25,C1CC1c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CC1c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.49,0.43,,7,7,50,49,,not tested,Comparatively low binding,,Z7151300575,DR01972
+SAR-by-ML,26,C1CN(CC1O)c1ccc(cc1)C(NCc1ccc2c(c1)nsn2)=O,C1CN(CC1O)c1ccc(cc1)C(NCc1ccc2c(c1)nsn2)=O,0.52,0.42,,12,10,49,51,,not tested,Solubility issue at higher compound concentration in SPR buffer,racemate,Z4304732836,DR02011
+Primary predictions,27,C(c1ccc2c(c1)OCO2)NC(c1ccc2c(c1)nns2)=O,C(c1ccc2c(c1)OCO2)NC(c1ccc2c(c1)nns2)=O,0.6,0.54,,17,17,54,58,,not tested,Comparatively low binding. Solubility issue at higher compound concentration in SPR buffer,,7092495,MR44780
+SAR-by-ML,28,CCC(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O,CCC(c1ccc(cc1)[Cl])NC(c1ccc(cc1)C1(COC1)O)=O,0.5,0.44,,35,35,52,52,,not tested,Comparatively low binding,racemate,Z3340126714,DR01946
+Primary predictions,29,CC(c1cccc(c1)[Cl])NC(c1ccc2c(c1)NC(CO2)=O)=O,CC(c1cccc(c1)[Cl])NC(c1ccc2c(c1)NC(CO2)=O)=O,0.44,0.41,,36,38,32,33,,not tested,Comparatively low binding,racemate,Z73340212,MR44791
+SAR-by-ML,30,COC(c1ccc(C(NC2(COC2)c2ccc(cc2)[Cl])=O)nc1)=O,COC(c1ccc(C(NC2(COC2)c2ccc(cc2)[Cl])=O)nc1)=O,0.47,0.43,,82,82,49,47,,not tested,Comparatively low binding,,Z7151300567,DR01956
+Primary predictions,31,CC(c1ccc(c(c1)[Cl])[Cl])NC(c1ccc(CNC(N)=O)cc1)=O,CC(c1ccc(c(c1)[Cl])[Cl])NC(c1ccc(CNC(N)=O)cc1)=O,0.51,0.46,,95,102,54,58,,not tested,Comparatively low binding. Also binding to the negative control.,racemate,Z28099046,MR44836
+Primary predictions,32,C1CC2C(Nc3cc(ccc3N2C1)C(NC(CCO)c1ccc(c(c1)[Cl])[Cl])=O)=O,C1CC2C(Nc3cc(ccc3N2C1)C(NC(CCO)c1ccc(c(c1)[Cl])[Cl])=O)=O,0.34,0.32,,113,112,82,87,,not tested,Also binding to the negative control.,racemate,Z2091422650,MR45335
+SAR-by-ML,33,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccnc(c1)C(N)=O)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1ccnc(c1)C(N)=O)=O,0.46,0.45,,130,135,60,61,,not tested,Comparatively low binding,,Z7151300554,DR02000
+SAR-by-ML,34,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1c(c(ns1)O)[Cl])=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1c(c(ns1)O)[Cl])=O,0.42,0.4,,135,139,61,62,,not tested,Comparatively low binding,,Z7151300552,DR01967
+Primary predictions,35,CC(c1ccc(cc1)[Cl])NC(c1ccc2C(N3CCCC3=Nc2c1)=O)=O,CC(c1ccc(cc1)[Cl])NC(c1ccc2C(N3CCCC3=Nc2c1)=O)=O,0.39,0.37,,270,265,93,94,,not tested,Also binding to the negative control.,racemate,Z27996284,MR44821
+SAR-by-ML,36,C1CN(CC1O)c1ccc(cc1)C(NC1(CC1)c1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NC1(CC1)c1ccc(cc1)[Cl])=O,0.45,0.4,,>10,>10,45,55,,not tested,"Comparatively low binding. Solubility issue at higher compound concentration in SPR buffer. KD not reliable. SPR run using Biacore 8K, Multi-cycle kinetics",racemate,Z7151300574,DR01980
+Primary predictions,37,Cc1cc(c(cc1C(NC1(CCC1)c1cccc(C#N)c1)=O)O)O,Cc1cc(c(cc1C(NC1(CCC1)c1cccc(C#N)c1)=O)O)O,0.32,0.3,,>217,>215,159,167,,not tested,Sticky. KD not reliable,,Z4292556414,MR45322
+Primary predictions,38,C(c1ccc2cnccc2c1)NC(c1c(c(ns1)O)[Cl])=O,C(c1ccc2cnccc2c1)NC(c1c(c(ns1)O)[Cl])=O,0.29,0.27,,>581,>532,256,260,,not tested,Non-specific binding. Also binding to the negative control. Kd not reliable.,,Z5419392745,MR45296
+Primary predictions,39,Cc1ccccc1N1CCC(CNC(Cc2ccc(cc2)C(F)(F)F)=O)C1,Cc1ccccc1N1CCC(CNC(Cc2ccc(cc2)C(F)(F)F)=O)C1,0.46,0.43,,0,0,,,,not tested,,racemate,15428757,MR44786
+Primary predictions,40,C1CN(CC1CN1C=Nc2cccc(c2C1=O)F)C1CC1,C1CN(CC1CN1C=Nc2cccc(c2C1=O)F)C1CC1,0.36,0.35,,0,0,,,,not tested,,,31215251,MR44781
+Primary predictions,41,COc1cccc2CN(CCCOc12)C(c1cn2ccsc2n1)=O,COc1cccc2CN(CCCOc12)C(c1cn2ccsc2n1)=O,0.48,0.4,,0,0,,,,not tested,,,44017216,MR44787
+Primary predictions,42,Cc1cc(c(cc1[N+]([O-])=O)F)N1CCN(CC1)C(c1cc(c(cc1[N+]([O-])=O)F)F)=O,Cc1cc(c(cc1[N+]([O-])=O)F)N1CCN(CC1)C(c1cc(c(cc1[N+]([O-])=O)F)F)=O,0.32,0.3,,0,0,,,,not tested,,,5784919,MR44777
+Primary predictions,43,C1CCN(C1)c1ccc(c(c1)NCc1ccc(cc1)[Cl])[N+]([O-])=O,C1CCN(C1)c1ccc(c(c1)NCc1ccc(cc1)[Cl])[N+]([O-])=O,0.33,0.31,,0,0,,,,not tested,,,5811112,MR44778
+Primary predictions,44,C(c1ccc2c(c1)non2)NC(c1cn2ccsc2n1)=O,C(c1ccc2c(c1)non2)NC(c1cn2ccsc2n1)=O,0.59,0.41,,0,0,,,,not tested,,,69328609,MR44782
+Primary predictions,45,Cc1c(C#N)c2ccccc2n1CC(N1CCc2ccccc2C1)=O,Cc1c(C#N)c2ccccc2n1CC(N1CCc2ccccc2C1)=O,0.55,0.55,,0,0,,,,not tested,,,6969063,MR44779
+Primary predictions,46,C1CCC2(C1)CC(c1ccccc1O2)NC(C1=CN=C2C=CC=CN2C1=O)=O,C1CCC2(C1)CC(c1ccccc1O2)NC(C1=CN=C2C=CC=CN2C1=O)=O,0.37,0.35,,0,0,,,,not tested,,racemate,79963605,MR44783
+Primary predictions,47,Cc1c2cc(ccc2n(C)c1C(NCc1nc(N)[nH]n1)=O)F,Cc1c2cc(ccc2n(C)c1C(NCc1nc(N)[nH]n1)=O)F,0.57,0.49,,0,0,,,,not tested,,,87734830,MR44784
+Primary predictions,48,C1CCN(C1)c1ccc(CNC(c2ccc(cc2)F)=O)cc1,C1CCN(C1)c1ccc(CNC(c2ccc(cc2)F)=O)cc1,0.49,0.42,,0,0,,,,not tested,,,9131112,XS19722b
+Primary predictions,49,CN(CCc1ccccc1)C(c1c(CN2CC[C@@H](C2)O)n2ccsc2n1)=O,CN(CCc1ccccc1)C(c1c(CN2CC[C@@H](C2)O)n2ccsc2n1)=O,0.5,0.45,,0,0,,,,not tested,,chiral,94003140,MR44785
+Primary predictions,50,C1Cc2ccccc2C1NC(c1ccc(cc1)[Cl])=O,C1Cc2ccccc2C1NC(c1ccc(cc1)[Cl])=O,0.5,0.43,,0,0,,,,not tested,,racemate,F2191-0096,MR44788
+Primary predictions,51,COC(c1ccccc1NC(c1ccc2c(c1)snn2)=O)=O,COC(c1ccccc1NC(c1ccc2c(c1)snn2)=O)=O,0.37,0.35,,0,0,,,,not tested,,,F3375-0068,MR44841
+Primary predictions,52,COc1cccc(c1)N1CCC(CNC(c2cccc(c2)F)=O)C1,COc1cccc(c1)N1CCC(CNC(c2cccc(c2)F)=O)C1,0.45,0.42,,0,0,,,,not tested,,racemate,Z1024157862,MR44811
+Primary predictions,53,C1=Cc2cc(ccc2OC1=O)NC(c1cc(c(cc1[N+]([O-])=O)F)F)=O,C1=Cc2cc(ccc2OC1=O)NC(c1cc(c(cc1[N+]([O-])=O)F)F)=O,0.3,0.27,,0,0,,,,not tested,,,Z1081019716,MR44828
+Primary predictions,54,C(C(NC1(CC1)c1ccc(cc1)[Cl])=O)c1cn2ccsc2n1,C(C(NC1(CC1)c1ccc(cc1)[Cl])=O)c1cn2ccsc2n1,0.47,0.41,,0,0,,,,not tested,,,Z1183595865,MR44790
+Primary predictions,55,C(CNC(Nc1cccc(c1)N1CCNC1=O)=O)c1ccc(c(c1)O)O,C(CNC(Nc1cccc(c1)N1CCNC1=O)=O)c1ccc(c(c1)O)O,0.43,0.3,,0,0,,,,not tested,,,Z1213139523,MR44825
+Primary predictions,56,CN(CC1CCN(C1)Cc1ccccc1)C(Cc1cccc(c1)O)=O,CN(CC1CCN(C1)Cc1ccccc1)C(Cc1cccc(c1)O)=O,0.68,0.56,,0,0,,,,not tested,,racemate,Z1286918850,MR44819
+Primary predictions,57,C1CN(CC1NC(c1cccc2c1OCO2)=O)c1cccc(c1)[Cl],C1CN(CC1NC(c1cccc2c1OCO2)=O)c1cccc(c1)[Cl],0.41,0.33,,0,0,,,,not tested,,racemate,Z1355292329,MR44807
+Primary predictions,58,CC(c1cccc(c1)N1CCCC1)NC(C1Cc2ccccc2O1)=O,CC(c1cccc(c1)N1CCCC1)NC(C1Cc2ccccc2O1)=O,0.48,0.38,,0,0,,,,not tested,,racemate,Z1391687781,MR44823
+Primary predictions,59,CC1CN(CC1NC(c1cc2cc(ccc2o1)[Br])=O)C1CC1,CC1CN(CC1NC(c1cc2cc(ccc2o1)[Br])=O)C1CC1,0.3,0.28,,0,0,,,,not tested,,racemate,Z1410738100,MR44827
+Primary predictions,60,CC1CN(CC1NS(c1cnn(c1)c1ccccc1)(=O)=O)C1CC1,CC1CN(CC1NS(c1cnn(c1)c1ccccc1)(=O)=O)C1CC1,0.29,0.25,,0,0,,,,not tested,,racemate,Z1438168066,MR44803
+Primary predictions,61,C1CC(c2ccccc2OC1)NC1CCN(C1)C1CC1,C1CC(c2ccccc2OC1)NC1CCN(C1)C1CC1,0.3,0.24,,0,0,,,,not tested,,racemate,Z1439448519,MR44835
+Primary predictions,62,C1CN(CC1CNc1c2cnccc2ncn1)c1ccc(c(c1)F)F,C1CN(CC1CNc1c2cnccc2ncn1)c1ccc(c(c1)F)F,0.3,0.28,,0,0,,,,not tested,,racemate,Z1502744753,MR44795
+Primary predictions,63,CN(C)c1nc2ccc(cc2o1)NCc1cc2c(cc1O)OCO2,CN(C)c1nc2ccc(cc2o1)NCc1cc2c(cc1O)OCO2,0.33,0.27,,0,0,,,,not tested,,,Z1600832277,MR44799
+Primary predictions,64,C(C(c1ccc(cc1)[Cl])NC(c1cccc2cn[nH]c12)=O)O,C(C(c1ccc(cc1)[Cl])NC(c1cccc2cn[nH]c12)=O)O,0.47,0.37,,0,0,,,,not tested,,racemate,Z1644951171,MR44832
+Primary predictions,65,Cc1cc2ccccc2n1CC(Nc1cc(ccc1N1CCCC1)C(N)=O)=O,Cc1cc2ccccc2n1CC(Nc1cc(ccc1N1CCCC1)C(N)=O)=O,0.39,0.37,,0,0,,,,not tested,,,Z165036438,MR44789
+Primary predictions,66,C1CN(Cc2ccccc2NCc2ccc(c(C#N)c2)F)C(N1)=O,C1CN(Cc2ccccc2NCc2ccc(c(C#N)c2)F)C(N1)=O,0.49,0.41,,0,0,,,,not tested,,,Z1672510704,MR44804
+Primary predictions,67,COc1ccc(cc1)C(c1ccc(cc1)OC)NC(CN1CCn2c(C1)ncn2)=O,COc1ccc(cc1)C(c1ccc(cc1)OC)NC(CN1CCn2c(C1)ncn2)=O,0.33,0.32,,0,0,,,,not tested,,,Z1717666979,MR44794
+Primary predictions,68,C1C(C(c2ccccc12)O)NC(c1ccc2CC(Nc2c1)=O)=O,C1C(C(c2ccccc12)O)NC(c1ccc2CC(Nc2c1)=O)=O,0.47,0.39,,0,0,,,,not tested,,racemate,Z1796205282,MR44800
+Primary predictions,69,CCOc1ccc2c(c1)C(CCO2)NC(c1cn2ccnc2s1)=O,CCOc1ccc2c(c1)C(CCO2)NC(c1cn2ccnc2s1)=O,0.37,0.33,,0,0,,,,not tested,,racemate,Z1796267602,MR44834
+Primary predictions,70,C1CCN(C1)c1cc(C#N)cc(c1)[Br],C1CCN(C1)c1cc(C#N)cc(c1)[Br],0.29,0.25,,0,0,,,,not tested,,,Z1799965185,MR44812
+Primary predictions,71,C(c1cc(cc(c1)[Cl])C(F)(F)F)Nc1ccc(C#N)nc1,C(c1cc(cc(c1)[Cl])C(F)(F)F)Nc1ccc(C#N)nc1,0.3,0.28,,0,0,,,,not tested,,,Z2007210562,MR44806
+Primary predictions,72,C1CN(CC1CNC(NCC1CC(C(N)=O)=NO1)=O)c1ccccc1,C1CN(CC1CNC(NCC1CC(C(N)=O)=NO1)=O)c1ccccc1,0.49,0.47,,0,0,,,,not tested,,racemate,Z2038072310,MR44840
+Primary predictions,73,CC1CC(CN1C1CC1)Nc1nc(C)cc(C#N)n1,CC1CC(CN1C1CC1)Nc1nc(C)cc(C#N)n1,0.23,0.22,,0,0,,,,not tested,,racemate,Z2091654699,MR44798
+Primary predictions,74,CN(C)C1(Cc2ccccc2C1)CNC(c1ccc2c(c1)NC(=O)O2)=O,CN(C)C1(Cc2ccccc2C1)CNC(c1ccc2c(c1)NC(=O)O2)=O,0.3,0.28,,0,0,,,,not tested,,,Z2116983991,MR44797
+Primary predictions,75,C1CC2(CCN(C2)C(c2c(c(ns2)O)[Cl])=O)Oc2ccccc12,C1CC2(CCN(C2)C(c2c(c(ns2)O)[Cl])=O)Oc2ccccc12,0.25,0.23,,0,0,,,,not tested,,racemate,Z2204217609,MR44808
+Primary predictions,76,Cc1cc(nc(NC(c2ccoc2C2CC2)=O)n1)OC,Cc1cc(nc(NC(c2ccoc2C2CC2)=O)n1)OC,0.34,0.29,,0,0,,,,not tested,,,Z2319505260,MR44772
+Primary predictions,77,CC(C)(C)OC(N1C[C@H]([C@H](Cc2ccccc2)C1)O)=O,CC(C)(C)OC(N1C[C@H]([C@H](Cc2ccccc2)C1)O)=O,0.58,0.5,,0,0,,,,not tested,,chiral,Z2327884118,MR44809
+Primary predictions,78,CCC(c1ccc(cc1)[Cl])NC(CN1CCn2cncc2C1)=O,CCC(c1ccc(cc1)[Cl])NC(CN1CCn2cncc2C1)=O,0.37,0.34,,0,0,,,,not tested,,racemate,Z2600917013,MR44822
+Primary predictions,79,CC(C(O)=O)(c1ccccc1)NC(c1cccc(c1)N1CCCC1)=O,CC(C(O)=O)(c1ccccc1)NC(c1cccc(c1)N1CCCC1)=O,0.57,0.52,,0,0,,,,not tested,,racemate,Z2607802130,MR44796
+Primary predictions,80,C1CCN(C1)c1cccc(c1)C(N1C[C@@H]2COCC[C@@]2(C1)C(N)=O)=O,C1CCN(C1)c1cccc(c1)C(N1C[C@@H]2COCC[C@@]2(C1)C(N)=O)=O,0.43,0.43,,0,0,,,,not tested,,chiral,Z2762361136,MR44792
+Primary predictions,81,CC(c1ccc(cc1)[Cl])NC(CCNC(c1ccc(cc1)[Br])=O)=O,CC(c1ccc(cc1)[Cl])NC(CCNC(c1ccc(cc1)[Br])=O)=O,0.48,0.47,,0,0,,,,not tested,,racemate,Z27996333,XS51538e
+Primary predictions,82,c1cc(cc(c1)[N+]([O-])=O)C(Nc1cccc2cnccc12)=O,c1cc(cc(c1)[N+]([O-])=O)C(Nc1cccc2cnccc12)=O,0.3,0.29,,0,0,,,,not tested,,,Z28182062,MR44720
+Primary predictions,83,CC(C)[C@@H](C(NC)=O)NC(c1ccc2c(cc[nH]2)n1)=O,CC(C)[C@@H](C(NC)=O)NC(c1ccc2c(cc[nH]2)n1)=O,0.62,0.58,,0,0,,,,not tested,,chiral,Z2907551538,MR44793
+Primary predictions,84,CC1CN(CC1NCc1ccccc1n1ccnc1)C1CC1,CC1CN(CC1NCc1ccccc1n1ccnc1)C1CC1,0.33,0.31,,0,0,,,,not tested,,racemate,Z2936884635,MR44802
+Primary predictions,85,CC(C)(C)OC(N1CCC2(CC(c3ccccc3O2)N)C1)=O,CC(C)(C)OC(N1CCC2(CC(c3ccccc3O2)N)C1)=O,0.31,0.3,,0,0,,,,not tested,,racemate,Z2937525227,MR44817
+Primary predictions,86,CC1CCN(C1)c1ccc(cc1)C(N1C(Cc2ccccc12)CO)=O,CC1CCN(C1)c1ccc(cc1)C(N1C(Cc2ccccc12)CO)=O,0.46,0.34,,0,0,,,,not tested,,racemate,Z3053222214,MR44805
+Primary predictions,87,C1CCN(C1)c1ccc(cc1)NC(CC(c1ccc(cc1)[Cl])NC(N)=O)=O,C1CCN(C1)c1ccc(cc1)NC(CC(c1ccc(cc1)[Cl])NC(N)=O)=O,0.54,0.45,,0,0,,,,not tested,,racemate,Z30643931,XS48242
+Primary predictions,88,C1CC2CN(CC2(C1)N)C(c1c2c(cccn2)ccn1)=O,C1CC2CN(CC2(C1)N)C(c1c2c(cccn2)ccn1)=O,0.32,0.27,,0,0,,,,not tested,,racemate,Z3132875912,MR44815
+Primary predictions,89,CN1C=CC(=CC1=O)C(Nc1ccc(c2ccncc12)N1CCCCC1)=O,CN1C=CC(=CC1=O)C(Nc1ccc(c2ccncc12)N1CCCCC1)=O,0.27,0.26,,0,0,,,,not tested,,,Z316504502,MR44838
+Primary predictions,90,CN(CCc1ccccc1)C(Cc1ccc(c(c1)O)O)=O,CN(CCc1ccccc1)C(Cc1ccc(c(c1)O)O)=O,1,0.69,,0,0,,,,not tested,,,Z3766472317,UB28860
+Primary predictions,91,Cc1c(C(N(C)Cc2cccc(c2)F)=O)n2ccsc2n1,Cc1c(C(N(C)Cc2cccc(c2)F)=O)n2ccsc2n1,1,0.81,,0,0,,,,not tested,,,Z3826900558,UB13392
+Primary predictions,92,C1C(N(c2ccccc2)N=C(C(NCc2cccc(C#N)c2)=O)N1)=O,C1C(N(c2ccccc2)N=C(C(NCc2cccc(C#N)c2)=O)N1)=O,0.62,0.53,,0,0,,,,not tested,,,Z395622454,MR44820
+Primary predictions,93,C1CN(CC1CNC(c1ccc(cc1)[Cl])=O)C1CC1,C1CN(CC1CNC(c1ccc(cc1)[Cl])=O)C1CC1,0.56,0.47,,0,0,,,,not tested,,racemate,Z403715606,MR44816
+Primary predictions,94,Cc1ccc(cc1C(N1C2CCC1C=C(C2)c1ccccc1)=O)N.C(C(F)(F)F)(O)=O,Cc1ccc(cc1C(N1C2CCC1C=C(C2)c1ccccc1)=O)N.C(C(F)(F)F)(O)=O,0.91,0.36,,0,0,,,,not tested,,racemate,Z4500910758,MR44818
+Primary predictions,95,C(C(Nc1cncc2cnccc12)=O)c1cccc(c1)[Cl],C(C(Nc1cncc2cnccc12)=O)c1cccc(c1)[Cl],0.35,0.3,,0,0,,,,not tested,,,Z4609618500,MR44813
+Primary predictions,96,CC(c1ccccc1)NC(CN(C)Cc1ccc(c(c1)[Cl])[Cl])=O,CC(c1ccccc1)NC(CN(C)Cc1ccc(c(c1)[Cl])[Cl])=O,0.43,0.41,,0,0,,,,not tested,,racemate,Z46409270,MR44839
+Primary predictions,97,CC1c2cccn2CCN1C(c1cc(cc(c1)[Br])N1CCCC1)=O,CC1c2cccn2CCN1C(c1cc(cc(c1)[Br])N1CCCC1)=O,0.32,0.29,,0,0,,,,not tested,,racemate,Z4669240681,MR44826
+Primary predictions,98,Cc1c(CCNc2cc(cc(C#N)n2)C(F)(F)F)sc(n1)N(C)C,Cc1c(CCNc2cc(cc(C#N)n2)C(F)(F)F)sc(n1)N(C)C,0.4,0.38,,0,0,,,,not tested,,,Z4774546380,MR44814
+Primary predictions,99,Cc1cc(NCC2CCN(C2)C2CC2)nc(c2cccc(c2)[N+]([O-])=O)n1,Cc1cc(NCC2CCN(C2)C2CC2)nc(c2cccc(c2)[N+]([O-])=O)n1,0.62,0.55,,0,0,,,,not tested,,racemate,Z644615906,MR44829
+Primary predictions,100,C1CN(CC1CN1C=C(C#N)C(NC1=O)=O)c1ccccc1,C1CN(CC1CN1C=C(C#N)C(NC1=O)=O)c1ccccc1,0.47,0.44,,0,0,,,,not tested,,racemate,Z666564728,MR44810
+Primary predictions,101,Cc1ccc(cc1[N+]([O-])=O)C(NC(C1CC1)c1ccc(cc1)[Cl])=O,Cc1ccc(cc1[N+]([O-])=O)C(NC(C1CC1)c1ccc(cc1)[Cl])=O,0.51,0.48,,0,0,,,,not tested,,racemate,Z70893967,MR44833
+Primary predictions,102,CC(N1CCCC(C1)C(N(C)CCc1ccc(cc1)F)=O)=O,CC(N1CCCC(C1)C(N(C)CCc1ccc(cc1)F)=O)=O,0.66,0.5,,0,0,,,,not tested,,racemate,Z809178266,MR44837
+Primary predictions,103,C1CN(CC1CNCc1c[nH]nc1c1cc2ccccc2o1)C1CC1,C1CN(CC1CNCc1c[nH]nc1c1cc2ccccc2o1)C1CC1,0.4,0.35,,0,0,,,,not tested,,racemate,Z823393894,MR44801
+Primary predictions,104,C1CN(CC1Nc1c2ccsc2ncn1)C1CC1,C1CN(CC1Nc1c2ccsc2ncn1)C1CC1,0.28,0.24,,0,0,,,,not tested,,racemate,Z826945526,MR44830
+Primary predictions,105,CCC(c1ccc(cc1)[Br])NC(c1ccc(cc1)S(NC1CC1)(=O)=O)=O,CCC(c1ccc(cc1)[Br])NC(c1ccc(cc1)S(NC1CC1)(=O)=O)=O,0.35,0.31,,0,0,,,,not tested,,racemate,Z87683191,MR44824
+Primary predictions,106,C1CN(CC1CNc1ccccn1)c1ccc(c2cnccc12)[N+]([O-])=O,C1CN(CC1CNc1ccccn1)c1ccc(c2cnccc12)[N+]([O-])=O,0.26,0.24,,0,0,,,,not tested,,racemate,Z990435826,MR44831
+Primary predictions,107,CCN1CCN(CC1)c1ccc(cc1F)C(N(C)c1cccc(C)c1)=O,CCN1CCN(CC1)c1ccc(cc1F)C(N(C)c1cccc(C)c1)=O,0.64,0.61,,0,0,,,,not tested,,,Z1048477424,MR45277
+Primary predictions,108,CN(Cc1ccc(c2ccc(cc2)[Cl])o1)C(CN1C(c2cccnc2C1=O)=O)=O,CN(Cc1ccc(c2ccc(cc2)[Cl])o1)C(CN1C(c2cccnc2C1=O)=O)=O,0.81,0.53,,0,0,,,,not tested,,,Z1167420839,MR45274
+Primary predictions,109,Cc1c(CC(N(C)C2CCN(C2)C2CC2)=O)c2ccccc2[nH]1,Cc1c(CC(N(C)C2CCN(C2)C2CC2)=O)c2ccccc2[nH]1,0.86,0.65,,0,0,,,,not tested,,racemate,Z1173513225,MR45290
+Primary predictions,110,CC(c1ccc(cc1)[Br])NC(CN(C)C1CCN(C1)C1CC1)=O,CC(c1ccc(cc1)[Br])NC(CN(C)C1CCN(C1)C1CC1)=O,0.44,0.43,,0,0,,,,not tested,,racemate,Z1176729393,MR45280
+Primary predictions,111,C(c1ccc(c(c1)O)O)NC(CSc1nnc(c2ccc(cc2)[Cl])o1)=O,C(c1ccc(c(c1)O)O)NC(CSc1nnc(c2ccc(cc2)[Cl])o1)=O,0.32,0.31,,0,0,,,,not tested,,,Z1451207994,MR45283
+Primary predictions,112,CN(Cc1ccc(c(c1)[Cl])[Cl])C(COC(C=Cc1ccc(c(c1)O)O)=O)=O,CN(Cc1ccc(c(c1)[Cl])[Cl])C(COC(C=Cc1ccc(c(c1)O)O)=O)=O,0.45,0.42,,0,0,,,,not tested,,,Z1476738797,MR45262
+Primary predictions,113,CN(C1CCN(C1)C1CC1)C(c1c(C2CC2)nc2n1ccs2)=O,CN(C1CCN(C1)C1CC1)C(c1c(C2CC2)nc2n1ccs2)=O,0.39,0.34,,0,0,,,,not tested,,racemate,Z1481478680,MR45293
+Primary predictions,114,CC(C)(C)OC(NCc1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)[Cl])=O)=O,CC(C)(C)OC(NCc1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)[Cl])=O)=O,0.38,0.32,,0,0,,,,not tested,,racemate,Z1602038317,MR45288
+Primary predictions,115,C1CN2C(CN1Cc1ccccc1CN1CCN3C(C1)=NNC3=O)=NNC2=O,C1CN2C(CN1Cc1ccccc1CN1CCN3C(C1)=NNC3=O)=NNC2=O,0.54,0.46,,0,0,,,,not tested,,,Z1723157813,MR45331
+Primary predictions,116,CN(CCCc1ccccc1)C(c1cn2ccnc2s1)=O,CN(CCCc1ccccc1)C(c1cn2ccnc2s1)=O,0.49,0.38,,0,0,,,,not tested,,,Z1796089026,MR45270
+Primary predictions,117,CN1C(C(CC1=O)C(NCc1ccc(c(c1)O)O)=O)c1ccc(c(c1)[Cl])[Cl],CN1C(C(CC1=O)C(NCc1ccc(c(c1)O)O)=O)c1ccc(c(c1)[Cl])[Cl],0.36,0.3,,0,0,,,,not tested,,racemate,Z1840405448,MR45316
+Primary predictions,118,Cc1ccccc1CN1CC(N(CC2CCN(C2)c2ccc(cc2)F)C1=O)=O,Cc1ccccc1CN1CC(N(CC2CCN(C2)c2ccc(cc2)F)C1=O)=O,0.46,0.42,,0,0,,,,not tested,,racemate,Z1868937816,MR45291
+Primary predictions,119,C1CCc2cc(C#N)ccc2C(C1)NCC1CCN(C1)C1CC1,C1CCc2cc(C#N)ccc2C(C1)NCC1CCN(C1)C1CC1,0.37,0.36,,0,0,,,,not tested,,racemate,Z1959918356,MR45300
+Primary predictions,120,CC1(CCN(C1)C(=O)OC(C)(C)C)CNC1CCN(C1)C1CC1,CC1(CCN(C1)C(=O)OC(C)(C)C)CNC1CCN(C1)C1CC1,0.28,0.26,,0,0,,,,not tested,,racemate,Z1986719890,MR45285
+Primary predictions,121,CS(N1CCC(CN(Cc2cccc(c2)F)C2CC2)C1)(=O)=O,CS(N1CCC(CN(Cc2cccc(c2)F)C2CC2)C1)(=O)=O,0.51,0.45,,0,0,,,,not tested,,racemate,Z2015132115,MR45308
+Primary predictions,122,CC(C)(C)OC(N1CCC(C1)N(C)C(Cc1coc2ccccc12)=O)=O,CC(C)(C)OC(N1CCC(C1)N(C)C(Cc1coc2ccccc12)=O)=O,0.61,0.61,,0,0,,,,not tested,,racemate,Z2072050704,MR45302
+Primary predictions,123,CCN(CC(NCc1cc(c(cc1[Cl])[Cl])[Cl])=O)C1CC1,CCN(CC(NCc1cc(c(cc1[Cl])[Cl])[Cl])=O)C1CC1,0.34,0.32,,0,0,,,,not tested,,,Z2086124685,MR45269
+Primary predictions,124,C1CN(CC1CNC(N1CCc2c(C1)cccc2C#N)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(N1CCc2c(C1)cccc2C#N)=O)c1ccc(cc1)[Cl],0.36,0.34,,0,0,,,,not tested,,racemate,Z2199609349,MR45297
+Primary predictions,125,CNC(c1ccc(NC2CC3CCC(C2)N3C)nc1)=O,CNC(c1ccc(NC2CC3CCC(C2)N3C)nc1)=O,1,0.42,,0,0,,,,not tested,,racemate,Z2274141778,MR45318
+Primary predictions,126,CN(C1CCN(C1)C1CC1)S(c1cccc2ccoc12)(=O)=O,CN(C1CCN(C1)C1CC1)S(c1cccc2ccoc12)(=O)=O,0.43,0.34,,0,0,,,,not tested,,racemate,Z2276312774,MR45312
+Primary predictions,127,CN(C(CCn1cccc1)=O)c1nccc(n1)OC,CN(C(CCn1cccc1)=O)c1nccc(n1)OC,0.39,0.36,,0,0,,,,not tested,,,Z2493735547,MR45324
+Primary predictions,128,CN1CCC2(CCCN(C2)C(c2cccnc2C(N)=O)=O)C1,CN1CCC2(CCCN(C2)C(c2cccnc2C(N)=O)=O)C1,0.64,0.49,,0,0,,,,not tested,,racemate,Z2640810955,MR45271
+Primary predictions,129,C1CN(CC1CN(C1CC1)C1CC1)C(c1ccccc1)=O,C1CN(CC1CN(C1CC1)C1CC1)C(c1ccccc1)=O,0.41,0.37,,0,0,,,,not tested,,racemate,Z2706420680,MR45320
+Primary predictions,130,C1CN(CCN(C1)c1cc(cc(C#N)n1)C(F)(F)F)C1CC1,C1CN(CCN(C1)c1cc(cc(C#N)n1)C(F)(F)F)C1CC1,0.48,0.43,,0,0,,,,not tested,,,Z2769605576,MR45289
+Primary predictions,131,CN1CCC(CNC(c2cc3c(cc[nH]3)nc2)=O)(C1)O,CN1CCC(CNC(c2cc3c(cc[nH]3)nc2)=O)(C1)O,0.48,0.42,,0,0,,,,not tested,,racemate,Z2839747305,MR45295
+Primary predictions,132,CN(C)C(CC1CCN(CC1)C(c1cc2cc(c(cc2s1)O)O)=O)=O,CN(C)C(CC1CCN(CC1)C(c1cc2cc(c(cc2s1)O)O)=O)=O,0.44,0.29,,0,0,,,,not tested,,,Z2879827538,MR45286
+Primary predictions,133,CN1CC2CCC(C1)N2C(c1ccc(C(=O)OC)nc1)=O,CN1CC2CCC(C1)N2C(c1ccc(C(=O)OC)nc1)=O,1,0.62,,0,0,,,,not tested,,racemate,Z2916159340,MR45263
+Primary predictions,134,C[C@H]1C(N(CCN2CCc3ccccc23)C(N1C)=O)=O,C[C@H]1C(N(CCN2CCc3ccccc23)C(N1C)=O)=O,1,0.62,,0,0,,,,not tested,,chiral,Z2926270736,MR45307
+Primary predictions,135,Cc1c(cn(C)n1)C1CC(C(N[C@H](C)c2ccc(cc2)[Br])=O)ON=1,Cc1c(cn(C)n1)C1CC(C(N[C@H](C)c2ccc(cc2)[Br])=O)ON=1,0.49,0.48,,0,0,,,,not tested,,chiral,Z2959083512,MR45282
+Primary predictions,136,CN(Cc1cccc(c1)N1CCCC1)C(Cc1ccc(c(c1)[N+]([O-])=O)OC)=O,CN(Cc1cccc(c1)N1CCCC1)C(Cc1ccc(c(c1)[N+]([O-])=O)OC)=O,0.63,0.53,,0,0,,,,not tested,,,Z2966813285,MR45329
+Primary predictions,137,C[C@@]12CN(C)C[C@H]2CN(C1)c1c(cccn1)C(NC)=O,C[C@@]12CN(C)C[C@H]2CN(C1)c1c(cccn1)C(NC)=O,0.47,0.38,,0,0,,,,not tested,,chiral,Z2976563848,MR45301
+Primary predictions,138,C1CN(CC1CN1C(C2(CC2)CNC1=O)=O)c1cccc(c1)[Br],C1CN(CC1CN1C(C2(CC2)CNC1=O)=O)c1cccc(c1)[Br],0.41,0.37,,0,0,,,,not tested,,racemate,Z3210929701,MR45328
+Primary predictions,139,Cc1nn2cc(C(N(C)CCc3cccc(C#N)c3)=O)nc2s1,Cc1nn2cc(C(N(C)CCc3cccc(C#N)c3)=O)nc2s1,0.42,0.39,,0,0,,,,not tested,,,Z3360825320,MR45278
+Primary predictions,140,COc1cccc(c1)[C@@H]1[C@H](CCN1C1CC1)NC1CCN(C1)C1CC1,COc1cccc(c1)[C@@H]1[C@H](CCN1C1CC1)NC1CCN(C1)C1CC1,0.33,0.32,,0,0,,,,not tested,,chiral,Z3362613086,MR45319
+Primary predictions,141,C[C@@H](c1cccc2cnccc12)NC1CCN(C1)C1CC1,C[C@@H](c1cccc2cnccc12)NC1CCN(C1)C1CC1,0.35,0.33,,0,0,,,,not tested,,chiral,Z3363535488,MR45313
+Primary predictions,142,C1CN(Cc2ccccc12)C1CN(CC1O)C1CC1,C1CN(Cc2ccccc12)C1CN(CC1O)C1CC1,0.23,0.22,,0,0,,,,not tested,,racemate,Z3410220640,MR45310
+Primary predictions,143,C1CN(CC1CN1C(CC(c2nccs2)NC1=O)=O)c1ccc(cc1)[Cl],C1CN(CC1CN1C(CC(c2nccs2)NC1=O)=O)c1ccc(cc1)[Cl],0.42,0.36,,0,0,,,,not tested,,racemate,Z3426114111,MR45332
+Primary predictions,144,C1CC1CC(c1ccc(cc1)[Cl])NC(Cc1ccc(c(c1)O)O)=O,C1CC1CC(c1ccc(cc1)[Cl])NC(Cc1ccc(c(c1)O)O)=O,0.62,0.47,,0,0,,,,not tested,,racemate,Z3630941352,MR45305
+Primary predictions,145,Cc1cc(C(NC)=O)nc(n1)N1CCC2(CC1)CN(C)c1ccccc12,Cc1cc(C(NC)=O)nc(n1)N1CCC2(CC1)CN(C)c1ccccc12,1,0.65,,0,0,,,,not tested,,,Z3833649758,MR45287
+Primary predictions,146,C1CC(N(C1)Cc1cccc(c1)NCc1cc(C#N)cc(C#N)c1)=O,C1CC(N(C1)Cc1cccc(c1)NCc1cc(C#N)cc(C#N)c1)=O,0.3,0.28,,0,0,,,,not tested,,,Z3860148069,MR45333
+Primary predictions,147,Cc1ccc(cc1NCc1cc(C#N)cc(C#N)c1)C(NC1CC1)=O,Cc1ccc(cc1NCc1cc(C#N)cc(C#N)c1)C(NC1CC1)=O,0.32,0.3,,0,0,,,,not tested,,,Z3860190201,MR45299
+Primary predictions,148,C1CN(CC1CNc1c2cnn(c3ccccc3)c2ncn1)C1CC1,C1CN(CC1CNc1c2cnn(c3ccccc3)c2ncn1)C1CC1,0.38,0.33,,0,0,,,,not tested,,racemate,Z397791294,MR45311
+Primary predictions,149,CN1CC(C1)N(C)C(c1cc(ccn1)n1cccc1)=O,CN1CC(C1)N(C)C(c1cc(ccn1)n1cccc1)=O,1,0.58,,0,0,,,,not tested,,,Z4032035979,MR45326
+Primary predictions,150,CN1C[C@H]2CN(C[C@H]2C1)C(c1cc(c([nH]1)[N+]([O-])=O)[Br])=O,CN1C[C@H]2CN(C[C@H]2C1)C(c1cc(c([nH]1)[N+]([O-])=O)[Br])=O,0.38,0.33,,0,0,,,,not tested,,,Z4105653389,MR45266
+Primary predictions,151,CC1CC(CN1C1CC1)NC(c1c[nH]c2cccc(c12)[Cl])=O,CC1CC(CN1C1CC1)NC(c1c[nH]c2cccc(c12)[Cl])=O,0.3,0.26,,0,0,,,,not tested,,racemate,Z4123016998,MR45323
+Primary predictions,152,C(CN1C[C@@H]2C[C@H]1CN2C1CC1)C(NCc1ccccc1[Cl])=O,C(CN1C[C@@H]2C[C@H]1CN2C1CC1)C(NCc1ccccc1[Cl])=O,0.3,0.28,,0,0,,,,not tested,,chiral,Z4194213283,MR45281
+Primary predictions,153,COCC1CCN(C1)c1ccc(cc1)C(N1C[C@@H]2C[C@H]1CN2C1CC1)=O,COCC1CCN(C1)c1ccc(cc1)C(N1C[C@@H]2C[C@H]1CN2C1CC1)=O,0.32,0.31,,0,0,,,,not tested,,chiral,Z4199892951,MR45264
+Primary predictions,154,Cc1ccc(CN2CCC(C2)CN(C)C2CC2)s1,Cc1ccc(CN2CCC(C2)CN(C)C2CC2)s1,0.48,0.38,,0,0,,,,not tested,,racemate,Z4265702894,MR45327
+Primary predictions,155,C1CC1N1CCC2(CCN(Cc3ccccc3)C2)C1,C1CC1N1CCC2(CCN(Cc3ccccc3)C2)C1,0.35,0.32,,0,0,,,,not tested,,racemate,Z4265950420,MR45337
+Primary predictions,156,CC(C)(C)OC(N1CCCC1C1CCN(C1)C1CC1)=O,CC(C)(C)OC(N1CCCC1C1CCN(C1)C1CC1)=O,0.31,0.28,,0,0,,,,not tested,,racemate,Z4268743041,MR45334
+Primary predictions,157,Cc1cc(c(cc1C(N[C@H]1CC(N(C)[C@@H]1c1ccc(cc1)[Cl])=O)=O)O)O,Cc1cc(c(cc1C(N[C@H]1CC(N(C)[C@@H]1c1ccc(cc1)[Cl])=O)=O)O)O,0.28,0.27,,0,0,,,,not tested,,chiral,Z4294387454,MR45330
+Primary predictions,158,CCCC(C(N(C)C)=O)NC(c1cc(c(cc1C)O)O)=O,CCCC(C(N(C)C)=O)NC(c1cc(c(cc1C)O)O)=O,0.41,0.35,,0,0,,,,not tested,,racemate,Z4295831506,MR45321
+Primary predictions,159,Cc1cccc(C#CCN2C[C@@H]3C[C@H]2CN3C2CC2)c1,Cc1cccc(C#CCN2C[C@@H]3C[C@H]2CN3C2CC2)c1,0.24,0.24,,0,0,,,,not tested,,chiral,Z4314882867,MR45294
+Primary predictions,160,CN1CC(C1)N(C)C(CCc1ccc2cc(c(cc2c1)O)O)=O,CN1CC(C1)N(C)C(CCc1ccc2cc(c(cc2c1)O)O)=O,0.65,0.37,,0,0,,,,not tested,,,Z4325243054,MR45336
+Primary predictions,161,C1CCC2(C1)CC(c1ccccc1O2)N(Cc1cccc(C#N)c1)C=O,C1CCC2(C1)CC(c1ccccc1O2)N(Cc1cccc(C#N)c1)C=O,0.7,0.52,,0,0,,,,not tested,,racemate,Z4355077279,MR45284
+Primary predictions,162,CN1CCOC(C1)C(c1ccc(cc1)[Cl])NC(c1cncc2cnccc12)=O,CN1CCOC(C1)C(c1ccc(cc1)[Cl])NC(c1cncc2cnccc12)=O,0.34,0.29,,0,0,,,,not tested,,racemate,Z4382778396,MR45276
+Primary predictions,163,Cc1ccc(cc1c1cccc(c1)N1CCCC1)C(N(C)C)=O,Cc1ccc(cc1c1cccc(c1)N1CCCC1)C(N(C)C)=O,1,0.67,,0,0,,,,not tested,,,Z4414837755,MR45315
+Primary predictions,164,CC1CN(CC1NC(CCCCc1c[nH]c2ccccc12)=O)C1CC1,CC1CN(CC1NC(CCCCc1c[nH]c2ccccc12)=O)C1CC1,0.4,0.38,,0,0,,,,not tested,,racemate,Z4503477380,MR45292
+Primary predictions,165,C[C@H]1CN(C)[C@H](C)CN1S(c1ccc2c(c1)scn2)(=O)=O,C[C@H]1CN(C)[C@H](C)CN1S(c1ccc2c(c1)scn2)(=O)=O,1,0.39,,0,0,,,,not tested,,chiral,Z4664513955,MR45304
+Primary predictions,166,CN(Cc1ccccc1OCc1ccccc1F)C1CCN(C1)C1CC1,CN(Cc1ccccc1OCc1ccccc1F)C1CCN(C1)C1CC1,0.44,0.43,,0,0,,,,not tested,,racemate,Z5419392715,MR45303
+Primary predictions,167,CC1CC(C(NC(c2ccc(cc2)OC)c2ccc(cc2)[Cl])=O)ON=1,CC1CC(C(NC(c2ccc(cc2)OC)c2ccc(cc2)[Cl])=O)ON=1,0.43,0.36,,0,0,,,,not tested,,racemate,Z5419392722,MR45275
+Primary predictions,168,CN(CCc1ccccc1F)C(c1cnc2n1ccs2)=O,CN(CCc1ccccc1F)C(c1cnc2n1ccs2)=O,0.57,0.53,,0,0,,,,not tested,,,Z5419392740,MR45268
+Primary predictions,169,COC(c1cccc(c1)c1cccc(c1)NC1CCN(C1)C1CC1)=O,COC(c1cccc(c1)c1cccc(c1)NC1CCN(C1)C1CC1)=O,0.38,0.37,,0,0,,,,not tested,,racemate,Z5419392751,MR45314
+Primary predictions,170,Cc1cc(ccc1F)N1CCC(C1)COC(C1COc2ccccc12)=O,Cc1cc(ccc1F)N1CCC(C1)COC(C1COc2ccccc12)=O,0.45,0.32,,0,0,,,,not tested,,racemate,Z5419392814,MR45298
+Primary predictions,171,C1c2ccccc2CC1(C(N)=O)NC(c1ccc2cccnc2c1)=O,C1c2ccccc2CC1(C(N)=O)NC(c1ccc2cccnc2c1)=O,0.73,0.48,,0,0,,,,not tested,,,Z5419392820,MR45265
+Primary predictions,172,C1C(CO1)(c1ccc(cc1)F)NC(c1ccc2cnccc2c1)=O,C1C(CO1)(c1ccc(cc1)F)NC(c1ccc2cnccc2c1)=O,0.37,0.34,,0,0,,,,not tested,,,Z5419392827,MR45267
+Primary predictions,173,CN(Cc1ccccc1n1cccc1)C(C1CCCN1C1CC1)=O,CN(Cc1ccccc1n1cccc1)C(C1CCCN1C1CC1)=O,0.53,0.46,,0,0,,,,not tested,,racemate,Z5419392830,MR45309
+Primary predictions,174,C(C(C(c1ccc(cc1)[Cl])O)NC(c1ccc2ccncc2c1)=O)O,C(C(C(c1ccc(cc1)[Cl])O)NC(c1ccc2ccncc2c1)=O)O,0.58,0.51,,0,0,,,,not tested,,racemate,Z5419392833,MR45273
+Primary predictions,175,Cc1cc(nc(n1)N(C)C1CCN(C1)C1CC1)OCc1ccccc1,Cc1cc(nc(n1)N(C)C1CCN(C1)C1CC1)OCc1ccccc1,0.37,0.33,,0,0,,,,not tested,,racemate,Z5419392853,MR45325
+Primary predictions,176,C1CC1CC(c1ccc(cc1)[Cl])NC(Cc1ccc(c(c1)O)O)=O,C1CC1CC(c1ccc(cc1)[Cl])NC(Cc1ccc(c(c1)O)O)=O,0.62,0.47,,0,0,,,,not tested,,racemate,Z5419392860,MR45306
+Primary predictions,177,CC1(C)CN(C(c2c(c(ns2)O)[Cl])=O)c2ccc(cc12)[Cl],CC1(C)CN(C(c2c(c(ns2)O)[Cl])=O)c2ccc(cc12)[Cl],0.24,0.23,,0,0,,,,not tested,,,Z5419392864,MR45317
+Primary predictions,178,CC1CC(CN1C1CC1)NCC1CCCCCC1,CC1CC(CN1C1CC1)NCC1CCCCCC1,0.2,0.19,,0,0,,,,not tested,,racemate,Z5489575965,MR45339
+Primary predictions,179,CC1CN(CC1NC1CCN(CC1)C1CC1)C1CC1,CC1CN(CC1NC1CCN(CC1)C1CC1)C1CC1,0.22,0.2,,0,0,,,,not tested,,racemate,Z5532809105,MR45338
+SAR-by-ML,180,C1CN(CC1CNC(CNC(c1ccc(cc1)O)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(CNC(c1ccc(cc1)O)=O)=O)c1ccc(cc1)[Cl],0.41,0.39,,0,0,,,,not tested,,racemate,Z1072029824,DR01951
+SAR-by-ML,181,C1CN(CC1CNC(NCC1(CC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,C1CN(CC1CNC(NCC1(CC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,0.47,0.42,,0,0,,,,not tested,,racemate,Z1094135474,DR02008
+SAR-by-ML,182,C1CN(CC1CNC(NC1(CC1)c1ccc(cc1)F)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(NC1(CC1)c1ccc(cc1)F)=O)c1ccc(cc1)[Cl],0.43,0.39,,0,0,,,,not tested,,racemate,Z1132952164,DR02005
+SAR-by-ML,183,C1CN(CC1CNC(c1ccc(CN2CCOCC2)cc1)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(CN2CCOCC2)cc1)=O)c1ccc(cc1)[Cl],0.47,0.4,,0,0,,,,not tested,,racemate,Z1174227875,DR01983
+SAR-by-ML,184,C1CN(CC1CNC(NC1(CC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,C1CN(CC1CNC(NC1(CC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,0.47,0.42,,0,0,,,,not tested,,racemate,Z1184558850,DR02015
+SAR-by-ML,185,Cc1ccc(cc1)N1CCC(C1)NC(c1ccc(cc1)[Cl])=O,Cc1ccc(cc1)N1CCC(C1)NC(c1ccc(cc1)[Cl])=O,0.37,0.33,,0,0,,,,not tested,,racemate,Z1210179204,DR01953
+SAR-by-ML,186,C1CN(CC1CNC(c1ccc(cc1)C(NC1CC1)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(cc1)C(NC1CC1)=O)=O)c1ccc(cc1)[Cl],0.46,0.41,,0,0,,,,not tested,,racemate,Z1521854576,DR01936
+SAR-by-ML,187,C1CN(CC1NC(c1ccc(cc1)C(NC1CC1)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(c1ccc(cc1)C(NC1CC1)=O)=O)c1ccc(cc1)[Cl],0.34,0.3,,0,0,,,,not tested,,racemate,Z1602037382,DR02012
+SAR-by-ML,188,C1CC(N(C1)Cc1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)[Cl])=O)=O,C1CC(N(C1)Cc1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)[Cl])=O)=O,0.38,0.32,,0,0,,,,not tested,,racemate,Z1602040103,DR01992
+SAR-by-ML,189,C1CN(CC1NC(CNC(c1ccc(cc1)F)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(CNC(c1ccc(cc1)F)=O)=O)c1ccc(cc1)[Cl],0.41,0.35,,0,0,,,,not tested,,racemate,Z1602588869,DR01962
+SAR-by-ML,190,C1CN(CC1CNC(c1ccc(cc1)C1(CC1)C#N)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(cc1)C1(CC1)C#N)=O)c1ccc(cc1)[Cl],0.43,0.4,,0,0,,,,not tested,,racemate,Z1609557377,DR01993
+SAR-by-ML,191,C1CC(COC1)c1ccc(cc1)C(NCC1CCN(C1)c1ccc(cc1)[Cl])=O,C1CC(COC1)c1ccc(cc1)C(NCC1CCN(C1)c1ccc(cc1)[Cl])=O,0.42,0.38,,0,0,,,,not tested,,racemate,Z1629587760,DR01987
+SAR-by-ML,192,C1CN(CC1CNC(c1ccc(cc1)OC1CCOC1)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(cc1)OC1CCOC1)=O)c1ccc(cc1)[Cl],0.4,0.38,,0,0,,,,not tested,,racemate,Z1926688637,DR01945
+SAR-by-ML,193,C1CN(CC1CNC(N1CC(C1)(c1ccc(cc1)[Cl])O)=O)c1ccc(cc1)F,C1CN(CC1CNC(N1CC(C1)(c1ccc(cc1)[Cl])O)=O)c1ccc(cc1)F,0.45,0.41,,0,0,,,,not tested,,racemate,Z2182424728,DR02002
+SAR-by-ML,194,C1CN(CC1CNC(N1CC(C1)(c1ccc(cc1)F)O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(N1CC(C1)(c1ccc(cc1)F)O)=O)c1ccc(cc1)[Cl],0.42,0.38,,0,0,,,,not tested,,racemate,Z2182471412,DR02007
+SAR-by-ML,195,C1CN(CC1NC(c1ccc(cc1)C1CCC(N1)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(c1ccc(cc1)C1CCC(N1)=O)=O)c1ccc(cc1)[Cl],0.32,0.27,,0,0,,,,not tested,,racemate,Z2839375428,DR01984
+SAR-by-ML,196,C1CN(CC1CNC(c1ccc(cc1)C1(COC1)O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(cc1)C1(COC1)O)=O)c1ccc(cc1)[Cl],0.44,0.39,,0,0,,,,not tested,,racemate,Z3346557425,DR01959
+SAR-by-ML,197,C1CN(CC1NC(c1ccc(cc1)C1(COC1)O)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(c1ccc(cc1)C1(COC1)O)=O)c1ccc(cc1)[Cl],0.3,0.28,,0,0,,,,not tested,,racemate,Z3352466955,DR01966
+SAR-by-ML,198,C1CC2C(Nc3cc(ccc3N2C1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,C1CC2C(Nc3cc(ccc3N2C1)C(NC1(COC1)c1ccc(cc1)[Cl])=O)=O,0.39,0.37,,0,0,,,,not tested,,racemate,Z4183609569,DR02018
+SAR-by-ML,199,C1CN(CC1O)c1ccc(cc1)C(NCCc1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NCCc1ccc(cc1)[Cl])=O,0.36,0.34,,0,0,,,,not tested,,racemate,Z4302091223,DR01935
+SAR-by-ML,200,C1CN(CC1O)c1ccc(cc1)C(NCCOc1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NCCOc1ccc(cc1)[Cl])=O,0.37,0.36,,0,0,,,,not tested,,racemate,Z4302153140,DR02013
+SAR-by-ML,201,C1CN(CC1CNC(c1ccc(cc1)N1CCC(C1)O)=O)c1ccc(cc1)F,C1CN(CC1CNC(c1ccc(cc1)N1CCC(C1)O)=O)c1ccc(cc1)F,0.48,0.46,,0,0,,,,not tested,,racemate,Z4302468174,DR01938
+SAR-by-ML,202,CC(c1cccc(c1)N1CCCC1)NC(c1ccc(cc1)N1CCC(C1)O)=O,CC(c1cccc(c1)N1CCCC1)NC(c1ccc(cc1)N1CCC(C1)O)=O,0.41,0.39,,0,0,,,,not tested,,racemate,Z4303160200,DR01998
+SAR-by-ML,203,C1CC2(C1)CC(c1ccccc1O2)NC(c1ccc(cc1)N1CCC(C1)O)=O,C1CC2(C1)CC(c1ccccc1O2)NC(c1ccc(cc1)N1CCC(C1)O)=O,0.35,0.33,,0,0,,,,not tested,,racemate,Z4303170903,DR01975
+SAR-by-ML,204,C1CN(CC1NC(c1ccc(cc1)N1CCC(C1)O)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(c1ccc(cc1)N1CCC(C1)O)=O)c1ccc(cc1)[Cl],0.33,0.3,,0,0,,,,not tested,,racemate,Z4303406212,DR01963
+SAR-by-ML,205,C1CN(CC1O)c1ccc(cc1)C(Nc1cccc2CN(Cc12)C1CC1)=O,C1CN(CC1O)c1ccc(cc1)C(Nc1cccc2CN(Cc12)C1CC1)=O,0.26,0.26,,0,0,,,,not tested,,racemate,Z4303413552,DR01985
+SAR-by-ML,206,C1CN(CC1O)c1ccc(cc1)C(NCC(=O)OCc1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NCC(=O)OCc1ccc(cc1)[Cl])=O,0.32,0.3,,0,0,,,,not tested,,racemate,Z4303456724,DR02006
+SAR-by-ML,207,C1CN(CC1CNC(c1ccc(cc1)N1CCC(C1)O)=O)Cc1ccccc1,C1CN(CC1CNC(c1ccc(cc1)N1CCC(C1)O)=O)Cc1ccccc1,0.4,0.38,,0,0,,,,not tested,,racemate,Z4303684856,DR01968
+SAR-by-ML,208,C1CN(CC1O)c1ccc(cc1)C(N1Cc2ccc(cc2C1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(N1Cc2ccc(cc2C1)[Cl])=O,0.32,0.29,,0,0,,,,not tested,,racemate,Z4304007647,DR01955
+SAR-by-ML,209,CC1(CCN(C1)C(=O)OC(C)(C)C)NC(c1ccc(cc1)N1CCC(C1)O)=O,CC1(CCN(C1)C(=O)OC(C)(C)C)NC(c1ccc(cc1)N1CCC(C1)O)=O,0.31,0.3,,0,0,,,,not tested,,racemate,Z4304249911,DR02003
+SAR-by-ML,210,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1CCO[C@H]1c1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1CCO[C@H]1c1ccc(cc1)[Cl])=O,0.32,0.28,,0,0,,,,not tested,,chiral,Z4304319619,DR02001
+SAR-by-ML,211,C1CC2(C1)C[C@H](c1cc(ccc1O2)F)NC(c1ccc(cc1)N1CCC(C1)O)=O,C1CC2(C1)C[C@H](c1cc(ccc1O2)F)NC(c1ccc(cc1)N1CCC(C1)O)=O,0.31,0.29,,0,0,,,,not tested,,chiral,Z4304927967,DR01964
+SAR-by-ML,212,C1CN(CC1O)c1ccc(cc1)C(NOCc1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(NOCc1ccc(cc1)[Cl])=O,0.33,0.3,,0,0,,,,not tested,,racemate,Z4305730476,DR02010
+SAR-by-ML,213,C1CN(CC1CNC(c1cccc(c1)C1(COC1)O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1cccc(c1)C1(COC1)O)=O)c1ccc(cc1)[Cl],0.43,0.4,,0,0,,,,not tested,,racemate,Z4318065475,DR01996
+SAR-by-ML,214,C1CN(CC1CNC(C1(CC1)c1ccc(cc1)C(N)=O)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(C1(CC1)c1ccc(cc1)C(N)=O)=O)c1ccc(cc1)[Cl],0.42,0.37,,0,0,,,,not tested,,racemate,Z4348536160,DR02017
+SAR-by-ML,215,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1CCN(C2CC2)[C@H]1c1ccccc1)=O,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1CCN(C2CC2)[C@H]1c1ccccc1)=O,0.32,0.27,,0,0,,,,not tested,,chiral,Z4612587179,DR01958
+SAR-by-ML,216,C1CN(CC1O)c1ccc(cc1)C(NC1(Cc2ccccc2)COC1)=O,C1CN(CC1O)c1ccc(cc1)C(NC1(Cc2ccccc2)COC1)=O,0.46,0.32,,0,0,,,,not tested,,racemate,Z4640393345,DR01952
+SAR-by-ML,217,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1C[C@H]1c1ccc(cc1)[Cl])=O,C1CN(CC1O)c1ccc(cc1)C(N[C@@H]1C[C@H]1c1ccc(cc1)[Cl])=O,0.33,0.28,,0,0,,,,not tested,,chiral,Z4772076085,DR01986
+SAR-by-ML,218,C1CCN(C1)c1cccc(c1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CCN(C1)c1cccc(c1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.54,0.5,,0,0,,,,not tested,,,Z7151300541,DR01982
+SAR-by-ML,219,C1CCN(C1)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CCN(C1)c1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.5,0.45,,0,0,,,,not tested,,,Z7151300545,DR01988
+SAR-by-ML,220,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1cncc2cnccc12)=O,C1C(CO1)(c1ccc(cc1)[Cl])NC(c1cncc2cnccc12)=O,0.41,0.37,,0,0,,,,not tested,,,Z7151300546,DR01948
+SAR-by-ML,221,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)c1ccc(cc1)F)=O,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)c1ccc(cc1)F)=O,0.41,0.37,,0,0,,,,not tested,,racemate,Z7151300547,DR02016
+SAR-by-ML,222,C1Cc2cc(ccc2C1NC(c1ccc(cc1)N1CCC(C1)O)=O)[Cl],C1Cc2cc(ccc2C1NC(c1ccc(cc1)N1CCC(C1)O)=O)[Cl],0.48,0.46,,0,0,,,,not tested,,racemate,Z7151300549,DR01981
+SAR-by-ML,223,C1CN(CC1C(NC1(COC1)c1ccc(cc1)[Cl])=O)c1ccccc1,C1CN(CC1C(NC1(COC1)c1ccc(cc1)[Cl])=O)c1ccccc1,0.36,0.35,,0,0,,,,not tested,,racemate,Z7151300555,DR01991
+SAR-by-ML,224,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)Cc1ccc(cc1)F)=O,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)Cc1ccc(cc1)F)=O,0.4,0.36,,0,0,,,,not tested,,racemate,Z7151300556,DR02014
+SAR-by-ML,225,CC1CCN(C1)c1ccc(cc1)C(NCC1(CC1)c1ccc(cc1)F)=O,CC1CCN(C1)c1ccc(cc1)C(NCC1(CC1)c1ccc(cc1)F)=O,0.38,0.36,,0,0,,,,not tested,,racemate,Z7151300557,DR01965
+SAR-by-ML,226,Cc1c(C(NC2(COC2)c2ccc(cc2)[Cl])=O)n2ccsc2n1,Cc1c(C(NC2(COC2)c2ccc(cc2)[Cl])=O)n2ccsc2n1,0.47,0.41,,0,0,,,,not tested,,,Z7151300561,DR01989
+SAR-by-ML,227,CC1(CC1)c1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)F)=O,CC1(CC1)c1ccc(cc1)C(NC1CCN(C1)c1ccc(cc1)F)=O,0.36,0.34,,0,0,,,,not tested,,racemate,Z7151300562,DR01994
+SAR-by-ML,228,C[C@H](c1ccc2CCCCc2c1)NC(c1ccc(cc1)N1CCC(C1)O)=O,C[C@H](c1ccc2CCCCc2c1)NC(c1ccc(cc1)N1CCC(C1)O)=O,0.38,0.33,,0,0,,,,not tested,,chiral,Z7151300564,DR01990
+SAR-by-ML,229,C1CN(CC1NC(c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,C1CN(CC1NC(c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,0.48,0.39,,0,0,,,,not tested,,racemate,Z7151300566,DR01976
+SAR-by-ML,230,C1CN(CC1O)c1ccc(cc1)C(Nc1cccc2cnccc12)=O,C1CN(CC1O)c1ccc(cc1)C(Nc1cccc2cnccc12)=O,0.3,0.29,,0,0,,,,not tested,,racemate,Z7151300568,DR01979
+SAR-by-ML,231,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)Cc1cccc(c1)F)=O,CC1CCN(C1)c1ccc(cc1)C(NC1(CC1)Cc1cccc(c1)F)=O,0.37,0.35,,0,0,,,,not tested,,racemate,Z7151300569,DR02009
+SAR-by-ML,232,CC1CCN(C1)c1ccc(cc1)C(NC1(C)Cc2ccccc2C1)=O,CC1CCN(C1)c1ccc(cc1)C(NC1(C)Cc2ccccc2C1)=O,0.3,0.29,,0,0,,,,not tested,,racemate,Z7151300571,DR01937
+SAR-by-ML,233,C1CN(CC1NC(c1ccc2CCc2c1)=O)c1ccc(cc1)[Cl],C1CN(CC1NC(c1ccc2CCc2c1)=O)c1ccc(cc1)[Cl],0.32,0.3,,0,0,,,,not tested,,racemate,Z7151300572,DR01973
+SAR-by-ML,234,C1CC1COc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CC1COc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.44,0.4,,0,0,,,,not tested,,,Z7151300576,DR01971
+SAR-by-ML,235,C1CC1Cc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,C1CC1Cc1ccc(cc1)C(NC1(COC1)c1ccc(cc1)[Cl])=O,0.49,0.44,,0,0,,,,not tested,,,Z7151300577,DR01970
+SAR-by-ML,236,C1CN(CC1CNC(c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,C1CN(CC1CNC(c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,0.6,0.5,,0,0,,,,not tested,,racemate,Z815403694,DR01960
+SAR-by-ML,237,C1CN(CC1CNC(C1(CCOCC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,C1CN(CC1CNC(C1(CCOCC1)c1ccc(cc1)[Cl])=O)c1ccc(cc1)F,0.45,0.41,,0,0,,,,not tested,,racemate,Z817076120,DR01995
+SAR-by-ML,238,C1CN(CC1CNC(c1ccc(cc1)F)=O)c1ccc(cc1)[Cl],C1CN(CC1CNC(c1ccc(cc1)F)=O)c1ccc(cc1)[Cl],0.54,0.47,,0,0,,,,not tested,,racemate,Z878851510,DR01950

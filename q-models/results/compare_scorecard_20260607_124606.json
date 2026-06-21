@@ -1,0 +1,94 @@
+{
+  "timestamp": "20260607_124606",
+  "models": [
+    "MAMMAL",
+    "ConPLex",
+    "Boltz-2"
+  ],
+  "decisive_win_fired": false,
+  "sources": {
+    "t1": "20260607_124012",
+    "t2": "20260607_124159",
+    "t3": "20260607_124240",
+    "t4": "20260607_124342"
+  },
+  "rows": [
+    {
+      "test": "1. Correlation (n=10)",
+      "metric": "Spearman \u03c1 vs pChEMBL",
+      "bar": "\u03c1>0.4 PASS",
+      "kind": "apples-to-apples (off-the-shelf DTI)",
+      "cells": {
+        "MAMMAL": "+0.43 [-0.29,+0.79] PASS",
+        "ConPLex": "-0.03 [-0.79,+0.86] FAIL",
+        "Boltz-2": "N/A \u2014 pending AWS"
+      }
+    },
+    {
+      "test": "2. Named (suze\u2192Nav1.8)",
+      "metric": "named > all 6 negatives",
+      "bar": "binary",
+      "kind": "apples-to-apples (off-the-shelf DTI)",
+      "cells": {
+        "MAMMAL": "FAIL (z -0.69)",
+        "ConPLex": "FAIL (z -2.35)",
+        "Boltz-2": "N/A \u2014 pending AWS"
+      }
+    },
+    {
+      "test": "3. Nav1.8 triage",
+      "metric": "AUROC actives vs decoys",
+      "bar": "AUROC>0.6 useful",
+      "kind": "apples-to-apples (off-the-shelf DTI)",
+      "cells": {
+        "MAMMAL": "0.43 [0.00,0.93]",
+        "ConPLex": "0.39 [0.00,0.75]",
+        "Boltz-2": "N/A \u2014 over compute budget (per-pair oracle)"
+      }
+    },
+    {
+      "test": "3. mTOR triage",
+      "metric": "AUROC actives vs decoys",
+      "bar": "AUROC>0.6 useful",
+      "kind": "apples-to-apples (off-the-shelf DTI)",
+      "cells": {
+        "MAMMAL": "0.54 [0.00,1.00]",
+        "ConPLex": "0.58 [0.17,1.00]",
+        "Boltz-2": "N/A \u2014 over compute budget (per-pair oracle)"
+      }
+    },
+    {
+      "test": "4. 4a_wdr91_chembl",
+      "metric": "AUROC (+EF5/10)",
+      "bar": "AUROC>0.6",
+      "kind": "ZERO-SHOT challengers vs FINE-TUNED MAMMAL",
+      "cells": {
+        "MAMMAL": "0.64 [0.52,0.75]",
+        "ConPLex": "0.57 [0.47,0.67]",
+        "Boltz-2": "N/A \u2014 over budget / pending AWS"
+      }
+    },
+    {
+      "test": "4. 4b_wdr91_spr",
+      "metric": "AUROC (+EF5/10)",
+      "bar": "AUROC>0.6",
+      "kind": "ZERO-SHOT challengers vs FINE-TUNED MAMMAL",
+      "cells": {
+        "MAMMAL": "0.82 [0.74,0.89]",
+        "ConPLex": "0.59 [0.50,0.69]",
+        "Boltz-2": "N/A \u2014 over budget / pending AWS"
+      }
+    },
+    {
+      "test": "4. 4c_pgk2_selectivity",
+      "metric": "AUROC (+EF5/10)",
+      "bar": "AUROC>0.6",
+      "kind": "ZERO-SHOT challengers vs FINE-TUNED MAMMAL",
+      "cells": {
+        "MAMMAL": "0.97 [0.94,0.99]",
+        "ConPLex": "0.62 [0.54,0.69]",
+        "Boltz-2": "N/A \u2014 over budget / pending AWS"
+      }
+    }
+  ]
+}

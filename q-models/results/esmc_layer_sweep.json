@@ -1,0 +1,251 @@
+{
+  "test": "esmc_600m_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T14:46:39.873902",
+  "model": "esmc_600m",
+  "n_layers": 36,
+  "n_proteins": 40,
+  "truncate_aa": 1022,
+  "final_embeddings_nn": {
+    "raw": 0.625,
+    "centered": 0.65
+  },
+  "per_layer": [
+    {
+      "layer": 0,
+      "nn_raw": 0.65,
+      "nn_centered": 0.7,
+      "best": 0.7
+    },
+    {
+      "layer": 1,
+      "nn_raw": 0.725,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "layer": 2,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "layer": 3,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "layer": 4,
+      "nn_raw": 0.75,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 5,
+      "nn_raw": 0.825,
+      "nn_centered": 0.775,
+      "best": 0.825
+    },
+    {
+      "layer": 6,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 7,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "layer": 8,
+      "nn_raw": 0.825,
+      "nn_centered": 0.75,
+      "best": 0.825
+    },
+    {
+      "layer": 9,
+      "nn_raw": 0.825,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "layer": 10,
+      "nn_raw": 0.825,
+      "nn_centered": 0.8,
+      "best": 0.825
+    },
+    {
+      "layer": 11,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 12,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 13,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "layer": 14,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 15,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 16,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "layer": 17,
+      "nn_raw": 0.8,
+      "nn_centered": 0.725,
+      "best": 0.8
+    },
+    {
+      "layer": 18,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "layer": 19,
+      "nn_raw": 0.8,
+      "nn_centered": 0.725,
+      "best": 0.8
+    },
+    {
+      "layer": 20,
+      "nn_raw": 0.775,
+      "nn_centered": 0.725,
+      "best": 0.775
+    },
+    {
+      "layer": 21,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "layer": 22,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "layer": 23,
+      "nn_raw": 0.725,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "layer": 24,
+      "nn_raw": 0.725,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 25,
+      "nn_raw": 0.725,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 26,
+      "nn_raw": 0.725,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 27,
+      "nn_raw": 0.725,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "layer": 28,
+      "nn_raw": 0.725,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "layer": 29,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "layer": 30,
+      "nn_raw": 0.7,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 31,
+      "nn_raw": 0.7,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "layer": 32,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "layer": 33,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "layer": 34,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "layer": 35,
+      "nn_raw": 0.725,
+      "nn_centered": 0.675,
+      "best": 0.725
+    }
+  ],
+  "best_layer": {
+    "layer": 5,
+    "nn_raw": 0.825,
+    "nn_centered": 0.775,
+    "used": "raw",
+    "per_family_nn_recall": {
+      "kinase": 1.0,
+      "gpcr": 1.0,
+      "ion_channel": 1.0,
+      "nuclear_receptor": 0.5,
+      "e3_ligase": 0.5,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    }
+  },
+  "references": {
+    "mammal_458M": 0.75,
+    "esm2_650M_raw": 0.725,
+    "esm2_650M_centered": 0.75,
+    "bar": 0.8
+  }
+}

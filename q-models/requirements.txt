@@ -1,0 +1,11 @@
+# MAMMAL exploration — key dependencies.
+# Install into a dedicated env (we use conda `mammal`, Python 3.11):
+#   pip install -r requirements.txt
+#
+# CRITICAL macOS gotcha: set USE_TF=0 (and USE_FLAX=0) BEFORE importing
+# transformers/mammal, or the import deadlocks on TensorFlow
+# ([mutex.cc:452] RAW: Lock blocking). The mammal_quiver package sets this at
+# import; ad-hoc REPLs must export it manually. See CLAUDE.md / README.md.
+
+biomed-multi-alignment    # MAMMAL model + tasks (pulls fuse-med-ml, transformers, torch)
+PyTDC                     # tdc.* — required by the dti_bindingdb_kd task; rdkit comes in via PyTDC

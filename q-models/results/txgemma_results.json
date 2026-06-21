@@ -1,0 +1,65 @@
+{
+  "test": "txgemma_9b_predict",
+  "timestamp": "2026-06-13T01:35:25.214627",
+  "model": "google/txgemma-9b-predict",
+  "LICENSE": "NON-COMMERCIAL RESEARCH ONLY (TxGemma HAI-DEF). Not shippable.",
+  "scoring": "P(B) via '(' trick on next-token logits; (B)=positive for all 4 templates",
+  "in_distribution": {
+    "BBB_Martins": {
+      "auroc": 0.9609962406015038,
+      "TPR": 0.9910714285714286,
+      "TNR": 0.7105263157894737,
+      "acc": 0.92,
+      "n": 150,
+      "pos": 112
+    },
+    "hERG_Karim": {
+      "auroc": 0.9508856682769726,
+      "TPR": 0.9130434782608695,
+      "TNR": 0.8765432098765432,
+      "acc": 0.8933333333333333,
+      "n": 150,
+      "pos": 69
+    },
+    "DILI": {
+      "auroc": 0.96697695035461,
+      "TPR": 0.9791666666666666,
+      "TNR": 0.8085106382978723,
+      "acc": 0.8947368421052632,
+      "n": 95,
+      "pos": 48
+    },
+    "ClinTox": {
+      "auroc": 0.9547101449275363,
+      "TPR": 0.75,
+      "TNR": 0.9565217391304348,
+      "acc": 0.94,
+      "n": 150,
+      "pos": 12
+    }
+  },
+  "external_30drug": {
+    "DILI": {
+      "auroc": 0.7777777777777778,
+      "TPR": 0.8,
+      "TNR": 0.4666666666666667,
+      "acc": 0.6333333333333333,
+      "n": 30,
+      "pos": 15
+    },
+    "ClinTox": {
+      "auroc": 0.4666666666666667,
+      "TPR": 0.26666666666666666,
+      "TNR": 0.6,
+      "acc": 0.43333333333333335,
+      "n": 30,
+      "pos": 15
+    }
+  },
+  "baselines": {
+    "BBB_Martins_MolFormer": 0.889,
+    "DILI_ADMET_AI_TPR": 0.83,
+    "ClinTox_MAMMAL_TPR": 0.08,
+    "hERG_rule_balacc": 0.65
+  }
+}

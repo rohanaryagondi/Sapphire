@@ -1,0 +1,231 @@
+{
+  "phase": "phase6_crossmodal_alignment",
+  "timestamp": "20260601_131645",
+  "device": "cpu",
+  "model": "base_458m (no task head)",
+  "n_targets": 6,
+  "targets": [
+    {
+      "name": "WDR91",
+      "family": "wd_repeat",
+      "seq_len": 747,
+      "truncated_protein": false,
+      "n_binder": 64,
+      "n_decoy": 40
+    },
+    {
+      "name": "PGK2_PGK1lig",
+      "family": "kinase_metab",
+      "seq_len": 417,
+      "truncated_protein": false,
+      "n_binder": 40,
+      "n_decoy": 40
+    },
+    {
+      "name": "EGFR",
+      "family": "kinase",
+      "seq_len": 1210,
+      "truncated_protein": false,
+      "n_binder": 6,
+      "n_decoy": 40
+    },
+    {
+      "name": "ADRB2",
+      "family": "gpcr",
+      "seq_len": 413,
+      "truncated_protein": false,
+      "n_binder": 6,
+      "n_decoy": 40
+    },
+    {
+      "name": "SCN10A",
+      "family": "ion_channel",
+      "seq_len": 1956,
+      "truncated_protein": true,
+      "n_binder": 6,
+      "n_decoy": 40
+    },
+    {
+      "name": "ESR1",
+      "family": "nuclear_recep",
+      "seq_len": 595,
+      "truncated_protein": false,
+      "n_binder": 5,
+      "n_decoy": 40
+    }
+  ],
+  "decoys_per_target_legA": 40,
+  "decoys_per_target_legB": 12,
+  "binders_cap_legB": 15,
+  "modality_diagnostic": {
+    "within_protein_cos_mean": 0.2781,
+    "within_molecule_cos_mean": 0.7249,
+    "cross_modal_cos_mean": 0.0802,
+    "cross_modal_cos_min": 0.0128,
+    "cross_modal_cos_max": 0.182,
+    "note": "if within-molecule >> cross-modal and cross-modal band is tight, raw cross-modal cosine is modality-dominated (uninformative for binding)."
+  },
+  "A_separate_encode_cosine": {
+    "per_target": {
+      "WDR91": {
+        "family": "wd_repeat",
+        "n_binder": 64,
+        "n_decoy": 40,
+        "auroc": 0.6652,
+        "mean_binder_cos": 0.1467,
+        "mean_decoy_cos": 0.1322,
+        "delta": 0.0144,
+        "cohens_d": 0.687,
+        "mannwhitney_p": 0.0047
+      },
+      "PGK2_PGK1lig": {
+        "family": "kinase_metab",
+        "n_binder": 40,
+        "n_decoy": 40,
+        "auroc": 0.225,
+        "mean_binder_cos": 0.0332,
+        "mean_decoy_cos": 0.0468,
+        "delta": -0.0135,
+        "cohens_d": -1.064,
+        "mannwhitney_p": 0.0
+      },
+      "EGFR": {
+        "family": "kinase",
+        "n_binder": 6,
+        "n_decoy": 40,
+        "auroc": 0.8417,
+        "mean_binder_cos": 0.093,
+        "mean_decoy_cos": 0.0643,
+        "delta": 0.0286,
+        "cohens_d": 1.071,
+        "mannwhitney_p": 0.0075
+      },
+      "ADRB2": {
+        "family": "gpcr",
+        "n_binder": 6,
+        "n_decoy": 40,
+        "auroc": 0.4542,
+        "mean_binder_cos": 0.0573,
+        "mean_decoy_cos": 0.059,
+        "delta": -0.0018,
+        "cohens_d": -0.103,
+        "mannwhitney_p": 0.7198
+      },
+      "SCN10A": {
+        "family": "ion_channel",
+        "n_binder": 6,
+        "n_decoy": 40,
+        "auroc": 0.35,
+        "mean_binder_cos": 0.0806,
+        "mean_decoy_cos": 0.0956,
+        "delta": -0.015,
+        "cohens_d": -0.439,
+        "mannwhitney_p": 0.2403
+      },
+      "ESR1": {
+        "family": "nuclear_recep",
+        "n_binder": 5,
+        "n_decoy": 40,
+        "auroc": 0.885,
+        "mean_binder_cos": 0.0769,
+        "mean_decoy_cos": 0.0402,
+        "delta": 0.0367,
+        "cohens_d": 1.842,
+        "mannwhitney_p": 0.0054
+      }
+    },
+    "pooled": {
+      "auroc": 0.6195,
+      "cohens_d": 0.56,
+      "mannwhitney_p": 0.0002,
+      "mean_auroc_across_targets": 0.5702
+    },
+    "verdict": "NO meaningful alignment (binder vs decoy ~ chance)"
+  },
+  "A2_target_specificity": {
+    "rank1_accuracy": 0.4961,
+    "mean_rank_of_true_target": 3.15,
+    "n_targets": 6,
+    "chance_rank1": 0.1667,
+    "chance_mean_rank": 3.5,
+    "n_binders_tested": 127
+  },
+  "B_joint_encode_block_alignment": {
+    "per_target": {
+      "WDR91": {
+        "family": "wd_repeat",
+        "n_binder": 15,
+        "n_decoy": 12,
+        "auroc": 0.5333,
+        "mean_binder_cos": 0.6118,
+        "mean_decoy_cos": 0.6072,
+        "delta": 0.0046,
+        "cohens_d": 0.142,
+        "mannwhitney_p": 0.7697
+      },
+      "PGK2_PGK1lig": {
+        "family": "kinase_metab",
+        "n_binder": 15,
+        "n_decoy": 12,
+        "auroc": 0.6611,
+        "mean_binder_cos": 0.589,
+        "mean_decoy_cos": 0.5172,
+        "delta": 0.0718,
+        "cohens_d": 0.628,
+        "mannwhitney_p": 0.1571
+      },
+      "EGFR": {
+        "family": "kinase",
+        "n_binder": 6,
+        "n_decoy": 12,
+        "auroc": 0.3056,
+        "mean_binder_cos": 0.3248,
+        "mean_decoy_cos": 0.3686,
+        "delta": -0.0438,
+        "cohens_d": -0.595,
+        "mannwhitney_p": 0.1898
+      },
+      "ADRB2": {
+        "family": "gpcr",
+        "n_binder": 6,
+        "n_decoy": 12,
+        "auroc": 0.8889,
+        "mean_binder_cos": 0.1725,
+        "mean_decoy_cos": 0.0342,
+        "delta": 0.1383,
+        "cohens_d": 2.084,
+        "mannwhitney_p": 0.0087
+      },
+      "SCN10A": {
+        "family": "ion_channel",
+        "n_binder": 0,
+        "n_decoy": 0,
+        "auroc": NaN,
+        "mean_binder_cos": NaN,
+        "mean_decoy_cos": NaN,
+        "delta": NaN,
+        "cohens_d": NaN,
+        "mannwhitney_p": NaN
+      },
+      "ESR1": {
+        "family": "nuclear_recep",
+        "n_binder": 5,
+        "n_decoy": 12,
+        "auroc": 0.2,
+        "mean_binder_cos": 0.2427,
+        "mean_decoy_cos": 0.2877,
+        "delta": -0.045,
+        "cohens_d": -1.063,
+        "mannwhitney_p": 0.0578
+      }
+    },
+    "pooled": {
+      "auroc": 0.6447,
+      "cohens_d": 0.539,
+      "mannwhitney_p": 0.0104,
+      "mean_auroc_across_targets": NaN
+    },
+    "verdict": "NO meaningful alignment (binder vs decoy ~ chance)"
+  },
+  "reference_prior": "DTI PEER (purpose-built joint binding head) gave ~0 single-target binder-vs-decoy separation: Nav1.8 +0.00, mTOR +0.10 (results/phase2b_quiver_targets.md)."
+}

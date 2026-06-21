@@ -1,0 +1,98 @@
+{
+  "timestamp": "20260528_192110",
+  "model": "ibm/biomed.omics.bl.sm.ma-ted-458m.dti_bindingdb_pkd",
+  "device": "mps",
+  "n": 20,
+  "spearman": 0.6135,
+  "pearson": 0.7669,
+  "pred_range": [
+    3.105,
+    6.656
+  ],
+  "exp_range": [
+    2.0,
+    8.745
+  ],
+  "rows": [
+    {
+      "exp_pkd": 2.0,
+      "pred_pkd": 3.105
+    },
+    {
+      "exp_pkd": 4.481,
+      "pred_pkd": 5.129
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.723
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 6.388
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.244
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.532
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.629
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.285
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.326
+    },
+    {
+      "exp_pkd": 5.0,
+      "pred_pkd": 5.558
+    },
+    {
+      "exp_pkd": 5.027,
+      "pred_pkd": 5.48
+    },
+    {
+      "exp_pkd": 5.456,
+      "pred_pkd": 6.565
+    },
+    {
+      "exp_pkd": 5.77,
+      "pred_pkd": 6.041
+    },
+    {
+      "exp_pkd": 6.044,
+      "pred_pkd": 6.258
+    },
+    {
+      "exp_pkd": 6.398,
+      "pred_pkd": 6.346
+    },
+    {
+      "exp_pkd": 6.638,
+      "pred_pkd": 6.512
+    },
+    {
+      "exp_pkd": 7.066,
+      "pred_pkd": 5.48
+    },
+    {
+      "exp_pkd": 7.523,
+      "pred_pkd": 6.357
+    },
+    {
+      "exp_pkd": 8.046,
+      "pred_pkd": 6.044
+    },
+    {
+      "exp_pkd": 8.745,
+      "pred_pkd": 6.656
+    }
+  ]
+}

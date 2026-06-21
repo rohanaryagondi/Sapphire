@@ -1,0 +1,283 @@
+{
+  "timestamp": "20260529_094957",
+  "n_safe": 15,
+  "n_toxic": 15,
+  "n_safe_external": 5,
+  "n_toxic_external": 7,
+  "safe_falsealarm_rate_all": 0.0,
+  "safe_falsealarm_rate_EXTERNAL": 0.0,
+  "toxic_sensitivity_all": 0.067,
+  "toxic_sensitivity_EXTERNAL": 0.0,
+  "rows": [
+    {
+      "name": "aspirin",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 1,
+      "p_toxic": 4.208689460938331e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "ibuprofen",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 3.133786549369688e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "acetaminophen",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 6.114678853919031e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "metformin",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 0.3403748869895935,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "amoxicillin",
+      "clinical_tox": 0,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.7694118241706747e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "omeprazole",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.8534362880018307e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "atorvastatin",
+      "clinical_tox": 0,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 2.0166921785857994e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "lisinopril",
+      "clinical_tox": 0,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.0823511047419743e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "amlodipine",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 0.004513065796345472,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "loratadine",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 2.2057920432416722e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "cetirizine",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.4158201793179614e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "caffeine",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 2.031927806456224e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "sertraline",
+      "clinical_tox": 0,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.5279201761586592e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "levothyroxine",
+      "clinical_tox": 0,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 5.011160055801156e-07,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "metoprolol",
+      "clinical_tox": 0,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 2.7016433250537375e-06,
+      "pred": 0,
+      "correct": 1
+    },
+    {
+      "name": "thalidomide",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.9532851638359716e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "cerivastatin",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 2.874809069908224e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "troglitazone",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.458171595913882e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "terfenadine",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.29782790736499e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "cisapride",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.188820760944509e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "rofecoxib",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 1.5289725752154482e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "fenfluramine",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 2.8934632609889377e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "astemizole",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.2495382861743565e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "pemoline",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 0.9976083040237427,
+      "pred": 1,
+      "correct": 1
+    },
+    {
+      "name": "bromfenac",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 8.205685730899859e-07,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "valdecoxib",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 8.775787705417315e-07,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "sibutramine",
+      "clinical_tox": 1,
+      "in_clintox": true,
+      "clintox_label": 0,
+      "p_toxic": 2.7871578822669107e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "phenformin",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 6.6935976974491496e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "benoxaprofen",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.519758711765462e-06,
+      "pred": 0,
+      "correct": 0
+    },
+    {
+      "name": "ximelagatran",
+      "clinical_tox": 1,
+      "in_clintox": false,
+      "clintox_label": null,
+      "p_toxic": 1.941599521160242e-06,
+      "pred": 0,
+      "correct": 0
+    }
+  ]
+}

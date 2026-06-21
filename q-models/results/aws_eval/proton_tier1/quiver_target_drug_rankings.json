@@ -1,0 +1,5747 @@
+{
+  "results": {
+    "SCN10A": {
+      "status": "ok",
+      "node_index": 22244,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "Nav1.8 - Journavx target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9999172687530518,
+              "rank": 1
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9998925924301147,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9998905658721924,
+              "rank": 3
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9998891353607178,
+              "rank": 4
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9998844861984253,
+              "rank": 5
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9998842477798462,
+              "rank": 6
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.999883770942688,
+              "rank": 7
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9998792409896851,
+              "rank": 8
+            },
+            {
+              "name": "Diclofenamide",
+              "node_index": 16874,
+              "score": 0.9998725652694702,
+              "rank": 9
+            },
+            {
+              "name": "Butabarbital",
+              "node_index": 14139,
+              "score": 0.9998657703399658,
+              "rank": 10
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9998607635498047,
+              "rank": 11
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9998605251312256,
+              "rank": 12
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9998599290847778,
+              "rank": 13
+            },
+            {
+              "name": "Bumetanide",
+              "node_index": 14748,
+              "score": 0.9998598098754883,
+              "rank": 14
+            },
+            {
+              "name": "Procainamide",
+              "node_index": 14942,
+              "score": 0.9998592138290405,
+              "rank": 15
+            },
+            {
+              "name": "Phenylpropanolamine",
+              "node_index": 14988,
+              "score": 0.9998584985733032,
+              "rank": 16
+            },
+            {
+              "name": "Rufinamide",
+              "node_index": 14415,
+              "score": 0.9998574256896973,
+              "rank": 17
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9998544454574585,
+              "rank": 18
+            },
+            {
+              "name": "Terbutaline",
+              "node_index": 14938,
+              "score": 0.999852180480957,
+              "rank": 19
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.999850869178772,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9642884135246277,
+              "rank": 1
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9641368985176086,
+              "rank": 2
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.9613973498344421,
+              "rank": 3
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9603483080863953,
+              "rank": 4
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.9599590301513672,
+              "rank": 5
+            },
+            {
+              "name": "Clozapine",
+              "node_index": 15190,
+              "score": 0.9597388505935669,
+              "rank": 6
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9597381949424744,
+              "rank": 7
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.9590305685997009,
+              "rank": 8
+            },
+            {
+              "name": "Phenytoin",
+              "node_index": 14143,
+              "score": 0.9583378434181213,
+              "rank": 9
+            },
+            {
+              "name": "Primidone",
+              "node_index": 15404,
+              "score": 0.9557135105133057,
+              "rank": 10
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.9556044340133667,
+              "rank": 11
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9555562138557434,
+              "rank": 12
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9554196000099182,
+              "rank": 13
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.9551151394844055,
+              "rank": 14
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9545565843582153,
+              "rank": 15
+            },
+            {
+              "name": "Haloperidol",
+              "node_index": 15040,
+              "score": 0.9545252919197083,
+              "rank": 16
+            },
+            {
+              "name": "Apomorphine",
+              "node_index": 14238,
+              "score": 0.9540872573852539,
+              "rank": 17
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9535273313522339,
+              "rank": 18
+            },
+            {
+              "name": "Modafinil",
+              "node_index": 15056,
+              "score": 0.9534170031547546,
+              "rank": 19
+            },
+            {
+              "name": "Orphenadrine",
+              "node_index": 14344,
+              "score": 0.9529971480369568,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "SCN9A": {
+      "status": "ok",
+      "node_index": 22304,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "Nav1.7 - selective pain",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9991681575775146,
+              "rank": 1
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9986690282821655,
+              "rank": 2
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9985387325286865,
+              "rank": 3
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9984250068664551,
+              "rank": 4
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9983628392219543,
+              "rank": 5
+            },
+            {
+              "name": "Ephedra sinica root",
+              "node_index": 16434,
+              "score": 0.9982395172119141,
+              "rank": 6
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9982393980026245,
+              "rank": 7
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.998216450214386,
+              "rank": 8
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.9981878399848938,
+              "rank": 9
+            },
+            {
+              "name": "Doxapram",
+              "node_index": 19785,
+              "score": 0.998163640499115,
+              "rank": 10
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.998120129108429,
+              "rank": 11
+            },
+            {
+              "name": "Trimebutine",
+              "node_index": 15702,
+              "score": 0.9980904459953308,
+              "rank": 12
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9980802536010742,
+              "rank": 13
+            },
+            {
+              "name": "Dimethyltryptamine",
+              "node_index": 16585,
+              "score": 0.9980208873748779,
+              "rank": 14
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9980027079582214,
+              "rank": 15
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9979943037033081,
+              "rank": 16
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9979932308197021,
+              "rank": 17
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9979197382926941,
+              "rank": 18
+            },
+            {
+              "name": "Miconazole",
+              "node_index": 14330,
+              "score": 0.9979164004325867,
+              "rank": 19
+            },
+            {
+              "name": "Dorzolamide",
+              "node_index": 15870,
+              "score": 0.9978762865066528,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9406976103782654,
+              "rank": 1
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9386158585548401,
+              "rank": 2
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9352773427963257,
+              "rank": 3
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9334232807159424,
+              "rank": 4
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9321723580360413,
+              "rank": 5
+            },
+            {
+              "name": "Modafinil",
+              "node_index": 15056,
+              "score": 0.9320670366287231,
+              "rank": 6
+            },
+            {
+              "name": "Flumazenil",
+              "node_index": 17367,
+              "score": 0.9310446381568909,
+              "rank": 7
+            },
+            {
+              "name": "Trapidil",
+              "node_index": 16662,
+              "score": 0.9289209842681885,
+              "rank": 8
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.928234338760376,
+              "rank": 9
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.9277797937393188,
+              "rank": 10
+            },
+            {
+              "name": "Trimebutine",
+              "node_index": 15702,
+              "score": 0.9277259111404419,
+              "rank": 11
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9275422692298889,
+              "rank": 12
+            },
+            {
+              "name": "Guanfacine",
+              "node_index": 15574,
+              "score": 0.9273602962493896,
+              "rank": 13
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.9269508123397827,
+              "rank": 14
+            },
+            {
+              "name": "Primidone",
+              "node_index": 15404,
+              "score": 0.9268966913223267,
+              "rank": 15
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.9252868294715881,
+              "rank": 16
+            },
+            {
+              "name": "Flurazepam",
+              "node_index": 15550,
+              "score": 0.9251718521118164,
+              "rank": 17
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.9240384101867676,
+              "rank": 18
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.923949658870697,
+              "rank": 19
+            },
+            {
+              "name": "Dosulepin",
+              "node_index": 15324,
+              "score": 0.923939049243927,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "SCN1A": {
+      "status": "ok",
+      "node_index": 10694,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "Nav1.1 - Dravet syndrome",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9993584752082825,
+              "rank": 1
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9991070628166199,
+              "rank": 2
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9990655779838562,
+              "rank": 3
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9990637898445129,
+              "rank": 4
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9990565180778503,
+              "rank": 5
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9989625215530396,
+              "rank": 6
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9989596605300903,
+              "rank": 7
+            },
+            {
+              "name": "Terbutaline",
+              "node_index": 14938,
+              "score": 0.9989437460899353,
+              "rank": 8
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9989336133003235,
+              "rank": 9
+            },
+            {
+              "name": "Dextromethorphan",
+              "node_index": 15200,
+              "score": 0.9989051818847656,
+              "rank": 10
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9989017248153687,
+              "rank": 11
+            },
+            {
+              "name": "Nitroprusside",
+              "node_index": 15953,
+              "score": 0.9988604784011841,
+              "rank": 12
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.9988548755645752,
+              "rank": 13
+            },
+            {
+              "name": "Rufinamide",
+              "node_index": 14415,
+              "score": 0.9988511800765991,
+              "rank": 14
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9988079071044922,
+              "rank": 15
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9988030195236206,
+              "rank": 16
+            },
+            {
+              "name": "Lemborexant",
+              "node_index": 15139,
+              "score": 0.9987891316413879,
+              "rank": 17
+            },
+            {
+              "name": "Ephedra sinica root",
+              "node_index": 16434,
+              "score": 0.9987608194351196,
+              "rank": 18
+            },
+            {
+              "name": "Brivaracetam",
+              "node_index": 15641,
+              "score": 0.9987338185310364,
+              "rank": 19
+            },
+            {
+              "name": "Ramelteon",
+              "node_index": 15412,
+              "score": 0.9987327456474304,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.962721049785614,
+              "rank": 1
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.961977481842041,
+              "rank": 2
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.961776852607727,
+              "rank": 3
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.961606502532959,
+              "rank": 4
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.960010826587677,
+              "rank": 5
+            },
+            {
+              "name": "Clozapine",
+              "node_index": 15190,
+              "score": 0.9591572284698486,
+              "rank": 6
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9590257406234741,
+              "rank": 7
+            },
+            {
+              "name": "Primidone",
+              "node_index": 15404,
+              "score": 0.9589077830314636,
+              "rank": 8
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9585800766944885,
+              "rank": 9
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9581739902496338,
+              "rank": 10
+            },
+            {
+              "name": "Guanfacine",
+              "node_index": 15574,
+              "score": 0.9578187465667725,
+              "rank": 11
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.9573197364807129,
+              "rank": 12
+            },
+            {
+              "name": "Flumazenil",
+              "node_index": 17367,
+              "score": 0.9559415578842163,
+              "rank": 13
+            },
+            {
+              "name": "Apomorphine",
+              "node_index": 14238,
+              "score": 0.9559046030044556,
+              "rank": 14
+            },
+            {
+              "name": "Phenytoin",
+              "node_index": 14143,
+              "score": 0.95574551820755,
+              "rank": 15
+            },
+            {
+              "name": "Flurazepam",
+              "node_index": 15550,
+              "score": 0.9555931091308594,
+              "rank": 16
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9554596543312073,
+              "rank": 17
+            },
+            {
+              "name": "Maprotiline",
+              "node_index": 14618,
+              "score": 0.9553382992744446,
+              "rank": 18
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.955023467540741,
+              "rank": 19
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9547162652015686,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "SCN5A": {
+      "status": "ok",
+      "node_index": 10418,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "Nav1.5 - cardiac (off-target)",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9999330043792725,
+              "rank": 1
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9999059438705444,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9999052286148071,
+              "rank": 3
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9998942613601685,
+              "rank": 4
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9998865127563477,
+              "rank": 5
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9998860359191895,
+              "rank": 6
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9998786449432373,
+              "rank": 7
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9998785257339478,
+              "rank": 8
+            },
+            {
+              "name": "Doxapram",
+              "node_index": 19785,
+              "score": 0.9998776912689209,
+              "rank": 9
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9998711347579956,
+              "rank": 10
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9998642206192017,
+              "rank": 11
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9998617172241211,
+              "rank": 12
+            },
+            {
+              "name": "Butabarbital",
+              "node_index": 14139,
+              "score": 0.999859094619751,
+              "rank": 13
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9998570680618286,
+              "rank": 14
+            },
+            {
+              "name": "Diclofenamide",
+              "node_index": 16874,
+              "score": 0.9998569488525391,
+              "rank": 15
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9998539686203003,
+              "rank": 16
+            },
+            {
+              "name": "Phenylpropanolamine",
+              "node_index": 14988,
+              "score": 0.9998512268066406,
+              "rank": 17
+            },
+            {
+              "name": "Travoprost",
+              "node_index": 17500,
+              "score": 0.9998481273651123,
+              "rank": 18
+            },
+            {
+              "name": "Bumetanide",
+              "node_index": 14748,
+              "score": 0.9998458623886108,
+              "rank": 19
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9998458623886108,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.948246955871582,
+              "rank": 1
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9464663863182068,
+              "rank": 2
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9425739049911499,
+              "rank": 3
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.941965639591217,
+              "rank": 4
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9400304555892944,
+              "rank": 5
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.9397999048233032,
+              "rank": 6
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9397924542427063,
+              "rank": 7
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.9391192197799683,
+              "rank": 8
+            },
+            {
+              "name": "Diazepam",
+              "node_index": 14266,
+              "score": 0.9383123517036438,
+              "rank": 9
+            },
+            {
+              "name": "Phenytoin",
+              "node_index": 14143,
+              "score": 0.9370691180229187,
+              "rank": 10
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.9369007349014282,
+              "rank": 11
+            },
+            {
+              "name": "Terbutaline",
+              "node_index": 14938,
+              "score": 0.9364966750144958,
+              "rank": 12
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.9362602233886719,
+              "rank": 13
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9361206293106079,
+              "rank": 14
+            },
+            {
+              "name": "Apomorphine",
+              "node_index": 14238,
+              "score": 0.9360871315002441,
+              "rank": 15
+            },
+            {
+              "name": "Isoflurane",
+              "node_index": 14246,
+              "score": 0.9359152913093567,
+              "rank": 16
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9354285597801208,
+              "rank": 17
+            },
+            {
+              "name": "Mitotane",
+              "node_index": 14024,
+              "score": 0.9353148937225342,
+              "rank": 18
+            },
+            {
+              "name": "Labetalol",
+              "node_index": 14217,
+              "score": 0.9349151253700256,
+              "rank": 19
+            },
+            {
+              "name": "Cannabidiol",
+              "node_index": 14735,
+              "score": 0.9347931146621704,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "MTOR": {
+      "status": "ok",
+      "node_index": 1557,
+      "node_type": "gene/protein",
+      "family": "kinase",
+      "note": "mTOR - the next BRAF",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Adenosine-5'-ditungstate",
+              "node_index": 18971,
+              "score": 0.9940528273582458,
+              "rank": 1
+            },
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9937745332717896,
+              "rank": 2
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9931696653366089,
+              "rank": 3
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.9902938604354858,
+              "rank": 4
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9901703000068665,
+              "rank": 5
+            },
+            {
+              "name": "Encenicline",
+              "node_index": 19338,
+              "score": 0.9898822903633118,
+              "rank": 6
+            },
+            {
+              "name": "2-Carboxyethylphosphonic Acid",
+              "node_index": 19979,
+              "score": 0.9895625710487366,
+              "rank": 7
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9882425665855408,
+              "rank": 8
+            },
+            {
+              "name": "Cenicriviroc",
+              "node_index": 21989,
+              "score": 0.9878392219543457,
+              "rank": 9
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9876757860183716,
+              "rank": 10
+            },
+            {
+              "name": "GTI 2040",
+              "node_index": 19425,
+              "score": 0.9875636100769043,
+              "rank": 11
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9867945313453674,
+              "rank": 12
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9864993095397949,
+              "rank": 13
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.9863899350166321,
+              "rank": 14
+            },
+            {
+              "name": "Tosedostat",
+              "node_index": 19069,
+              "score": 0.9861171841621399,
+              "rank": 15
+            },
+            {
+              "name": "Phosphonothreonine",
+              "node_index": 18173,
+              "score": 0.985857367515564,
+              "rank": 16
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9857324957847595,
+              "rank": 17
+            },
+            {
+              "name": "3-{[(1R)-1-phenylethyl]amino}-4-(pyridin-4-ylamino)cyclobut-3-ene-1,2-dione",
+              "node_index": 18950,
+              "score": 0.9857153296470642,
+              "rank": 18
+            },
+            {
+              "name": "Anthralin",
+              "node_index": 19936,
+              "score": 0.9857019186019897,
+              "rank": 19
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.9854680895805359,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.956840455532074,
+              "rank": 1
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.9440800547599792,
+              "rank": 2
+            },
+            {
+              "name": "(S)-3-phenyllactic acid",
+              "node_index": 19828,
+              "score": 0.9293655753135681,
+              "rank": 3
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.9265344142913818,
+              "rank": 4
+            },
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.9159913063049316,
+              "rank": 5
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.9095017313957214,
+              "rank": 6
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.9080507159233093,
+              "rank": 7
+            },
+            {
+              "name": "Sagopilone",
+              "node_index": 15771,
+              "score": 0.9078524112701416,
+              "rank": 8
+            },
+            {
+              "name": "Milataxel",
+              "node_index": 16116,
+              "score": 0.902806282043457,
+              "rank": 9
+            },
+            {
+              "name": "Tipifarnib",
+              "node_index": 19353,
+              "score": 0.9007473587989807,
+              "rank": 10
+            },
+            {
+              "name": "Artenimol",
+              "node_index": 15333,
+              "score": 0.8984051942825317,
+              "rank": 11
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.8974997401237488,
+              "rank": 12
+            },
+            {
+              "name": "ATP",
+              "node_index": 15940,
+              "score": 0.8963592052459717,
+              "rank": 13
+            },
+            {
+              "name": "AT-7519",
+              "node_index": 18605,
+              "score": 0.894939124584198,
+              "rank": 14
+            },
+            {
+              "name": "Copper",
+              "node_index": 14010,
+              "score": 0.8934110403060913,
+              "rank": 15
+            },
+            {
+              "name": "NADH",
+              "node_index": 14667,
+              "score": 0.891991376876831,
+              "rank": 16
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.8918741345405579,
+              "rank": 17
+            },
+            {
+              "name": "TG-100801",
+              "node_index": 16106,
+              "score": 0.8913933038711548,
+              "rank": 18
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.8907792568206787,
+              "rank": 19
+            },
+            {
+              "name": "Risdiplam",
+              "node_index": 14564,
+              "score": 0.8900021910667419,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "UBE3A": {
+      "status": "ok",
+      "node_index": 5478,
+      "node_type": "gene/protein",
+      "family": "e3_ligase",
+      "note": "UBE3A - Angelman syndrome",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9423741698265076,
+              "rank": 1
+            },
+            {
+              "name": "Adenosine-5'-ditungstate",
+              "node_index": 18971,
+              "score": 0.918764054775238,
+              "rank": 2
+            },
+            {
+              "name": "Tosedostat",
+              "node_index": 19069,
+              "score": 0.8950380682945251,
+              "rank": 3
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.8848426342010498,
+              "rank": 4
+            },
+            {
+              "name": "Encenicline",
+              "node_index": 19338,
+              "score": 0.8821983337402344,
+              "rank": 5
+            },
+            {
+              "name": "Zinc acetate",
+              "node_index": 14761,
+              "score": 0.8796095848083496,
+              "rank": 6
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.8755863308906555,
+              "rank": 7
+            },
+            {
+              "name": "Zinc chloride",
+              "node_index": 14551,
+              "score": 0.8741336464881897,
+              "rank": 8
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.8736501336097717,
+              "rank": 9
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.8693429231643677,
+              "rank": 10
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.8538722991943359,
+              "rank": 11
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.8491240739822388,
+              "rank": 12
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.8491128087043762,
+              "rank": 13
+            },
+            {
+              "name": "3-Indolebutyric Acid",
+              "node_index": 19706,
+              "score": 0.8471516966819763,
+              "rank": 14
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.8452020883560181,
+              "rank": 15
+            },
+            {
+              "name": "Vinylglycine",
+              "node_index": 19741,
+              "score": 0.8371043801307678,
+              "rank": 16
+            },
+            {
+              "name": "S-(Dimethylarsenic)Cysteine",
+              "node_index": 16851,
+              "score": 0.8326470851898193,
+              "rank": 17
+            },
+            {
+              "name": "Guanosine-5'-Diphosphate",
+              "node_index": 18470,
+              "score": 0.8229014277458191,
+              "rank": 18
+            },
+            {
+              "name": "(S)-3-phenyllactic acid",
+              "node_index": 19828,
+              "score": 0.8190253376960754,
+              "rank": 19
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.8146897554397583,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.9626997113227844,
+              "rank": 1
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.9524243474006653,
+              "rank": 2
+            },
+            {
+              "name": "(S)-3-phenyllactic acid",
+              "node_index": 19828,
+              "score": 0.9392024874687195,
+              "rank": 3
+            },
+            {
+              "name": "NADH",
+              "node_index": 14667,
+              "score": 0.922953188419342,
+              "rank": 4
+            },
+            {
+              "name": "Artenimol",
+              "node_index": 15333,
+              "score": 0.9219569563865662,
+              "rank": 5
+            },
+            {
+              "name": "ATP",
+              "node_index": 15940,
+              "score": 0.9149002432823181,
+              "rank": 6
+            },
+            {
+              "name": "Copper",
+              "node_index": 14010,
+              "score": 0.9132541418075562,
+              "rank": 7
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.9079855680465698,
+              "rank": 8
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.9050689339637756,
+              "rank": 9
+            },
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.9033284783363342,
+              "rank": 10
+            },
+            {
+              "name": "Tipifarnib",
+              "node_index": 19353,
+              "score": 0.9029251337051392,
+              "rank": 11
+            },
+            {
+              "name": "Milataxel",
+              "node_index": 16116,
+              "score": 0.9028975367546082,
+              "rank": 12
+            },
+            {
+              "name": "N-Formylmethionine",
+              "node_index": 16905,
+              "score": 0.9020047187805176,
+              "rank": 13
+            },
+            {
+              "name": "AT-7519",
+              "node_index": 18605,
+              "score": 0.890508234500885,
+              "rank": 14
+            },
+            {
+              "name": "Plinabulin",
+              "node_index": 17665,
+              "score": 0.8887161612510681,
+              "rank": 15
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.8847872018814087,
+              "rank": 16
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.8846720457077026,
+              "rank": 17
+            },
+            {
+              "name": "Guanosine-5'-Diphosphate",
+              "node_index": 18470,
+              "score": 0.8843943476676941,
+              "rank": 18
+            },
+            {
+              "name": "MK-1775",
+              "node_index": 19553,
+              "score": 0.8823564052581787,
+              "rank": 19
+            },
+            {
+              "name": "Sagopilone",
+              "node_index": 15771,
+              "score": 0.8819320797920227,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "ADRB2": {
+      "status": "ok",
+      "node_index": 1493,
+      "node_type": "gene/protein",
+      "family": "gpcr",
+      "note": "ADRB2 - propranolol target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9997960925102234,
+              "rank": 1
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9997380375862122,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9997321963310242,
+              "rank": 3
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9997175335884094,
+              "rank": 4
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9996868371963501,
+              "rank": 5
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9996587038040161,
+              "rank": 6
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9996497631072998,
+              "rank": 7
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9996483325958252,
+              "rank": 8
+            },
+            {
+              "name": "Diclofenamide",
+              "node_index": 16874,
+              "score": 0.9996463060379028,
+              "rank": 9
+            },
+            {
+              "name": "Travoprost",
+              "node_index": 17500,
+              "score": 0.9996356964111328,
+              "rank": 10
+            },
+            {
+              "name": "Terbutaline",
+              "node_index": 14938,
+              "score": 0.999616265296936,
+              "rank": 11
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9996161460876465,
+              "rank": 12
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9996111989021301,
+              "rank": 13
+            },
+            {
+              "name": "Butabarbital",
+              "node_index": 14139,
+              "score": 0.9996092915534973,
+              "rank": 14
+            },
+            {
+              "name": "Haloperidol",
+              "node_index": 15040,
+              "score": 0.9995960593223572,
+              "rank": 15
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9995896220207214,
+              "rank": 16
+            },
+            {
+              "name": "Phenylpropanolamine",
+              "node_index": 14988,
+              "score": 0.9995837807655334,
+              "rank": 17
+            },
+            {
+              "name": "Dabigatran etexilate",
+              "node_index": 14425,
+              "score": 0.9995837807655334,
+              "rank": 18
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9995827078819275,
+              "rank": 19
+            },
+            {
+              "name": "Nitroprusside",
+              "node_index": 15953,
+              "score": 0.9995806813240051,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.912539541721344,
+              "rank": 1
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9113401174545288,
+              "rank": 2
+            },
+            {
+              "name": "Estradiol dienanthate",
+              "node_index": 14542,
+              "score": 0.9053052067756653,
+              "rank": 3
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.903554379940033,
+              "rank": 4
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9024134278297424,
+              "rank": 5
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.9023496508598328,
+              "rank": 6
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.9002534747123718,
+              "rank": 7
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.900054931640625,
+              "rank": 8
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.8994773030281067,
+              "rank": 9
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.897682785987854,
+              "rank": 10
+            },
+            {
+              "name": "Cinnarizine",
+              "node_index": 14210,
+              "score": 0.8974959850311279,
+              "rank": 11
+            },
+            {
+              "name": "Phenytoin",
+              "node_index": 14143,
+              "score": 0.8966663479804993,
+              "rank": 12
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.8955705761909485,
+              "rank": 13
+            },
+            {
+              "name": "Mitotane",
+              "node_index": 14024,
+              "score": 0.8955186605453491,
+              "rank": 14
+            },
+            {
+              "name": "Clozapine",
+              "node_index": 15190,
+              "score": 0.8945004940032959,
+              "rank": 15
+            },
+            {
+              "name": "Letermovir",
+              "node_index": 15141,
+              "score": 0.893258273601532,
+              "rank": 16
+            },
+            {
+              "name": "Curcumin sulfate",
+              "node_index": 14842,
+              "score": 0.8920248746871948,
+              "rank": 17
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.8919633030891418,
+              "rank": 18
+            },
+            {
+              "name": "Cimetidine",
+              "node_index": 14197,
+              "score": 0.8915929198265076,
+              "rank": 19
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.8906245231628418,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "DRD2": {
+      "status": "ok",
+      "node_index": 2400,
+      "node_type": "gene/protein",
+      "family": "gpcr",
+      "note": "DRD2 - haloperidol target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9997220635414124,
+              "rank": 1
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9996494054794312,
+              "rank": 2
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9996229410171509,
+              "rank": 3
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9996160268783569,
+              "rank": 4
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.999606192111969,
+              "rank": 5
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9996028542518616,
+              "rank": 6
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9995933175086975,
+              "rank": 7
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9995627999305725,
+              "rank": 8
+            },
+            {
+              "name": "Butabarbital",
+              "node_index": 14139,
+              "score": 0.9995585083961487,
+              "rank": 9
+            },
+            {
+              "name": "Ephedra sinica root",
+              "node_index": 16434,
+              "score": 0.9995484948158264,
+              "rank": 10
+            },
+            {
+              "name": "Diclofenamide",
+              "node_index": 16874,
+              "score": 0.9995484948158264,
+              "rank": 11
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9995434880256653,
+              "rank": 12
+            },
+            {
+              "name": "Dextromethorphan",
+              "node_index": 15200,
+              "score": 0.9995230436325073,
+              "rank": 13
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9995207786560059,
+              "rank": 14
+            },
+            {
+              "name": "Brexanolone",
+              "node_index": 14820,
+              "score": 0.9995195865631104,
+              "rank": 15
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9995030164718628,
+              "rank": 16
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9995012283325195,
+              "rank": 17
+            },
+            {
+              "name": "Nitroprusside",
+              "node_index": 15953,
+              "score": 0.9994940757751465,
+              "rank": 18
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9994925260543823,
+              "rank": 19
+            },
+            {
+              "name": "Travoprost",
+              "node_index": 17500,
+              "score": 0.9994866847991943,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9364135265350342,
+              "rank": 1
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.9315037727355957,
+              "rank": 2
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.9310396909713745,
+              "rank": 3
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.9307604432106018,
+              "rank": 4
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9306886792182922,
+              "rank": 5
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9300355315208435,
+              "rank": 6
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9299563765525818,
+              "rank": 7
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.92845618724823,
+              "rank": 8
+            },
+            {
+              "name": "Maprotiline",
+              "node_index": 14618,
+              "score": 0.9281425476074219,
+              "rank": 9
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9279621243476868,
+              "rank": 10
+            },
+            {
+              "name": "Phenytoin",
+              "node_index": 14143,
+              "score": 0.9275456666946411,
+              "rank": 11
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.927224338054657,
+              "rank": 12
+            },
+            {
+              "name": "Flumazenil",
+              "node_index": 17367,
+              "score": 0.9270218014717102,
+              "rank": 13
+            },
+            {
+              "name": "Diazepam",
+              "node_index": 14266,
+              "score": 0.9267215132713318,
+              "rank": 14
+            },
+            {
+              "name": "Apomorphine",
+              "node_index": 14238,
+              "score": 0.9258626103401184,
+              "rank": 15
+            },
+            {
+              "name": "Labetalol",
+              "node_index": 14217,
+              "score": 0.925780177116394,
+              "rank": 16
+            },
+            {
+              "name": "Solifenacin",
+              "node_index": 14662,
+              "score": 0.9256588816642761,
+              "rank": 17
+            },
+            {
+              "name": "Cerivastatin",
+              "node_index": 15035,
+              "score": 0.9256121516227722,
+              "rank": 18
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.9255792498588562,
+              "rank": 19
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9254405498504639,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "EGFR": {
+      "status": "ok",
+      "node_index": 125,
+      "node_type": "gene/protein",
+      "family": "kinase",
+      "note": "EGFR - erlotinib target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9963552951812744,
+              "rank": 1
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9938808679580688,
+              "rank": 2
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9937521815299988,
+              "rank": 3
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9933711290359497,
+              "rank": 4
+            },
+            {
+              "name": "Cenicriviroc",
+              "node_index": 21989,
+              "score": 0.9931695461273193,
+              "rank": 5
+            },
+            {
+              "name": "Opaganib",
+              "node_index": 20270,
+              "score": 0.9926741719245911,
+              "rank": 6
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9921854138374329,
+              "rank": 7
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9920662641525269,
+              "rank": 8
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9919885993003845,
+              "rank": 9
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9919541478157043,
+              "rank": 10
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9917725920677185,
+              "rank": 11
+            },
+            {
+              "name": "NADPH",
+              "node_index": 16349,
+              "score": 0.9915406107902527,
+              "rank": 12
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.9914693236351013,
+              "rank": 13
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9914135932922363,
+              "rank": 14
+            },
+            {
+              "name": "octyl 3-deoxy-2-O-(6-deoxy-alpha-L-galactopyranosyl)-beta-D-xylo-hexopyranoside",
+              "node_index": 16684,
+              "score": 0.9913201928138733,
+              "rank": 15
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.9908987283706665,
+              "rank": 16
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.990842342376709,
+              "rank": 17
+            },
+            {
+              "name": "Encenicline",
+              "node_index": 19338,
+              "score": 0.990496039390564,
+              "rank": 18
+            },
+            {
+              "name": "Eptinezumab",
+              "node_index": 19346,
+              "score": 0.9904748797416687,
+              "rank": 19
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9904552102088928,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.9127464294433594,
+              "rank": 1
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.911919116973877,
+              "rank": 2
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.9111776947975159,
+              "rank": 3
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.91073077917099,
+              "rank": 4
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.9073150157928467,
+              "rank": 5
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.8983405828475952,
+              "rank": 6
+            },
+            {
+              "name": "Tivozanib",
+              "node_index": 14508,
+              "score": 0.8959961533546448,
+              "rank": 7
+            },
+            {
+              "name": "Vismodegib",
+              "node_index": 14443,
+              "score": 0.8947343826293945,
+              "rank": 8
+            },
+            {
+              "name": "Sonidegib",
+              "node_index": 15708,
+              "score": 0.8946186304092407,
+              "rank": 9
+            },
+            {
+              "name": "Nintedanib",
+              "node_index": 14464,
+              "score": 0.891130805015564,
+              "rank": 10
+            },
+            {
+              "name": "Resiquimod",
+              "node_index": 16583,
+              "score": 0.8908546566963196,
+              "rank": 11
+            },
+            {
+              "name": "Tegafur",
+              "node_index": 14588,
+              "score": 0.888378381729126,
+              "rank": 12
+            },
+            {
+              "name": "Cobimetinib",
+              "node_index": 14628,
+              "score": 0.887826681137085,
+              "rank": 13
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8870515823364258,
+              "rank": 14
+            },
+            {
+              "name": "Palbociclib",
+              "node_index": 14462,
+              "score": 0.8852653503417969,
+              "rank": 15
+            },
+            {
+              "name": "Lenvatinib",
+              "node_index": 15321,
+              "score": 0.8850584626197815,
+              "rank": 16
+            },
+            {
+              "name": "Pemetrexed",
+              "node_index": 14227,
+              "score": 0.8829208612442017,
+              "rank": 17
+            },
+            {
+              "name": "Docetaxel",
+              "node_index": 14879,
+              "score": 0.8826150298118591,
+              "rank": 18
+            },
+            {
+              "name": "Cediranib",
+              "node_index": 17118,
+              "score": 0.8824700713157654,
+              "rank": 19
+            },
+            {
+              "name": "Infigratinib",
+              "node_index": 14663,
+              "score": 0.8815451264381409,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "BRAF": {
+      "status": "ok",
+      "node_index": 1979,
+      "node_type": "gene/protein",
+      "family": "kinase",
+      "note": "BRAF - vemurafenib target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9983887672424316,
+              "rank": 1
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9977906942367554,
+              "rank": 2
+            },
+            {
+              "name": "Cenicriviroc",
+              "node_index": 21989,
+              "score": 0.9972471594810486,
+              "rank": 3
+            },
+            {
+              "name": "Lutetium Lu 177 dotatate",
+              "node_index": 17348,
+              "score": 0.9971603155136108,
+              "rank": 4
+            },
+            {
+              "name": "Adenosine-5'-ditungstate",
+              "node_index": 18971,
+              "score": 0.9970517158508301,
+              "rank": 5
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9968596696853638,
+              "rank": 6
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9967955946922302,
+              "rank": 7
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.9967021346092224,
+              "rank": 8
+            },
+            {
+              "name": "N-ISOBUTYL-N-[4-METHOXYPHENYLSULFONYL]GLYCYL HYDROXAMIC ACID",
+              "node_index": 18694,
+              "score": 0.9964788556098938,
+              "rank": 9
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9964326620101929,
+              "rank": 10
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9964253306388855,
+              "rank": 11
+            },
+            {
+              "name": "Telapristone acetate",
+              "node_index": 17459,
+              "score": 0.9963409304618835,
+              "rank": 12
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.9961581826210022,
+              "rank": 13
+            },
+            {
+              "name": "Sibrotuzumab",
+              "node_index": 19732,
+              "score": 0.9961362481117249,
+              "rank": 14
+            },
+            {
+              "name": "Elafibranor",
+              "node_index": 16335,
+              "score": 0.9961073994636536,
+              "rank": 15
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.996030867099762,
+              "rank": 16
+            },
+            {
+              "name": "Risankizumab",
+              "node_index": 20236,
+              "score": 0.9960047602653503,
+              "rank": 17
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9959558248519897,
+              "rank": 18
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.995947539806366,
+              "rank": 19
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.9958465695381165,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.9687981605529785,
+              "rank": 1
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.967417299747467,
+              "rank": 2
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.9669216275215149,
+              "rank": 3
+            },
+            {
+              "name": "Tivozanib",
+              "node_index": 14508,
+              "score": 0.965072512626648,
+              "rank": 4
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.959834635257721,
+              "rank": 5
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.9587101936340332,
+              "rank": 6
+            },
+            {
+              "name": "Docetaxel",
+              "node_index": 14879,
+              "score": 0.9570046663284302,
+              "rank": 7
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.9564037919044495,
+              "rank": 8
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.951124906539917,
+              "rank": 9
+            },
+            {
+              "name": "Vismodegib",
+              "node_index": 14443,
+              "score": 0.9504941701889038,
+              "rank": 10
+            },
+            {
+              "name": "Tegafur",
+              "node_index": 14588,
+              "score": 0.9486196041107178,
+              "rank": 11
+            },
+            {
+              "name": "Umbralisib",
+              "node_index": 14674,
+              "score": 0.9485690593719482,
+              "rank": 12
+            },
+            {
+              "name": "Sonidegib",
+              "node_index": 15708,
+              "score": 0.9481379389762878,
+              "rank": 13
+            },
+            {
+              "name": "Risdiplam",
+              "node_index": 14564,
+              "score": 0.945633590221405,
+              "rank": 14
+            },
+            {
+              "name": "Amrubicin",
+              "node_index": 15371,
+              "score": 0.94502192735672,
+              "rank": 15
+            },
+            {
+              "name": "Sagopilone",
+              "node_index": 15771,
+              "score": 0.9449343085289001,
+              "rank": 16
+            },
+            {
+              "name": "Nintedanib",
+              "node_index": 14464,
+              "score": 0.9445443749427795,
+              "rank": 17
+            },
+            {
+              "name": "Tipifarnib",
+              "node_index": 19353,
+              "score": 0.9443691372871399,
+              "rank": 18
+            },
+            {
+              "name": "Dabrafenib",
+              "node_index": 14453,
+              "score": 0.9443070292472839,
+              "rank": 19
+            },
+            {
+              "name": "Olaparib",
+              "node_index": 14463,
+              "score": 0.9440982937812805,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "HCN1": {
+      "status": "ok",
+      "node_index": 22180,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "HCN1 - pacemaker channel",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.927953839302063,
+              "rank": 1
+            },
+            {
+              "name": "Zinc acetate",
+              "node_index": 14761,
+              "score": 0.9117936491966248,
+              "rank": 2
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9108508229255676,
+              "rank": 3
+            },
+            {
+              "name": "Cyanocobalamin",
+              "node_index": 14790,
+              "score": 0.899188220500946,
+              "rank": 4
+            },
+            {
+              "name": "Lanoteplase",
+              "node_index": 16716,
+              "score": 0.893976628780365,
+              "rank": 5
+            },
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.8932432532310486,
+              "rank": 6
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.8881030082702637,
+              "rank": 7
+            },
+            {
+              "name": "octyl 3-deoxy-2-O-(6-deoxy-alpha-L-galactopyranosyl)-beta-D-xylo-hexopyranoside",
+              "node_index": 16684,
+              "score": 0.883859395980835,
+              "rank": 8
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.8756639957427979,
+              "rank": 9
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.8749973177909851,
+              "rank": 10
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.8695329427719116,
+              "rank": 11
+            },
+            {
+              "name": "Acyclovir",
+              "node_index": 14256,
+              "score": 0.8684965968132019,
+              "rank": 12
+            },
+            {
+              "name": "DDP733",
+              "node_index": 16954,
+              "score": 0.866600513458252,
+              "rank": 13
+            },
+            {
+              "name": "Thiamine",
+              "node_index": 14132,
+              "score": 0.8622145056724548,
+              "rank": 14
+            },
+            {
+              "name": "Glycine",
+              "node_index": 14672,
+              "score": 0.8601016998291016,
+              "rank": 15
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.8590281009674072,
+              "rank": 16
+            },
+            {
+              "name": "Calcium Phosphate",
+              "node_index": 14492,
+              "score": 0.854418933391571,
+              "rank": 17
+            },
+            {
+              "name": "beta-D-fructofuranose 1,6-bisphosphate",
+              "node_index": 16164,
+              "score": 0.8525813817977905,
+              "rank": 18
+            },
+            {
+              "name": "Vitamin A",
+              "node_index": 14051,
+              "score": 0.8508301973342896,
+              "rank": 19
+            },
+            {
+              "name": "Citrulline",
+              "node_index": 16001,
+              "score": 0.8470032215118408,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Trapidil",
+              "node_index": 16662,
+              "score": 0.9068787097930908,
+              "rank": 1
+            },
+            {
+              "name": "Guanidine",
+              "node_index": 16544,
+              "score": 0.9013890027999878,
+              "rank": 2
+            },
+            {
+              "name": "Fluciclovine (18F)",
+              "node_index": 16553,
+              "score": 0.8988224864006042,
+              "rank": 3
+            },
+            {
+              "name": "Tezampanel",
+              "node_index": 16754,
+              "score": 0.8984234929084778,
+              "rank": 4
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.8942456245422363,
+              "rank": 5
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.8929150104522705,
+              "rank": 6
+            },
+            {
+              "name": "Prasterone",
+              "node_index": 14703,
+              "score": 0.8886990547180176,
+              "rank": 7
+            },
+            {
+              "name": "Calcium citrate",
+              "node_index": 14487,
+              "score": 0.8877055644989014,
+              "rank": 8
+            },
+            {
+              "name": "Taurine",
+              "node_index": 15011,
+              "score": 0.8868432641029358,
+              "rank": 9
+            },
+            {
+              "name": "Tetraethylammonium",
+              "node_index": 17816,
+              "score": 0.8854018449783325,
+              "rank": 10
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.8817564845085144,
+              "rank": 11
+            },
+            {
+              "name": "Menadione",
+              "node_index": 14869,
+              "score": 0.8809680938720703,
+              "rank": 12
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.8797644972801208,
+              "rank": 13
+            },
+            {
+              "name": "Ellagic acid",
+              "node_index": 15918,
+              "score": 0.8796688318252563,
+              "rank": 14
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.879412055015564,
+              "rank": 15
+            },
+            {
+              "name": "Estradiol dienanthate",
+              "node_index": 14542,
+              "score": 0.8738873600959778,
+              "rank": 16
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.8734004497528076,
+              "rank": 17
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8669336438179016,
+              "rank": 18
+            },
+            {
+              "name": "Tirbanibulin",
+              "node_index": 15287,
+              "score": 0.8653948307037354,
+              "rank": 19
+            },
+            {
+              "name": "Butamben",
+              "node_index": 14490,
+              "score": 0.8647115230560303,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "KCNQ2": {
+      "status": "ok",
+      "node_index": 3294,
+      "node_type": "gene/protein",
+      "family": "ion_channel",
+      "note": "KCNQ2 - epilepsy",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9983914494514465,
+              "rank": 1
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9977701902389526,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9972919821739197,
+              "rank": 3
+            },
+            {
+              "name": "Thiamine",
+              "node_index": 14132,
+              "score": 0.9971562623977661,
+              "rank": 4
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.997117280960083,
+              "rank": 5
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9970345497131348,
+              "rank": 6
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9970099925994873,
+              "rank": 7
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9969307780265808,
+              "rank": 8
+            },
+            {
+              "name": "Acyclovir",
+              "node_index": 14256,
+              "score": 0.996745228767395,
+              "rank": 9
+            },
+            {
+              "name": "Cyanocobalamin",
+              "node_index": 14790,
+              "score": 0.9966679215431213,
+              "rank": 10
+            },
+            {
+              "name": "Ritodrine",
+              "node_index": 14838,
+              "score": 0.9964542388916016,
+              "rank": 11
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9964262843132019,
+              "rank": 12
+            },
+            {
+              "name": "DDP733",
+              "node_index": 16954,
+              "score": 0.9964219331741333,
+              "rank": 13
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.9963172674179077,
+              "rank": 14
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9963170289993286,
+              "rank": 15
+            },
+            {
+              "name": "Miconazole",
+              "node_index": 14330,
+              "score": 0.9962440729141235,
+              "rank": 16
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9960516095161438,
+              "rank": 17
+            },
+            {
+              "name": "Exenatide",
+              "node_index": 14360,
+              "score": 0.9960151314735413,
+              "rank": 18
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9959290623664856,
+              "rank": 19
+            },
+            {
+              "name": "Ephedra sinica root",
+              "node_index": 16434,
+              "score": 0.9958972930908203,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9125613570213318,
+              "rank": 1
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9012839794158936,
+              "rank": 2
+            },
+            {
+              "name": "Estradiol dienanthate",
+              "node_index": 14542,
+              "score": 0.8978846669197083,
+              "rank": 3
+            },
+            {
+              "name": "Mitotane",
+              "node_index": 14024,
+              "score": 0.8969084620475769,
+              "rank": 4
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.8923393487930298,
+              "rank": 5
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.8918426036834717,
+              "rank": 6
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.891302764415741,
+              "rank": 7
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.8909070491790771,
+              "rank": 8
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.889549732208252,
+              "rank": 9
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.8894088268280029,
+              "rank": 10
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.888102650642395,
+              "rank": 11
+            },
+            {
+              "name": "Curcumin sulfate",
+              "node_index": 14842,
+              "score": 0.8878457546234131,
+              "rank": 12
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.8875132203102112,
+              "rank": 13
+            },
+            {
+              "name": "Indocyanine green acid form",
+              "node_index": 14897,
+              "score": 0.887332022190094,
+              "rank": 14
+            },
+            {
+              "name": "Digitoxin",
+              "node_index": 14371,
+              "score": 0.8867471814155579,
+              "rank": 15
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.8856802582740784,
+              "rank": 16
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.8856051564216614,
+              "rank": 17
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.8854942917823792,
+              "rank": 18
+            },
+            {
+              "name": "Rifamycin",
+              "node_index": 14504,
+              "score": 0.8853443264961243,
+              "rank": 19
+            },
+            {
+              "name": "Letermovir",
+              "node_index": 15141,
+              "score": 0.8829283714294434,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "HTR2A": {
+      "status": "ok",
+      "node_index": 3417,
+      "node_type": "gene/protein",
+      "family": "gpcr",
+      "note": "HTR2A - serotonin",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9998264908790588,
+              "rank": 1
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9997455477714539,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9997451901435852,
+              "rank": 3
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9997387528419495,
+              "rank": 4
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9997193217277527,
+              "rank": 5
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9997100234031677,
+              "rank": 6
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9996929168701172,
+              "rank": 7
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.999690055847168,
+              "rank": 8
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9996845722198486,
+              "rank": 9
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9996827840805054,
+              "rank": 10
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9996817111968994,
+              "rank": 11
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9996798038482666,
+              "rank": 12
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9996776580810547,
+              "rank": 13
+            },
+            {
+              "name": "Dextromethorphan",
+              "node_index": 15200,
+              "score": 0.9996565580368042,
+              "rank": 14
+            },
+            {
+              "name": "Brivaracetam",
+              "node_index": 15641,
+              "score": 0.9996496438980103,
+              "rank": 15
+            },
+            {
+              "name": "Terbutaline",
+              "node_index": 14938,
+              "score": 0.9996484518051147,
+              "rank": 16
+            },
+            {
+              "name": "Lemborexant",
+              "node_index": 15139,
+              "score": 0.9996473789215088,
+              "rank": 17
+            },
+            {
+              "name": "Brexanolone",
+              "node_index": 14820,
+              "score": 0.9996451139450073,
+              "rank": 18
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9996436834335327,
+              "rank": 19
+            },
+            {
+              "name": "Travoprost",
+              "node_index": 17500,
+              "score": 0.9996381998062134,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9312525987625122,
+              "rank": 1
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9210973978042603,
+              "rank": 2
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.920260488986969,
+              "rank": 3
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9199941754341125,
+              "rank": 4
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9198945760726929,
+              "rank": 5
+            },
+            {
+              "name": "Nortriptyline",
+              "node_index": 14203,
+              "score": 0.9186245203018188,
+              "rank": 6
+            },
+            {
+              "name": "Apomorphine",
+              "node_index": 14238,
+              "score": 0.9179949760437012,
+              "rank": 7
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9176899790763855,
+              "rank": 8
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9173923134803772,
+              "rank": 9
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9172634482383728,
+              "rank": 10
+            },
+            {
+              "name": "Promethazine",
+              "node_index": 14323,
+              "score": 0.9149628281593323,
+              "rank": 11
+            },
+            {
+              "name": "Pindolol",
+              "node_index": 14660,
+              "score": 0.9138550162315369,
+              "rank": 12
+            },
+            {
+              "name": "Maprotiline",
+              "node_index": 14618,
+              "score": 0.913593590259552,
+              "rank": 13
+            },
+            {
+              "name": "Flumazenil",
+              "node_index": 17367,
+              "score": 0.913442850112915,
+              "rank": 14
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.9133680462837219,
+              "rank": 15
+            },
+            {
+              "name": "Vortioxetine",
+              "node_index": 15122,
+              "score": 0.9133207201957703,
+              "rank": 16
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.912121593952179,
+              "rank": 17
+            },
+            {
+              "name": "Nelfinavir",
+              "node_index": 14136,
+              "score": 0.9120597839355469,
+              "rank": 18
+            },
+            {
+              "name": "Trimebutine",
+              "node_index": 15702,
+              "score": 0.9116300344467163,
+              "rank": 19
+            },
+            {
+              "name": "Nitrazepam",
+              "node_index": 15610,
+              "score": 0.9116008281707764,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "OPRM1": {
+      "status": "ok",
+      "node_index": 532,
+      "node_type": "gene/protein",
+      "family": "gpcr",
+      "note": "OPRM1 - mu-opioid",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9997251629829407,
+              "rank": 1
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9995658993721008,
+              "rank": 2
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9995375871658325,
+              "rank": 3
+            },
+            {
+              "name": "Tiapride",
+              "node_index": 17481,
+              "score": 0.9995261430740356,
+              "rank": 4
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9995176792144775,
+              "rank": 5
+            },
+            {
+              "name": "Etomidate",
+              "node_index": 14635,
+              "score": 0.9995065927505493,
+              "rank": 6
+            },
+            {
+              "name": "Amitriptyline",
+              "node_index": 14160,
+              "score": 0.9994925260543823,
+              "rank": 7
+            },
+            {
+              "name": "Trimebutine",
+              "node_index": 15702,
+              "score": 0.999481737613678,
+              "rank": 8
+            },
+            {
+              "name": "Tryptophan",
+              "node_index": 14707,
+              "score": 0.9994744658470154,
+              "rank": 9
+            },
+            {
+              "name": "Brivaracetam",
+              "node_index": 15641,
+              "score": 0.9994695782661438,
+              "rank": 10
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9994596838951111,
+              "rank": 11
+            },
+            {
+              "name": "Dextromethorphan",
+              "node_index": 15200,
+              "score": 0.9994558691978455,
+              "rank": 12
+            },
+            {
+              "name": "Fluphenazine",
+              "node_index": 15206,
+              "score": 0.9994555115699768,
+              "rank": 13
+            },
+            {
+              "name": "Ephedra sinica root",
+              "node_index": 16434,
+              "score": 0.9994440674781799,
+              "rank": 14
+            },
+            {
+              "name": "Carbamoylcholine",
+              "node_index": 14783,
+              "score": 0.9994193315505981,
+              "rank": 15
+            },
+            {
+              "name": "Pentaerythritol tetranitrate",
+              "node_index": 14717,
+              "score": 0.9994049072265625,
+              "rank": 16
+            },
+            {
+              "name": "Enflurane",
+              "node_index": 14138,
+              "score": 0.999404788017273,
+              "rank": 17
+            },
+            {
+              "name": "Ibutilide",
+              "node_index": 16380,
+              "score": 0.999403715133667,
+              "rank": 18
+            },
+            {
+              "name": "Nedocromil",
+              "node_index": 16402,
+              "score": 0.9993981122970581,
+              "rank": 19
+            },
+            {
+              "name": "Lemborexant",
+              "node_index": 15139,
+              "score": 0.9993975162506104,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Flumazenil",
+              "node_index": 17367,
+              "score": 0.9618688225746155,
+              "rank": 1
+            },
+            {
+              "name": "Dihydroergocristine",
+              "node_index": 15792,
+              "score": 0.9600399136543274,
+              "rank": 2
+            },
+            {
+              "name": "Efavirenz",
+              "node_index": 14225,
+              "score": 0.9580685496330261,
+              "rank": 3
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9577926993370056,
+              "rank": 4
+            },
+            {
+              "name": "Saquinavir",
+              "node_index": 14351,
+              "score": 0.9576311111450195,
+              "rank": 5
+            },
+            {
+              "name": "Guanfacine",
+              "node_index": 15574,
+              "score": 0.956351637840271,
+              "rank": 6
+            },
+            {
+              "name": "Verapamil",
+              "node_index": 14230,
+              "score": 0.9562666416168213,
+              "rank": 7
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.9560828804969788,
+              "rank": 8
+            },
+            {
+              "name": "Nitrazepam",
+              "node_index": 15610,
+              "score": 0.954533576965332,
+              "rank": 9
+            },
+            {
+              "name": "Glipizide",
+              "node_index": 14321,
+              "score": 0.9535753130912781,
+              "rank": 10
+            },
+            {
+              "name": "Meperidine",
+              "node_index": 14183,
+              "score": 0.9531401991844177,
+              "rank": 11
+            },
+            {
+              "name": "Trimebutine",
+              "node_index": 15702,
+              "score": 0.9526905417442322,
+              "rank": 12
+            },
+            {
+              "name": "Modafinil",
+              "node_index": 15056,
+              "score": 0.9525583386421204,
+              "rank": 13
+            },
+            {
+              "name": "Temazepam",
+              "node_index": 15517,
+              "score": 0.9523405432701111,
+              "rank": 14
+            },
+            {
+              "name": "Triazolam",
+              "node_index": 15061,
+              "score": 0.9521642327308655,
+              "rank": 15
+            },
+            {
+              "name": "Tiotropium",
+              "node_index": 15258,
+              "score": 0.9519146680831909,
+              "rank": 16
+            },
+            {
+              "name": "Dosulepin",
+              "node_index": 15324,
+              "score": 0.9518908858299255,
+              "rank": 17
+            },
+            {
+              "name": "Dronedarone",
+              "node_index": 14403,
+              "score": 0.9518039226531982,
+              "rank": 18
+            },
+            {
+              "name": "Primidone",
+              "node_index": 15404,
+              "score": 0.9515292644500732,
+              "rank": 19
+            },
+            {
+              "name": "Pergolide",
+              "node_index": 15583,
+              "score": 0.9513515830039978,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "MAPK1": {
+      "status": "ok",
+      "node_index": 418,
+      "node_type": "gene/protein",
+      "family": "kinase",
+      "note": "MAPK1 / ERK2",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9991660118103027,
+              "rank": 1
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9989097118377686,
+              "rank": 2
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9988232254981995,
+              "rank": 3
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.998666524887085,
+              "rank": 4
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9986604452133179,
+              "rank": 5
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9986265897750854,
+              "rank": 6
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.9986082911491394,
+              "rank": 7
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9985103011131287,
+              "rank": 8
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9984791874885559,
+              "rank": 9
+            },
+            {
+              "name": "Cenicriviroc",
+              "node_index": 21989,
+              "score": 0.9984534978866577,
+              "rank": 10
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9984517097473145,
+              "rank": 11
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.998428225517273,
+              "rank": 12
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9984230995178223,
+              "rank": 13
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9984214305877686,
+              "rank": 14
+            },
+            {
+              "name": "Atl146e",
+              "node_index": 18187,
+              "score": 0.9983502626419067,
+              "rank": 15
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.9983262419700623,
+              "rank": 16
+            },
+            {
+              "name": "Mdl 101,146",
+              "node_index": 17188,
+              "score": 0.9981980919837952,
+              "rank": 17
+            },
+            {
+              "name": "1,4-Dideoxy-5-Dehydro-O2-Sulfo-Glucuronic Acid",
+              "node_index": 18371,
+              "score": 0.9981585144996643,
+              "rank": 18
+            },
+            {
+              "name": "2-(6-HYDROXY-1,3-BENZOTHIAZOL-2-YL)-1,3-THIAZOL-4(5H)-ONE",
+              "node_index": 20074,
+              "score": 0.9980863332748413,
+              "rank": 19
+            },
+            {
+              "name": "Eptinezumab",
+              "node_index": 19346,
+              "score": 0.9980728626251221,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8838655352592468,
+              "rank": 1
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.8662344217300415,
+              "rank": 2
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.8662097454071045,
+              "rank": 3
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.8661688566207886,
+              "rank": 4
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.8628841638565063,
+              "rank": 5
+            },
+            {
+              "name": "Vismodegib",
+              "node_index": 14443,
+              "score": 0.8503025770187378,
+              "rank": 6
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.8488606214523315,
+              "rank": 7
+            },
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.8472588062286377,
+              "rank": 8
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8469663262367249,
+              "rank": 9
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.8453708291053772,
+              "rank": 10
+            },
+            {
+              "name": "Tegafur",
+              "node_index": 14588,
+              "score": 0.8422566652297974,
+              "rank": 11
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8418611288070679,
+              "rank": 12
+            },
+            {
+              "name": "Nintedanib",
+              "node_index": 14464,
+              "score": 0.8394245505332947,
+              "rank": 13
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.8385342955589294,
+              "rank": 14
+            },
+            {
+              "name": "Pemetrexed",
+              "node_index": 14227,
+              "score": 0.834757387638092,
+              "rank": 15
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.8324585556983948,
+              "rank": 16
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.8322831988334656,
+              "rank": 17
+            },
+            {
+              "name": "Tivozanib",
+              "node_index": 14508,
+              "score": 0.8319926857948303,
+              "rank": 18
+            },
+            {
+              "name": "Lapatinib",
+              "node_index": 15085,
+              "score": 0.830291211605072,
+              "rank": 19
+            },
+            {
+              "name": "Cobimetinib",
+              "node_index": 14628,
+              "score": 0.8296814560890198,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "MAPK3": {
+      "status": "ok",
+      "node_index": 866,
+      "node_type": "gene/protein",
+      "family": "kinase",
+      "note": "MAPK3 / ERK1",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9991565942764282,
+              "rank": 1
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.999092698097229,
+              "rank": 2
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9990271329879761,
+              "rank": 3
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9989295601844788,
+              "rank": 4
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.9989206790924072,
+              "rank": 5
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9988948702812195,
+              "rank": 6
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9987038373947144,
+              "rank": 7
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9986984729766846,
+              "rank": 8
+            },
+            {
+              "name": "Atl146e",
+              "node_index": 18187,
+              "score": 0.9986467957496643,
+              "rank": 9
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9986244440078735,
+              "rank": 10
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9985268115997314,
+              "rank": 11
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.9984995126724243,
+              "rank": 12
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9984941482543945,
+              "rank": 13
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9984728693962097,
+              "rank": 14
+            },
+            {
+              "name": "beta-D-fructofuranose 1,6-bisphosphate",
+              "node_index": 16164,
+              "score": 0.9984403252601624,
+              "rank": 15
+            },
+            {
+              "name": "NADPH",
+              "node_index": 16349,
+              "score": 0.9984385371208191,
+              "rank": 16
+            },
+            {
+              "name": "octyl 3-deoxy-2-O-(6-deoxy-alpha-L-galactopyranosyl)-beta-D-xylo-hexopyranoside",
+              "node_index": 16684,
+              "score": 0.9984183311462402,
+              "rank": 17
+            },
+            {
+              "name": "Mdl 101,146",
+              "node_index": 17188,
+              "score": 0.9982874989509583,
+              "rank": 18
+            },
+            {
+              "name": "2'-Deoxyguanosine-5'-Triphosphate",
+              "node_index": 19494,
+              "score": 0.9982549548149109,
+              "rank": 19
+            },
+            {
+              "name": "2-({6-[(3-Chlorophenyl)amino]-9-isopropyl-9H-purin-2-yl}amino)ethanol",
+              "node_index": 20073,
+              "score": 0.9982482194900513,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.912370502948761,
+              "rank": 1
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8976433277130127,
+              "rank": 2
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.8947298526763916,
+              "rank": 3
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.893034040927887,
+              "rank": 4
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8911292552947998,
+              "rank": 5
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.876429557800293,
+              "rank": 6
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8716548085212708,
+              "rank": 7
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.8695994019508362,
+              "rank": 8
+            },
+            {
+              "name": "Quercetin",
+              "node_index": 14392,
+              "score": 0.8694111108779907,
+              "rank": 9
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.865813136100769,
+              "rank": 10
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.8648240566253662,
+              "rank": 11
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.8630841970443726,
+              "rank": 12
+            },
+            {
+              "name": "Prasterone sulfate",
+              "node_index": 14752,
+              "score": 0.8588516116142273,
+              "rank": 13
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8565352559089661,
+              "rank": 14
+            },
+            {
+              "name": "Foretinib",
+              "node_index": 15982,
+              "score": 0.8558677434921265,
+              "rank": 15
+            },
+            {
+              "name": "Risdiplam",
+              "node_index": 14564,
+              "score": 0.8530611395835876,
+              "rank": 16
+            },
+            {
+              "name": "Genistein",
+              "node_index": 14064,
+              "score": 0.8494192361831665,
+              "rank": 17
+            },
+            {
+              "name": "Zinc chloride",
+              "node_index": 14551,
+              "score": 0.8483216166496277,
+              "rank": 18
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.8468841910362244,
+              "rank": 19
+            },
+            {
+              "name": "Dabrafenib",
+              "node_index": 14453,
+              "score": 0.8423057198524475,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "PKM": {
+      "status": "ok",
+      "node_index": 5513,
+      "node_type": "gene/protein",
+      "family": "metabolic_enzyme",
+      "note": "Pyruvate kinase (PKM1/PKM2) - QS0113172 alternative target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.996803879737854,
+              "rank": 1
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9944619536399841,
+              "rank": 2
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9941034913063049,
+              "rank": 3
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9940815567970276,
+              "rank": 4
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9939411878585815,
+              "rank": 5
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9938534498214722,
+              "rank": 6
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9931837916374207,
+              "rank": 7
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.9930142760276794,
+              "rank": 8
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.992912232875824,
+              "rank": 9
+            },
+            {
+              "name": "Cenicriviroc",
+              "node_index": 21989,
+              "score": 0.9923070073127747,
+              "rank": 10
+            },
+            {
+              "name": "Adenosine-5'-ditungstate",
+              "node_index": 18971,
+              "score": 0.992004930973053,
+              "rank": 11
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9919325709342957,
+              "rank": 12
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9914153218269348,
+              "rank": 13
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.9913712739944458,
+              "rank": 14
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9910330176353455,
+              "rank": 15
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.990959644317627,
+              "rank": 16
+            },
+            {
+              "name": "Zinc acetate",
+              "node_index": 14761,
+              "score": 0.9907824397087097,
+              "rank": 17
+            },
+            {
+              "name": "Encenicline",
+              "node_index": 19338,
+              "score": 0.9905401468276978,
+              "rank": 18
+            },
+            {
+              "name": "Tosedostat",
+              "node_index": 19069,
+              "score": 0.9904165267944336,
+              "rank": 19
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.9903995394706726,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.9457265734672546,
+              "rank": 1
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.9429303407669067,
+              "rank": 2
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.9428880214691162,
+              "rank": 3
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.9389229416847229,
+              "rank": 4
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.9339313507080078,
+              "rank": 5
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.9334085583686829,
+              "rank": 6
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.9292742609977722,
+              "rank": 7
+            },
+            {
+              "name": "Alvocidib",
+              "node_index": 15945,
+              "score": 0.9275016784667969,
+              "rank": 8
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.9263885021209717,
+              "rank": 9
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.9242358803749084,
+              "rank": 10
+            },
+            {
+              "name": "Tivozanib",
+              "node_index": 14508,
+              "score": 0.9230530261993408,
+              "rank": 11
+            },
+            {
+              "name": "Risdiplam",
+              "node_index": 14564,
+              "score": 0.9181563854217529,
+              "rank": 12
+            },
+            {
+              "name": "Sagopilone",
+              "node_index": 15771,
+              "score": 0.917914628982544,
+              "rank": 13
+            },
+            {
+              "name": "(S)-3-phenyllactic acid",
+              "node_index": 19828,
+              "score": 0.9175159335136414,
+              "rank": 14
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.9172269105911255,
+              "rank": 15
+            },
+            {
+              "name": "Docetaxel",
+              "node_index": 14879,
+              "score": 0.9153277277946472,
+              "rank": 16
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.9127671122550964,
+              "rank": 17
+            },
+            {
+              "name": "Prasterone sulfate",
+              "node_index": 14752,
+              "score": 0.9105090498924255,
+              "rank": 18
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.9102579951286316,
+              "rank": 19
+            },
+            {
+              "name": "Dabrafenib",
+              "node_index": 14453,
+              "score": 0.9060733914375305,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "LDHA": {
+      "status": "ok",
+      "node_index": 2584,
+      "node_type": "gene/protein",
+      "family": "metabolic_enzyme",
+      "note": "Lactate dehydrogenase A - PKM2 downstream",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9731489419937134,
+              "rank": 1
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9654625654220581,
+              "rank": 2
+            },
+            {
+              "name": "Zinc acetate",
+              "node_index": 14761,
+              "score": 0.9601878523826599,
+              "rank": 3
+            },
+            {
+              "name": "Adenosine-5'-ditungstate",
+              "node_index": 18971,
+              "score": 0.9540480971336365,
+              "rank": 4
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9526338577270508,
+              "rank": 5
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.951231062412262,
+              "rank": 6
+            },
+            {
+              "name": "Zinc chloride",
+              "node_index": 14551,
+              "score": 0.9511154294013977,
+              "rank": 7
+            },
+            {
+              "name": "Tosedostat",
+              "node_index": 19069,
+              "score": 0.9510830640792847,
+              "rank": 8
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9506160020828247,
+              "rank": 9
+            },
+            {
+              "name": "Vitamin A",
+              "node_index": 14051,
+              "score": 0.9454297423362732,
+              "rank": 10
+            },
+            {
+              "name": "Tibolone",
+              "node_index": 14461,
+              "score": 0.9443190693855286,
+              "rank": 11
+            },
+            {
+              "name": "Anthralin",
+              "node_index": 19936,
+              "score": 0.940485417842865,
+              "rank": 12
+            },
+            {
+              "name": "Encenicline",
+              "node_index": 19338,
+              "score": 0.9402359127998352,
+              "rank": 13
+            },
+            {
+              "name": "Calcium Phosphate",
+              "node_index": 14492,
+              "score": 0.935352087020874,
+              "rank": 14
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9344721436500549,
+              "rank": 15
+            },
+            {
+              "name": "Citrulline",
+              "node_index": 16001,
+              "score": 0.9337416291236877,
+              "rank": 16
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9332064986228943,
+              "rank": 17
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.932280421257019,
+              "rank": 18
+            },
+            {
+              "name": "Sucrose",
+              "node_index": 17191,
+              "score": 0.9318653345108032,
+              "rank": 19
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9299840927124023,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.9263361096382141,
+              "rank": 1
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.9043022394180298,
+              "rank": 2
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.9026232957839966,
+              "rank": 3
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.8983641266822815,
+              "rank": 4
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.8942831158638,
+              "rank": 5
+            },
+            {
+              "name": "Quercetin",
+              "node_index": 14392,
+              "score": 0.8886747360229492,
+              "rank": 6
+            },
+            {
+              "name": "(S)-3-phenyllactic acid",
+              "node_index": 19828,
+              "score": 0.8873290419578552,
+              "rank": 7
+            },
+            {
+              "name": "Artenimol",
+              "node_index": 15333,
+              "score": 0.8866989016532898,
+              "rank": 8
+            },
+            {
+              "name": "Zinc chloride",
+              "node_index": 14551,
+              "score": 0.8687583208084106,
+              "rank": 9
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8670435547828674,
+              "rank": 10
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8646873831748962,
+              "rank": 11
+            },
+            {
+              "name": "Copper",
+              "node_index": 14010,
+              "score": 0.8553484082221985,
+              "rank": 12
+            },
+            {
+              "name": "NADH",
+              "node_index": 14667,
+              "score": 0.8508778214454651,
+              "rank": 13
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.8463143110275269,
+              "rank": 14
+            },
+            {
+              "name": "Genistein",
+              "node_index": 14064,
+              "score": 0.8370344042778015,
+              "rank": 15
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.8356020450592041,
+              "rank": 16
+            },
+            {
+              "name": "Zinc",
+              "node_index": 14760,
+              "score": 0.8338873386383057,
+              "rank": 17
+            },
+            {
+              "name": "D-alpha-Tocopherol acetate",
+              "node_index": 14597,
+              "score": 0.8284531235694885,
+              "rank": 18
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.818648636341095,
+              "rank": 19
+            },
+            {
+              "name": "Guanosine-5'-Diphosphate",
+              "node_index": 18470,
+              "score": 0.8179661631584167,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "PPARA": {
+      "status": "ok",
+      "node_index": 1121,
+      "node_type": "gene/protein",
+      "family": "nuclear_receptor",
+      "note": "PPAR-alpha - PPARD paralog, ligand overlap",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.998808741569519,
+              "rank": 1
+            },
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.998377799987793,
+              "rank": 2
+            },
+            {
+              "name": "Thiamine",
+              "node_index": 14132,
+              "score": 0.9982337951660156,
+              "rank": 3
+            },
+            {
+              "name": "Ritodrine",
+              "node_index": 14838,
+              "score": 0.9980898499488831,
+              "rank": 4
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9980602860450745,
+              "rank": 5
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.998054027557373,
+              "rank": 6
+            },
+            {
+              "name": "Glycine",
+              "node_index": 14672,
+              "score": 0.9980539083480835,
+              "rank": 7
+            },
+            {
+              "name": "Yohimbine",
+              "node_index": 15256,
+              "score": 0.9979742169380188,
+              "rank": 8
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9979519248008728,
+              "rank": 9
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.9979360103607178,
+              "rank": 10
+            },
+            {
+              "name": "Ammonia",
+              "node_index": 14665,
+              "score": 0.997901439666748,
+              "rank": 11
+            },
+            {
+              "name": "Arginine",
+              "node_index": 16000,
+              "score": 0.9978758096694946,
+              "rank": 12
+            },
+            {
+              "name": "Acyclovir",
+              "node_index": 14256,
+              "score": 0.9978544116020203,
+              "rank": 13
+            },
+            {
+              "name": "Lanoteplase",
+              "node_index": 16716,
+              "score": 0.9978529214859009,
+              "rank": 14
+            },
+            {
+              "name": "octyl 3-deoxy-2-O-(6-deoxy-alpha-L-galactopyranosyl)-beta-D-xylo-hexopyranoside",
+              "node_index": 16684,
+              "score": 0.9978445768356323,
+              "rank": 15
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.99782794713974,
+              "rank": 16
+            },
+            {
+              "name": "Bremelanotide",
+              "node_index": 17954,
+              "score": 0.9978142976760864,
+              "rank": 17
+            },
+            {
+              "name": "Glucosamine",
+              "node_index": 16275,
+              "score": 0.9978004097938538,
+              "rank": 18
+            },
+            {
+              "name": "DDP733",
+              "node_index": 16954,
+              "score": 0.9977709054946899,
+              "rank": 19
+            },
+            {
+              "name": "Cyanocobalamin",
+              "node_index": 14790,
+              "score": 0.9976145029067993,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.8914944529533386,
+              "rank": 1
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.8749675750732422,
+              "rank": 2
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8627990484237671,
+              "rank": 3
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8555974960327148,
+              "rank": 4
+            },
+            {
+              "name": "Halothane",
+              "node_index": 14342,
+              "score": 0.8500553369522095,
+              "rank": 5
+            },
+            {
+              "name": "Arachidonic Acid",
+              "node_index": 14395,
+              "score": 0.848095715045929,
+              "rank": 6
+            },
+            {
+              "name": "Digitoxin",
+              "node_index": 14371,
+              "score": 0.847139298915863,
+              "rank": 7
+            },
+            {
+              "name": "Estradiol dienanthate",
+              "node_index": 14542,
+              "score": 0.8458231687545776,
+              "rank": 8
+            },
+            {
+              "name": "Lovastatin",
+              "node_index": 14137,
+              "score": 0.8445560932159424,
+              "rank": 9
+            },
+            {
+              "name": "Choline salicylate",
+              "node_index": 14734,
+              "score": 0.8416445255279541,
+              "rank": 10
+            },
+            {
+              "name": "Liotrix",
+              "node_index": 14063,
+              "score": 0.8407100439071655,
+              "rank": 11
+            },
+            {
+              "name": "Simeprevir",
+              "node_index": 14421,
+              "score": 0.838794469833374,
+              "rank": 12
+            },
+            {
+              "name": "Genistein",
+              "node_index": 14064,
+              "score": 0.838532030582428,
+              "rank": 13
+            },
+            {
+              "name": "Mitotane",
+              "node_index": 14024,
+              "score": 0.8384236693382263,
+              "rank": 14
+            },
+            {
+              "name": "Quercetin",
+              "node_index": 14392,
+              "score": 0.8380796313285828,
+              "rank": 15
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8371739983558655,
+              "rank": 16
+            },
+            {
+              "name": "Cenobamate",
+              "node_index": 14412,
+              "score": 0.8369917869567871,
+              "rank": 17
+            },
+            {
+              "name": "Istradefylline",
+              "node_index": 14505,
+              "score": 0.8359870910644531,
+              "rank": 18
+            },
+            {
+              "name": "Hydrocortisone valerate",
+              "node_index": 14047,
+              "score": 0.8359795212745667,
+              "rank": 19
+            },
+            {
+              "name": "Curcumin sulfate",
+              "node_index": 14842,
+              "score": 0.8340000510215759,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "PPARD": {
+      "status": "ok",
+      "node_index": 176,
+      "node_type": "gene/protein",
+      "family": "nuclear_receptor",
+      "note": "PPAR-delta - QS0069567/QS0113172 originally-claimed target",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9988563060760498,
+              "rank": 1
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9984250068664551,
+              "rank": 2
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.9983419179916382,
+              "rank": 3
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9983137845993042,
+              "rank": 4
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9983106851577759,
+              "rank": 5
+            },
+            {
+              "name": "NADPH",
+              "node_index": 16349,
+              "score": 0.998281717300415,
+              "rank": 6
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9981638789176941,
+              "rank": 7
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.9981130361557007,
+              "rank": 8
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9979459643363953,
+              "rank": 9
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9978618025779724,
+              "rank": 10
+            },
+            {
+              "name": "Sibrotuzumab",
+              "node_index": 19732,
+              "score": 0.9978457689285278,
+              "rank": 11
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9978400468826294,
+              "rank": 12
+            },
+            {
+              "name": "Tetomilast",
+              "node_index": 18932,
+              "score": 0.9977450370788574,
+              "rank": 13
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9977207779884338,
+              "rank": 14
+            },
+            {
+              "name": "Tibolone",
+              "node_index": 14461,
+              "score": 0.9976529479026794,
+              "rank": 15
+            },
+            {
+              "name": "Anthralin",
+              "node_index": 19936,
+              "score": 0.99759441614151,
+              "rank": 16
+            },
+            {
+              "name": "Atl146e",
+              "node_index": 18187,
+              "score": 0.9975882768630981,
+              "rank": 17
+            },
+            {
+              "name": "16-Bromoepiandrosterone",
+              "node_index": 18653,
+              "score": 0.9975881576538086,
+              "rank": 18
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9975720047950745,
+              "rank": 19
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.9975603818893433,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8676608800888062,
+              "rank": 1
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.8655139803886414,
+              "rank": 2
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.8588570356369019,
+              "rank": 3
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.8463250398635864,
+              "rank": 4
+            },
+            {
+              "name": "Vismodegib",
+              "node_index": 14443,
+              "score": 0.8454276323318481,
+              "rank": 5
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8449403047561646,
+              "rank": 6
+            },
+            {
+              "name": "Genistein",
+              "node_index": 14064,
+              "score": 0.8433233499526978,
+              "rank": 7
+            },
+            {
+              "name": "Ponatinib",
+              "node_index": 15117,
+              "score": 0.8386261463165283,
+              "rank": 8
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.8367162346839905,
+              "rank": 9
+            },
+            {
+              "name": "Nintedanib",
+              "node_index": 14464,
+              "score": 0.8365780115127563,
+              "rank": 10
+            },
+            {
+              "name": "Tegafur",
+              "node_index": 14588,
+              "score": 0.8348934650421143,
+              "rank": 11
+            },
+            {
+              "name": "Pemetrexed",
+              "node_index": 14227,
+              "score": 0.8347641825675964,
+              "rank": 12
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8343650102615356,
+              "rank": 13
+            },
+            {
+              "name": "Cobimetinib",
+              "node_index": 14628,
+              "score": 0.8336928486824036,
+              "rank": 14
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8336098790168762,
+              "rank": 15
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.8312165141105652,
+              "rank": 16
+            },
+            {
+              "name": "Lapatinib",
+              "node_index": 15085,
+              "score": 0.8279270529747009,
+              "rank": 17
+            },
+            {
+              "name": "Aldesleukin",
+              "node_index": 14742,
+              "score": 0.8276616334915161,
+              "rank": 18
+            },
+            {
+              "name": "Infigratinib",
+              "node_index": 14663,
+              "score": 0.8213502764701843,
+              "rank": 19
+            },
+            {
+              "name": "Temsirolimus",
+              "node_index": 15100,
+              "score": 0.817372739315033,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "PPARG": {
+      "status": "ok",
+      "node_index": 988,
+      "node_type": "gene/protein",
+      "family": "nuclear_receptor",
+      "note": "PPAR-gamma - PPARD paralog",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9995599389076233,
+              "rank": 1
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9995421171188354,
+              "rank": 2
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9994977712631226,
+              "rank": 3
+            },
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9994826316833496,
+              "rank": 4
+            },
+            {
+              "name": "Atl146e",
+              "node_index": 18187,
+              "score": 0.9994770884513855,
+              "rank": 5
+            },
+            {
+              "name": "Bepridil",
+              "node_index": 15250,
+              "score": 0.9994531273841858,
+              "rank": 6
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9993853569030762,
+              "rank": 7
+            },
+            {
+              "name": "Glycine",
+              "node_index": 14672,
+              "score": 0.9993791580200195,
+              "rank": 8
+            },
+            {
+              "name": "octyl 3-deoxy-2-O-(6-deoxy-alpha-L-galactopyranosyl)-beta-D-xylo-hexopyranoside",
+              "node_index": 16684,
+              "score": 0.9993768334388733,
+              "rank": 9
+            },
+            {
+              "name": "DDP733",
+              "node_index": 16954,
+              "score": 0.999372661113739,
+              "rank": 10
+            },
+            {
+              "name": "Thiamine",
+              "node_index": 14132,
+              "score": 0.9993725419044495,
+              "rank": 11
+            },
+            {
+              "name": "Caffeine",
+              "node_index": 14870,
+              "score": 0.9993473887443542,
+              "rank": 12
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.9993233680725098,
+              "rank": 13
+            },
+            {
+              "name": "Arginine",
+              "node_index": 16000,
+              "score": 0.9993171691894531,
+              "rank": 14
+            },
+            {
+              "name": "Abacavir",
+              "node_index": 15941,
+              "score": 0.9993021488189697,
+              "rank": 15
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9993005990982056,
+              "rank": 16
+            },
+            {
+              "name": "Ammonia",
+              "node_index": 14665,
+              "score": 0.9992806315422058,
+              "rank": 17
+            },
+            {
+              "name": "Ritodrine",
+              "node_index": 14838,
+              "score": 0.9992758631706238,
+              "rank": 18
+            },
+            {
+              "name": "Tibolone",
+              "node_index": 14461,
+              "score": 0.999271810054779,
+              "rank": 19
+            },
+            {
+              "name": "Glucosamine",
+              "node_index": 16275,
+              "score": 0.9992682337760925,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.8898340463638306,
+              "rank": 1
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8887826800346375,
+              "rank": 2
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.8863676190376282,
+              "rank": 3
+            },
+            {
+              "name": "Aldesleukin",
+              "node_index": 14742,
+              "score": 0.8858292102813721,
+              "rank": 4
+            },
+            {
+              "name": "Nintedanib",
+              "node_index": 14464,
+              "score": 0.8826190233230591,
+              "rank": 5
+            },
+            {
+              "name": "Pemetrexed",
+              "node_index": 14227,
+              "score": 0.8801825642585754,
+              "rank": 6
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.8797584772109985,
+              "rank": 7
+            },
+            {
+              "name": "Lapatinib",
+              "node_index": 15085,
+              "score": 0.8754147887229919,
+              "rank": 8
+            },
+            {
+              "name": "Tegafur",
+              "node_index": 14588,
+              "score": 0.8739352226257324,
+              "rank": 9
+            },
+            {
+              "name": "Tacrolimus",
+              "node_index": 14274,
+              "score": 0.8732235431671143,
+              "rank": 10
+            },
+            {
+              "name": "Tamoxifen",
+              "node_index": 14231,
+              "score": 0.8712406158447266,
+              "rank": 11
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8703088760375977,
+              "rank": 12
+            },
+            {
+              "name": "Vismodegib",
+              "node_index": 14443,
+              "score": 0.8697323799133301,
+              "rank": 13
+            },
+            {
+              "name": "Ponatinib",
+              "node_index": 15117,
+              "score": 0.8688955903053284,
+              "rank": 14
+            },
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.8668826222419739,
+              "rank": 15
+            },
+            {
+              "name": "Cobimetinib",
+              "node_index": 14628,
+              "score": 0.8666555881500244,
+              "rank": 16
+            },
+            {
+              "name": "Infigratinib",
+              "node_index": 14663,
+              "score": 0.8652070760726929,
+              "rank": 17
+            },
+            {
+              "name": "Docetaxel",
+              "node_index": 14879,
+              "score": 0.8641727566719055,
+              "rank": 18
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.8639830350875854,
+              "rank": 19
+            },
+            {
+              "name": "Etoposide",
+              "node_index": 14685,
+              "score": 0.8625203967094421,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    },
+    "RXRA": {
+      "status": "ok",
+      "node_index": 1925,
+      "node_type": "gene/protein",
+      "family": "nuclear_receptor",
+      "note": "Retinoid X receptor alpha - PPAR heterodimer partner",
+      "per_edge_type": {
+        "('drug', 'drug_protein', 'gene/protein')": {
+          "etype_index": 45,
+          "src_orientation": "drug->gene",
+          "top20_predictions": [
+            {
+              "name": "Obinepitide",
+              "node_index": 19387,
+              "score": 0.9987472295761108,
+              "rank": 1
+            },
+            {
+              "name": "Beta carotene",
+              "node_index": 14052,
+              "score": 0.9984115362167358,
+              "rank": 2
+            },
+            {
+              "name": "N-cyclohexyltaurine",
+              "node_index": 18909,
+              "score": 0.9983599781990051,
+              "rank": 3
+            },
+            {
+              "name": "(5R)-2-sulfanyl-5-[4-(trifluoromethyl)benzyl]-1,3-thiazol-4(5H)-one",
+              "node_index": 20096,
+              "score": 0.997920572757721,
+              "rank": 4
+            },
+            {
+              "name": "1-Allyl-3-Butyl-8-(N-Acetyl-4-Aminobenzyl)-Xanthine",
+              "node_index": 18097,
+              "score": 0.9978783130645752,
+              "rank": 5
+            },
+            {
+              "name": "Sifalimumab",
+              "node_index": 19689,
+              "score": 0.9978673458099365,
+              "rank": 6
+            },
+            {
+              "name": "ANZ-100",
+              "node_index": 19697,
+              "score": 0.9978551268577576,
+              "rank": 7
+            },
+            {
+              "name": "N-Acetylglucosamine",
+              "node_index": 16409,
+              "score": 0.9976213574409485,
+              "rank": 8
+            },
+            {
+              "name": "Cycloleucine",
+              "node_index": 17113,
+              "score": 0.997562050819397,
+              "rank": 9
+            },
+            {
+              "name": "METHYL(2-ACETOXY-2-(2-CARBOXY-4-AMINO-PHENYL))ACETATE",
+              "node_index": 19858,
+              "score": 0.9975155591964722,
+              "rank": 10
+            },
+            {
+              "name": "Peptide YY (3-36)",
+              "node_index": 19386,
+              "score": 0.9974448680877686,
+              "rank": 11
+            },
+            {
+              "name": "Hydroxyaminovaline",
+              "node_index": 18269,
+              "score": 0.997361958026886,
+              "rank": 12
+            },
+            {
+              "name": "Tibolone",
+              "node_index": 14461,
+              "score": 0.9973254203796387,
+              "rank": 13
+            },
+            {
+              "name": "Mdl 101,146",
+              "node_index": 17188,
+              "score": 0.9973064661026001,
+              "rank": 14
+            },
+            {
+              "name": "4-S-Glutathionyl-5-pentyl-tetrahydro-furan-2-ol",
+              "node_index": 17858,
+              "score": 0.9972585439682007,
+              "rank": 15
+            },
+            {
+              "name": "Emricasan",
+              "node_index": 17329,
+              "score": 0.997239351272583,
+              "rank": 16
+            },
+            {
+              "name": "Anthralin",
+              "node_index": 19936,
+              "score": 0.9971349239349365,
+              "rank": 17
+            },
+            {
+              "name": "Atl146e",
+              "node_index": 18187,
+              "score": 0.9971240162849426,
+              "rank": 18
+            },
+            {
+              "name": "beta-D-fructofuranose 1,6-bisphosphate",
+              "node_index": 16164,
+              "score": 0.9971150159835815,
+              "rank": 19
+            },
+            {
+              "name": "Human C1-esterase inhibitor",
+              "node_index": 16184,
+              "score": 0.9971127510070801,
+              "rank": 20
+            }
+          ]
+        },
+        "('gene/protein', 'rev_drug_protein', 'drug')": {
+          "etype_index": 83,
+          "src_orientation": "gene->drug",
+          "top20_predictions": [
+            {
+              "name": "Ibrexafungerp",
+              "node_index": 14524,
+              "score": 0.938923180103302,
+              "rank": 1
+            },
+            {
+              "name": "Ripretinib",
+              "node_index": 14555,
+              "score": 0.9344054460525513,
+              "rank": 2
+            },
+            {
+              "name": "Resveratrol",
+              "node_index": 14071,
+              "score": 0.9306326508522034,
+              "rank": 3
+            },
+            {
+              "name": "Fostamatinib",
+              "node_index": 15759,
+              "score": 0.9302998781204224,
+              "rank": 4
+            },
+            {
+              "name": "Zinc sulfate, unspecified form",
+              "node_index": 14552,
+              "score": 0.9238728284835815,
+              "rank": 5
+            },
+            {
+              "name": "Irinotecan",
+              "node_index": 14250,
+              "score": 0.9138526320457458,
+              "rank": 6
+            },
+            {
+              "name": "Ataluren",
+              "node_index": 14854,
+              "score": 0.9079025983810425,
+              "rank": 7
+            },
+            {
+              "name": "Corticosterone",
+              "node_index": 14713,
+              "score": 0.9045478105545044,
+              "rank": 8
+            },
+            {
+              "name": "Prasterone sulfate",
+              "node_index": 14752,
+              "score": 0.9043543934822083,
+              "rank": 9
+            },
+            {
+              "name": "Abemaciclib",
+              "node_index": 14517,
+              "score": 0.9034221768379211,
+              "rank": 10
+            },
+            {
+              "name": "Quercetin",
+              "node_index": 14392,
+              "score": 0.9017195105552673,
+              "rank": 11
+            },
+            {
+              "name": "Glutathione",
+              "node_index": 14968,
+              "score": 0.9012894034385681,
+              "rank": 12
+            },
+            {
+              "name": "Genistein",
+              "node_index": 14064,
+              "score": 0.9001827836036682,
+              "rank": 13
+            },
+            {
+              "name": "Vandetanib",
+              "node_index": 14408,
+              "score": 0.8980377316474915,
+              "rank": 14
+            },
+            {
+              "name": "Selumetinib",
+              "node_index": 14500,
+              "score": 0.8878568410873413,
+              "rank": 15
+            },
+            {
+              "name": "Zinc chloride",
+              "node_index": 14551,
+              "score": 0.8876039981842041,
+              "rank": 16
+            },
+            {
+              "name": "Risdiplam",
+              "node_index": 14564,
+              "score": 0.8871426582336426,
+              "rank": 17
+            },
+            {
+              "name": "Medical Cannabis",
+              "node_index": 14739,
+              "score": 0.8856472373008728,
+              "rank": 18
+            },
+            {
+              "name": "Saracatinib",
+              "node_index": 15750,
+              "score": 0.885185182094574,
+              "rank": 19
+            },
+            {
+              "name": "Dabrafenib",
+              "node_index": 14453,
+              "score": 0.881913423538208,
+              "rank": 20
+            }
+          ]
+        }
+      }
+    }
+  },
+  "n_drugs_in_kg": 8160
+}

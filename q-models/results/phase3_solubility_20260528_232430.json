@@ -1,0 +1,11 @@
+{
+  "timestamp": "20260528_232430",
+  "benchmark": "DeepSol test (Khurana 2018, Zenodo 1162886)",
+  "n_scored": 1992,
+  "n_errors": 7,
+  "pos_rate": 0.501,
+  "accuracy": 0.7339,
+  "auroc": 0.829,
+  "paper_deepsol_acc": 0.77,
+  "note": "DeepSol paper reports ~0.77 test accuracy"
+}

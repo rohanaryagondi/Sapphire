@@ -1,0 +1,702 @@
+{
+  "timestamp": "20260607_025514",
+  "checkpoint": "dti_bindingdb_pkd_peer",
+  "checkpoint_path": "/Users/rohanaryagondi/Library/CloudStorage/OneDrive-YaleUniversity/Career/Quiver/Mammal/models/dti_bindingdb_pkd_peer",
+  "norm_constants": [
+    6.286291085593906,
+    1.5422950906208512
+  ],
+  "device": "mps",
+  "wall_time_sec": 536.6,
+  "panel": [
+    {
+      "accession": "P42345",
+      "gene": "MTOR",
+      "n_pairs": 192,
+      "class": "kinase"
+    },
+    {
+      "accession": "P15056",
+      "gene": "BRAF",
+      "n_pairs": 532,
+      "class": "kinase"
+    },
+    {
+      "accession": "Q8K4Z4",
+      "gene": "Adrb2",
+      "n_pairs": 211,
+      "class": "gpcr"
+    },
+    {
+      "accession": "P31389",
+      "gene": "HRH1",
+      "n_pairs": 184,
+      "class": "gpcr"
+    },
+    {
+      "accession": "P51449",
+      "gene": "RORC",
+      "n_pairs": 374,
+      "class": "nuclear_receptor"
+    },
+    {
+      "accession": "P00918",
+      "gene": "CA2",
+      "n_pairs": 269,
+      "class": "other"
+    }
+  ],
+  "params": {
+    "pkd_threshold": 7.0,
+    "n_binders": 30,
+    "n_random_decoys": 30,
+    "n_matched_per_binder": 3,
+    "mw_tol_da": 50.0,
+    "seed": 42,
+    "top_frac": 0.05
+  },
+  "per_target": [
+    {
+      "accession": "P42345",
+      "gene": "MTOR",
+      "n_pairs": 192,
+      "class": "kinase",
+      "seq_len": 2549,
+      "truncated": true,
+      "binders": {
+        "n": 12,
+        "pkd_range": [
+          7.07,
+          9.284
+        ],
+        "mean_true_pkd": 7.922,
+        "mean_predicted_pkd": 6.287
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 5.88
+      },
+      "decoys_matched": {
+        "n": 36,
+        "mean_predicted_pkd": 6.192,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.761,
+      "auroc_matched": 0.558,
+      "separation_random_pkd": 0.407,
+      "separation_matched_pkd": 0.095,
+      "spearman_test_fold": {
+        "n": 42,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": 0.266,
+        "pearson": 0.602,
+        "pkd_range_true": [
+          2.0,
+          9.377
+        ],
+        "pkd_range_pred": [
+          5.391,
+          7.32
+        ]
+      },
+      "ef_top5pct": 2.0,
+      "top3_binders": [
+        {
+          "smiles": "CCC(=O)N1CCN(c2ccc(-n3c(=O)ccc4cnc5ccc(-c6cnc7ccccc7c6)cc5c43)cc2C(F)(F)F)CC1",
+          "true_pkd": 9.284
+        },
+        {
+          "smiles": "CN(C)C1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1",
+          "true_pkd": 8.983
+        },
+        {
+          "smiles": "CC(C)n1nc(-c2cc3cc(O)ccc3[nH]2)c2c(N)ncnc21",
+          "true_pkd": 8.509
+        }
+      ]
+    },
+    {
+      "accession": "P15056",
+      "gene": "BRAF",
+      "n_pairs": 532,
+      "class": "kinase",
+      "seq_len": 766,
+      "truncated": false,
+      "binders": {
+        "n": 30,
+        "pkd_range": [
+          8.959,
+          9.585
+        ],
+        "mean_true_pkd": 9.032,
+        "mean_predicted_pkd": 7.139
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 6.9
+      },
+      "decoys_matched": {
+        "n": 90,
+        "mean_predicted_pkd": 6.996,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.468,
+      "auroc_matched": 0.463,
+      "separation_random_pkd": 0.239,
+      "separation_matched_pkd": 0.142,
+      "spearman_test_fold": {
+        "n": 119,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": 0.449,
+        "pearson": 0.579,
+        "pkd_range_true": [
+          4.9,
+          9.745
+        ],
+        "pkd_range_pred": [
+          5.38,
+          9.338
+        ]
+      },
+      "ef_top5pct": 4.0,
+      "top3_binders": [
+        {
+          "smiles": "CN(C)CCOc1ccc(-c2nc(-c3ccncc3)c(-c3ccc4c(c3)CCC4N=O)[nH]2)cc1",
+          "true_pkd": 9.585
+        },
+        {
+          "smiles": "O=NC1CCc2cc(-c3cn(CCO)nc3-c3ccncc3)ccc21",
+          "true_pkd": 9.553
+        },
+        {
+          "smiles": "CC(COc1nccc(-c2nc(-c3ccncc3)c(-c3ccc4c(c3)CCC4N=O)[nH]2)n1)N(C)C",
+          "true_pkd": 9.222
+        }
+      ]
+    },
+    {
+      "accession": "Q8K4Z4",
+      "gene": "Adrb2",
+      "n_pairs": 211,
+      "class": "gpcr",
+      "seq_len": 418,
+      "truncated": false,
+      "binders": {
+        "n": 30,
+        "pkd_range": [
+          7.857,
+          9.788
+        ],
+        "mean_true_pkd": 8.382,
+        "mean_predicted_pkd": 7.802
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 6.825
+      },
+      "decoys_matched": {
+        "n": 90,
+        "mean_predicted_pkd": 6.848,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.871,
+      "auroc_matched": 0.881,
+      "separation_random_pkd": 0.977,
+      "separation_matched_pkd": 0.954,
+      "spearman_test_fold": {
+        "n": 49,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": 0.756,
+        "pearson": 0.765,
+        "pkd_range_true": [
+          3.5,
+          9.01
+        ],
+        "pkd_range_pred": [
+          5.117,
+          8.62
+        ]
+      },
+      "ef_top5pct": 4.0,
+      "top3_binders": [
+        {
+          "smiles": "O[C@H](COc1cccc2ccccc12)[C@@H]1CCCCN1",
+          "true_pkd": 9.788
+        },
+        {
+          "smiles": "CC(C)(C)NC[C@H](O)COc1nsnc1N1CCOCC1",
+          "true_pkd": 9.575
+        },
+        {
+          "smiles": "CC(C)NCC(O)COc1cccc2ccccc12",
+          "true_pkd": 8.968
+        }
+      ]
+    },
+    {
+      "accession": "P31389",
+      "gene": "HRH1",
+      "n_pairs": 184,
+      "class": "gpcr",
+      "seq_len": 488,
+      "truncated": false,
+      "binders": {
+        "n": 30,
+        "pkd_range": [
+          8.222,
+          9.646
+        ],
+        "mean_true_pkd": 8.826,
+        "mean_predicted_pkd": 7.423
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 7.59
+      },
+      "decoys_matched": {
+        "n": 90,
+        "mean_predicted_pkd": 7.729,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.4,
+      "auroc_matched": 0.33,
+      "separation_random_pkd": -0.167,
+      "separation_matched_pkd": -0.306,
+      "spearman_test_fold": {
+        "n": 33,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": -0.14,
+        "pearson": 0.049,
+        "pkd_range_true": [
+          3.8,
+          9.13
+        ],
+        "pkd_range_pred": [
+          6.676,
+          8.769
+        ]
+      },
+      "ef_top5pct": 0.0,
+      "top3_binders": [
+        {
+          "smiles": "Cc1ccc(/C(=C\\CN2CCCC2)c2ccccn2)cc1",
+          "true_pkd": 9.646
+        },
+        {
+          "smiles": "COc1ccc(CN(CCN(C)C)c2ccccn2)cc1",
+          "true_pkd": 9.319
+        },
+        {
+          "smiles": "CN(C)CCc1cnc(-c2cccc(Br)c2)[nH]1",
+          "true_pkd": 9.093
+        }
+      ]
+    },
+    {
+      "accession": "P51449",
+      "gene": "RORC",
+      "n_pairs": 374,
+      "class": "nuclear_receptor",
+      "seq_len": 518,
+      "truncated": false,
+      "binders": {
+        "n": 30,
+        "pkd_range": [
+          8.854,
+          9.921
+        ],
+        "mean_true_pkd": 9.146,
+        "mean_predicted_pkd": 8.296
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 6.578
+      },
+      "decoys_matched": {
+        "n": 90,
+        "mean_predicted_pkd": 6.864,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.97,
+      "auroc_matched": 0.952,
+      "separation_random_pkd": 1.717,
+      "separation_matched_pkd": 1.432,
+      "spearman_test_fold": {
+        "n": 82,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": -0.101,
+        "pearson": -0.062,
+        "pkd_range_true": [
+          5.131,
+          9.509
+        ],
+        "pkd_range_pred": [
+          6.164,
+          9.485
+        ]
+      },
+      "ef_top5pct": 4.0,
+      "top3_binders": [
+        {
+          "smiles": "COc1nc2ccc([C@@](O)(c3cc(C)nc(C)c3)c3cnnn3C)cc2c(Cl)c1CN1CCC(C(F)(F)F)CC1",
+          "true_pkd": 9.921
+        },
+        {
+          "smiles": "COc1nc2ccc(C(O)(c3sc(C)nc3C)c3cnnn3C)cc2c(Cl)c1Cc1ccc(C(F)(F)F)cc1",
+          "true_pkd": 9.907
+        },
+        {
+          "smiles": "COc1nc2c(C)cc(C(O)(c3c(C)nn(C)c3C)c3cnc(C)n3C)cc2c(Cl)c1OCC(F)(F)F",
+          "true_pkd": 9.796
+        }
+      ]
+    },
+    {
+      "accession": "P00918",
+      "gene": "CA2",
+      "n_pairs": 269,
+      "class": "other",
+      "seq_len": 260,
+      "truncated": false,
+      "binders": {
+        "n": 30,
+        "pkd_range": [
+          8.921,
+          9.873
+        ],
+        "mean_true_pkd": 9.419,
+        "mean_predicted_pkd": 8.466
+      },
+      "decoys_random": {
+        "n": 30,
+        "mean_predicted_pkd": 7.034
+      },
+      "decoys_matched": {
+        "n": 90,
+        "mean_predicted_pkd": 7.135,
+        "n_per_binder": 3,
+        "mw_tol_da": 50.0
+      },
+      "auroc_random": 0.867,
+      "auroc_matched": 0.84,
+      "separation_random_pkd": 1.432,
+      "separation_matched_pkd": 1.331,
+      "spearman_test_fold": {
+        "n": 73,
+        "status": "ok (potential PEER leakage \u2014 upper bound)",
+        "spearman": 0.872,
+        "pearson": 0.774,
+        "pkd_range_true": [
+          2.699,
+          10.398
+        ],
+        "pkd_range_pred": [
+          5.439,
+          9.71
+        ]
+      },
+      "ef_top5pct": 4.0,
+      "top3_binders": [
+        {
+          "smiles": "CCN[C@H]1C[C@H](CCO[N+](=O)[O-])S(=O)(=O)c2sc(S(N)(=O)=O)cc21",
+          "true_pkd": 9.873
+        },
+        {
+          "smiles": "CC(C)(C)c1cc(=O)[nH]c(SCC(=O)c2ccc(S(N)(=O)=O)cc2)n1",
+          "true_pkd": 9.854
+        },
+        {
+          "smiles": "CCN[C@H]1C[C@H](C)S(=O)(=O)c2sc(S(N)(=O)=O)cc21",
+          "true_pkd": 9.845
+        }
+      ]
+    }
+  ],
+  "offtarget_matrix": {
+    "per_binder": [
+      {
+        "accession": "P42345",
+        "smiles": "CCC(=O)N1CCN(c2ccc(-n3c(=O)ccc4cnc5ccc(-c6cnc7ccccc7c6)cc5c43)cc2C(F)(F)F)CC1",
+        "true_pkd_on_target": 9.284,
+        "pkd_vs_panel": {
+          "P42345": 6.848,
+          "P15056": 7.911,
+          "Q8K4Z4": 8.156,
+          "P31389": 8.546,
+          "P51449": 7.717,
+          "P00918": 7.835
+        },
+        "mean_offtarget_pkd": 8.033,
+        "delta_on_minus_meanoff": -1.185
+      },
+      {
+        "accession": "P42345",
+        "smiles": "CN(C)C1CCN(C(=O)c2ccc(NC(=O)Nc3ccc(-c4nc(N5CCOCC5)nc(N5CCOCC5)n4)cc3)cc2)CC1",
+        "true_pkd_on_target": 8.983,
+        "pkd_vs_panel": {
+          "P42345": 7.32,
+          "P15056": 8.144,
+          "Q8K4Z4": 7.889,
+          "P31389": 8.756,
+          "P51449": 7.893,
+          "P00918": 7.804
+        },
+        "mean_offtarget_pkd": 8.097,
+        "delta_on_minus_meanoff": -0.777
+      },
+      {
+        "accession": "P42345",
+        "smiles": "CC(C)n1nc(-c2cc3cc(O)ccc3[nH]2)c2c(N)ncnc21",
+        "true_pkd_on_target": 8.509,
+        "pkd_vs_panel": {
+          "P42345": 5.673,
+          "P15056": 7.431,
+          "Q8K4Z4": 6.412,
+          "P31389": 7.337,
+          "P51449": 6.771,
+          "P00918": 7.461
+        },
+        "mean_offtarget_pkd": 7.082,
+        "delta_on_minus_meanoff": -1.409
+      },
+      {
+        "accession": "P15056",
+        "smiles": "CN(C)CCOc1ccc(-c2nc(-c3ccncc3)c(-c3ccc4c(c3)CCC4N=O)[nH]2)cc1",
+        "true_pkd_on_target": 9.585,
+        "pkd_vs_panel": {
+          "P42345": 6.469,
+          "P15056": 8.915,
+          "Q8K4Z4": 7.991,
+          "P31389": 8.827,
+          "P51449": 7.86,
+          "P00918": 8.46
+        },
+        "mean_offtarget_pkd": 7.921,
+        "delta_on_minus_meanoff": 0.994
+      },
+      {
+        "accession": "P15056",
+        "smiles": "O=NC1CCc2cc(-c3cn(CCO)nc3-c3ccncc3)ccc21",
+        "true_pkd_on_target": 9.553,
+        "pkd_vs_panel": {
+          "P42345": 5.955,
+          "P15056": 9.158,
+          "Q8K4Z4": 7.794,
+          "P31389": 7.984,
+          "P51449": 6.776,
+          "P00918": 7.926
+        },
+        "mean_offtarget_pkd": 7.287,
+        "delta_on_minus_meanoff": 1.871
+      },
+      {
+        "accession": "P15056",
+        "smiles": "CC(COc1nccc(-c2nc(-c3ccncc3)c(-c3ccc4c(c3)CCC4N=O)[nH]2)n1)N(C)C",
+        "true_pkd_on_target": 9.222,
+        "pkd_vs_panel": {
+          "P42345": 6.677,
+          "P15056": 9.036,
+          "Q8K4Z4": 8.884,
+          "P31389": 9.206,
+          "P51449": 8.399,
+          "P00918": 8.653
+        },
+        "mean_offtarget_pkd": 8.364,
+        "delta_on_minus_meanoff": 0.672
+      },
+      {
+        "accession": "Q8K4Z4",
+        "smiles": "O[C@H](COc1cccc2ccccc12)[C@@H]1CCCCN1",
+        "true_pkd_on_target": 9.788,
+        "pkd_vs_panel": {
+          "P42345": 6.064,
+          "P15056": 7.291,
+          "Q8K4Z4": 8.335,
+          "P31389": 8.416,
+          "P51449": 6.901,
+          "P00918": 7.643
+        },
+        "mean_offtarget_pkd": 7.263,
+        "delta_on_minus_meanoff": 1.072
+      },
+      {
+        "accession": "Q8K4Z4",
+        "smiles": "CC(C)(C)NC[C@H](O)COc1nsnc1N1CCOCC1",
+        "true_pkd_on_target": 9.575,
+        "pkd_vs_panel": {
+          "P42345": 6.373,
+          "P15056": 7.739,
+          "Q8K4Z4": 8.629,
+          "P31389": 8.206,
+          "P51449": 7.388,
+          "P00918": 8.198
+        },
+        "mean_offtarget_pkd": 7.581,
+        "delta_on_minus_meanoff": 1.048
+      },
+      {
+        "accession": "Q8K4Z4",
+        "smiles": "CC(C)NCC(O)COc1cccc2ccccc12",
+        "true_pkd_on_target": 8.968,
+        "pkd_vs_panel": {
+          "P42345": 6.505,
+          "P15056": 7.473,
+          "Q8K4Z4": 7.731,
+          "P31389": 8.217,
+          "P51449": 6.909,
+          "P00918": 7.624
+        },
+        "mean_offtarget_pkd": 7.346,
+        "delta_on_minus_meanoff": 0.385
+      },
+      {
+        "accession": "P31389",
+        "smiles": "Cc1ccc(/C(=C\\CN2CCCC2)c2ccccn2)cc1",
+        "true_pkd_on_target": 9.646,
+        "pkd_vs_panel": {
+          "P42345": 5.413,
+          "P15056": 6.621,
+          "Q8K4Z4": 7.129,
+          "P31389": 7.032,
+          "P51449": 6.233,
+          "P00918": 6.555
+        },
+        "mean_offtarget_pkd": 6.39,
+        "delta_on_minus_meanoff": 0.642
+      },
+      {
+        "accession": "P31389",
+        "smiles": "COc1ccc(CN(CCN(C)C)c2ccccn2)cc1",
+        "true_pkd_on_target": 9.319,
+        "pkd_vs_panel": {
+          "P42345": 5.854,
+          "P15056": 6.625,
+          "Q8K4Z4": 6.505,
+          "P31389": 7.098,
+          "P51449": 6.699,
+          "P00918": 7.23
+        },
+        "mean_offtarget_pkd": 6.583,
+        "delta_on_minus_meanoff": 0.515
+      },
+      {
+        "accession": "P31389",
+        "smiles": "CN(C)CCc1cnc(-c2cccc(Br)c2)[nH]1",
+        "true_pkd_on_target": 9.093,
+        "pkd_vs_panel": {
+          "P42345": 5.678,
+          "P15056": 6.207,
+          "Q8K4Z4": 6.202,
+          "P31389": 7.108,
+          "P51449": 6.401,
+          "P00918": 6.603
+        },
+        "mean_offtarget_pkd": 6.218,
+        "delta_on_minus_meanoff": 0.89
+      },
+      {
+        "accession": "P51449",
+        "smiles": "COc1nc2ccc([C@@](O)(c3cc(C)nc(C)c3)c3cnnn3C)cc2c(Cl)c1CN1CCC(C(F)(F)F)CC1",
+        "true_pkd_on_target": 9.921,
+        "pkd_vs_panel": {
+          "P42345": 6.66,
+          "P15056": 8.067,
+          "Q8K4Z4": 7.984,
+          "P31389": 8.421,
+          "P51449": 8.287,
+          "P00918": 7.79
+        },
+        "mean_offtarget_pkd": 7.784,
+        "delta_on_minus_meanoff": 0.503
+      },
+      {
+        "accession": "P51449",
+        "smiles": "COc1nc2ccc(C(O)(c3sc(C)nc3C)c3cnnn3C)cc2c(Cl)c1Cc1ccc(C(F)(F)F)cc1",
+        "true_pkd_on_target": 9.907,
+        "pkd_vs_panel": {
+          "P42345": 7.788,
+          "P15056": 8.785,
+          "Q8K4Z4": 8.907,
+          "P31389": 8.994,
+          "P51449": 9.741,
+          "P00918": 8.973
+        },
+        "mean_offtarget_pkd": 8.689,
+        "delta_on_minus_meanoff": 1.052
+      },
+      {
+        "accession": "P51449",
+        "smiles": "COc1nc2c(C)cc(C(O)(c3c(C)nn(C)c3C)c3cnc(C)n3C)cc2c(Cl)c1OCC(F)(F)F",
+        "true_pkd_on_target": 9.796,
+        "pkd_vs_panel": {
+          "P42345": 6.719,
+          "P15056": 8.184,
+          "Q8K4Z4": 7.877,
+          "P31389": 8.322,
+          "P51449": 8.335,
+          "P00918": 8.062
+        },
+        "mean_offtarget_pkd": 7.833,
+        "delta_on_minus_meanoff": 0.502
+      },
+      {
+        "accession": "P00918",
+        "smiles": "CCN[C@H]1C[C@H](CCO[N+](=O)[O-])S(=O)(=O)c2sc(S(N)(=O)=O)cc21",
+        "true_pkd_on_target": 9.873,
+        "pkd_vs_panel": {
+          "P42345": 6.015,
+          "P15056": 7.272,
+          "Q8K4Z4": 7.797,
+          "P31389": 8.104,
+          "P51449": 6.721,
+          "P00918": 9.86
+        },
+        "mean_offtarget_pkd": 7.182,
+        "delta_on_minus_meanoff": 2.678
+      },
+      {
+        "accession": "P00918",
+        "smiles": "CC(C)(C)c1cc(=O)[nH]c(SCC(=O)c2ccc(S(N)(=O)=O)cc2)n1",
+        "true_pkd_on_target": 9.854,
+        "pkd_vs_panel": {
+          "P42345": 5.898,
+          "P15056": 6.619,
+          "Q8K4Z4": 6.641,
+          "P31389": 7.796,
+          "P51449": 6.542,
+          "P00918": 7.189
+        },
+        "mean_offtarget_pkd": 6.699,
+        "delta_on_minus_meanoff": 0.49
+      },
+      {
+        "accession": "P00918",
+        "smiles": "CCN[C@H]1C[C@H](C)S(=O)(=O)c2sc(S(N)(=O)=O)cc21",
+        "true_pkd_on_target": 9.845,
+        "pkd_vs_panel": {
+          "P42345": 5.949,
+          "P15056": 7.382,
+          "Q8K4Z4": 7.878,
+          "P31389": 7.987,
+          "P51449": 6.697,
+          "P00918": 9.936
+        },
+        "mean_offtarget_pkd": 7.179,
+        "delta_on_minus_meanoff": 2.757
+      }
+    ],
+    "per_target_mean_delta": {
+      "P42345": -1.124,
+      "P15056": 1.179,
+      "Q8K4Z4": 0.835,
+      "P31389": 0.682,
+      "P51449": 0.685,
+      "P00918": 1.975
+    }
+  }
+}

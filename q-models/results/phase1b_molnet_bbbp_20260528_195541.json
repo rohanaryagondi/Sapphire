@@ -1,0 +1,10 @@
+{
+  "timestamp": "20260528_195541",
+  "dataset": "bbbp",
+  "task_name": "BBBP",
+  "n_test_scored": 204,
+  "n_errors": 0,
+  "auroc": 0.9682,
+  "acc@0.5": 0.848,
+  "paper_auroc": 0.957
+}

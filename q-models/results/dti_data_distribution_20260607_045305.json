@@ -1,0 +1,758 @@
+{
+  "generated_utc": "20260607_045305",
+  "dataset": "BindingDB_Kd (PyTDC) \u2014 MAMMAL DTI head training pool",
+  "preprocessing": "harmonize_affinities(max_affinity); same pool feeds cold_split & PEER split",
+  "raw": {
+    "pairs": 52274,
+    "drugs": 10661,
+    "targets": 1090
+  },
+  "harmonized": {
+    "pairs": 42236,
+    "drugs": 9887,
+    "targets": 1090
+  },
+  "target_id_is_uniprot_accession": {
+    "unique_ids": 1090,
+    "accession_like": 1089,
+    "non_accession": [
+      "P0DP25,P0DP24,P0DP23"
+    ]
+  },
+  "skew": {
+    "n_targets": 1090,
+    "total_pairs": 42236,
+    "top_1pct_n": 11,
+    "top_1pct_share": 0.0712,
+    "top_10pct_n": 109,
+    "top_10pct_share": 0.3021,
+    "gini": 0.5725,
+    "max_pairs": 532,
+    "median_pairs": 13.5,
+    "max_over_median": 39.4
+  },
+  "top20_targets": [
+    {
+      "accession": "P15056",
+      "pairs": 532,
+      "gene": "BRAF",
+      "protein": "Serine/threonine-protein kinase B-raf (EC 2.7.11.1) (Proto-oncogene B-",
+      "seq_len": 766
+    },
+    {
+      "accession": "P51449",
+      "pairs": 374,
+      "gene": "RORC",
+      "protein": "Nuclear receptor ROR-gamma (Nuclear receptor RZR-gamma) (Nuclear recep",
+      "seq_len": 518
+    },
+    {
+      "accession": "P36888",
+      "pairs": 317,
+      "gene": "FLT3",
+      "protein": "Receptor-type tyrosine-protein kinase FLT3 (EC 2.7.10.1) (FL cytokine ",
+      "seq_len": 993
+    },
+    {
+      "accession": "P10721",
+      "pairs": 300,
+      "gene": "KIT",
+      "protein": "Mast/stem cell growth factor receptor Kit (SCFR) (EC 2.7.10.1) (Piebal",
+      "seq_len": 976
+    },
+    {
+      "accession": "P00918",
+      "pairs": 269,
+      "gene": "CA2",
+      "protein": "Carbonic anhydrase 2 (EC 4.2.1.1) (Carbonate dehydratase II) (Carbonic",
+      "seq_len": 260
+    },
+    {
+      "accession": "P24941",
+      "pairs": 239,
+      "gene": "CDK2",
+      "protein": "Cyclin-dependent kinase 2 (EC 2.7.11.22) (Cell division protein kinase",
+      "seq_len": 298
+    },
+    {
+      "accession": "Q8K4Z4",
+      "pairs": 211,
+      "gene": "Adrb2",
+      "protein": "Beta-2 adrenergic receptor (Beta-2 adrenoreceptor) (Beta-2 adrenocepto",
+      "seq_len": 418
+    },
+    {
+      "accession": "Q9JI35",
+      "pairs": 211,
+      "gene": "HRH3",
+      "protein": "Histamine H3 receptor (H3R) (HH3R)",
+      "seq_len": 445
+    },
+    {
+      "accession": "P42345",
+      "pairs": 192,
+      "gene": "MTOR",
+      "protein": "Serine/threonine-protein kinase mTOR (EC 2.7.11.1) (FK506-binding prot",
+      "seq_len": 2549
+    },
+    {
+      "accession": "P31389",
+      "pairs": 184,
+      "gene": "HRH1",
+      "protein": "Histamine H1 receptor (H1R) (HH1R)",
+      "seq_len": 488
+    },
+    {
+      "accession": "P48736",
+      "pairs": 177,
+      "gene": "PIK3CG",
+      "protein": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit gamma",
+      "seq_len": 1102
+    },
+    {
+      "accession": "O00329",
+      "pairs": 172,
+      "gene": "PIK3CD",
+      "protein": "Phosphatidylinositol 4,5-bisphosphate 3-kinase catalytic subunit delta",
+      "seq_len": 1044
+    },
+    {
+      "accession": "O00750",
+      "pairs": 169,
+      "gene": "PIK3C2B",
+      "protein": "Phosphatidylinositol 4-phosphate 3-kinase C2 domain-containing subunit",
+      "seq_len": 1634
+    },
+    {
+      "accession": "P55899",
+      "pairs": 166,
+      "gene": "FCGRT",
+      "protein": "IgG receptor FcRn large subunit p51 (FcRn) (IgG Fc fragment receptor t",
+      "seq_len": 365
+    },
+    {
+      "accession": "P07900",
+      "pairs": 157,
+      "gene": "HSP90AA1",
+      "protein": "Heat shock protein HSP 90-alpha (EC 3.6.4.10) (Heat shock 86 kDa) (HSP",
+      "seq_len": 732
+    },
+    {
+      "accession": "P06239",
+      "pairs": 154,
+      "gene": "LCK",
+      "protein": "Tyrosine-protein kinase Lck (EC 2.7.10.2) (Leukocyte C-terminal Src ki",
+      "seq_len": 509
+    },
+    {
+      "accession": "Q96GD4",
+      "pairs": 149,
+      "gene": "AURKB",
+      "protein": "Aurora kinase B (EC 2.7.11.1) (Aurora 1) (Aurora- and IPL1-like midbod",
+      "seq_len": 344
+    },
+    {
+      "accession": "P27694",
+      "pairs": 147,
+      "gene": "RPA1",
+      "protein": "Replication protein A 70 kDa DNA-binding subunit (RP-A p70) (Replicati",
+      "seq_len": 616
+    },
+    {
+      "accession": "P21731",
+      "pairs": 144,
+      "gene": "TBXA2R",
+      "protein": "Thromboxane A2 receptor (TXA2-R) (Prostanoid TP receptor)",
+      "seq_len": 343
+    },
+    {
+      "accession": "P17931",
+      "pairs": 134,
+      "gene": "LGALS3",
+      "protein": "Galectin-3 (Gal-3) (35 kDa lectin) (Carbohydrate-binding protein 35) (",
+      "seq_len": 250
+    }
+  ],
+  "class_breakdown": {
+    "method_targets": {
+      "uniprot_keyword": 1089,
+      "name_heuristic": 1
+    },
+    "pairs": {
+      "kinase": 30743,
+      "nuclear_receptor": 1041,
+      "other": 5969,
+      "gpcr": 3726,
+      "ion_channel": 427,
+      "protease": 302,
+      "phosphatase": 28
+    },
+    "targets": {
+      "kinase": 388,
+      "nuclear_receptor": 30,
+      "other": 419,
+      "gpcr": 166,
+      "ion_channel": 47,
+      "protease": 34,
+      "phosphatase": 6
+    },
+    "pairs_pct": {
+      "kinase": 0.7279,
+      "nuclear_receptor": 0.0246,
+      "other": 0.1413,
+      "gpcr": 0.0882,
+      "ion_channel": 0.0101,
+      "protease": 0.0072,
+      "phosphatase": 0.0007
+    }
+  },
+  "ion_channel_headline": {
+    "uniprot_keyword_ion_channels": {
+      "n_targets": 47,
+      "n_pairs": 427,
+      "pct_of_pairs": 0.0101,
+      "detail": [
+        {
+          "accession": "Q9BX84",
+          "pairs": 72,
+          "gene": "TRPM6",
+          "protein": "Transient receptor potential cation channel subfamily M member 6 (EC 2.7.11.1) (",
+          "families": "Protein kinase superfamily, Alpha-type protein kinase family, ALPK subfamily; Transient receptor (TC 1.A.4) family, LTrpC subfamily, TRPM6 sub-subfamily",
+          "seq_len": 2022
+        },
+        {
+          "accession": "O70212",
+          "pairs": 58,
+          "gene": "HTR3A",
+          "protein": "5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, 5-hydroxytryptamine receptor (TC 1.A.9.2) subfamily, HTR3A sub-subfamily",
+          "seq_len": 490
+        },
+        {
+          "accession": "Q12809",
+          "pairs": 45,
+          "gene": "KCNH2",
+          "protein": "Voltage-gated inwardly rectifying potassium channel KCNH2 (Eag homolog) (Ether-a",
+          "families": "Potassium channel family, H (Eag) (TC 1.A.1.20) subfamily, Kv11.1/KCNH2 sub-subfamily",
+          "seq_len": 1159
+        },
+        {
+          "accession": "P70605",
+          "pairs": 40,
+          "gene": "Kcnn3",
+          "protein": "Small conductance calcium-activated potassium channel protein 3 (SK3) (SKCa 3) (",
+          "families": "Potassium channel KCNN family, KCa2.3/KCNN3 subfamily",
+          "seq_len": 732
+        },
+        {
+          "accession": "Q99572",
+          "pairs": 34,
+          "gene": "P2RX7",
+          "protein": "P2X purinoceptor 7 (P2X7) (ATP receptor) (P2Z receptor) (Purinergic receptor)",
+          "families": "P2X receptor family",
+          "seq_len": 595
+        },
+        {
+          "accession": "P22001",
+          "pairs": 27,
+          "gene": "KCNA3",
+          "protein": "Potassium voltage-gated channel subfamily A member 3 (HGK5) (HLK3) (HPCN3) (Volt",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.3/KCNA3 sub-subfamily",
+          "seq_len": 575
+        },
+        {
+          "accession": "Q13936",
+          "pairs": 22,
+          "gene": "CACNA1C",
+          "protein": "Voltage-dependent L-type calcium channel subunit alpha-1C (Calcium channel, L ty",
+          "families": "Calcium channel alpha-1 subunit (TC 1.A.1.11) family, CACNA1C subfamily",
+          "seq_len": 2221
+        },
+        {
+          "accession": "P34158",
+          "pairs": 22,
+          "gene": "Cftr",
+          "protein": "Cystic fibrosis transmembrane conductance regulator (CFTR) (ATP-binding cassette",
+          "families": "ABC transporter superfamily, ABCC family, CFTR transporter (TC 3.A.1.202) subfamily",
+          "seq_len": 1476
+        },
+        {
+          "accession": "P22756",
+          "pairs": 12,
+          "gene": "Grik1",
+          "protein": "Glutamate receptor ionotropic, kainate 1 (GluK1) (Glutamate receptor 5) (GluR-5)",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, GRIK1 subfamily",
+          "seq_len": 949
+        },
+        {
+          "accession": "P43144",
+          "pairs": 8,
+          "gene": "Chrna9",
+          "protein": "Neuronal acetylcholine receptor subunit alpha-9 (Nicotinic acetylcholine recepto",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Acetylcholine receptor (TC 1.A.9.1) subfamily, Alpha-9/CHRNA9 sub-subfamily",
+          "seq_len": 479
+        },
+        {
+          "accession": "Q00194",
+          "pairs": 7,
+          "gene": "CNGA1",
+          "protein": "Cyclic nucleotide-gated channel alpha-1 (CNG channel alpha-1) (CNG-1) (CNG1) (Cy",
+          "families": "Cyclic nucleotide-gated cation channel (TC 1.A.1.5) family, CNGA1 subfamily",
+          "seq_len": 690
+        },
+        {
+          "accession": "P36544",
+          "pairs": 7,
+          "gene": "CHRNA7",
+          "protein": "Neuronal acetylcholine receptor subunit alpha-7 (nAChR7) (Nicotinic acetylcholin",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Acetylcholine receptor (TC 1.A.9.1) subfamily, Alpha-7/CHRNA7 sub-subfamily",
+          "seq_len": 502
+        },
+        {
+          "accession": "P14867",
+          "pairs": 5,
+          "gene": "GABRA1",
+          "protein": "Gamma-aminobutyric acid receptor subunit alpha-1 (GABA(A) receptor subunit alpha",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Gamma-aminobutyric acid receptor (TC 1.A.9.5) subfamily, GABRA1 sub-subfamily",
+          "seq_len": 456
+        },
+        {
+          "accession": "P16390",
+          "pairs": 5,
+          "gene": "Kcna3",
+          "protein": "Potassium voltage-gated channel subfamily A member 3 (MK3) (Voltage-gated potass",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.3/KCNA3 sub-subfamily",
+          "seq_len": 528
+        },
+        {
+          "accession": "Q14573",
+          "pairs": 4,
+          "gene": "ITPR3",
+          "protein": "Inositol 1,4,5-trisphosphate-gated calcium channel ITPR3 (IP3 receptor isoform 3",
+          "families": "InsP3 receptor family",
+          "seq_len": 2671
+        },
+        {
+          "accession": "O75311",
+          "pairs": 4,
+          "gene": "GLRA3",
+          "protein": "Glycine receptor subunit alpha-3",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Glycine receptor (TC 1.A.9.3) subfamily, GLRA3 sub-subfamily",
+          "seq_len": 464
+        },
+        {
+          "accession": "Q8NER1",
+          "pairs": 4,
+          "gene": "TRPV1",
+          "protein": "Transient receptor potential cation channel subfamily V member 1 (TrpV1) (Capsai",
+          "families": "Transient receptor (TC 1.A.4) family, TrpV subfamily, TRPV1 sub-subfamily",
+          "seq_len": 839
+        },
+        {
+          "accession": "P16389",
+          "pairs": 4,
+          "gene": "KCNA2",
+          "protein": "Potassium voltage-gated channel subfamily A member 2 (NGK1) (Voltage-gated K(+) ",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.2/KCNA2 sub-subfamily",
+          "seq_len": 499
+        },
+        {
+          "accession": "P46098",
+          "pairs": 4,
+          "gene": "HTR3A",
+          "protein": "5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, 5-hydroxytryptamine receptor (TC 1.A.9.2) subfamily, HTR3A sub-subfamily",
+          "seq_len": 478
+        },
+        {
+          "accession": "P42262",
+          "pairs": 4,
+          "gene": "GRIA2",
+          "protein": "Glutamate receptor 2 (GluR-2) (AMPA-selective glutamate receptor 2) (GluR-B) (Gl",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, GRIA2 subfamily",
+          "seq_len": 883
+        },
+        {
+          "accession": "P48547",
+          "pairs": 4,
+          "gene": "KCNC1",
+          "protein": "Voltage-gated potassium channel KCNC1 (NGK2) (Potassium voltage-gated channel su",
+          "families": "Potassium channel family, C (Shaw) (TC 1.A.1.2) subfamily, Kv3.1/KCNC1 sub-subfamily",
+          "seq_len": 511
+        },
+        {
+          "accession": "Q09470",
+          "pairs": 4,
+          "gene": "KCNA1",
+          "protein": "Potassium voltage-gated channel subfamily A member 1 (Voltage-gated K(+) channel",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.1/KCNA1 sub-subfamily",
+          "seq_len": 495
+        },
+        {
+          "accession": "P35563",
+          "pairs": 3,
+          "gene": "Htr3a",
+          "protein": "5-hydroxytryptamine receptor 3A (5-HT3-A) (5-HT3A) (5-hydroxytryptamine receptor",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, 5-hydroxytryptamine receptor (TC 1.A.9.2) subfamily, HTR3A sub-subfamily",
+          "seq_len": 483
+        },
+        {
+          "accession": "P47824",
+          "pairs": 3,
+          "gene": "P2rx1",
+          "protein": "P2X purinoceptor 1 (P2X1) (ATP receptor) (Purinergic receptor) (RP-2 protein)",
+          "families": "P2X receptor family",
+          "seq_len": 399
+        },
+        {
+          "accession": "P22460",
+          "pairs": 2,
+          "gene": "KCNA5",
+          "protein": "Potassium voltage-gated channel subfamily A member 5 (HPCN1) (Voltage-gated pota",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.5/KCNA5 sub-subfamily",
+          "seq_len": 613
+        },
+        {
+          "accession": "Q64663",
+          "pairs": 2,
+          "gene": "P2rx7",
+          "protein": "P2X purinoceptor 7 (P2X7) (ATP receptor) (P2Z receptor) (Purinergic receptor)",
+          "families": "P2X receptor family",
+          "seq_len": 595
+        },
+        {
+          "accession": "O35433",
+          "pairs": 1,
+          "gene": "Trpv1",
+          "protein": "Transient receptor potential cation channel subfamily V member 1 (TrpV1) (Capsai",
+          "families": "Transient receptor (TC 1.A.4) family, TrpV subfamily, TRPV1 sub-subfamily",
+          "seq_len": 838
+        },
+        {
+          "accession": "Q9H2S1",
+          "pairs": 1,
+          "gene": "KCNN2",
+          "protein": "Small conductance calcium-activated potassium channel protein 2 (SK2) (SKCa 2) (",
+          "families": "Potassium channel KCNN family, KCa2.2/KCNN2 subfamily",
+          "seq_len": 579
+        },
+        {
+          "accession": "P04775",
+          "pairs": 1,
+          "gene": "Scn2a",
+          "protein": "Sodium channel protein type 2 subunit alpha (Sodium channel protein brain II sub",
+          "families": "Sodium channel (TC 1.A.1.10) family, Nav1.2/SCN2A subfamily",
+          "seq_len": 2005
+        },
+        {
+          "accession": "P04774",
+          "pairs": 1,
+          "gene": "Scn1a",
+          "protein": "Sodium channel protein type 1 subunit alpha (Sodium channel protein brain I subu",
+          "families": "Sodium channel (TC 1.A.1.10) family, Nav1.1/SCN1A subfamily",
+          "seq_len": 2009
+        },
+        {
+          "accession": "O08562",
+          "pairs": 1,
+          "gene": "Scn9a",
+          "protein": "Sodium channel protein type 9 subunit alpha (Peripheral sodium channel 1) (PN1) ",
+          "families": "Sodium channel (TC 1.A.1.10) family, Nav1.7/SCN9A subfamily",
+          "seq_len": 1984
+        },
+        {
+          "accession": "P03300",
+          "pairs": 1,
+          "gene": "",
+          "protein": "Genome polyprotein [Cleaved into: P1; Capsid protein VP0 (VP4-VP2); Capsid prote",
+          "families": "Picornaviruses polyprotein family",
+          "seq_len": 2209
+        },
+        {
+          "accession": "P24046",
+          "pairs": 1,
+          "gene": "GABRR1",
+          "protein": "Gamma-aminobutyric acid receptor subunit rho-1 (GABA(A) receptor subunit rho-1) ",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Gamma-aminobutyric acid receptor (TC 1.A.9.5) subfamily, GABRR1 sub-subfamily",
+          "seq_len": 479
+        },
+        {
+          "accession": "P23574",
+          "pairs": 1,
+          "gene": "Gabrg1",
+          "protein": "Gamma-aminobutyric acid receptor subunit gamma-1 (GABA(A) receptor subunit gamma",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Gamma-aminobutyric acid receptor (TC 1.A.9.5) subfamily, GABRG1 sub-subfamily",
+          "seq_len": 465
+        },
+        {
+          "accession": "P35439",
+          "pairs": 1,
+          "gene": "Grin1",
+          "protein": "Glutamate receptor ionotropic, NMDA 1 (GluN1) (Glutamate [NMDA] receptor subunit",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, NR1/GRIN1 subfamily",
+          "seq_len": 938
+        },
+        {
+          "accession": "Q05941",
+          "pairs": 1,
+          "gene": "Chrna7",
+          "protein": "Neuronal acetylcholine receptor subunit alpha-7 (nAChR7) (Nicotinic acetylcholin",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Acetylcholine receptor (TC 1.A.9.1) subfamily, Alpha-7/CHRNA7 sub-subfamily",
+          "seq_len": 502
+        },
+        {
+          "accession": "Q05586",
+          "pairs": 1,
+          "gene": "GRIN1",
+          "protein": "Glutamate receptor ionotropic, NMDA 1 (GluN1) (Glutamate [NMDA] receptor subunit",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, NR1/GRIN1 subfamily",
+          "seq_len": 938
+        },
+        {
+          "accession": "P19491",
+          "pairs": 1,
+          "gene": "Gria2",
+          "protein": "Glutamate receptor 2 (GluR-2) (AMPA-selective glutamate receptor 2) (GluR-B) (Gl",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, GRIA2 subfamily",
+          "seq_len": 883
+        },
+        {
+          "accession": "Q13224",
+          "pairs": 1,
+          "gene": "GRIN2B",
+          "protein": "Glutamate receptor ionotropic, NMDA 2B (GluN2B) (Glutamate [NMDA] receptor subun",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, NR2B/GRIN2B subfamily",
+          "seq_len": 1484
+        },
+        {
+          "accession": "P28476",
+          "pairs": 1,
+          "gene": "GABRR2",
+          "protein": "Gamma-aminobutyric acid receptor subunit rho-2 (GABA(A) receptor subunit rho-2) ",
+          "families": "Ligand-gated ion channel (TC 1.A.9) family, Gamma-aminobutyric acid receptor (TC 1.A.9.5) subfamily, GABRR2 sub-subfamily",
+          "seq_len": 465
+        },
+        {
+          "accession": "P17658",
+          "pairs": 1,
+          "gene": "KCNA6",
+          "protein": "Potassium voltage-gated channel subfamily A member 6 (Voltage-gated potassium ch",
+          "families": "Potassium channel family, A (Shaker) (TC 1.A.1.2) subfamily, Kv1.6/KCNA6 sub-subfamily",
+          "seq_len": 529
+        },
+        {
+          "accession": "P42260",
+          "pairs": 1,
+          "gene": "Grik2",
+          "protein": "Glutamate receptor ionotropic, kainate 2 (GluK2) (Glutamate receptor 6) (GluR-6)",
+          "families": "Glutamate-gated ion channel (TC 1.A.10.1) family, GRIK2 subfamily",
+          "seq_len": 908
+        },
+        {
+          "accession": "Q92952",
+          "pairs": 1,
+          "gene": "KCNN1",
+          "protein": "Small conductance calcium-activated potassium channel protein 1 (SK1) (SKCa 1) (",
+          "families": "Potassium channel KCNN family, KCa2.1/KCNN1 subfamily",
+          "seq_len": 543
+        },
+        {
+          "accession": "P08104",
+          "pairs": 1,
+          "gene": "Scn3a",
+          "protein": "Sodium channel protein type 3 subunit alpha (Sodium channel protein brain III su",
+          "families": "Sodium channel (TC 1.A.1.10) family, Nav1.3/SCN3A subfamily",
+          "seq_len": 1951
+        },
+        {
+          "accession": "Q7Z2W7",
+          "pairs": 1,
+          "gene": "TRPM8",
+          "protein": "Transient receptor potential cation channel subfamily M member 8 (Long transient",
+          "families": "Transient receptor (TC 1.A.4) family, LTrpC subfamily, TRPM8 sub-subfamily",
+          "seq_len": 1104
+        },
+        {
+          "accession": "P15390",
+          "pairs": 1,
+          "gene": "Scn4a",
+          "protein": "Sodium channel protein type 4 subunit alpha (Mu-1) (SkM1) (Sodium channel protei",
+          "families": "Sodium channel (TC 1.A.1.10) family, Nav1.4/SCN4A subfamily",
+          "seq_len": 1840
+        },
+        {
+          "accession": "Q8R4D5",
+          "pairs": 1,
+          "gene": "Trpm8",
+          "protein": "Transient receptor potential cation channel subfamily M member 8 (Long transient",
+          "families": "Transient receptor (TC 1.A.4) family, LTrpC subfamily, TRPM8 sub-subfamily",
+          "seq_len": 1104
+        }
+      ]
+    },
+    "name_keyword_channel_hits": [
+      {
+        "accession": "Q12809",
+        "pairs": 45,
+        "gene": "KCNH2",
+        "protein": "Voltage-gated inwardly rectifying potassium channel KCNH2 (Eag homolog) (Ether-a"
+      },
+      {
+        "accession": "P70605",
+        "pairs": 40,
+        "gene": "Kcnn3",
+        "protein": "Small conductance calcium-activated potassium channel protein 3 (SK3) (SKCa 3) ("
+      },
+      {
+        "accession": "P22001",
+        "pairs": 27,
+        "gene": "KCNA3",
+        "protein": "Potassium voltage-gated channel subfamily A member 3 (HGK5) (HLK3) (HPCN3) (Volt"
+      },
+      {
+        "accession": "Q13936",
+        "pairs": 22,
+        "gene": "CACNA1C",
+        "protein": "Voltage-dependent L-type calcium channel subunit alpha-1C (Calcium channel, L ty"
+      },
+      {
+        "accession": "P34158",
+        "pairs": 22,
+        "gene": "Cftr",
+        "protein": "Cystic fibrosis transmembrane conductance regulator (CFTR) (ATP-binding cassette"
+      },
+      {
+        "accession": "P16390",
+        "pairs": 5,
+        "gene": "Kcna3",
+        "protein": "Potassium voltage-gated channel subfamily A member 3 (MK3) (Voltage-gated potass"
+      },
+      {
+        "accession": "Q14573",
+        "pairs": 4,
+        "gene": "ITPR3",
+        "protein": "Inositol 1,4,5-trisphosphate-gated calcium channel ITPR3 (IP3 receptor isoform 3"
+      },
+      {
+        "accession": "P16389",
+        "pairs": 4,
+        "gene": "KCNA2",
+        "protein": "Potassium voltage-gated channel subfamily A member 2 (NGK1) (Voltage-gated K(+) "
+      },
+      {
+        "accession": "P48547",
+        "pairs": 4,
+        "gene": "KCNC1",
+        "protein": "Voltage-gated potassium channel KCNC1 (NGK2) (Potassium voltage-gated channel su"
+      },
+      {
+        "accession": "Q09470",
+        "pairs": 4,
+        "gene": "KCNA1",
+        "protein": "Potassium voltage-gated channel subfamily A member 1 (Voltage-gated K(+) channel"
+      },
+      {
+        "accession": "P22460",
+        "pairs": 2,
+        "gene": "KCNA5",
+        "protein": "Potassium voltage-gated channel subfamily A member 5 (HPCN1) (Voltage-gated pota"
+      },
+      {
+        "accession": "Q9H2S1",
+        "pairs": 1,
+        "gene": "KCNN2",
+        "protein": "Small conductance calcium-activated potassium channel protein 2 (SK2) (SKCa 2) ("
+      },
+      {
+        "accession": "P04775",
+        "pairs": 1,
+        "gene": "Scn2a",
+        "protein": "Sodium channel protein type 2 subunit alpha (Sodium channel protein brain II sub"
+      },
+      {
+        "accession": "P04774",
+        "pairs": 1,
+        "gene": "Scn1a",
+        "protein": "Sodium channel protein type 1 subunit alpha (Sodium channel protein brain I subu"
+      },
+      {
+        "accession": "O08562",
+        "pairs": 1,
+        "gene": "Scn9a",
+        "protein": "Sodium channel protein type 9 subunit alpha (Peripheral sodium channel 1) (PN1) "
+      },
+      {
+        "accession": "P17658",
+        "pairs": 1,
+        "gene": "KCNA6",
+        "protein": "Potassium voltage-gated channel subfamily A member 6 (Voltage-gated potassium ch"
+      },
+      {
+        "accession": "Q92952",
+        "pairs": 1,
+        "gene": "KCNN1",
+        "protein": "Small conductance calcium-activated potassium channel protein 1 (SK1) (SKCa 1) ("
+      },
+      {
+        "accession": "P08104",
+        "pairs": 1,
+        "gene": "Scn3a",
+        "protein": "Sodium channel protein type 3 subunit alpha (Sodium channel protein brain III su"
+      },
+      {
+        "accession": "P45880",
+        "pairs": 1,
+        "gene": "VDAC2",
+        "protein": "Non-selective voltage-gated ion channel VDAC2 (VDAC-2) (hVDAC2) (Outer mitochond"
+      },
+      {
+        "accession": "P15390",
+        "pairs": 1,
+        "gene": "Scn4a",
+        "protein": "Sodium channel protein type 4 subunit alpha (Mu-1) (SkM1) (Sodium channel protei"
+      }
+    ],
+    "nav_scn": {
+      "nav1_8_present_as_target": false,
+      "scn_family_targets": [
+        [
+          "P04775",
+          1,
+          "Scn2a",
+          "Sodium channel protein type 2 subunit alpha (Sodium channel protein brain II sub"
+        ],
+        [
+          "P04774",
+          1,
+          "Scn1a",
+          "Sodium channel protein type 1 subunit alpha (Sodium channel protein brain I subu"
+        ],
+        [
+          "O08562",
+          1,
+          "Scn9a",
+          "Sodium channel protein type 9 subunit alpha (Peripheral sodium channel 1) (PN1) "
+        ],
+        [
+          "P08104",
+          1,
+          "Scn3a",
+          "Sodium channel protein type 3 subunit alpha (Sodium channel protein brain III su"
+        ],
+        [
+          "P15390",
+          1,
+          "Scn4a",
+          "Sodium channel protein type 4 subunit alpha (Mu-1) (SkM1) (Sodium channel protei"
+        ]
+      ],
+      "nav1_8_sequence_in_data": false,
+      "nav1_8_50aa_probe_substring_present": false,
+      "nav1_8_length": 1956
+    },
+    "long_multidomain_targets": {
+      "gt_1500aa": 46,
+      "gt_1900aa": 21
+    }
+  }
+}

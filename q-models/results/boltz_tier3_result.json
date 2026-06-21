@@ -1,0 +1,172 @@
+{
+  "T7_rows": [
+    {
+      "target": "Nav1.1",
+      "label": 0,
+      "optimization_score": 0.31074845790863037,
+      "binding_confidence": 0.49205282330513
+    },
+    {
+      "target": "Nav1.2",
+      "label": 0,
+      "optimization_score": 0.2407521903514862,
+      "binding_confidence": 0.379811555147171
+    },
+    {
+      "target": "Nav1.3",
+      "label": 0,
+      "optimization_score": 0.3316726088523865,
+      "binding_confidence": 0.46513015031814575
+    },
+    {
+      "target": "Nav1.4",
+      "label": 0,
+      "optimization_score": 0.2696647346019745,
+      "binding_confidence": 0.40689852833747864
+    },
+    {
+      "target": "Nav1.5",
+      "label": 0,
+      "optimization_score": 0.327239990234375,
+      "binding_confidence": 0.428943395614624
+    },
+    {
+      "target": "Nav1.6",
+      "label": 0,
+      "optimization_score": 0.2902509570121765,
+      "binding_confidence": 0.43743425607681274
+    },
+    {
+      "target": "Nav1.7",
+      "label": 0,
+      "optimization_score": 0.30908218026161194,
+      "binding_confidence": 0.45285487174987793
+    },
+    {
+      "target": "Nav1.8",
+      "label": 1,
+      "optimization_score": 0.2733469605445862,
+      "binding_confidence": 0.3548402786254883
+    },
+    {
+      "target": "Nav1.9",
+      "label": 0,
+      "optimization_score": 0.322818398475647,
+      "binding_confidence": 0.42032817006111145
+    }
+  ],
+  "T7_nav18_rank_by_bindconf": 9,
+  "T7_auroc_bindconf": 0.0,
+  "T7_auroc_optscore": 0.25,
+  "T8_rows": [
+    {
+      "id": "Apamin-SK",
+      "label": 0,
+      "binding_confidence": 3.48614230460953e-05,
+      "optimization_score": null,
+      "iptm": 0.7073673605918884
+    },
+    {
+      "id": "ProTx-I",
+      "label": 1,
+      "binding_confidence": 1.5551966498605907e-05,
+      "optimization_score": null,
+      "iptm": 0.23723137378692627
+    },
+    {
+      "id": "ProTx-II",
+      "label": 1,
+      "binding_confidence": 1.0655402547854465e-05,
+      "optimization_score": null,
+      "iptm": 0.7985699772834778
+    },
+    {
+      "id": "Iberiotoxin-BK",
+      "label": 0,
+      "binding_confidence": 9.50386584008811e-06,
+      "optimization_score": null,
+      "iptm": 0.4787142276763916
+    },
+    {
+      "id": "Charybdotoxin-Kv",
+      "label": 0,
+      "binding_confidence": 5.4110510063765105e-06,
+      "optimization_score": null,
+      "iptm": 0.4652325510978699
+    },
+    {
+      "id": "HwTx-IV",
+      "label": 1,
+      "binding_confidence": 4.121159236092353e-06,
+      "optimization_score": null,
+      "iptm": 0.5921646356582642
+    }
+  ],
+  "T8_auroc_bindconf": 0.4444,
+  "T8_auroc_iptm": 0.5556,
+  "T9_n": 10,
+  "T9_designs": [
+    {
+      "seq": "MSISQILLFASNNLLNINRLLRYFYE",
+      "binding_confidence": 0.0010506321676075458,
+      "optimization_score": null,
+      "iptm": 0.7240410447120667
+    },
+    {
+      "seq": "SEVVRVFAGLLTLALGQALLYKTFVE",
+      "binding_confidence": 1.0448397370055318e-05,
+      "optimization_score": null,
+      "iptm": 0.735626220703125
+    },
+    {
+      "seq": "GSLSDRSLLRAFGTLLATLGYLSSQSH",
+      "binding_confidence": 7.39824608899653e-06,
+      "optimization_score": null,
+      "iptm": 0.8835709691047668
+    },
+    {
+      "seq": "PLGGAELLALGFAIALIQSEQDRVES",
+      "binding_confidence": 4.943701475632699e-06,
+      "optimization_score": null,
+      "iptm": 0.6947576403617859
+    },
+    {
+      "seq": "DIGTQQGRVFAGLLTVQSGLAVIYSKY",
+      "binding_confidence": 3.7954621802782642e-06,
+      "optimization_score": null,
+      "iptm": 0.8605984449386597
+    },
+    {
+      "seq": "MSVLRNLGGLTTLAGGGYLALEYLRK",
+      "binding_confidence": 3.0084051104495305e-06,
+      "optimization_score": null,
+      "iptm": 0.36951202154159546
+    },
+    {
+      "seq": "SRTLEIQEIARHFGGLLTLFMALSAKS",
+      "binding_confidence": 2.9350496333790945e-06,
+      "optimization_score": null,
+      "iptm": 0.834592342376709
+    },
+    {
+      "seq": "GAPVGSGSFLSLLGGIASALALLELS",
+      "binding_confidence": 2.8380478397593834e-06,
+      "optimization_score": null,
+      "iptm": 0.6059847474098206
+    },
+    {
+      "seq": "SGLRRNGLLRNTGGLLALAGGINTLYS",
+      "binding_confidence": 2.0198916899971663e-06,
+      "optimization_score": null,
+      "iptm": 0.7904421091079712
+    },
+    {
+      "seq": "DTLGTELAAILGGLLAIQLGIAAAYQ",
+      "binding_confidence": 1.8589347746456043e-06,
+      "optimization_score": null,
+      "iptm": 0.8055309057235718
+    }
+  ],
+  "T9_bindconf_max": 0.0010506321676075458,
+  "T9_bindconf_median": 3.7954621802782642e-06
+}

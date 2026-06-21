@@ -1,0 +1,19 @@
+{
+  "timestamp": "20260528_223849",
+  "readout": "generative P(<1>) at classification position 1 (validated on BBBP=0.996)",
+  "n_actives": 27,
+  "n_decoys": 500,
+  "auroc": 0.6313,
+  "median_P1_active": 0.0,
+  "median_P1_decoy": 0.0,
+  "frac_argmax_active_overall": 0.0,
+  "enrichment_top5pct": [
+    5.25,
+    "7/26"
+  ],
+  "enrichment_top10pct": [
+    2.95,
+    "8/53"
+  ],
+  "spearman_Pactive_vs_pKd": -0.15
+}

@@ -1,0 +1,326 @@
+{
+  "test": "esm3_sm_open_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T16:57:24.140918",
+  "model": "esm3_sm_open_v1",
+  "n_blocks": 48,
+  "embedding_dim": 1536,
+  "LICENSE": "NON-COMMERCIAL RESEARCH ONLY (ESM-3 open weights). Not shippable without a commercial deal.",
+  "final_embeddings_nn": {
+    "raw": 0.75,
+    "centered": 0.75
+  },
+  "per_block": [
+    {
+      "block": 0,
+      "nn_raw": 0.6,
+      "nn_centered": 0.625,
+      "best": 0.625
+    },
+    {
+      "block": 1,
+      "nn_raw": 0.625,
+      "nn_centered": 0.65,
+      "best": 0.65
+    },
+    {
+      "block": 2,
+      "nn_raw": 0.675,
+      "nn_centered": 0.65,
+      "best": 0.675
+    },
+    {
+      "block": 3,
+      "nn_raw": 0.7,
+      "nn_centered": 0.675,
+      "best": 0.7
+    },
+    {
+      "block": 4,
+      "nn_raw": 0.675,
+      "nn_centered": 0.675,
+      "best": 0.675
+    },
+    {
+      "block": 5,
+      "nn_raw": 0.65,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 6,
+      "nn_raw": 0.7,
+      "nn_centered": 0.675,
+      "best": 0.7
+    },
+    {
+      "block": 7,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 8,
+      "nn_raw": 0.7,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "block": 9,
+      "nn_raw": 0.7,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 10,
+      "nn_raw": 0.675,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "block": 11,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 12,
+      "nn_raw": 0.7,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "block": 13,
+      "nn_raw": 0.7,
+      "nn_centered": 0.7,
+      "best": 0.7
+    },
+    {
+      "block": 14,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 15,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 16,
+      "nn_raw": 0.65,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 17,
+      "nn_raw": 0.7,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 18,
+      "nn_raw": 0.725,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 19,
+      "nn_raw": 0.675,
+      "nn_centered": 0.7,
+      "best": 0.7
+    },
+    {
+      "block": 20,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 21,
+      "nn_raw": 0.675,
+      "nn_centered": 0.75,
+      "best": 0.75
+    },
+    {
+      "block": 22,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "block": 23,
+      "nn_raw": 0.775,
+      "nn_centered": 0.65,
+      "best": 0.775
+    },
+    {
+      "block": 24,
+      "nn_raw": 0.725,
+      "nn_centered": 0.675,
+      "best": 0.725
+    },
+    {
+      "block": 25,
+      "nn_raw": 0.775,
+      "nn_centered": 0.675,
+      "best": 0.775
+    },
+    {
+      "block": 26,
+      "nn_raw": 0.775,
+      "nn_centered": 0.675,
+      "best": 0.775
+    },
+    {
+      "block": 27,
+      "nn_raw": 0.775,
+      "nn_centered": 0.7,
+      "best": 0.775
+    },
+    {
+      "block": 28,
+      "nn_raw": 0.775,
+      "nn_centered": 0.7,
+      "best": 0.775
+    },
+    {
+      "block": 29,
+      "nn_raw": 0.8,
+      "nn_centered": 0.725,
+      "best": 0.8
+    },
+    {
+      "block": 30,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "block": 31,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 32,
+      "nn_raw": 0.85,
+      "nn_centered": 0.8,
+      "best": 0.85
+    },
+    {
+      "block": 33,
+      "nn_raw": 0.875,
+      "nn_centered": 0.775,
+      "best": 0.875
+    },
+    {
+      "block": 34,
+      "nn_raw": 0.825,
+      "nn_centered": 0.8,
+      "best": 0.825
+    },
+    {
+      "block": 35,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 36,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 37,
+      "nn_raw": 0.775,
+      "nn_centered": 0.85,
+      "best": 0.85
+    },
+    {
+      "block": 38,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 39,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 40,
+      "nn_raw": 0.8,
+      "nn_centered": 0.825,
+      "best": 0.825
+    },
+    {
+      "block": 41,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "block": 42,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "block": 43,
+      "nn_raw": 0.75,
+      "nn_centered": 0.725,
+      "best": 0.75
+    },
+    {
+      "block": 44,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "block": 45,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "block": 46,
+      "nn_raw": 0.775,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 47,
+      "nn_raw": 0.75,
+      "nn_centered": 0.75,
+      "best": 0.75
+    }
+  ],
+  "best_block": {
+    "block": 33,
+    "nn_raw": 0.875,
+    "nn_centered": 0.775,
+    "used": "raw",
+    "per_family_nn_recall": {
+      "kinase": 1.0,
+      "gpcr": 1.0,
+      "ion_channel": 0.875,
+      "nuclear_receptor": 1.0,
+      "e3_ligase": 0.5,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    }
+  },
+  "references": {
+    "esm2_650M_best": 0.875,
+    "mammal_best": 0.85,
+    "esmc_600M_best": 0.825,
+    "prostt5_best": 0.825,
+    "e3_ligase_ceiling_seq_models": 0.5,
+    "bar": 0.8
+  },
+  "hypothesis": "ESM-3's function track may crack the e3_ligase/NR families that pure-sequence models fail on"
+}

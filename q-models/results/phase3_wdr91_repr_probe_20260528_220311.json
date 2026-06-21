@@ -1,0 +1,21 @@
+{
+  "timestamp": "20260528_220311",
+  "n_actives": 27,
+  "n_decoys": 500,
+  "method": "5fold CV nearest-active-centroid cosine, mean of 5 seeds",
+  "representations": {
+    "base_encoder": {
+      "cv_auroc_mean": 0.8567,
+      "cv_auroc_std": 0.0031
+    },
+    "wdr91_encoder": {
+      "cv_auroc_mean": 0.7983,
+      "cv_auroc_std": 0.0038
+    },
+    "morgan_fp": {
+      "cv_auroc_mean": 0.943,
+      "cv_auroc_std": 0.0025
+    }
+  },
+  "delta_wdr91_minus_base": -0.0584
+}

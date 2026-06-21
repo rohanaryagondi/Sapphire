@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Quiver MAMMAL Explorer</title>
+<style>
+  :root {
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --line:#2a2f3a;
+    --text:#e6e9ef; --muted:#9aa3b2; --accent:#5b9dff;
+    --reliable:#1a7f37; --caution:#bf8700; --dont_use:#cf222e; --low_value:#6e7781; --split:#137a7f;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  a { color:var(--accent); }
+  header { padding:18px 24px 10px; border-bottom:1px solid var(--line); }
+  header h1 { margin:0 0 2px; font-size:18px; letter-spacing:.2px; }
+  header .sub { color:var(--muted); font-size:12.5px; }
+  .banner { margin:12px 24px 0; padding:10px 14px; border-radius:8px;
+    background:linear-gradient(90deg,#2a1d12,#1e222b); border:1px solid #4a361f;
+    color:#f4d9b0; font-size:12.5px; }
+  .banner b { color:#ffcf8f; }
+  .tabs { display:flex; flex-wrap:wrap; gap:6px; padding:14px 24px 0; }
+  .tab { padding:7px 12px; border:1px solid var(--line); border-bottom:none;
+    border-radius:8px 8px 0 0; background:var(--panel); color:var(--muted); cursor:pointer; font-size:13px; }
+  .tab.active { background:var(--panel2); color:var(--text); border-color:var(--accent); }
+  .tab .em { margin-right:5px; }
+  main { padding:0 24px 40px; }
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:0 10px 10px 10px;
+    padding:18px 20px; max-width:900px; }
+  h2 { margin:2px 0 4px; font-size:16px; }
+  .tagline { color:var(--muted); font-size:12.5px; margin-bottom:14px; }
+  label { display:block; font-size:12px; color:var(--muted); margin:10px 0 4px; }
+  input, textarea { width:100%; background:var(--panel); color:var(--text); border:1px solid var(--line);
+    border-radius:7px; padding:9px 10px; font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace; }
+  textarea { min-height:70px; resize:vertical; word-break:break-all; }
+  .row { display:flex; gap:18px; align-items:center; margin-top:14px; }
+  button { background:var(--accent); color:#06122b; border:none; border-radius:7px; padding:9px 16px;
+    font-weight:600; cursor:pointer; font-size:13px; }
+  button.ghost { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  button:disabled { opacity:.5; cursor:default; }
+  /* reliability panel */
+  .rel { margin:6px 0 4px; padding:12px 14px; border-radius:9px; border:1px solid var(--line);
+    background:var(--panel); border-left-width:4px; }
+  .rel .badge { display:inline-block; font-weight:700; font-size:12px; padding:2px 9px; border-radius:20px;
+    color:#fff; margin-right:8px; }
+  .rel .headline { font-weight:650; }
+  .rel .why { color:var(--muted); margin-top:6px; }
+  .rel .use { margin-top:6px; }
+  .rel .use b { color:var(--text); }
+  .rel .src { margin-top:6px; font-size:11.5px; color:var(--muted); font-family:ui-monospace,Menlo,monospace; }
+  .bg-reliable{background:var(--reliable)} .bl-reliable{border-left-color:var(--reliable)}
+  .bg-caution{background:var(--caution)} .bl-caution{border-left-color:var(--caution)}
+  .bg-dont_use{background:var(--dont_use)} .bl-dont_use{border-left-color:var(--dont_use)}
+  .bg-low_value{background:var(--low_value)} .bl-low_value{border-left-color:var(--low_value)}
+  .bg-split{background:var(--split)} .bl-split{border-left-color:var(--split)}
+  /* result */
+  .result { margin-top:16px; }
+  .provider { background:var(--panel); border:1px solid var(--line); border-radius:9px; padding:14px 16px; margin-top:10px; }
+  .provider .pname { font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .provider .big { font-size:30px; font-weight:700; margin:4px 0 2px; }
+  .provider .sub { color:var(--muted); font-size:12.5px; }
+  .kind { font-size:10.5px; padding:1px 7px; border-radius:10px; border:1px solid var(--line); color:var(--muted); margin-left:8px; }
+  .err { color:#ff9a9a; margin-top:12px; white-space:pre-wrap; }
+  .spin { color:var(--muted); margin-top:12px; }
+  .hint { color:var(--muted); font-size:11.5px; margin-top:4px; }
+  .rel .src a { color:var(--accent); text-decoration:none; }
+  .rel .src a:hover { text-decoration:underline; }
+  .warn { margin-top:8px; padding:8px 11px; border-radius:7px; font-size:12px;
+    background:#3a2a12; border:1px solid #6e4f1f; color:#ffcf8f; }
+  /* mode toggle (Single / Batch) */
+  .modes { display:inline-flex; gap:0; margin:8px 0 2px; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .modes button { background:var(--panel); color:var(--muted); border:none; border-radius:0;
+    padding:6px 14px; font-weight:600; font-size:12.5px; }
+  .modes button.on { background:var(--accent); color:#06122b; }
+  /* batch results table */
+  table.batch { width:100%; border-collapse:collapse; margin-top:12px; font-size:12.5px; }
+  table.batch th, table.batch td { text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.batch th { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.4px;
+    cursor:pointer; user-select:none; white-space:nowrap; }
+  table.batch th:hover { color:var(--text); }
+  table.batch td.num { font-family:ui-monospace,Menlo,monospace; white-space:nowrap; }
+  table.batch td.mono { font-family:ui-monospace,Menlo,monospace; word-break:break-all; max-width:360px; }
+  table.batch tr.bad td { color:var(--muted); }
+  table.batch td .pill { font-size:10px; padding:1px 7px; border-radius:10px; }
+  .pill.pos { background:rgba(26,127,55,.25); color:#7ee2a0; }
+  .pill.neg { background:rgba(207,34,46,.2); color:#ff9a9a; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Quiver MAMMAL Explorer</h1>
+  <div class="sub">IBM MAMMAL public heads — with Quiver's empirical reliability verdict on every prediction.</div>
+</header>
+<div class="banner" id="banner">loading strategic context…</div>
+<div class="tabs" id="tabs"></div>
+<main><div class="card" id="card"></div></main>
+
+<script>
+const API = ""; // same-origin
+
+// Tab config: order + fields per task. (Generation/Embeddings added in a later step.)
+const TABS = {
+  dti:         { label:"Drug–Target Binding", tagline:"SMILES + protein → predicted pKd",
+                 fields:[ {n:"smiles", l:"Drug SMILES"},
+                          {n:"uniprot_acc", l:"UniProt accession (sequence fetched automatically)"},
+                          {n:"target_seq", l:"…or paste a protein sequence instead", ta:true, opt:true} ] },
+  ppi:         { label:"Protein–Protein Interaction", tagline:"two proteins → interact?",
+                 fields:[ {n:"seq_a", l:"Protein A (AA)", ta:true}, {n:"seq_b", l:"Protein B (AA)", ta:true} ] },
+  bbbp:        { label:"BBB Penetrance", tagline:"SMILES → blood-brain-barrier penetrant?",
+                 fields:[ {n:"smiles", l:"Drug SMILES"} ] },
+  clintox_tox: { label:"Clinical Toxicity", tagline:"SMILES → clinical-trial tox failure?",
+                 fields:[ {n:"smiles", l:"Drug SMILES"} ] },
+  clintox_fda: { label:"FDA Approval", tagline:"SMILES → FDA-approved?",
+                 fields:[ {n:"smiles", l:"Drug SMILES"} ] },
+  solubility:  { label:"Protein Solubility", tagline:"protein → soluble?",
+                 fields:[ {n:"protein_seq", l:"Protein sequence (AA)", ta:true} ] },
+  tcr:         { label:"TCR–Epitope Binding", tagline:"TCR-beta + epitope → bind?",
+                 fields:[ {n:"tcr_beta_seq", l:"TCR-beta CDR3 (AA)", ta:true}, {n:"epitope_seq", l:"Epitope peptide (AA)"} ] },
+  generation:  { label:"Generation", tagline:"masked SMILES/AA → span-infill (demo only)",
+                 fields:[ {n:"prompt", l:"SMILES or AA (middle third auto-masked, or place <SENTINEL_ID_0> yourself)", ta:true},
+                          {n:"kind", l:"Modality", select:["smiles","protein"]} ] },
+  embeddings:  { label:"Embeddings", tagline:"protein/SMILES → 768-d vector + nearest family",
+                 fields:[ {n:"text", l:"Protein sequence (AA) or SMILES", ta:true},
+                          {n:"kind", l:"Modality", select:["protein","smiles"]} ] },
+};
+
+// Batch triage: which tabs support a "many rows → ranked" mode, and how to build rows.
+// (PPI/TCR are pairwise, generation/embeddings aren't triage — single only.)
+const BATCH = {
+  bbbp:        { kind:"list", entity:"smiles",      label:"Drug SMILES — one per line (CSV ok: first column used, optional 2nd column = name)" },
+  clintox_tox: { kind:"list", entity:"smiles",      label:"Drug SMILES — one per line (CSV ok: first column used, optional 2nd column = name)" },
+  clintox_fda: { kind:"list", entity:"smiles",      label:"Drug SMILES — one per line (CSV ok: first column used, optional 2nd column = name)" },
+  solubility:  { kind:"list", entity:"protein_seq", label:"Protein sequences (AA) — one per line" },
+  dti:         { kind:"dti_cross" },
+};
+
+let VERDICTS = {};
+let active = Object.keys(TABS)[0];
+let mode = "single";      // "single" | "batch" (per-tab; reset on tab switch)
+let pendingFill = null;   // inputs to populate after switching tabs (History → Load)
+let batchState = null;    // last batch response, kept for client-side re-sort / CSV export
+
+function el(tag, attrs={}, ...kids){
+  const e=document.createElement(tag);
+  for(const k in attrs){ if(k==="class")e.className=attrs[k]; else if(k==="html")e.innerHTML=attrs[k]; else e.setAttribute(k,attrs[k]); }
+  for(const c of kids){ if(c==null)continue; e.append(c.nodeType?c:document.createTextNode(c)); }
+  return e;
+}
+
+function relPanel(v){
+  if(!v) return el("div");
+  const p = el("div", {class:`rel bl-${v.badge}`});
+  const head = el("div", {},
+    el("span",{class:`badge bg-${v.badge}`}, `${v.badge_emoji} ${v.badge_label}`),
+    el("span",{class:"headline"}, v.headline));
+  p.append(head,
+    el("div",{class:"why"}, v.why),
+    el("div",{class:"use", html:`<b>Recommended use:</b> ${escapeHtml(v.recommended_use)}`}),
+    el("div",{class:"src", html:`evidence: ${evidenceLinks(v.source)}`}));
+  return p;
+}
+function escapeHtml(s){ return (s||"").replace(/[&<>]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+// Turn the comma-separated "results/foo.md, docs/bar.md" citation into links the
+// backend serves read-only at /doc/<path> — open the actual receipt behind a verdict.
+function evidenceLinks(source){
+  return (source||"").split(",").map(s=>s.trim()).filter(Boolean).map(p=>{
+    const path = p.split(/\s/)[0];
+    return `<a href="/doc/${encodeURI(path)}" target="_blank" rel="noopener">${escapeHtml(p)}</a>`;
+  }).join(", ");
+}
+
+function fmtPrediction(pr){
+  if(pr.score_kind==="pkd")
+    return { big:`${pr.value.toFixed(2)} ${pr.units||"pKd"}`, sub:pr.note||"" };
+  if(pr.score_kind==="normalized_p1"){
+    const pct=(pr.value*100).toFixed(1);
+    const cls = pr.pred_class===1 ? "positive" : pr.pred_class===0 ? "negative" : "—";
+    return { big:`${pct}%`, sub:`P(class 1) · argmax: ${cls}${pr.note?" · "+pr.note:""}` };
+  }
+  if(pr.score_kind==="raw_p1")
+    return { big:`${pr.value.toFixed(4)}`, sub:`raw positive-token score (uncalibrated)${pr.note?" · "+pr.note:""}` };
+  return { big:"—", sub:pr.note||"" };
+}
+
+function renderTabs(){
+  const bar=document.getElementById("tabs"); bar.innerHTML="";
+  for(const [k,t] of Object.entries(TABS)){
+    const v=VERDICTS[k];
+    const tab=el("div",{class:"tab"+(k===active?" active":""), "data-task":k},
+      el("span",{class:"em"}, v?v.badge_emoji:""), t.label);
+    tab.onclick=()=>{ active=k; render(); };
+    bar.append(tab);
+  }
+  const htab=el("div",{class:"tab"+(active==="history"?" active":""), "data-task":"history"},
+    el("span",{class:"em"},"🕘"), "History");
+  htab.onclick=()=>{ active="history"; render(); };
+  bar.append(htab);
+}
+
+function render(){
+  renderTabs();
+  const card=document.getElementById("card"); card.innerHTML="";
+  if(active==="history"){ renderHistory(card); return; }
+  const t=TABS[active];
+  card.append(el("h2",{}, t.label), el("div",{class:"tagline"}, t.tagline));
+
+  if(BATCH[active]){
+    const toggle=el("div",{class:"modes"});
+    for(const m of ["single","batch"]){
+      const b=el("button",{class:(mode===m?"on":"")}, m==="single"?"Single":"Batch triage");
+      b.onclick=()=>{ mode=m; render(); };
+      toggle.append(b);
+    }
+    card.append(toggle);
+  } else if(mode!=="single"){ mode="single"; }
+
+  card.append(relPanel(VERDICTS[active]));
+
+  if(BATCH[active] && mode==="batch"){ renderBatch(card, active); return; }
+
+  const inputs={};
+  for(const f of t.fields){
+    card.append(el("label",{}, f.l + (f.opt?" (optional)":"")));
+    let inp;
+    if(f.select){
+      inp = el("select",{id:"f_"+f.n});
+      for(const o of f.select) inp.append(el("option",{value:o}, o));
+    } else {
+      inp = f.ta ? el("textarea",{id:"f_"+f.n}) : el("input",{id:"f_"+f.n, type:"text"});
+    }
+    inputs[f.n]=inp; card.append(inp);
+  }
+
+  if(pendingFill){
+    for(const f of t.fields){ if(pendingFill[f.n]!=null) inputs[f.n].value=pendingFill[f.n]; }
+    pendingFill=null;
+  }
+
+  const btn=el("button",{id:"btn-predict"}, "Predict");
+  const ex=el("button",{class:"ghost", id:"btn-example"}, "Load example");
+  const row=el("div",{class:"row"}, btn, ex);
+  card.append(row);
+  const out=el("div",{class:"result", id:"out"}); card.append(out);
+
+  ex.onclick=async()=>{
+    try{
+      const e=await (await fetch(`${API}/examples/${active}`)).json();
+      for(const f of t.fields){ if(e[f.n]!=null) inputs[f.n].value=e[f.n]; }
+      if(e._note) out.innerHTML=`<div class="hint">example: ${escapeHtml(e._note)}</div>`;
+    }catch(err){ out.innerHTML=`<div class="err">${err}</div>`; }
+  };
+
+  btn.onclick=async()=>{
+    const body={};
+    for(const f of t.fields){ const val=inputs[f.n].value.trim(); if(val) body[f.n]=val; }
+    btn.disabled=true; out.innerHTML=`<div class="spin">running model… (first call loads ~1.8&nbsp;GB)</div>`;
+    try{
+      const res=await fetch(`${API}/predict/${active}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const data=await res.json();
+      if(!res.ok){ out.innerHTML=`<div class="err">${escapeHtml(JSON.stringify(data.detail||data,null,2))}</div>`; return; }
+      renderResult(out, data);
+    }catch(err){ out.innerHTML=`<div class="err">${err}</div>`; }
+    finally{ btn.disabled=false; }
+  };
+}
+
+function providerCard(p){
+  const pr=p.prediction, e=pr.extra||{};
+  const card=el("div",{class:"provider"},
+    el("div",{class:"pname"}, p.provider_name,
+      el("span",{class:"kind"}, p.provider_kind==="ibm_public"?"IBM public":"Quiver")));
+  if(pr.score_kind!=="none"){
+    const f=fmtPrediction(pr);
+    card.append(el("div",{class:"big"}, f.big), el("div",{class:"sub"}, f.sub));
+    if(e.target_truncated)
+      card.append(el("div",{class:"warn"},
+        `⚠ target is ${e.target_len} aa — the DTI head only sees the first 1250. Any binding region past residue 1250 is invisible (this is exactly why suzetrigine→Nav1.8 fails). Treat this score with extra caution.`));
+  } else if(pr.vector){                               // embeddings
+    if(pr.nearest_family){
+      card.append(el("div",{class:"big"}, pr.nearest_family), el("div",{class:"sub"}, "nearest reference family"));
+    } else { card.append(el("div",{class:"big"}, "768-d vector")); }
+    if(pr.family_scores){
+      const rows=Object.entries(pr.family_scores).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k}: ${v.toFixed(3)}`).join("\n");
+      card.append(el("div",{class:"sub", html:`<pre style="margin:6px 0;white-space:pre-wrap;font-size:12px">${escapeHtml(rows)}</pre>`}));
+    }
+    card.append(el("div",{class:"hint"}, `dim ${e.dim||pr.vector.length} · preview [${(e.preview||pr.vector.slice(0,6)).join(", ")}]`));
+    if(pr.note) card.append(el("div",{class:"hint"}, pr.note));
+  } else {                                            // generation
+    card.append(el("div",{class:"big", html:`<span style="font-size:18px;word-break:break-all">${escapeHtml((pr.text&&pr.text[0])||"(no valid output)")}</span>`}));
+    const bits=[];
+    if(e.predicted_fill!=null) bits.push(`fill: ${e.predicted_fill}`);
+    if(e.reconstructed_valid!=null) bits.push(`valid: ${e.reconstructed_valid}`);
+    if(e.exact_recovery!=null) bits.push(`exact recovery: ${e.exact_recovery}`);
+    if(e.aa_valid_fraction!=null) bits.push(`AA-valid: ${e.aa_valid_fraction}`);
+    card.append(el("div",{class:"sub"}, bits.join(" · ")));
+    if(pr.note) card.append(el("div",{class:"hint"}, pr.note));
+  }
+  return card;
+}
+
+function renderResult(out, data){
+  out.innerHTML="";
+  if(data.standardized_smiles)
+    out.append(el("div",{class:"hint"}, `scored standardized SMILES: ${data.standardized_smiles}`));
+  for(const p of data.providers) out.append(providerCard(p));
+  // reliability repeated under the result so the verdict travels with the number
+  out.append(relPanel(data.reliability));
+}
+
+// ---------------- history ----------------
+function trunc(s,n){ return s.length>n ? s.slice(0,n)+"…" : s; }
+function inputPreview(inp){
+  return Object.entries(inp||{}).map(([k,v])=>`${k}=${trunc(String(v),46)}`).join("  ·  ") || "(no inputs)";
+}
+function fmtSummary(s){
+  if(!s) return "—";
+  if(s.score_kind==="pkd") return `${s.value!=null?Number(s.value).toFixed(2):"?"} ${s.units||"pKd"}`;
+  if(s.score_kind==="normalized_p1") return `${s.value!=null?(s.value*100).toFixed(1)+"%":"?"}${s.pred_class!=null?` (class ${s.pred_class})`:""}`;
+  if(s.text) return s.text;
+  if(s.nearest_family) return `nearest family: ${s.nearest_family}`;
+  return s.value!=null ? String(s.value) : "(embedding vector)";
+}
+function loadHistoryRecord(rec){ active=rec.task; mode="single"; pendingFill=rec.inputs||{}; render(); }
+
+function historyRow(rec){
+  const v=TABS[rec.task], label=v?v.label:rec.task, vb=VERDICTS[rec.task];
+  const row=el("div",{class:"provider"});
+  row.append(el("div",{class:"pname"},
+    el("span",{class:`badge bg-${rec.badge}`}, vb?vb.badge_emoji:"●"),
+    " "+label,
+    el("span",{class:"kind"}, new Date(rec.ts).toLocaleString())));
+  row.append(el("div",{class:"big", html:`<span style="font-size:18px;word-break:break-all">${escapeHtml(fmtSummary(rec.summary))}</span>`}));
+  row.append(el("div",{class:"sub", html:`<span style="font-family:ui-monospace,Menlo,monospace;font-size:11.5px">${escapeHtml(inputPreview(rec.inputs))}</span>`}));
+  const loadBtn=el("button",{class:"ghost", "data-load":rec.task}, "Load into tab");
+  loadBtn.onclick=()=>loadHistoryRecord(rec);
+  row.append(el("div",{class:"row"}, loadBtn));
+  return row;
+}
+
+async function renderHistory(card){
+  card.append(el("h2",{}, "History"),
+    el("div",{class:"tagline"}, "Every prediction you've run (most recent first). Persists on the server across restarts."));
+  const list=el("div",{class:"result", id:"hist"});
+  const refresh=el("button",{class:"ghost"}, "Refresh");
+  const clr=el("button",{class:"ghost"}, "Clear history");
+  card.append(el("div",{class:"row"}, refresh, clr), list);
+  async function load(){
+    list.innerHTML='<div class="spin">loading…</div>';
+    try{
+      const data=await (await fetch(`${API}/history?limit=200`)).json();
+      list.innerHTML="";
+      if(!data.records || !data.records.length){
+        list.innerHTML='<div class="hint">No predictions yet — run something in a tab and it shows up here.</div>'; return;
+      }
+      list.append(el("div",{class:"hint"}, `${data.count} prediction${data.count===1?"":"s"} logged`));
+      for(const rec of data.records) list.append(historyRow(rec));
+    }catch(err){ list.innerHTML=`<div class="err">${err}</div>`; }
+  }
+  refresh.onclick=load;
+  clr.onclick=async()=>{ if(confirm("Clear all prediction history?")){ await fetch(`${API}/history`,{method:"DELETE"}); load(); } };
+  load();
+}
+
+// ---------------- batch triage ----------------
+const BATCH_EXAMPLES = {
+  list_smiles:
+    "CN1C=NC2=C1C(=O)N(C(=O)N2C)C, caffeine\n"+
+    "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O, ibuprofen\n"+
+    "CC(=O)OC1=CC=CC=C1C(=O)O, aspirin\n"+
+    "CN1C(=O)CN=C(c2ccccc2)c2cc(Cl)ccc21, diazepam\n"+
+    "NCCc1ccc(O)c(O)c1, dopamine",
+  list_protein_seq:
+    "MADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMISELDQDGFIDKEDLHDGDGKISFEEFLNLVNKEMTADVDGDGQVNYEEFVTMMTSK, calmodulin\n"+
+    "KVFGRCELAAAMKRHGLDNYRGYSLGNWVCAAKFESNFNTQATNRNTDGSTDYGILQINSR, lysozyme-frag",
+  dti_comps: "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=C(C(=C(C=C3)F)F)OC, suzetrigine",
+  dti_targs: "Q9Y5Y9, Nav1.8 (SCN10A)\nP35498, Nav1.1 (SCN1A)",
+};
+
+function parseList(text){
+  return (text||"").split(/\r?\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#")).map(l=>{
+    const parts=l.split(/[,\t]/);
+    return { value:parts[0].trim(), name:parts.slice(1).join(",").trim() };
+  }).filter(r=>r.value);
+}
+
+function renderBatch(card, task){
+  const cfg=BATCH[task];
+  const out=el("div",{class:"result", id:"bout"});
+
+  // ---- input area ----
+  let buildRows;   // () => {rows:[payload], labels:[str]}
+  if(cfg.kind==="list"){
+    card.append(el("label",{}, cfg.label));
+    const ta=el("textarea",{id:"b_list"}); ta.style.minHeight="130px"; card.append(ta);
+    const file=el("input",{type:"file", id:"b_file", accept:".csv,.txt,.smi,.tsv"});
+    file.onchange=()=>{ const f=file.files[0]; if(!f)return; const r=new FileReader();
+      r.onload=()=>{ ta.value=r.result; }; r.readAsText(f); };
+    card.append(el("div",{class:"hint"}, "…or upload a .csv / .txt (one entry per line; CSV first column used, optional 2nd column = name)"), file);
+    buildRows=()=>{ const es=parseList(ta.value);
+      return { rows:es.map(e=>({[cfg.entity]:e.value})), labels:es.map(e=>e.name||e.value) }; };
+  } else {  // dti_cross
+    card.append(el("div",{class:"hint"},
+      "Cross-target ranking — the one DTI use the verdict calls reasonable: rank ONE compound across a panel of targets (1 compound × N targets). Many-vs-many also works (cross-product)."));
+    card.append(el("label",{}, "Compounds — SMILES, one per line (CSV: SMILES, name)"));
+    const tc=el("textarea",{id:"b_comp"}); tc.style.minHeight="70px"; card.append(tc);
+    card.append(el("label",{}, "Targets — UniProt accessions, one per line (CSV: accession, name)"));
+    const tt=el("textarea",{id:"b_targ"}); tt.style.minHeight="70px"; card.append(tt);
+    buildRows=()=>{ const cs=parseList(tc.value), ts=parseList(tt.value), rows=[], labels=[];
+      for(const c of cs) for(const t of ts){ rows.push({smiles:c.value, uniprot_acc:t.value});
+        labels.push(`${c.name||trunc(c.value,16)} → ${t.name||t.value}`); }
+      return {rows, labels}; };
+  }
+
+  const run=el("button",{id:"b_run"}, "Rank");
+  const ex=el("button",{class:"ghost"}, "Load example");
+  card.append(el("div",{class:"row"}, run, ex), out);
+
+  ex.onclick=()=>{
+    if(cfg.kind==="list"){ document.getElementById("b_list").value=BATCH_EXAMPLES["list_"+cfg.entity]||""; }
+    else { document.getElementById("b_comp").value=BATCH_EXAMPLES.dti_comps;
+           document.getElementById("b_targ").value=BATCH_EXAMPLES.dti_targs; }
+  };
+
+  run.onclick=async()=>{
+    const {rows, labels}=buildRows();
+    if(!rows.length){ out.innerHTML=`<div class="err">No input rows — paste at least one entry.</div>`; return; }
+    run.disabled=true;
+    out.innerHTML=`<div class="spin">ranking ${rows.length} row${rows.length===1?"":"s"}… (first call loads ~1.8&nbsp;GB; ~0.4–0.8&nbsp;s each)</div>`;
+    try{
+      const res=await fetch(`${API}/predict/${task}/batch`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({rows})});
+      const data=await res.json();
+      if(!res.ok){ out.innerHTML=`<div class="err">${escapeHtml(JSON.stringify(data.detail||data,null,2))}</div>`; return; }
+      batchState={ task, data, labels, sortKey:"rank", sortDir:1 };
+      renderBatchResult(out);
+    }catch(err){ out.innerHTML=`<div class="err">${err}</div>`; }
+    finally{ run.disabled=false; }
+  };
+
+  if(batchState && batchState.task===task) renderBatchResult(out);   // keep results across re-render
+}
+
+function batchScore(pr){
+  if(!pr) return {txt:"—", val:-Infinity};
+  if(pr.score_kind==="pkd") return {txt:`${Number(pr.value).toFixed(2)} pKd`, val:pr.value};
+  if(pr.score_kind==="normalized_p1") return {txt:`${(pr.value*100).toFixed(1)}%`, val:pr.value};
+  return {txt:pr.value!=null?String(pr.value):"—", val:pr.value??-Infinity};
+}
+function batchLabel(rec){ return (batchState.labels[rec.index]) || JSON.stringify(rec.inputs); }
+
+function sortedBatchRows(){
+  const k=batchState.sortKey, dir=batchState.sortDir, rows=batchState.data.rows.slice();
+  const keyfn = k==="name" ? r=>batchLabel(r).toLowerCase()
+              : k==="score" ? r=>batchScore(r.prediction).val
+              : r=>(r.rank==null ? Infinity : r.rank);   // rank: errors last regardless of dir
+  rows.sort((a,b)=>{ const x=keyfn(a), y=keyfn(b);
+    if(x<y) return -1*dir; if(x>y) return 1*dir; return a.index-b.index; });
+  return rows;
+}
+
+function renderBatchResult(out){
+  const d=batchState.data; out.innerHTML="";
+  const scored=d.rows.filter(r=>r.rank!=null).length;
+  const errs=d.rows.length-scored;
+  let summary=`Ranked ${scored} of ${d.processed} row${d.processed===1?"":"s"}`;
+  if(errs) summary+=` · ${errs} could not be scored`;
+  if(d.dropped) summary+=` · ${d.dropped} dropped (cap reached)`;
+  out.append(el("div",{class:"hint"}, summary));
+
+  const csv=el("button",{class:"ghost"}, "Download CSV");
+  csv.onclick=()=>downloadBatchCsv();
+  out.append(el("div",{class:"row"}, csv));
+
+  const tbl=el("table",{class:"batch"});
+  const head=el("tr",{});
+  const cols=[["rank","#"],["name","Compound / target"],["score","Score"],["class","Call"],["note","Note"]];
+  for(const [key,label] of cols){
+    const th=el("th",{}, label + (batchState.sortKey===key ? (batchState.sortDir>0?" ▲":" ▼") : ""));
+    if(["rank","name","score"].includes(key))
+      th.onclick=()=>{ if(batchState.sortKey===key) batchState.sortDir*=-1; else { batchState.sortKey=key; batchState.sortDir = key==="score"?-1:1; } renderBatchResult(out); };
+    head.append(th);
+  }
+  tbl.append(head);
+
+  for(const rec of sortedBatchRows()){
+    const pr=rec.prediction, sc=batchScore(pr);
+    const tr=el("tr",{class:rec.error?"bad":""});
+    tr.append(el("td",{class:"num"}, rec.rank!=null?String(rec.rank):"—"));
+    tr.append(el("td",{class:"mono"}, batchLabel(rec)));
+    tr.append(el("td",{class:"num"}, sc.txt));
+    // call pill
+    let call="";
+    if(pr && pr.score_kind==="normalized_p1" && pr.pred_class!=null){
+      call = el("span",{class:`pill ${pr.pred_class===1?"pos":"neg"}`}, pr.pred_class===1?"yes":"no");
+    }
+    tr.append(el("td",{}, call||""));
+    // note
+    let note="";
+    if(rec.error) note=rec.error;
+    else if(pr && pr.extra && pr.extra.target_truncated) note=`⚠ target ${pr.extra.target_len} aa — truncated to 1250`;
+    else if(rec.standardized_smiles && rec.standardized_smiles!==(rec.inputs.smiles||"")) note="standardized";
+    tr.append(el("td",{class:"hint"}, note));
+    tbl.append(tr);
+  }
+  out.append(tbl);
+  out.append(relPanel(d.reliability));
+}
+
+function downloadBatchCsv(){
+  const d=batchState.data;
+  const head=["rank","label","input","score_kind","value","pred_class","standardized_smiles","error"];
+  const esc=v=>{ const s=v==null?"":String(v); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; };
+  const lines=[head.join(",")];
+  for(const rec of sortedBatchRows()){
+    const pr=rec.prediction||{};
+    const input=rec.inputs.smiles||rec.inputs.protein_seq||(rec.inputs.smiles&&rec.inputs.uniprot_acc?`${rec.inputs.smiles}|${rec.inputs.uniprot_acc}`:JSON.stringify(rec.inputs));
+    lines.push([rec.rank, batchLabel(rec), input, pr.score_kind, pr.value, pr.pred_class, rec.standardized_smiles, rec.error].map(esc).join(","));
+  }
+  const blob=new Blob([lines.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`${batchState.task}_batch.csv`; a.click(); URL.revokeObjectURL(a.href);
+}
+
+async function boot(){
+  try{
+    const r=await (await fetch(`${API}/reliability`)).json();
+    VERDICTS=r.verdicts||{};
+    document.getElementById("banner").innerHTML=`<b>Strategic context:</b> ${escapeHtml(r.banner)}`;
+  }catch(err){
+    document.getElementById("banner").textContent="(could not load reliability data — is the backend running?)";
+  }
+  render();
+}
+boot();
+</script>
+</body>
+</html>

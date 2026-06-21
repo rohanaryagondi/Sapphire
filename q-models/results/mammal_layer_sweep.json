@@ -1,0 +1,111 @@
+{
+  "test": "mammal_458m_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T15:40:50.444429",
+  "model": "ibm/biomed.omics.bl.sm.ma-ted-458m (base_458m)",
+  "encoder_block_stack": "t5_model.encoder.block",
+  "n_blocks": 12,
+  "embedding_dim": 768,
+  "pooling": "masked-mean over all tokens (embed.py recipe, incl. special tokens)",
+  "final_post_norm_nn": {
+    "raw": 0.75,
+    "centered": 0.8,
+    "note": "encoder_last_hidden_state = the canonical phase5 0.750 readout (sanity check)"
+  },
+  "per_block": [
+    {
+      "block": 0,
+      "nn_raw": 0.65,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 1,
+      "nn_raw": 0.675,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "block": 2,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 3,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 4,
+      "nn_raw": 0.675,
+      "nn_centered": 0.7,
+      "best": 0.7
+    },
+    {
+      "block": 5,
+      "nn_raw": 0.675,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "block": 6,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "block": 7,
+      "nn_raw": 0.725,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 8,
+      "nn_raw": 0.85,
+      "nn_centered": 0.825,
+      "best": 0.85
+    },
+    {
+      "block": 9,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "block": 10,
+      "nn_raw": 0.725,
+      "nn_centered": 0.7,
+      "best": 0.725
+    },
+    {
+      "block": 11,
+      "nn_raw": 0.7,
+      "nn_centered": 0.65,
+      "best": 0.7
+    }
+  ],
+  "best_block": {
+    "block": 8,
+    "nn_raw": 0.85,
+    "nn_centered": 0.825,
+    "used": "raw",
+    "per_family_nn_recall": {
+      "kinase": 1.0,
+      "gpcr": 1.0,
+      "ion_channel": 0.875,
+      "nuclear_receptor": 0.8333333333333334,
+      "e3_ligase": 0.5,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    }
+  },
+  "references": {
+    "esm2_650M_best": 0.875,
+    "esm2_3B_best": 0.85,
+    "esm2_15B_best": 0.85,
+    "esmc_600M_best": 0.825,
+    "mammal_canonical_last_layer": 0.75,
+    "bar": 0.8
+  }
+}

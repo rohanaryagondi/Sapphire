@@ -1,0 +1,146 @@
+{
+  "test": "esm2_vs_mammal_protein_embeddings",
+  "n_proteins": 25,
+  "proteins": [
+    {
+      "name": "EGFR",
+      "accession": "P00533",
+      "family": "kinase"
+    },
+    {
+      "name": "BRAF",
+      "accession": "P15056",
+      "family": "kinase"
+    },
+    {
+      "name": "CDK2",
+      "accession": "P24941",
+      "family": "kinase"
+    },
+    {
+      "name": "ABL1",
+      "accession": "P00519",
+      "family": "kinase"
+    },
+    {
+      "name": "MAPK1",
+      "accession": "P28482",
+      "family": "kinase"
+    },
+    {
+      "name": "DRD2",
+      "accession": "P14416",
+      "family": "gpcr"
+    },
+    {
+      "name": "ADRB2",
+      "accession": "P07550",
+      "family": "gpcr"
+    },
+    {
+      "name": "HTR2A",
+      "accession": "P28223",
+      "family": "gpcr"
+    },
+    {
+      "name": "CNR1",
+      "accession": "P21554",
+      "family": "gpcr"
+    },
+    {
+      "name": "OPRM1",
+      "accession": "P35372",
+      "family": "gpcr"
+    },
+    {
+      "name": "Nav1.7",
+      "accession": "Q15858",
+      "family": "ion_channel"
+    },
+    {
+      "name": "Nav1.8",
+      "accession": "Q9Y5Y9",
+      "family": "ion_channel"
+    },
+    {
+      "name": "KCNQ2",
+      "accession": "O43526",
+      "family": "ion_channel"
+    },
+    {
+      "name": "HCN1",
+      "accession": "O60353",
+      "family": "ion_channel"
+    },
+    {
+      "name": "TRPV1",
+      "accession": "Q8NER1",
+      "family": "ion_channel"
+    },
+    {
+      "name": "PPARG",
+      "accession": "P37231",
+      "family": "nuclear_receptor"
+    },
+    {
+      "name": "RXRA",
+      "accession": "P19793",
+      "family": "nuclear_receptor"
+    },
+    {
+      "name": "VDR",
+      "accession": "P11473",
+      "family": "nuclear_receptor"
+    },
+    {
+      "name": "ESR1",
+      "accession": "P03372",
+      "family": "nuclear_receptor"
+    },
+    {
+      "name": "AR",
+      "accession": "P10275",
+      "family": "nuclear_receptor"
+    },
+    {
+      "name": "THROMBIN",
+      "accession": "P00734",
+      "family": "serine_protease"
+    },
+    {
+      "name": "tPA",
+      "accession": "P00750",
+      "family": "serine_protease"
+    },
+    {
+      "name": "PLASMIN",
+      "accession": "P00747",
+      "family": "serine_protease"
+    },
+    {
+      "name": "TRYPSIN",
+      "accession": "P07477",
+      "family": "serine_protease"
+    },
+    {
+      "name": "KALLIKREIN",
+      "accession": "P29622",
+      "family": "serine_protease"
+    }
+  ],
+  "mammal": {
+    "nn_recall": 0.92,
+    "intra_mean": 0.7120198607444763,
+    "inter_mean": 0.24862483143806458,
+    "gap": 0.46339502930641174,
+    "embedding_dim": 768
+  },
+  "esm2": {
+    "model": "facebook/esm2_t6_8M_UR50D",
+    "nn_recall": 0.88,
+    "intra_mean": 0.9325946569442749,
+    "inter_mean": 0.8392596244812012,
+    "gap": 0.09333503246307373,
+    "embedding_dim": 320
+  }
+}

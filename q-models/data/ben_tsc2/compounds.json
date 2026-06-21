@@ -1,0 +1,264 @@
+{
+  "source_email": "Ben Bouchard (Quiver), 2026-06-11. TSC2 target deconvolution via DFP library.",
+  "context": "QS0069567 and QS0113172 rescued the TSC2 Optopatch phenotype in a 30K screen. DFP library matched them functionally to Dasa-58 (PKM2 activator) and GSK 3787 (PPARD antagonist). Boltz-2 is being asked to verify those predicted physical binding targets \u2014 NOT TSC2 itself.",
+  "targets": [
+    {
+      "gene": "PKM",
+      "uniprot": "P14618"
+    },
+    {
+      "gene": "PPARD",
+      "uniprot": "Q03181"
+    }
+  ],
+  "compounds": [
+    {
+      "qs_id": "QS0113172",
+      "name": "",
+      "gene": "PKM",
+      "uniprot": "P14618",
+      "role": "putative_hit",
+      "class": "Putative",
+      "comment": "Functional Match to Dasa-58 in DFP",
+      "smiles": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+      "target_name": "Pyruvate Kinase Isozyme M2"
+    },
+    {
+      "qs_id": "QS0321744",
+      "name": "Dasa-58",
+      "gene": "PKM",
+      "uniprot": "P14618",
+      "role": "positive_control",
+      "class": "Confirmed",
+      "comment": "Known PKM2 binder",
+      "smiles": "O=C(O)C[C@@H](C(O)=O)NC(C1=C(N)N([C@H]2[C@@H]([C@@H]([C@@H](COP(O)(O)=O)O2)O)O)C=N1)=O",
+      "target_name": "Pyruvate Kinase Isozyme M2"
+    },
+    {
+      "qs_id": "QS0321760",
+      "name": "GSK 3787",
+      "gene": "PPARD",
+      "uniprot": "Q03181",
+      "role": "positive_control",
+      "class": "Confirmed",
+      "comment": "Known PPARD binder",
+      "smiles": "O=C(C2=CC=C(Cl)C=C2)NCCS(C1=CC=C(C(F)(F)F)C=N1)(=O)=O",
+      "target_name": "Peroxisome proliferator-activated receptor delt"
+    },
+    {
+      "qs_id": "QS0069567",
+      "name": "",
+      "gene": "PPARD",
+      "uniprot": "Q03181",
+      "role": "putative_hit",
+      "class": "Putative",
+      "comment": "Functional Match to GSK 3787 in DFP",
+      "smiles": "O=S(N1CCN(C2=CC=CC=N2)CC1)(C3=CC=C(Cl)C=C3)=O",
+      "target_name": "Peroxisome proliferator-activated receptor delt"
+    },
+    {
+      "qs_id": "QS0113172",
+      "name": "",
+      "gene": "PPARD",
+      "uniprot": "Q03181",
+      "role": "putative_hit",
+      "class": "Putative",
+      "comment": "Functional Match to GSK 3787 in DFP",
+      "smiles": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+      "target_name": "Peroxisome proliferator-activated receptor delt"
+    },
+    {
+      "qs_id": "QS0141913",
+      "name": "GF 109203X",
+      "gene": "PRKCA",
+      "uniprot": "P17252",
+      "role": "negative_control",
+      "class": "Confirmed",
+      "comment": "Use as control",
+      "smiles": "CN(C)CCCN1C=C(C2=CC=CC=C12)C1=C(C(=O)NC1=O)C1=CNC2=CC=CC=C12",
+      "target_name": "Protein Kinase C"
+    },
+    {
+      "qs_id": "QS0061489",
+      "name": "carbamazepine",
+      "gene": "KCNQ2",
+      "uniprot": "O43526",
+      "role": "negative_control",
+      "class": "Confirmed",
+      "comment": "Use as control",
+      "smiles": "NC(N1C3=C(C=CC=C3)C=CC2=C1C=CC=C2)=O",
+      "target_name": "KCNQ2 and Pan Nav"
+    },
+    {
+      "qs_id": "QS0214154",
+      "name": "BMS 191011",
+      "gene": "KCNMA1",
+      "uniprot": "Q12791",
+      "role": "negative_control",
+      "class": "Confirmed",
+      "comment": "Use as control",
+      "smiles": "OC1=CC=C(Cl)C=C1CN1N=C(OC1=O)C1=CC=C(C=C1)C(F)(F)F",
+      "target_name": "KCNMA1"
+    },
+    {
+      "qs_id": "QS0206838",
+      "name": "Biperiden hydrochloride",
+      "gene": "CHRM3",
+      "uniprot": "P20309",
+      "role": "negative_control",
+      "class": "Confirmed",
+      "comment": "Use as control",
+      "smiles": "OC(C1CC2CC1C=C2)(c1ccccc1)CCN1CCCCC1",
+      "target_name": "cholinergic receptor muscarinic 3"
+    },
+    {
+      "qs_id": "QS0321864",
+      "name": "BIIB021",
+      "gene": "HSP90AA1",
+      "uniprot": "P07900",
+      "role": "negative_control",
+      "class": "Confirmed",
+      "comment": "Use as control",
+      "smiles": "ClC1=C2C(N(CC3=NC=C(C)C(OC)=C3C)C=N2)=NC(N)=N1",
+      "target_name": "heat shock protein 90 alpha family class A member 1"
+    }
+  ],
+  "boltz_complexes": [
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0113172",
+      "ligand_name": "QS0113172",
+      "ligand_smiles": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+      "expected": "putative_hit",
+      "rationale": "Functional Match to Dasa-58 in DFP"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0321744",
+      "ligand_name": "Dasa-58",
+      "ligand_smiles": "O=C(O)C[C@@H](C(O)=O)NC(C1=C(N)N([C@H]2[C@@H]([C@@H]([C@@H](COP(O)(O)=O)O2)O)O)C=N1)=O",
+      "expected": "positive_control",
+      "rationale": "Known PKM2 binder"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0321760",
+      "ligand_name": "GSK 3787",
+      "ligand_smiles": "O=C(C2=CC=C(Cl)C=C2)NCCS(C1=CC=C(C(F)(F)F)C=N1)(=O)=O",
+      "expected": "positive_control",
+      "rationale": "Known PPARD binder"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0069567",
+      "ligand_name": "QS0069567",
+      "ligand_smiles": "O=S(N1CCN(C2=CC=CC=N2)CC1)(C3=CC=C(Cl)C=C3)=O",
+      "expected": "putative_hit",
+      "rationale": "Functional Match to GSK 3787 in DFP"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0113172",
+      "ligand_name": "QS0113172",
+      "ligand_smiles": "O=S(N(C)CC(NC(C)C1=CC=CC=C1)=O)(C2=CC=C(Br)C=C2)=O",
+      "expected": "putative_hit",
+      "rationale": "Functional Match to GSK 3787 in DFP"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0141913",
+      "ligand_name": "GF 109203X",
+      "ligand_smiles": "CN(C)CCCN1C=C(C2=CC=CC=C12)C1=C(C(=O)NC1=O)C1=CNC2=CC=CC=C12",
+      "expected": "negative_control",
+      "rationale": "Confirmed PRKCA binder \u2014 should NOT bind PKM"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0141913",
+      "ligand_name": "GF 109203X",
+      "ligand_smiles": "CN(C)CCCN1C=C(C2=CC=CC=C12)C1=C(C(=O)NC1=O)C1=CNC2=CC=CC=C12",
+      "expected": "negative_control",
+      "rationale": "Confirmed PRKCA binder \u2014 should NOT bind PPARD"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0061489",
+      "ligand_name": "carbamazepine",
+      "ligand_smiles": "NC(N1C3=C(C=CC=C3)C=CC2=C1C=CC=C2)=O",
+      "expected": "negative_control",
+      "rationale": "Confirmed KCNQ2 binder \u2014 should NOT bind PKM"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0061489",
+      "ligand_name": "carbamazepine",
+      "ligand_smiles": "NC(N1C3=C(C=CC=C3)C=CC2=C1C=CC=C2)=O",
+      "expected": "negative_control",
+      "rationale": "Confirmed KCNQ2 binder \u2014 should NOT bind PPARD"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0214154",
+      "ligand_name": "BMS 191011",
+      "ligand_smiles": "OC1=CC=C(Cl)C=C1CN1N=C(OC1=O)C1=CC=C(C=C1)C(F)(F)F",
+      "expected": "negative_control",
+      "rationale": "Confirmed KCNMA1 binder \u2014 should NOT bind PKM"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0214154",
+      "ligand_name": "BMS 191011",
+      "ligand_smiles": "OC1=CC=C(Cl)C=C1CN1N=C(OC1=O)C1=CC=C(C=C1)C(F)(F)F",
+      "expected": "negative_control",
+      "rationale": "Confirmed KCNMA1 binder \u2014 should NOT bind PPARD"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0206838",
+      "ligand_name": "Biperiden hydrochloride",
+      "ligand_smiles": "OC(C1CC2CC1C=C2)(c1ccccc1)CCN1CCCCC1",
+      "expected": "negative_control",
+      "rationale": "Confirmed CHRM3 binder \u2014 should NOT bind PKM"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0206838",
+      "ligand_name": "Biperiden hydrochloride",
+      "ligand_smiles": "OC(C1CC2CC1C=C2)(c1ccccc1)CCN1CCCCC1",
+      "expected": "negative_control",
+      "rationale": "Confirmed CHRM3 binder \u2014 should NOT bind PPARD"
+    },
+    {
+      "protein_gene": "PKM",
+      "protein_uniprot": "P14618",
+      "ligand_qs": "QS0321864",
+      "ligand_name": "BIIB021",
+      "ligand_smiles": "ClC1=C2C(N(CC3=NC=C(C)C(OC)=C3C)C=N2)=NC(N)=N1",
+      "expected": "negative_control",
+      "rationale": "Confirmed HSP90AA1 binder \u2014 should NOT bind PKM"
+    },
+    {
+      "protein_gene": "PPARD",
+      "protein_uniprot": "Q03181",
+      "ligand_qs": "QS0321864",
+      "ligand_name": "BIIB021",
+      "ligand_smiles": "ClC1=C2C(N(CC3=NC=C(C)C(OC)=C3C)C=N2)=NC(N)=N1",
+      "expected": "negative_control",
+      "rationale": "Confirmed HSP90AA1 binder \u2014 should NOT bind PPARD"
+    }
+  ],
+  "expected_outcome": "If putative hits score with positive controls AND clearly above negative controls, DFP target-deconvolution confirmed structurally."
+}

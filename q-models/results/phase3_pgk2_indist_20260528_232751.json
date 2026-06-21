@@ -1,0 +1,17 @@
+{
+  "timestamp": "20260528_232751",
+  "target": "PGK2",
+  "data": "CACHE #7 DEL_hit_candidates_1.csv",
+  "readout": "generative P(<1>) via <PGK2_DEL>",
+  "n_hits": 1393,
+  "n_decoys": 500,
+  "A_auroc_hits_vs_decoys": 0.9838,
+  "A_note": "optimistic upper bound (likely train-set overlap)",
+  "B_spearman_score_vs_DELcount": -0.064,
+  "B_auroc_highcount_vs_lowcount": 0.4103,
+  "B_n_highcount": 155,
+  "B_n_lowcount(=5)": 441,
+  "B_median_score_high": 0.99997,
+  "B_median_score_low": 0.99998,
+  "B_note": "faithful in-distribution: does score track DEL enrichment (confound-free)"
+}

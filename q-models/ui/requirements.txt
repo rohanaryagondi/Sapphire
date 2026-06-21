@@ -1,0 +1,15 @@
+# Web layer for the Quiver MAMMAL Explorer (ui/). Install AFTER the repo-root
+# requirements.txt, which brings the heavy stack (MAMMAL / torch / rdkit via PyTDC).
+#
+#   pip install -r requirements.txt        # MAMMAL + torch + rdkit  (root)
+#   pip install -r ui/requirements.txt     # this file               (web layer)
+#
+# Versions are floors known to work in the `mammal` conda env (Python 3.11);
+# see ui/SETUP_NEW_MACHINE.md for the full runbook.
+
+fastapi>=0.110            # routes + same-origin frontend serving
+uvicorn[standard]>=0.27   # ASGI server (run with --workers 1; MPS isn't fork-safe)
+pydantic>=2.5             # the request/response schemas are pydantic v2
+markdown>=3.4             # renders /doc/*.md as styled dark-theme HTML pages
+httpx>=0.27               # only needed by fastapi.testclient (ui/tests)
+pytest>=8.0               # test runner

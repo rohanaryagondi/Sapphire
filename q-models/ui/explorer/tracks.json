@@ -1,0 +1,708 @@
+{
+  "_meta": {
+    "title": "Quiver Capability Explorer",
+    "subtitle": "One tab per Quiver track — each routed to the best model we found, with its empirical operating envelope on every result. 9 tracks.",
+    "banner": "These are commodity tools that enrich Quiver's insights — they do not replace the V1-T + functional-trace moat. 'State-of-the-art on shit is still shit': every verdict below is empirical on real Quiver substrate, not paper benchmarks.",
+    "generated_from": "docs/models_tracks_scorecard.md (canonical, 2026-06-14)",
+    "badges": {
+      "reliable": {
+        "label": "Reliable",
+        "emoji": "✅",
+        "desc": "Use the number; verdict is well-supported on Quiver substrate."
+      },
+      "caution": {
+        "label": "Use with caution",
+        "emoji": "⚠️",
+        "desc": "Best available, but marginal or directional — read the envelope."
+      },
+      "split": {
+        "label": "Split verdict",
+        "emoji": "◑",
+        "desc": "Trust one direction only (e.g. yes vs no, or ranking vs prediction)."
+      },
+      "low_value": {
+        "label": "Low value",
+        "emoji": "➖",
+        "desc": "Works but not a Quiver bottleneck — deprioritized."
+      },
+      "build": {
+        "label": "Build, don't buy",
+        "emoji": "🔨",
+        "desc": "Nothing public works (and nothing public can). This is the moat."
+      },
+      "dont_use": {
+        "label": "Do not use",
+        "emoji": "⛔",
+        "desc": "Worse than chance / wrong task — do not ship."
+      }
+    }
+  },
+  "tracks": [
+    {
+      "id": "family_clustering",
+      "n": 1,
+      "label": "Protein Family Clustering",
+      "emoji": "🧬",
+      "question": "Given a panel of genes, which embeddings put same-family genes together?",
+      "tagline": "Protein sequence(s) → embedding + nearest reference family",
+      "best_model": "ESM-2-650M",
+      "best_model_detail": "ESM-2-650M (best-layer ~idx 8/33, mean-centered). MAMMAL 458M is at parity; SaProt / ProstT5 are GPCR specialists.",
+      "license": "MIT",
+      "est_runtime": "~4 min incl. startup (~2 s warm)",
+      "aws_model_key": "esm2_650m",
+      "performance": {
+        "headline": "NN-recall 0.875 (40-gene panel, best-layer)",
+        "metrics": [
+          {
+            "name": "NN-recall (40-gene)",
+            "value": "0.875"
+          },
+          {
+            "name": "NN-recall (167-gene)",
+            "value": "0.946"
+          },
+          {
+            "name": "GPCR (SaProt/ProstT5)",
+            "value": "1.000"
+          },
+          {
+            "name": "E3-ligase ceiling",
+            "value": "~0.65 (universal)"
+          }
+        ]
+      },
+      "badge": "reliable",
+      "verdict": {
+        "headline": "Reliable for family grouping — but layer selection is the real lever, not model choice.",
+        "why": "On the 40-gene panel ESM-2-650M (0.875) ≈ MAMMAL 458M (0.850) ≈ ESM-2 3B/15B (0.850): a 4-way near-tie at saturation. A 23× parameter increase moves nothing. The naive last-layer mean-pool undersells every encoder by ~0.10—extract an early-mid layer (~20-25% depth) and mean-center.",
+        "recommended_use": "Use ESM-2-650M (smallest, MIT) or MAMMAL, layer-selected + centered. Use SaProt/ProstT5 for GPCR-family hits (perfect 8/8). Function-defined families (E3 ligases, nuclear receptors) are a universal ceiling for sequence-only models at any size. TESTED 2026-06-15: ProTrek-650M (MIT, function-aware trimodal PLM) is NOT a clustering upgrade (0.725 < ESM-2-650M 0.875), but its TEXT-anchored family assignment cracks the function-defined families that defeat sequence-only models — E3-ligase 0.75, nuclear-receptor 1.0. Use ProTrek text-assignment (not sequence clustering) for E3/NR.",
+        "source": "docs/models_tracks_scorecard.md, results/esm2_layer_sweep.json, results/mammal_layer_sweep.json"
+      },
+      "inputs": [
+        {
+          "name": "sequences",
+          "label": "Protein sequence(s) — one per line, FASTA-style (optional ',name')",
+          "type": "textarea",
+          "placeholder": "MADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAEL..., calmodulin"
+        }
+      ],
+      "example": {
+        "sequences": "KVFGRCELAAAMKRHGLDNYRGYSLGNWVCAAKFESNFNTQATNRNTDGSTDYGILQINSR, lysozyme-frag\nMADQLTEEQIAEFKEAFSLFDKDGDGTITTKELGTVMRSLGQNPTEAELQDMISELDQDGFIDKEDLHDGDGKISFEEFLNLVNKEMTADVDGDGQVNYEEFVTMMTSK, calmodulin"
+      },
+      "example_note": "lysozyme + calmodulin — distinct families should land on distinct reference clusters.",
+      "stub_prediction": {
+        "score_kind": "embedding",
+        "nearest_family": "lysozyme",
+        "family_scores": {
+          "lysozyme": 0.94,
+          "ion_channel": 0.31,
+          "gpcr": 0.22,
+          "kinase": 0.18
+        },
+        "dim": 1280,
+        "note": "STUB — wire ESM-2-650M embedding extraction on AWS to populate this."
+      }
+    },
+    {
+      "id": "dti",
+      "n": 2,
+      "label": "DTI / Binder Triage",
+      "emoji": "🎯",
+      "question": "Given a Quiver target and a compound, does it bind?",
+      "tagline": "Target (UniProt or sequence) + compound SMILES → binding score (BALM triage → Boltz-2 confirm)",
+      "best_model": "Per-target CNS binder fine-tunes (LIVE) → Boltz-2 confirm",
+      "best_model_detail": "Per-target Morgan-FP+GradientBoosting binder fine-tunes — one per data-rich CNS target (Nav/Cav/NMDA + mTOR-pathway + GPCR + kinase), trained on ChEMBL+GtoPdb, served LIVE in this app (CPU, no AWS). Family-mean scaffold-split CV AUROC 0.95–0.99 vs zero-shot 0.50 on ion channels. BALM/PLAPT (zero-shot) are the fallback for targets without a fine-tune; Boltz-2 (Track 3) confirms structure/selectivity and novel out-of-domain chemotypes.",
+      "license": "MIT (BALM/PLAPT) · Boltz-2 MIT",
+      "est_runtime": "~3 min incl. startup (BALM/PLAPT seconds warm)",
+      "aws_model_key": "balm",
+      "performance": {
+        "headline": "18 LIVE per-target binder fine-tunes (16 ChEMBL-curated 0.95–0.997 + 2 PubChem-qHTS rescues 0.79–0.81) vs zero-shot 0.50",
+        "metrics": [
+          {
+            "name": "Live per-target fine-tunes",
+            "value": "18 CNS targets (served in-app, CPU)"
+          },
+          {
+            "name": "ChEMBL-curated (scaffold-CV)",
+            "value": "0.95–0.997 (Nav1.7 0.995 / Nav1.8 0.987 / DRD2 0.995 / PPARD 0.997)"
+          },
+          {
+            "name": "PubChem-qHTS rescues",
+            "value": "KCNQ2 0.811 / Cav3.2 0.791 (epilepsy channels)"
+          },
+          {
+            "name": "vs zero-shot BALM (ion channel)",
+            "value": "0.50 (chance)"
+          },
+          {
+            "name": "build-don't-buy (no public data)",
+            "value": "Nav1.1/Dravet, Nav1.6 → Quiver data"
+          }
+        ]
+      },
+      "badge": "reliable",
+      "verdict": {
+        "headline": "Per-target binder fine-tunes are LIVE and strong in-domain (0.95–0.99 scaffold-split) — the deployable answer where data exists; gate by Tanimoto-to-train and hand novel chemotypes to Boltz-2.",
+        "why": "The campaign's lever, deployed: per-target FP+GBT fine-tunes hit family-mean scaffold-split CV AUROC 0.95–0.99 (Nav 0.993, mTOR 0.993, GPCR 0.995, kinase 0.992, NMDA 0.979, Cav 0.953) — vs off-the-shelf zero-shot 0.50 on ion channels. They run live in this app (CPU joblibs, no GPU/AWS). HONEST LIMIT: like all ligand-QSAR they collapse off-distribution — e.g. suzetrigine (a novel 2024 Nav1.8 scaffold absent from ChEMBL, Tanimoto 0.41 to nearest active) is under-recognized (P≈0.14). So every call carries a Tanimoto-to-train confidence flag; low/medium-confidence (novel) compounds are a weak prior to confirm structurally with Boltz-2. VALIDATION CAVEAT: scaffold-split CV on PUBLIC data (ChEMBL/PubChem/TDC) — strong generalization to novel public scaffolds, but NOT yet validated on Quiver's own measured binders. The one test against real Quiver experimental hits (TSC2 deconvolution) failed out-of-domain — so treat low/medium-confidence (novel-chemotype) calls as weak priors until a Quiver held-out panel is scored.",
+        "recommended_use": "Use the per-target fine-tune's P(binder) for data-rich CNS targets (Nav1.7/1.8/1.2/1.5, NMDA, mTOR-pathway incl. PKM2/PPARD, DRD2/HTR2A, GSK3B/LRRK2/BACE1) — high-confidence (in-domain) calls are reliable; treat low/medium-confidence (novel-scaffold) calls as weak priors and confirm with Boltz-2 (Track 3). For data-POOR channels (Nav1.1/Dravet, Nav1.6, Kv7.2/epilepsy) no public fine-tune is possible — generate Quiver screening data (see docs/cns_finetune_readiness.md). Off-the-shelf BALM/PLAPT zero-shot remains a fallback for un-fine-tuned targets (kinase/mTOR ~0.72–0.80, ion channels 0.50).",
+        "source": "docs/cns_finetune_readiness.md, results/cns_pertarget_finetune_characterization.md, results/ionchannel_finetune_characterization.md, results/cns_dti_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Compound SMILES",
+          "type": "text",
+          "placeholder": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=..."
+        },
+        {
+          "name": "uniprot_acc",
+          "label": "Target UniProt accession (sequence fetched automatically)",
+          "type": "text",
+          "placeholder": "Q9Y5Y9"
+        },
+        {
+          "name": "target_seq",
+          "label": "…or paste a target protein sequence instead",
+          "type": "textarea",
+          "optional": true
+        }
+      ],
+      "example": {
+        "smiles": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=C(C(=C(C=C3)F)F)OC",
+        "uniprot_acc": "Q9Y5Y9"
+      },
+      "example_note": "suzetrigine → Nav1.8 (SCN10A) — the named test off-the-shelf DTI heads fail and Boltz-2 partially recovers.",
+      "stub_prediction": {
+        "score_kind": "affinity",
+        "value": 7.7,
+        "units": "BALM cosine→pKd (predicted)",
+        "binder_call": "likely binder",
+        "note": "STUB — wire BALM (cosine) on AWS; PLAPT for a fast first pass; Boltz-2 (Track 3) to confirm."
+      },
+      "local_model": "cns_pertarget (per-target joblib; EXPLORER_LOCAL_MODELS=1)"
+    },
+    {
+      "id": "structure_binding",
+      "n": 3,
+      "label": "Structure-Based Binding",
+      "emoji": "🧲",
+      "question": "Does it bind — co-folded, so it works on novel pockets BindingDB doesn't cover?",
+      "tagline": "Target sequence + ligand SMILES → co-folded complex + affinity",
+      "best_model": "Boltz-2",
+      "best_model_detail": "Boltz-2 (structure + affinity in one model). Folded into Track 2; no separate model needed.",
+      "license": "MIT",
+      "est_runtime": "~12 min incl. startup (~2-5 min warm)",
+      "aws_model_key": "boltz2",
+      "performance": {
+        "headline": "Same model as Track 2 (Boltz-2)",
+        "metrics": [
+          {
+            "name": "Approaches FEP accuracy",
+            "value": "literature SOTA"
+          },
+          {
+            "name": "Beats AF3 / Chai-1 on affinity",
+            "value": "yes"
+          },
+          {
+            "name": "Nav1.8 / mTOR",
+            "value": "0.714 / 1.000"
+          }
+        ]
+      },
+      "badge": "caution",
+      "verdict": {
+        "headline": "Boltz-2 co-folding — the structure-based route for pockets BindingDB can't reach.",
+        "why": "Boltz-2 predicts the complex AND an affinity in one pass, so it works where no binding-data baseline can (novel pockets, no training pairs). Literature rates it as approaching FEP accuracy and beating AF3/Chai-1 on affinity. Same empirical envelope as Track 2.",
+        "recommended_use": "Use for structure-based triage on targets without binding data. NOTE: deep co-folding campaigns (TSC2, DFP compounds) live on the boltz branch — this tab routes to the same Boltz-2 AWS endpoint.",
+        "source": "docs/models_tracks_scorecard.md, results/aws_eval/boltz_nav_eval.md, docs/community_consensus_2026-06-13.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Ligand SMILES",
+          "type": "text",
+          "placeholder": "CC(=O)OC1=CC=CC=C1C(=O)O"
+        },
+        {
+          "name": "target_seq",
+          "label": "Target protein sequence (AA)",
+          "type": "textarea"
+        }
+      ],
+      "example": {
+        "smiles": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=C(C(=C(C=C3)F)F)OC",
+        "target_seq": "MEFPIGSLETNNFRRFTPESLAEIEKQIAAKQGTKKAREKHREQKDQEEKPRPQLDLKACNQLPKFYG"
+      },
+      "example_note": "suzetrigine + a Nav1.8 pocket fragment — co-fold demo.",
+      "stub_prediction": {
+        "score_kind": "complex",
+        "confidence": 0.78,
+        "affinity": 6.4,
+        "units": "pKd (predicted)",
+        "note": "STUB — wire Boltz-2 co-folding on an AWS GPU (A100/L4) to populate complex + affinity."
+      }
+    },
+    {
+      "id": "bbbp",
+      "n": 4,
+      "label": "BBB Penetrance",
+      "emoji": "🧠",
+      "question": "Will a CNS compound actually cross the blood-brain barrier?",
+      "tagline": "SMILES → P(BBB+); MapLight primary, MolFormer-XL backstop",
+      "best_model": "MapLight",
+      "best_model_detail": "MapLight (CatBoost on ECFP+Avalon+ErG+RDKit descriptors) — confirmed held-out on B3DB. MolFormer-XL is the secondary cross-check; MAMMAL the 'trust the no' specificity backstop.",
+      "license": "MIT",
+      "est_runtime": "~2 min incl. startup (CPU, ~instant warm)",
+      "aws_model_key": "maplight",
+      "performance": {
+        "headline": "MapLight-class model, LIVE: scaffold-test AUROC 0.903 (≈ MapLight 0.91)",
+        "metrics": [
+          {
+            "name": "Local BBBP (scaffold-test)",
+            "value": "0.903"
+          },
+          {
+            "name": "MapLight reference (AWS)",
+            "value": "0.905–0.919"
+          },
+          {
+            "name": "served",
+            "value": "LIVE in-app (CPU, no AWS)"
+          },
+          {
+            "name": "MapLight TDC scaffold",
+            "value": "0.905 (vs MolFormer 0.889)"
+          },
+          {
+            "name": "Brier (calibration)",
+            "value": "0.106 (best)"
+          }
+        ]
+      },
+      "badge": "reliable",
+      "verdict": {
+        "headline": "MapLight is the BBBP primary — confirmed on a held-out dataset, best calibration + best OOD-robustness. Ship a Tanimoto-to-train confidence flag.",
+        "why": "MapLight (fingerprint+CatBoost) beats MolFormer-XL on TDC scaffold (0.905 vs 0.889) AND on an INDEPENDENT held-out set (B3DB 0.919 vs 0.854, 6,142 leakage-removed cpds), with the best calibration (Brier 0.106) and far-OOD AUROC (0.674 vs MolFormer's near-chance 0.590). Fingerprint+GBT beats the SMILES LM on this substructure-driven endpoint. CPU-only, commercial-OK. VALIDATION: TDC scaffold-split (public) — not yet validated on Quiver compounds; gate by the Tanimoto-to-train confidence flag.",
+        "recommended_use": "LIVE in-app: a MapLight-class FP+GBT model (Morgan+MACCS+RDKit-desc) gives a real BBB probability (scaffold-test AUROC 0.903 ≈ MapLight 0.91), Tanimoto-to-train confidence-gated. Default to MapLight's probability; attach a Tanimoto-to-train confidence flag (near-domain AUROC ~0.96, far-OOD ~0.67 — flag low-confidence novel scaffolds). Keep MolFormer-XL as a secondary cross-check and MAMMAL's confident 'no' as a specificity backstop.",
+        "source": "docs/models_tracks_scorecard.md, results/chemeleon_maplight_characterization.md, results/maplight_b3db_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Drug SMILES",
+          "type": "text",
+          "placeholder": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C"
+        }
+      ],
+      "batch": {
+        "entity": "smiles",
+        "label": "Drug SMILES — one per line (CSV ok: first column SMILES, optional 2nd = name)"
+      },
+      "example": {
+        "smiles": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C"
+      },
+      "example_note": "caffeine — CNS-penetrant; should score BBB+.",
+      "stub_prediction": {
+        "score_kind": "probability",
+        "value": 0.92,
+        "call": "BBB+",
+        "providers": [
+          {
+            "name": "MapLight",
+            "value": 0.92,
+            "call": "BBB+ (primary, held-out confirmed)"
+          },
+          {
+            "name": "MolFormer-XL",
+            "value": 0.91,
+            "call": "BBB+ (secondary cross-check)"
+          },
+          {
+            "name": "MAMMAL BBBP",
+            "value": 0.74,
+            "call": "no confident negative (trust the no)"
+          }
+        ],
+        "note": "STUB — wire MapLight (primary) + MolFormer-XL backstop on AWS. Attach Tanimoto-to-train confidence flag."
+      },
+      "local_model": "derisking_local/BBB_Martins (EXPLORER_LOCAL_MODELS=1)"
+    },
+    {
+      "id": "toxicity",
+      "n": 5,
+      "label": "Toxicity / DILI / hERG",
+      "emoji": "☠️",
+      "question": "Is this compound likely to fail Phase 1 on safety?",
+      "tagline": "SMILES → hERG + DILI risk (ClinTox dropped — it's worse than chance)",
+      "best_model": "ChemBERTa-2 + ADMET-AI + MapLight (hERG)",
+      "best_model_detail": "ChemBERTa-2 (hERG+DILI, one commercial model) + ADMET-AI (DILI gate) + MapLight (most OOD-robust hERG, far-OOD 0.809). ClinTox dropped (worse than chance across 4 models).",
+      "license": "MIT",
+      "est_runtime": "~4 min incl. startup (~1 s warm)",
+      "aws_model_key": "chemberta2",
+      "performance": {
+        "headline": "hERG + DILI, LIVE: scaffold-test AUROC 0.881 / 0.934",
+        "metrics": [
+          {
+            "name": "Local hERG (scaffold-test)",
+            "value": "0.881 (≈ MapLight 0.89)"
+          },
+          {
+            "name": "Local DILI (scaffold-test)",
+            "value": "0.934"
+          },
+          {
+            "name": "served",
+            "value": "LIVE in-app (CPU, no AWS)"
+          },
+          {
+            "name": "ClinTox",
+            "value": "omitted (dead)"
+          }
+        ]
+      },
+      "badge": "reliable",
+      "verdict": {
+        "headline": "Reliable de-risking gate — use hERG + DILI, never ClinTox.",
+        "why": "MapLight (FP+CatBoost) is the most OOD-robust hERG model we've measured (far-OOD AUROC 0.809 vs the LMs' 0.56–0.61) — it degrades least on novel chemotypes, the failure mode that sinks a de-risking gate. ChemBERTa-2 gives one commercial-OK model for hERG (0.726) + DILI (ext TPR 0.73); ADMET-AI adds a strong DILI gate (TPR 0.83). ClinTox (failed-trial label) does NOT transfer to real withdrawals (external AUROC 0.24–0.47 across MAMMAL/MolFormer/ChemBERTa/TxGemma). TxGemma-9B is the ~0.95 ceiling but research-only. VALIDATION: TDC scaffold-split (public) — not yet validated on Quiver compounds; gate by the Tanimoto-to-train confidence flag.",
+        "recommended_use": "LIVE in-app: MapLight-class FP+GBT hERG (0.881) + DILI (0.934) scaffold-test, Tanimoto-gated. Run hERG (MapLight for OOD robustness; ChemBERTa-2 in-domain) + DILI (ADMET-AI / ChemBERTa-2) as a Phase-1 safety gate; treat a high score as a flag, not a kill. Drop ClinTox. CardioGenAI's NaV1.5/CaV1.2 multi-channel concept is appealing but its heads are uncalibrated + vocab-locked (not adopted).",
+        "source": "docs/models_tracks_scorecard.md, results/chemberta_admet.json, results/chemeleon_maplight_characterization.md, results/cardiogenai_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Drug SMILES",
+          "type": "text",
+          "placeholder": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
+        }
+      ],
+      "batch": {
+        "entity": "smiles",
+        "label": "Drug SMILES — one per line (CSV ok: first column SMILES, optional 2nd = name)"
+      },
+      "example": {
+        "smiles": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"
+      },
+      "example_note": "ibuprofen — benign safety reference.",
+      "stub_prediction": {
+        "score_kind": "panel",
+        "endpoints": [
+          {
+            "name": "hERG",
+            "value": 0.18,
+            "call": "low risk",
+            "model": "ChemBERTa-2"
+          },
+          {
+            "name": "DILI",
+            "value": 0.22,
+            "call": "low risk",
+            "model": "ChemBERTa-2 / ADMET-AI"
+          }
+        ],
+        "note": "STUB — wire ChemBERTa-2 + ADMET-AI on AWS. ClinTox intentionally omitted (dead)."
+      },
+      "local_model": "derisking_local/hERG_Karim + DILI (EXPLORER_LOCAL_MODELS=1)"
+    },
+    {
+      "id": "kg_hypothesis",
+      "n": 6,
+      "label": "KG / Hypothesis Generation",
+      "emoji": "🕸️",
+      "question": "What is connected to this CRISPR-N hit in the literature/KG?",
+      "tagline": "Target gene (+ optional known drug) → re-ranked shortlist of KG-connected drugs",
+      "best_model": "PROTON + ULTRA",
+      "best_model_detail": "PROTON (NeuroKG bilinear decoder, known-drug ranking) + ULTRA (zero-shot KG FM that fixes PROTON's hub bias AND adds inductive novel-target capability). Ranking direction only.",
+      "license": "MIT + Harvard Dataverse",
+      "est_runtime": "~5 min incl. startup (~1 s warm)",
+      "aws_model_key": "proton",
+      "performance": {
+        "headline": "PROTON ranks known drugs (median 4.3%); ULTRA fixes hub bias + does novel targets",
+        "metrics": [
+          {
+            "name": "PROTON known-binder ranking",
+            "value": "median 4.3%"
+          },
+          {
+            "name": "ULTRA hub bias (top-10 Jaccard)",
+            "value": "0.065 (no Bepridil hub)"
+          },
+          {
+            "name": "ULTRA inductive novel target",
+            "value": "median 0.34% (PROTON: 0 capability)"
+          },
+          {
+            "name": "PROTON forward prediction",
+            "value": "hub noise (❌)"
+          }
+        ]
+      },
+      "badge": "split",
+      "verdict": {
+        "headline": "Co-winners on the SAME graph: PROTON ranks known drugs; ULTRA (zero-shot) fixes PROTON's hub bias and adds novel-target capability. Ranking-shortlist tools, not predictors.",
+        "why": "On NeuroKG (PROTON's own training graph), ULTRA — a zero-shot KG foundation model — fixes both of PROTON's documented failures: no hub bias (per-target top-10 Jaccard 0.065; its top drugs are correct pharmacology — kinase inhibitors for kinases, etc. — not Bepridil-for-everything) and real inductive novel-target capability (median 0.34% with a target's edges held out, where PROTON has zero capability). PROTON still ranks KNOWN drugs well (median 4.3%) on well-studied targets. Both remain ranking-shortlist tools — PROTON's forward 'top drug' prediction is hub noise and is never surfaced.",
+        "recommended_use": "Use ULTRA as the default for novel/weakly-connected targets, hub-sensitive shortlists, and ion-channel targets; PROTON for known-drug ranking against well-studied NeuroKG targets. Never expose forward 'top drug' predictions. Neither is trustworthy on kinases. EMET (BenchSci) is the same use case at $150-500K/yr (wrong-fit).",
+        "source": "docs/models_tracks_scorecard.md, results/proton_characterization.md, results/ultra_neurokg_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "gene",
+          "label": "Target gene symbol",
+          "type": "text",
+          "placeholder": "DRD2"
+        },
+        {
+          "name": "known_drug",
+          "label": "Known drug to rank (optional — ranking direction)",
+          "type": "text",
+          "optional": true,
+          "placeholder": "haloperidol"
+        }
+      ],
+      "example": {
+        "gene": "DRD2",
+        "known_drug": "haloperidol"
+      },
+      "example_note": "DRD2 / haloperidol — a well-studied target where the ranking direction works (median 2.6%).",
+      "stub_prediction": {
+        "score_kind": "ranking",
+        "rank_percentile": 0.026,
+        "shortlist": [
+          {
+            "drug": "haloperidol",
+            "rank_pct": 0.026,
+            "note": "queried known drug"
+          },
+          {
+            "drug": "risperidone",
+            "rank_pct": 0.031
+          },
+          {
+            "drug": "chlorpromazine",
+            "rank_pct": 0.044
+          }
+        ],
+        "note": "STUB — wire PROTON ranking on AWS. Ranking direction only; forward 'top drug' prediction is intentionally NOT surfaced (hub noise)."
+      }
+    },
+    {
+      "id": "generative",
+      "n": 7,
+      "label": "Generative Chemistry",
+      "emoji": "⚗️",
+      "question": "Hit-to-lead expansion / analog generation.",
+      "tagline": "Seed SMILES → nearest-neighbour analogs (Morgan FP + Enamine REAL)",
+      "best_model": "Morgan FP + Enamine REAL NN",
+      "best_model_detail": "Morgan fingerprints + Enamine REAL nearest-neighbour. Boring, works; beats MAMMAL embeddings.",
+      "license": "n/a (RDKit + Enamine)",
+      "est_runtime": "~2 min incl. startup (~1 s warm)",
+      "aws_model_key": "morgan_fp",
+      "performance": {
+        "headline": "0.96 similarity (vs MAMMAL 0.72)",
+        "metrics": [
+          {
+            "name": "Morgan FP similarity",
+            "value": "0.96"
+          },
+          {
+            "name": "MAMMAL embedding sim",
+            "value": "0.72"
+          },
+          {
+            "name": "MAMMAL exact recovery",
+            "value": "1/8 (span-infill, not de novo)"
+          }
+        ]
+      },
+      "badge": "low_value",
+      "verdict": {
+        "headline": "Morgan FP + Enamine REAL is the boring winner — but generation isn't a Quiver bottleneck.",
+        "why": "MAMMAL public weights are span-infillers, not de-novo generators (1/8 exact recovery). Morgan-fingerprint similarity beats MAMMAL embedding similarity 0.96 vs 0.72 for analog expansion. Quiver's bottleneck is target-ID and triage, not novel-structure generation.",
+        "recommended_use": "Use Morgan FP nearest-neighbour over Enamine REAL for hit-to-lead expansion. Deprioritized — revisit only after Tracks 4-5 ship to the Explorer.",
+        "source": "docs/models_tracks_scorecard.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Seed SMILES",
+          "type": "text",
+          "placeholder": "CC(=O)OC1=CC=CC=C1C(=O)O"
+        }
+      ],
+      "example": {
+        "smiles": "CC(=O)OC1=CC=CC=C1C(=O)O"
+      },
+      "example_note": "aspirin — expand to near analogs by Morgan similarity.",
+      "stub_prediction": {
+        "score_kind": "analogs",
+        "neighbors": [
+          {
+            "smiles": "CC(=O)OC1=CC=CC=C1C(=O)OC",
+            "similarity": 0.91,
+            "name": "methyl-aspirin"
+          },
+          {
+            "smiles": "CCC(=O)OC1=CC=CC=C1C(=O)O",
+            "similarity": 0.88
+          }
+        ],
+        "note": "STUB — wire Morgan FP nearest-neighbour over Enamine REAL to populate analogs."
+      }
+    },
+    {
+      "id": "selectivity",
+      "n": 8,
+      "label": "Off-Target / Selectivity",
+      "emoji": "🎯",
+      "question": "Does this compound only hit Nav1.8, or also Nav1.5/1.7?",
+      "tagline": "Compound SMILES + target panel → per-paralog selectivity ranking",
+      "best_model": "Boltz-2",
+      "best_model_detail": "Boltz-2 across a paralog panel (folded into Track 2). Ranks Nav1.8 #1 but with narrow margins.",
+      "license": "MIT",
+      "est_runtime": "~15 min incl. startup (~3 min/paralog warm)",
+      "aws_model_key": "boltz2",
+      "performance": {
+        "headline": "Ranks Nav1.8 #1 (narrow margins) · ConPLex 0.437 blind",
+        "metrics": [
+          {
+            "name": "Boltz-2 Nav1.8 rank",
+            "value": "#1 (margins 0.31–0.44)"
+          },
+          {
+            "name": "ConPLex pan-Nav AUROC",
+            "value": "0.437 (blind)"
+          },
+          {
+            "name": "Cross-paralog (1.5/1.7/1.8)",
+            "value": "0.71–0.75"
+          }
+        ]
+      },
+      "badge": "caution",
+      "verdict": {
+        "headline": "Boltz-2 gets the right paralog order — but margins are too narrow to call selectivity.",
+        "why": "Boltz-2 ranks suzetrigine's Nav1.8 #1 across 9 SCN paralogs, but margins are narrow (0.31–0.44) — directionally right, quantitatively soft. SEQUENCE DTI CANNOT do fine selectivity: BALM biases to Nav1.5, and on Ben's PKM2-vs-PPARD target deconvolution both BALM and PLAPT are at chance (controls outscore binders). Fine selectivity/deconvolution needs co-folding (Boltz-2) or Quiver's own functional/DFP signatures.",
+        "recommended_use": "Use Boltz-2 to rank a compound across a paralog panel for DIRECTIONAL selectivity (a hypothesis, not a ratio). Do NOT use sequence DTI (BALM/PLAPT) for selectivity or target deconvolution — it's at chance. Quiver's functional/DFP signatures are the deconvolution route.",
+        "source": "docs/models_tracks_scorecard.md, results/aws_eval/boltz_nav_eval.md, results/tsc2_deconv_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "smiles",
+          "label": "Compound SMILES",
+          "type": "text",
+          "placeholder": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)..."
+        },
+        {
+          "name": "targets",
+          "label": "Target panel — UniProt accessions, one per line (CSV: acc, name)",
+          "type": "textarea",
+          "placeholder": "Q9Y5Y9, Nav1.8 (SCN10A)\nQ15858, Nav1.7 (SCN9A)\nQ14524, Nav1.5 (SCN5A)"
+        }
+      ],
+      "example": {
+        "smiles": "C[C@H]1[C@H]([C@@H](O[C@@]1(C)C(F)(F)F)C(=O)NC2=CC(=NC=C2)C(=O)N)C3=C(C(=C(C=C3)F)F)OC",
+        "targets": "Q9Y5Y9, Nav1.8 (SCN10A)\nQ15858, Nav1.7 (SCN9A)\nQ14524, Nav1.5 (SCN5A)"
+      },
+      "example_note": "suzetrigine across Nav1.8 / 1.7 / 1.5 — Nav1.8 should rank first.",
+      "stub_prediction": {
+        "score_kind": "panel_ranking",
+        "ranking": [
+          {
+            "target": "Nav1.8 (SCN10A)",
+            "score": 0.44,
+            "rank": 1
+          },
+          {
+            "target": "Nav1.7 (SCN9A)",
+            "score": 0.38,
+            "rank": 2
+          },
+          {
+            "target": "Nav1.5 (SCN5A)",
+            "score": 0.33,
+            "rank": 3
+          }
+        ],
+        "note": "STUB — wire Boltz-2 paralog-panel scoring on an AWS GPU to populate this."
+      }
+    },
+    {
+      "id": "variant_effect",
+      "n": 9,
+      "label": "Variant Effect (Channelopathy)",
+      "emoji": "⚡",
+      "question": "Is this ion-channel missense variant gain- or loss-of-function?",
+      "tagline": "Gene + missense variant → GoF / LoF call (funNCion; Nav1.8 = build-don't-buy)",
+      "best_model": "funNCion",
+      "best_model_detail": "funNCion (Apache-2.0, ion-channel GoF/LoF classifier, AUROC 0.897). MissION (0.925) is portal-only (not adoptable). A generic pLM (ESM-2 LLR) is insufficient (0.665). Nav1.8/SCN10A is absent from public sets → Quiver V1-T fine-tune is the moat.",
+      "license": "Apache-2.0",
+      "est_runtime": "~3 min incl. startup",
+      "aws_model_key": "funncion",
+      "performance": {
+        "headline": "funNCion AUROC 0.897 · generic pLM (ESM-2 LLR) only 0.665",
+        "metrics": [
+          {
+            "name": "funNCion (adoptable)",
+            "value": "0.897"
+          },
+          {
+            "name": "MissION (portal-only)",
+            "value": "0.925 (not adoptable)"
+          },
+          {
+            "name": "ESM-2 650M LLR (generic)",
+            "value": "0.665 (insufficient)"
+          },
+          {
+            "name": "SCN5A/Nav1.5 (ESM-2)",
+            "value": "0.737 · Nav1.8 absent"
+          }
+        ]
+      },
+      "badge": "caution",
+      "verdict": {
+        "headline": "funNCion is the adoptable ion-channel GoF/LoF model for public channels. A generic pLM can't do it. Nav1.8 isn't in any public set — that's the moat.",
+        "why": "Target deconvolution of variant FUNCTION: funNCion (Apache-2.0) calls GoF vs LoF on ion-channel missense at AUROC 0.897 and is downloadable. MissION (0.925) is marginally better but web-portal-only (no repo/weights) → not adoptable. A generic protein LM (ESM-2 650M masked-marginal LLR) scores only 0.665 — it captures deleteriousness, NOT GoF-vs-LoF direction (best Quiver channel SCN5A 0.737). Critically, SCN10A (Nav1.8) + SCN3A are ABSENT from every public training set, so no public model calls GoF/LoF on Quiver's flagship channel. EMPIRICAL 2026-06-15: a supervised GoF/LoF fine-tune on pooled SCION+funNCion Nav/Cav variants (2,212) does NOT generalize across genes (leave-one-gene-out 0.36 < ESM-2-LLR baseline 0.61) and does NOT transfer to held-out Nav1.8 (0.48 ≈ chance). Direction is channel-specific — Nav1.8 GoF/LoF needs Quiver functional data (build-don't-buy, now demonstrated not just asserted).",
+        "recommended_use": "Use funNCion for GoF/LoF on the public channels (SCN1A/2A/5A, etc.); do NOT rely on a generic pLM. For Nav1.8 — build, don't buy: a variant-effect model fine-tuned on Quiver's own V1-T functional readouts is the moat (same thesis as the Nav binder fine-tune). MissION is a demo, not a pipeline component.",
+        "source": "docs/models_tracks_scorecard.md, results/mission_characterization.md"
+      },
+      "inputs": [
+        {
+          "name": "gene",
+          "label": "Ion-channel gene symbol",
+          "type": "text",
+          "placeholder": "SCN2A"
+        },
+        {
+          "name": "variant",
+          "label": "Missense variant (refAA, position, altAA)",
+          "type": "text",
+          "placeholder": "R1882Q"
+        }
+      ],
+      "example": {
+        "gene": "SCN2A",
+        "variant": "R1882Q"
+      },
+      "example_note": "SCN2A R1882Q — a known gain-of-function epilepsy variant (funNCion calls direction; ESM-2 LLR can't).",
+      "stub_prediction": {
+        "score_kind": "panel",
+        "endpoints": [
+          {
+            "name": "GoF probability",
+            "value": 0.82,
+            "call": "likely gain-of-function",
+            "model": "funNCion"
+          },
+          {
+            "name": "LoF probability",
+            "value": 0.18,
+            "call": "—",
+            "model": "funNCion"
+          }
+        ],
+        "note": "STUB — wire funNCion on AWS. Generic pLM (ESM-2 LLR) intentionally NOT the primary (0.665, direction-blind). Nav1.8 unsupported by public models."
+      }
+    }
+  ]
+}

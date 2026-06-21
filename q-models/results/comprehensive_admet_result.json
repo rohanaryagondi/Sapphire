@@ -1,0 +1,323 @@
+{
+  "test": "comprehensive_admet_characterization",
+  "timestamp": "2026-06-13T16:34:48.111005",
+  "models": {
+    "MolFormer-XL": {
+      "BBB_Martins": {
+        "n_test": 406,
+        "pos": 303,
+        "random_auroc": 0.836,
+        "scaffold_held_out_auroc": 0.796,
+        "TPR": 0.861,
+        "TNR": 0.612,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 43,
+            "auroc": 0.747
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 109,
+            "auroc": 0.737
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 254,
+            "auroc": 0.903
+          }
+        ],
+        "calibration": {
+          "brier": 0.151,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.289,
+              "obs_rate": 0.441,
+              "n": 136
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.945,
+              "obs_rate": 0.846,
+              "n": 136
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.998,
+              "obs_rate": 0.949,
+              "n": 136
+            }
+          ]
+        }
+      },
+      "hERG_Karim": {
+        "n_test": 2689,
+        "pos": 1343,
+        "random_auroc": 0.841,
+        "scaffold_held_out_auroc": 0.793,
+        "TPR": 0.757,
+        "TNR": 0.757,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 72,
+            "auroc": 0.704
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 210,
+            "auroc": 0.727
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 2407,
+            "auroc": 0.851
+          }
+        ],
+        "calibration": {
+          "brier": 0.163,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.131,
+              "obs_rate": 0.175,
+              "n": 897
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.494,
+              "obs_rate": 0.457,
+              "n": 897
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.862,
+              "obs_rate": 0.867,
+              "n": 897
+            }
+          ]
+        }
+      },
+      "DILI": {
+        "n_test": 95,
+        "pos": 48,
+        "random_auroc": 0.83,
+        "scaffold_held_out_auroc": 0.793,
+        "TPR": 0.771,
+        "TNR": 0.766,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 47,
+            "auroc": 0.648
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 24,
+            "auroc": 0.978
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 24,
+            "auroc": 0.993
+          }
+        ],
+        "calibration": {
+          "brier": 0.177,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.039,
+              "obs_rate": 0.156,
+              "n": 32
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.478,
+              "obs_rate": 0.516,
+              "n": 31
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.93,
+              "obs_rate": 0.844,
+              "n": 32
+            }
+          ]
+        }
+      }
+    },
+    "ChemBERTa-2": {
+      "BBB_Martins": {
+        "n_test": 406,
+        "pos": 303,
+        "random_auroc": 0.874,
+        "scaffold_held_out_auroc": 0.851,
+        "TPR": 0.888,
+        "TNR": 0.718,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 43,
+            "auroc": 0.794
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 109,
+            "auroc": 0.849
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 254,
+            "auroc": 0.892
+          }
+        ],
+        "calibration": {
+          "brier": 0.122,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.29,
+              "obs_rate": 0.404,
+              "n": 136
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.749,
+              "obs_rate": 0.89,
+              "n": 136
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.927,
+              "obs_rate": 0.941,
+              "n": 136
+            }
+          ]
+        }
+      },
+      "hERG_Karim": {
+        "n_test": 2689,
+        "pos": 1343,
+        "random_auroc": 0.8,
+        "scaffold_held_out_auroc": 0.773,
+        "TPR": 0.716,
+        "TNR": 0.738,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 72,
+            "auroc": 0.588
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 210,
+            "auroc": 0.711
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 2407,
+            "auroc": 0.808
+          }
+        ],
+        "calibration": {
+          "brier": 0.183,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.22,
+              "obs_rate": 0.207,
+              "n": 897
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.493,
+              "obs_rate": 0.482,
+              "n": 897
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.769,
+              "obs_rate": 0.81,
+              "n": 897
+            }
+          ]
+        }
+      },
+      "DILI": {
+        "n_test": 95,
+        "pos": 48,
+        "random_auroc": 0.881,
+        "scaffold_held_out_auroc": 0.879,
+        "TPR": 0.812,
+        "TNR": 0.809,
+        "applicability_domain": [
+          {
+            "band": "far/OOD",
+            "tanimoto": "0.0-0.3",
+            "n": 47,
+            "auroc": 0.804
+          },
+          {
+            "band": "mid",
+            "tanimoto": "0.3-0.5",
+            "n": 24,
+            "auroc": 0.852
+          },
+          {
+            "band": "near",
+            "tanimoto": "0.5-1.01",
+            "n": 24,
+            "auroc": 1.0
+          }
+        ],
+        "calibration": {
+          "brier": 0.139,
+          "reliability": [
+            {
+              "bin": 0,
+              "pred_mean": 0.128,
+              "obs_rate": 0.156,
+              "n": 32
+            },
+            {
+              "bin": 1,
+              "pred_mean": 0.479,
+              "obs_rate": 0.419,
+              "n": 31
+            },
+            {
+              "bin": 2,
+              "pred_mean": 0.858,
+              "obs_rate": 0.938,
+              "n": 32
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dims": [
+    "random_auroc",
+    "scaffold_auroc",
+    "applicability_domain",
+    "calibration",
+    "tpr_tnr_asymmetry"
+  ]
+}

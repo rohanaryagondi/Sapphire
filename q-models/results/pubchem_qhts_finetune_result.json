@@ -1,0 +1,25 @@
+{
+  "source": "PubChem qHTS (non-ChEMBL); negatives = assay inactives",
+  "targets": {
+    "KCNQ2": {
+      "status": "trained",
+      "uniprot": "O43526",
+      "family": "kv",
+      "source": "PubChem AID 2156",
+      "n_pos": 3407,
+      "n_neg": 6000,
+      "scaffold_cv_auroc": 0.8114,
+      "model": "models/cns_pertarget/KCNQ2.joblib"
+    },
+    "CACNA1H": {
+      "status": "trained",
+      "uniprot": "O95180",
+      "family": "cav",
+      "source": "PubChem AID 449739",
+      "n_pos": 4230,
+      "n_neg": 6000,
+      "scaffold_cv_auroc": 0.7912,
+      "model": "models/cns_pertarget/CACNA1H.joblib"
+    }
+  }
+}

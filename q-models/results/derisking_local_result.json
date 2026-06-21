@@ -1,0 +1,29 @@
+{
+  "recipe": "Morgan2048+MACCS167+RDKit2D -> HistGradientBoosting; TDC scaffold split",
+  "endpoints": {
+    "BBB_Martins": {
+      "status": "trained",
+      "track": "bbbp",
+      "test_scaffold_auroc": 0.9026,
+      "n_train": 1624,
+      "reference_maplight_auroc": 0.91,
+      "model": "models/derisking_local/BBB_Martins.joblib"
+    },
+    "hERG_Karim": {
+      "status": "trained",
+      "track": "herg",
+      "test_scaffold_auroc": 0.8811,
+      "n_train": 10755,
+      "reference_maplight_auroc": 0.89,
+      "model": "models/derisking_local/hERG_Karim.joblib"
+    },
+    "DILI": {
+      "status": "trained",
+      "track": "dili",
+      "test_scaffold_auroc": 0.9335,
+      "n_train": 379,
+      "reference_maplight_auroc": 0.83,
+      "model": "models/derisking_local/DILI.joblib"
+    }
+  }
+}

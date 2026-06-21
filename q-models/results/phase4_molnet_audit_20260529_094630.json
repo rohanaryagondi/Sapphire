@@ -1,0 +1,37 @@
+{
+  "timestamp": "20260529_094630",
+  "heads": {
+    "BBBP": {
+      "task": "BBBP",
+      "positive_means": "penetrant",
+      "n_test": 204,
+      "pos_rate": 0.525,
+      "auroc": 0.9682,
+      "saturation_frac": 0.951,
+      "TPR_at_0.5": 0.981,
+      "TNR_at_0.5": 0.701
+    },
+    "ClinTox-tox": {
+      "task": "TOXICITY",
+      "positive_means": "toxic",
+      "n_test": 148,
+      "pos_rate": 0.068,
+      "auroc": 1.0,
+      "saturation_frac": 1.0,
+      "TPR_at_0.5": 1.0,
+      "TNR_at_0.5": 1.0,
+      "nontoxic_falsealarm_rate": 0.0,
+      "nontoxic_n": 200
+    },
+    "ClinTox-FDA": {
+      "task": "FDA_APPR",
+      "positive_means": "approved",
+      "n_test": 148,
+      "pos_rate": 0.939,
+      "auroc": 1.0,
+      "saturation_frac": 0.622,
+      "TPR_at_0.5": 0.928,
+      "TNR_at_0.5": 1.0
+    }
+  }
+}

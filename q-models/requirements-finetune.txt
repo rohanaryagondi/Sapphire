@@ -1,0 +1,13 @@
+# Extras for the LIVE local fine-tunes + Explorer live tracks (DTI / BBBP / Tox).
+# These are CPU-only (Morgan-FP + GradientBoosting); NO GPU / NO 17 GB MAMMAL weights needed.
+# Install AFTER requirements.txt + ui/requirements.txt.
+#   pip install -r requirements-finetune.txt
+#
+# (rdkit + scikit-learn + numpy usually arrive via PyTDC, but pin them explicitly so a
+#  fresh box can regenerate the per-target models without the heavy MAMMAL stack.)
+rdkit                 # fingerprints, scaffolds, descriptors (Morgan/MACCS/RDKit-2D)
+scikit-learn          # HistGradientBoostingClassifier + GroupKFold + roc_auc_score
+joblib                # serialize the per-target model bundles -> models/cns_pertarget, models/derisking_local
+numpy
+pandas                # TDC dataframes (de-risking trainer)
+PyTDC                 # TDC benchmarks for BBBP / hERG / DILI (de-risking trainer)

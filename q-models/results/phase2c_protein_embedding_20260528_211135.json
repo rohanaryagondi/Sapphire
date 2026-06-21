@@ -1,0 +1,8 @@
+{
+  "timestamp": "20260528_211135",
+  "n": 25,
+  "n_families": 5,
+  "nn_same_family": 0.92,
+  "intra_minus_inter_cosine": 0.457,
+  "random_baseline_nn": 0.167
+}

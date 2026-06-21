@@ -1,0 +1,116 @@
+{
+  "targets": {
+    "PKM2": "CHEMBL2107",
+    "PPARD": "CHEMBL3979"
+  },
+  "active_pchembl": 6.0,
+  "n_raw": {
+    "PKM2": 1032,
+    "PPARD": 1865
+  },
+  "models": {
+    "PKM2": {
+      "n_pos": 821,
+      "n_neg": 1323,
+      "n_inactives": 59,
+      "n_cross_decoys": 1264,
+      "scaffold_cv_auroc": 0.9928685492483581,
+      "cv_folds": 5
+    },
+    "PPARD": {
+      "n_pos": 1264,
+      "n_neg": 915,
+      "n_inactives": 94,
+      "n_cross_decoys": 821,
+      "scaffold_cv_auroc": 0.9895615175182257,
+      "cv_folds": 5
+    }
+  },
+  "panel_scores": [
+    {
+      "qs_id": "QS0113172",
+      "name": "QS0113172",
+      "role": "hit_putative",
+      "true_PKM2": 1,
+      "true_PPARD": 1,
+      "P_PKM2": 0.159,
+      "P_PPARD": 0.366
+    },
+    {
+      "qs_id": "QS0321744",
+      "name": "Dasa-58",
+      "role": "reference_confirmed",
+      "true_PKM2": 1,
+      "true_PPARD": 0,
+      "P_PKM2": 0.059,
+      "P_PPARD": 0.463
+    },
+    {
+      "qs_id": "QS0321760",
+      "name": "GSK 3787",
+      "role": "reference_confirmed",
+      "true_PKM2": 0,
+      "true_PPARD": 1,
+      "P_PKM2": 0.042,
+      "P_PPARD": 0.921
+    },
+    {
+      "qs_id": "QS0069567",
+      "name": "QS0069567",
+      "role": "hit_putative",
+      "true_PKM2": 0,
+      "true_PPARD": 1,
+      "P_PKM2": 0.75,
+      "P_PPARD": 0.09
+    },
+    {
+      "qs_id": "QS0141913",
+      "name": "GF 109203X",
+      "role": "control",
+      "true_PKM2": 0,
+      "true_PPARD": 0,
+      "P_PKM2": 0.801,
+      "P_PPARD": 0.021
+    },
+    {
+      "qs_id": "QS0061489",
+      "name": "carbamazepine",
+      "role": "control",
+      "true_PKM2": 0,
+      "true_PPARD": 0,
+      "P_PKM2": 0.214,
+      "P_PPARD": 0.007
+    },
+    {
+      "qs_id": "QS0214154",
+      "name": "BMS 191011",
+      "role": "control",
+      "true_PKM2": 0,
+      "true_PPARD": 0,
+      "P_PKM2": 0.388,
+      "P_PPARD": 0.731
+    },
+    {
+      "qs_id": "QS0206838",
+      "name": "Biperiden hydrochloride",
+      "role": "control",
+      "true_PKM2": 0,
+      "true_PPARD": 0,
+      "P_PKM2": 0.736,
+      "P_PPARD": 0.045
+    },
+    {
+      "qs_id": "QS0321864",
+      "name": "BIIB021",
+      "role": "control",
+      "true_PKM2": 0,
+      "true_PPARD": 0,
+      "P_PKM2": 0.462,
+      "P_PPARD": 0.098
+    }
+  ],
+  "panel_auroc": {
+    "PKM2": 0.143,
+    "PPARD": 0.722
+  }
+}

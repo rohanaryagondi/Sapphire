@@ -1,0 +1,185 @@
+{
+  "test": "molformer_xl_clintox",
+  "timestamp": "2026-06-12T16:03:30.901117",
+  "model": "ibm/MoLFormer-XL-both-10pct",
+  "approach": "MolFormer-XL mean-pooled embeddings + balanced logistic-regression probe on TDC ClinTox train",
+  "clintox_test": {
+    "n": 296,
+    "auroc": 0.8967524509803921,
+    "tp": 16,
+    "tn": 247,
+    "fp": 25,
+    "fn": 8,
+    "TPR": 0.6666666666666666,
+    "TNR": 0.9080882352941176,
+    "acc": 0.8885135135135135
+  },
+  "external_panel_30drug": {
+    "n": 30,
+    "auroc": 0.24444444444444444,
+    "tp": 3,
+    "tn": 8,
+    "fp": 7,
+    "fn": 12,
+    "TPR": 0.2,
+    "TNR": 0.5333333333333333,
+    "acc": 0.36666666666666664,
+    "compare": {
+      "MAMMAL_ClinTox_TPR": 0.08,
+      "MAMMAL_ClinTox_AUROC": 0.28,
+      "ADMET_AI_DILI_TPR": 0.83
+    }
+  },
+  "per_drug": [
+    {
+      "name": "aspirin",
+      "toxic": 0,
+      "prob": 0.14056430913728804
+    },
+    {
+      "name": "ibuprofen",
+      "toxic": 0,
+      "prob": 0.018646156559080848
+    },
+    {
+      "name": "metformin",
+      "toxic": 0,
+      "prob": 0.9874929303452853
+    },
+    {
+      "name": "atorvastatin",
+      "toxic": 0,
+      "prob": 0.2649628002967423
+    },
+    {
+      "name": "omeprazole",
+      "toxic": 0,
+      "prob": 0.025339894116115237
+    },
+    {
+      "name": "metoprolol",
+      "toxic": 0,
+      "prob": 0.7272470854549828
+    },
+    {
+      "name": "amlodipine",
+      "toxic": 0,
+      "prob": 0.2277274182638402
+    },
+    {
+      "name": "gabapentin",
+      "toxic": 0,
+      "prob": 0.9550331802449237
+    },
+    {
+      "name": "citalopram",
+      "toxic": 0,
+      "prob": 0.790305861557386
+    },
+    {
+      "name": "donepezil",
+      "toxic": 0,
+      "prob": 0.13585691091240706
+    },
+    {
+      "name": "memantine",
+      "toxic": 0,
+      "prob": 0.016952768519651083
+    },
+    {
+      "name": "caffeine",
+      "toxic": 0,
+      "prob": 0.02821031598221713
+    },
+    {
+      "name": "diphenhydramine",
+      "toxic": 0,
+      "prob": 0.7683759424900272
+    },
+    {
+      "name": "lidocaine",
+      "toxic": 0,
+      "prob": 0.9524185114097368
+    },
+    {
+      "name": "fluoxetine",
+      "toxic": 0,
+      "prob": 0.917282105783049
+    },
+    {
+      "name": "cerivastatin",
+      "toxic": 1,
+      "prob": 0.003054646853870203
+    },
+    {
+      "name": "troglitazone",
+      "toxic": 1,
+      "prob": 0.09909936236068327
+    },
+    {
+      "name": "terfenadine",
+      "toxic": 1,
+      "prob": 7.925935659971586e-05
+    },
+    {
+      "name": "thalidomide",
+      "toxic": 1,
+      "prob": 0.07562337360255708
+    },
+    {
+      "name": "cisapride",
+      "toxic": 1,
+      "prob": 0.10358626306029559
+    },
+    {
+      "name": "bromfenac",
+      "toxic": 1,
+      "prob": 0.02250001089624473
+    },
+    {
+      "name": "mibefradil",
+      "toxic": 1,
+      "prob": 0.011392327212884606
+    },
+    {
+      "name": "trovafloxacin",
+      "toxic": 1,
+      "prob": 0.006542506210471436
+    },
+    {
+      "name": "grepafloxacin",
+      "toxic": 1,
+      "prob": 0.8503106615658896
+    },
+    {
+      "name": "alosetron",
+      "toxic": 1,
+      "prob": 0.03207082520321094
+    },
+    {
+      "name": "valdecoxib",
+      "toxic": 1,
+      "prob": 0.19249619086728004
+    },
+    {
+      "name": "ximelagatran",
+      "toxic": 1,
+      "prob": 0.8073416678228569
+    },
+    {
+      "name": "pemoline",
+      "toxic": 1,
+      "prob": 0.006750383482025504
+    },
+    {
+      "name": "rofecoxib",
+      "toxic": 1,
+      "prob": 0.6376259154066213
+    },
+    {
+      "name": "tegaserod",
+      "toxic": 1,
+      "prob": 0.017772099656414454
+    }
+  ]
+}

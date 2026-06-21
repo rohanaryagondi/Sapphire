@@ -1,0 +1,69 @@
+{
+  "timestamp": "20260528_214459",
+  "n_actives": 27,
+  "n_decoys": 200,
+  "table": [
+    {
+      "scheme": "smiles_only",
+      "readout": "pos0",
+      "auroc": 0.385,
+      "auroc_flipped": 0.615,
+      "spearman_pKd": -0.331
+    },
+    {
+      "scheme": "smiles_only",
+      "readout": "eos",
+      "auroc": 0.385,
+      "auroc_flipped": 0.615,
+      "spearman_pKd": -0.331
+    },
+    {
+      "scheme": "smiles_only",
+      "readout": "mean",
+      "auroc": 0.633,
+      "auroc_flipped": 0.367,
+      "spearman_pKd": -0.28
+    },
+    {
+      "scheme": "smiles_only",
+      "readout": "max",
+      "auroc": 0.498,
+      "auroc_flipped": 0.502,
+      "spearman_pKd": -0.023
+    },
+    {
+      "scheme": "protein_smiles",
+      "readout": "pos0",
+      "auroc": 0.483,
+      "auroc_flipped": 0.517,
+      "spearman_pKd": 0.121
+    },
+    {
+      "scheme": "protein_smiles",
+      "readout": "eos",
+      "auroc": 0.483,
+      "auroc_flipped": 0.517,
+      "spearman_pKd": 0.121
+    },
+    {
+      "scheme": "protein_smiles",
+      "readout": "mean",
+      "auroc": 0.415,
+      "auroc_flipped": 0.585,
+      "spearman_pKd": -0.166
+    },
+    {
+      "scheme": "protein_smiles",
+      "readout": "max",
+      "auroc": 0.46,
+      "auroc_flipped": 0.54,
+      "spearman_pKd": -0.522
+    }
+  ],
+  "best": {
+    "scheme": "smiles_only",
+    "readout": "mean",
+    "auroc": 0.633,
+    "flipped": 0.367
+  }
+}

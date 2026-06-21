@@ -1,0 +1,1419 @@
+{
+  "jobs": {
+    "ovn-ws1-design-TSC2": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5012903213500977,
+        "bindconf_median": 0.31307655572891235,
+        "optscore_max": 0.24817407131195068,
+        "top": [
+          {
+            "smiles": "O=C(O)c1cc(C(=O)c2ccc(C(=O)c3ccco3)s2)cc(C(F)(F)F)c1",
+            "bind": 0.5012903213500977,
+            "opt": 0.22644618153572083
+          },
+          {
+            "smiles": "CC(C)(C)[Si](C)(C)OCCC(=O)CCc1ccc(Br)c(Cl)c1",
+            "bind": 0.4506834149360657,
+            "opt": 0.13820984959602356
+          },
+          {
+            "smiles": "Cc1nc(NC(=S)Nc2ccc(F)c(N3CCOCC3)c2)ccc1Br",
+            "bind": 0.42494308948516846,
+            "opt": 0.18628965318202972
+          },
+          {
+            "smiles": "O=C(O)C(Cl)c1cccc2ncccc12",
+            "bind": 0.3906101584434509,
+            "opt": 0.03344239667057991
+          },
+          {
+            "smiles": "NC1(Cc2n[nH]c(Cc3ccc(SC(F)(F)F)cc3)n2)CC1",
+            "bind": 0.36809244751930237,
+            "opt": 0.2063221037387848
+          }
+        ]
+      },
+      "gene": "TSC2",
+      "role": "query",
+      "domain_len": 1807
+    },
+    "ovn-ws1-design-WDR26": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5384429097175598,
+        "bindconf_median": 0.2687831521034241,
+        "optscore_max": 0.28447097539901733,
+        "top": [
+          {
+            "smiles": "C#Cc1c(C(C)(C)N)nnn1Cc1cccc(C(=O)NCc2ccco2)c1",
+            "bind": 0.5384429097175598,
+            "opt": 0.11954256892204285
+          },
+          {
+            "smiles": "O=C(O)C(Br)Sc1nccc2ccccc12",
+            "bind": 0.46813708543777466,
+            "opt": 0.09445638954639435
+          },
+          {
+            "smiles": "CC(N)c1nc2cc(C(=O)c3ccc(N=C=O)cc3F)ccc2[nH]1",
+            "bind": 0.4416356682777405,
+            "opt": 0.15216514468193054
+          },
+          {
+            "smiles": "O=C(Cl)COCC=Cc1ccccc1",
+            "bind": 0.39843371510505676,
+            "opt": 0.15527558326721191
+          },
+          {
+            "smiles": "COc1cccc(-c2c[nH]c(C3CCCN3c3cc(Cl)c(O)cc3[N+](=O)[O-])n2)c1",
+            "bind": 0.3788537383079529,
+            "opt": 0.08769901096820831
+          }
+        ]
+      },
+      "gene": "WDR26",
+      "role": "query",
+      "domain_len": 661
+    },
+    "ovn-ws1-design-TSC1": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6878594160079956,
+        "bindconf_median": 0.33526018261909485,
+        "optscore_max": 0.23995114862918854,
+        "top": [
+          {
+            "smiles": "Cn1c(-c2ccc(C(=O)CCl)o2)nc2ccnc(Cl)c21",
+            "bind": 0.6878594160079956,
+            "opt": 0.1120247021317482
+          },
+          {
+            "smiles": "COC(=O)c1cc2c(C#N)ccc(Cl)c2[nH]1",
+            "bind": 0.6323873996734619,
+            "opt": 0.12646202743053436
+          },
+          {
+            "smiles": "Cc1cc(C(F)F)nc2sc(-c3nnn(C(Cl)(Cl)c4nc5ccccc5[nH]4)n3)c(N)c12",
+            "bind": 0.6199133396148682,
+            "opt": 0.23995114862918854
+          },
+          {
+            "smiles": "CCC(CCl)NC(=O)Cc1ccc(N)cc1",
+            "bind": 0.47926074266433716,
+            "opt": 0.12937696278095245
+          },
+          {
+            "smiles": "CC(Nc1ccc(S(=O)(=O)F)cc1[N+](=O)[O-])c1ccc(OC(F)(F)F)cc1",
+            "bind": 0.43025529384613037,
+            "opt": 0.14973226189613342
+          }
+        ]
+      },
+      "gene": "TSC1",
+      "role": "query",
+      "domain_len": 1164
+    },
+    "ovn-ws1-design-PTEN": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.46889162063598633,
+        "bindconf_median": 0.20535802841186523,
+        "optscore_max": 0.34125083684921265,
+        "top": [
+          {
+            "smiles": "O=Cc1cccc2cc(-c3ccc4c(c3)CCO4)[nH]c12",
+            "bind": 0.46889162063598633,
+            "opt": 0.14596027135849
+          },
+          {
+            "smiles": "CC(C)(C)C1CCN1c1cc(N)c([N+](=O)[O-])cc1F",
+            "bind": 0.4388071298599243,
+            "opt": 0.17632247507572174
+          },
+          {
+            "smiles": "COC(=O)c1c(I)[nH]c2ccc(C=C(CC(NC(=O)OC(C)(C)C)C(=O)OC)C(F)(F)F)cc12",
+            "bind": 0.37082943320274353,
+            "opt": 0.19811275601387024
+          },
+          {
+            "smiles": "Cc1c(C(=O)OC2CCc3sc(Br)cc32)c(-c2ccccc2)cn1C",
+            "bind": 0.3696559965610504,
+            "opt": 0.24887070059776306
+          },
+          {
+            "smiles": "COc1cc(CNC(=O)OC(C)(C)C)ccc1CNc1cc(N)c2ccncc2n1",
+            "bind": 0.31696170568466187,
+            "opt": 0.18112362921237946
+          }
+        ]
+      },
+      "gene": "PTEN",
+      "role": "query",
+      "domain_len": 403
+    },
+    "ovn-ws1-design-STXBP1": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5930373668670654,
+        "bindconf_median": 0.2754665017127991,
+        "optscore_max": 0.29610490798950195,
+        "top": [
+          {
+            "smiles": "Cc1c(C(=O)O)sc2ccc(C(=O)c3ccc(CBr)cc3F)cc12",
+            "bind": 0.5930373668670654,
+            "opt": 0.13514086604118347
+          },
+          {
+            "smiles": "CC(C)(c1nc(-c2ccc(C(=O)NCCN(Cc3ccccc3)C(=O)c3cc(C(F)(F)F)cs3)s2)n[nH]1)C(F)F",
+            "bind": 0.47331252694129944,
+            "opt": 0.2411285936832428
+          },
+          {
+            "smiles": "CC(C)(C)c1ccc(-c2nnc(SC(=O)C34CC(c5ccc(F)cc5)(C3)C4F)n2-c2ccccc2)cc1",
+            "bind": 0.39116984605789185,
+            "opt": 0.28666990995407104
+          },
+          {
+            "smiles": "COC(=O)c1cc(OC(F)(F)F)c2[nH]c(-c3ccccc3F)cc2c1",
+            "bind": 0.35227900743484497,
+            "opt": 0.20261700451374054
+          },
+          {
+            "smiles": "CC(=O)c1cc2cc(C(=O)C3(CC=O)CCN(C(=O)OC(C)(C)C)CC3)ccc2o1",
+            "bind": 0.3424338102340698,
+            "opt": 0.25554436445236206
+          }
+        ]
+      },
+      "gene": "STXBP1",
+      "role": "query",
+      "domain_len": 594
+    },
+    "ovn-ws1-design-SCN2A": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.7097654342651367,
+        "bindconf_median": 0.2354276329278946,
+        "optscore_max": 0.4852340817451477,
+        "top": [
+          {
+            "smiles": "Cc1ccc(C2(C(=O)C(C)c3ccc(Cl)cc3Cl)CCN(Cc3ccccc3)CC2)cc1",
+            "bind": 0.7097654342651367,
+            "opt": 0.286283016204834
+          },
+          {
+            "smiles": "COc1cccc(Cn2ccc3ccc(NC(=O)C4(c5ccccc5Cl)CCC4)cc32)c1",
+            "bind": 0.566887378692627,
+            "opt": 0.3268810212612152
+          },
+          {
+            "smiles": "CC(C)(C)c1ccc(CN2CCN(C(c3ccccc3)c3ccc(C(=O)c4cc(B(O)O)ccc4F)cc3)CC2)cc1",
+            "bind": 0.5087495446205139,
+            "opt": 0.4852340817451477
+          },
+          {
+            "smiles": "CCOC(=O)CCCCCCCNC(=O)N(C)Cc1c(CC)oc2ccccc12",
+            "bind": 0.48796185851097107,
+            "opt": 0.22772419452667236
+          },
+          {
+            "smiles": "COC(=O)c1cc(F)c2oc(-c3c(Br)cccc3OC)nc2c1",
+            "bind": 0.4274364113807678,
+            "opt": 0.3118877112865448
+          }
+        ]
+      },
+      "gene": "SCN2A",
+      "role": "query",
+      "domain_len": 2005
+    },
+    "ovn-ws1-design-KCNQ2": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6373544931411743,
+        "bindconf_median": 0.2660300135612488,
+        "optscore_max": 0.4307636320590973,
+        "top": [
+          {
+            "smiles": "O=c1c2ccc(-c3nc4cccnc4n3C3CCCCC3)cc2nc(S)n1Cc1ccco1",
+            "bind": 0.6373544931411743,
+            "opt": 0.3456338942050934
+          },
+          {
+            "smiles": "C[Si](C)(CI)Cn1cc(-c2ccc3cccnc3c2)nn1",
+            "bind": 0.5492309927940369,
+            "opt": 0.20619617402553558
+          },
+          {
+            "smiles": "Cn1cc2ccc(C#Cc3ccc(COC(=O)c4ccccc4O)cc3)cc2n1",
+            "bind": 0.4674914479255676,
+            "opt": 0.1971593201160431
+          },
+          {
+            "smiles": "CC(C)(C)CNc1ccc([N+](=O)[O-])cc1I",
+            "bind": 0.46230271458625793,
+            "opt": 0.25235146284103394
+          },
+          {
+            "smiles": "CCCCCCCCCCCC(O[Si](C)(C)C(C)(C)C)c1nc2cncc(Br)c2s1",
+            "bind": 0.4373841881752014,
+            "opt": 0.31210532784461975
+          }
+        ]
+      },
+      "gene": "KCNQ2",
+      "role": "query",
+      "domain_len": 872
+    },
+    "ovn-ws1-design-SYNGAP1": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.4817900061607361,
+        "bindconf_median": 0.280664324760437,
+        "optscore_max": 0.2766871154308319,
+        "top": [
+          {
+            "smiles": "CCN(CC)CCNC(=O)c1ccc(CNc2ccc3ncccc3c2[N+](=O)[O-])cc1",
+            "bind": 0.4817900061607361,
+            "opt": 0.18655885756015778
+          },
+          {
+            "smiles": "O=C(NC(COc1cc(F)c2cn[nH]c2c1)C(=O)O)OCC1c2ccccc2-c2ccccc21",
+            "bind": 0.42277950048446655,
+            "opt": 0.2478882074356079
+          },
+          {
+            "smiles": "C=Cc1cccc(N2CCN(c3nc(-c4ccco4)cc(C(F)F)n3)CC2)c1[N+](=O)[O-]",
+            "bind": 0.4094347357749939,
+            "opt": 0.14021845161914825
+          },
+          {
+            "smiles": "O=C(O)c1ccc(NCc2cnc(-c3ccccc3)s2)c([N+](=O)[O-])c1",
+            "bind": 0.397516131401062,
+            "opt": 0.15729330480098724
+          },
+          {
+            "smiles": "COc1cccc(C#Cc2ncc(F)cc2N=[N+]=[N-])c1Cl",
+            "bind": 0.3414391875267029,
+            "opt": 0.24452656507492065
+          }
+        ]
+      },
+      "gene": "SYNGAP1",
+      "role": "query",
+      "domain_len": 1343
+    },
+    "ovn-ws1-design-CHD8": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6034849882125854,
+        "bindconf_median": 0.3031103014945984,
+        "optscore_max": 0.36998260021209717,
+        "top": [
+          {
+            "smiles": "Cc1c(B(O)O)ccnc1NCc1cc2[nH]ccc2s1",
+            "bind": 0.6034849882125854,
+            "opt": 0.36998260021209717
+          },
+          {
+            "smiles": "Cn1c(-c2ccc3ncnc(Cl)c3c2)nc2cnc3c(Br)cccc3c21",
+            "bind": 0.5941624641418457,
+            "opt": 0.2848484516143799
+          },
+          {
+            "smiles": "CC(C)(C)OC(=O)N1CCc2cc(CNc3cc(O)c(C=O)cc3[N+](=O)[O-])ccc2C1",
+            "bind": 0.5921132564544678,
+            "opt": 0.2618103623390198
+          },
+          {
+            "smiles": "CCSc1snc(O)c1-c1n[nH]c(-c2cc(-c3ccc(OC)cc3)n[nH]2)n1",
+            "bind": 0.5289981365203857,
+            "opt": 0.15521512925624847
+          },
+          {
+            "smiles": "N#Cc1cc(NC(=O)NCCn2cnc(-c3nnnn3Cc3cc4cc(OCc5ccccc5)ccc4[nH]3)n2)c(F)cc1F",
+            "bind": 0.47947007417678833,
+            "opt": 0.30525490641593933
+          }
+        ]
+      },
+      "gene": "CHD8",
+      "role": "query",
+      "domain_len": 520
+    },
+    "ovn-ws1-design-KMT2A": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.3120065927505493,
+        "bindconf_median": 0.15263278782367706,
+        "optscore_max": 0.3334236741065979,
+        "top": [
+          {
+            "smiles": "O=S(=O)(Cc1c(F)cccc1C(F)(F)F)Nc1nc(-c2ccc(Br)cc2)no1",
+            "bind": 0.3120065927505493,
+            "opt": 0.211322620511055
+          },
+          {
+            "smiles": "CC(C)OCC#Cc1ccc2ccc(C=O)nc2c1F",
+            "bind": 0.24017329514026642,
+            "opt": 0.14987896382808685
+          },
+          {
+            "smiles": "Oc1c(Cl)ccc2ncccc12",
+            "bind": 0.22082450985908508,
+            "opt": 0.040974073112010956
+          },
+          {
+            "smiles": "CN(C)CCC(=O)NCC#Cc1cccc(CC(=O)O)c1N",
+            "bind": 0.2053205817937851,
+            "opt": 0.07476575672626495
+          },
+          {
+            "smiles": "Nc1ccc(S(=O)(=O)Nc2nnn(Cc3ccc4ccoc4c3)n2)cc1",
+            "bind": 0.1882370114326477,
+            "opt": 0.14787565171718597
+          }
+        ]
+      },
+      "gene": "KMT2A",
+      "role": "query",
+      "domain_len": 269
+    },
+    "ovn-ws1-design-SMARCA4": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5807137489318848,
+        "bindconf_median": 0.33739325404167175,
+        "optscore_max": 0.3855332136154175,
+        "top": [
+          {
+            "smiles": "Cc1cccc(-n2ncc3c(C(=O)CCN(C(=O)CCl)c4ccccc4F)ncnc32)c1",
+            "bind": 0.5807137489318848,
+            "opt": 0.19293323159217834
+          },
+          {
+            "smiles": "COC(=O)c1cnc2c(c1)cc(C(=O)Sc1nc(C)nc3ccccc13)n2C",
+            "bind": 0.5223842263221741,
+            "opt": 0.12987104058265686
+          },
+          {
+            "smiles": "C=C1CC(C(=O)OCC)(C(OC(=O)Cc2cc([N+](=O)[O-])nn2C)c2ccc(Cl)c(Cl)c2)C1",
+            "bind": 0.5166308879852295,
+            "opt": 0.22571957111358643
+          },
+          {
+            "smiles": "COc1ccc2c(c1)CCN=C2CCl",
+            "bind": 0.5155560970306396,
+            "opt": 0.13425129652023315
+          },
+          {
+            "smiles": "NC1=NC(=C(C(=O)Nc2ccc3c(c2)OCCO3)C(=O)c2ccnc3nc(Br)ccc23)c2ccccc21",
+            "bind": 0.5093193650245667,
+            "opt": 0.2284260392189026
+          }
+        ]
+      },
+      "gene": "SMARCA4",
+      "role": "query",
+      "domain_len": 1647
+    },
+    "ovn-ws1-design-SRCAP": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6714737415313721,
+        "bindconf_median": 0.29765522480010986,
+        "optscore_max": 0.31155773997306824,
+        "top": [
+          {
+            "smiles": "C#Cc1cncc(NC(=O)CC(=O)c2ccc(Br)cc2C(=O)CBr)c1",
+            "bind": 0.6714737415313721,
+            "opt": 0.31155773997306824
+          },
+          {
+            "smiles": "S=C(NCc1cccc(Br)c1)Nc1nc(=S)c2[nH]cnc2[nH]1",
+            "bind": 0.5573732852935791,
+            "opt": 0.15564751625061035
+          },
+          {
+            "smiles": "CC(C)(C)OC(=O)NCCC(=O)Cn1nnc(-c2ncccc2C=O)n1",
+            "bind": 0.5084972381591797,
+            "opt": 0.14179649949073792
+          },
+          {
+            "smiles": "COC(=O)c1sc(SC)nc1NC(=O)c1ccc2cc(Br)ccc2c1",
+            "bind": 0.5005889534950256,
+            "opt": 0.17445264756679535
+          },
+          {
+            "smiles": "CCc1ccc(-c2nnn(C(CCc3ccccc3)CN3CC=C(c4c[nH]c5ncccc45)CC3)n2)cc1",
+            "bind": 0.44347673654556274,
+            "opt": 0.15589356422424316
+          }
+        ]
+      },
+      "gene": "SRCAP",
+      "role": "query",
+      "domain_len": 500
+    },
+    "ovn-ws1-design-RPS17": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5548074245452881,
+        "bindconf_median": 0.34303200244903564,
+        "optscore_max": 0.23513169586658478,
+        "top": [
+          {
+            "smiles": "Nc1ccc(OC(F)F)c(-c2nc(-c3ccc4ccccc4c3N)n[nH]2)c1",
+            "bind": 0.5548074245452881,
+            "opt": 0.14859092235565186
+          },
+          {
+            "smiles": "N#Cc1cc(N)c(-c2nnn[nH]2)cc1S(N)(=O)=O",
+            "bind": 0.49706628918647766,
+            "opt": 0.11136392503976822
+          },
+          {
+            "smiles": "COc1ccc2c(CCc3nc(-c4ccc5nc(Cl)cnc5c4)n[nH]3)c[nH]c2c1",
+            "bind": 0.4823898673057556,
+            "opt": 0.08125177770853043
+          },
+          {
+            "smiles": "C#Cc1ccc(-c2cc3cc(I)cc(CC)c3[nH]2)cc1",
+            "bind": 0.4821089804172516,
+            "opt": 0.09106500446796417
+          },
+          {
+            "smiles": "Cc1ccc(Cn2c(SC(=O)C34C5CCC(CC53)C4NC(=O)OCC3c4ccccc4-c4ccccc43)nc3ccccc3c2=O)cc1",
+            "bind": 0.4421002268791199,
+            "opt": 0.23513169586658478
+          }
+        ]
+      },
+      "gene": "RPS17",
+      "role": "query",
+      "domain_len": 135
+    },
+    "ovn-ws1-design-HNRNPK": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5819180011749268,
+        "bindconf_median": 0.3326469659805298,
+        "optscore_max": 0.25392627716064453,
+        "top": [
+          {
+            "smiles": "Cc1ccc2c(c1)cc(NC(=O)N(Cc1ccccc1)c1cc(C(=O)O)ccn1)n2C",
+            "bind": 0.5819180011749268,
+            "opt": 0.10670073330402374
+          },
+          {
+            "smiles": "COC(=O)CCC(=O)CNc1ccc([N+](=O)[O-])cc1B(O)O",
+            "bind": 0.5092037916183472,
+            "opt": 0.1439058482646942
+          },
+          {
+            "smiles": "c1cc(NCc2ccco2)cc(-c2cn(CCc3cscn3)nn2)c1",
+            "bind": 0.47753143310546875,
+            "opt": 0.09255457669496536
+          },
+          {
+            "smiles": "CCc1ccc2occ(C3NCCc4cc(CCl)ccc43)c(=O)c2c1",
+            "bind": 0.4743117392063141,
+            "opt": 0.07585542649030685
+          },
+          {
+            "smiles": "Nc1cccnc1SCCc1nc(-c2ccc(S)c(F)c2)n[nH]1",
+            "bind": 0.4541829824447632,
+            "opt": 0.09545537829399109
+          }
+        ]
+      },
+      "gene": "HNRNPK",
+      "role": "query",
+      "domain_len": 463
+    },
+    "ovn-ws1-design-USP7": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5722295045852661,
+        "bindconf_median": 0.3351843059062958,
+        "optscore_max": 0.4001238942146301,
+        "top": [
+          {
+            "smiles": "O=C(Cl)c1cccc(C(=O)Nc2nnc(-c3ncccc3Cl)s2)c1",
+            "bind": 0.5722295045852661,
+            "opt": 0.13779962062835693
+          },
+          {
+            "smiles": "CCCCCCCCCCCCCCCc1nc2cncnc2n1C(C)C",
+            "bind": 0.4628804624080658,
+            "opt": 0.18389245867729187
+          },
+          {
+            "smiles": "O=C(O)c1ccc(NCCNc2ncnc3ccc([N+](=O)[O-])cc23)c([N+](=O)[O-])c1",
+            "bind": 0.45279285311698914,
+            "opt": 0.10475494712591171
+          },
+          {
+            "smiles": "O=[N+]([O-])c1ccc(OCc2coc(C3CC3)n2)c2ncccc12",
+            "bind": 0.4396529793739319,
+            "opt": 0.13767699897289276
+          },
+          {
+            "smiles": "NC(=O)c1ccc(-c2ccc3c(c2)N(C(=O)Nc2ccccc2Br)CCO3)s1",
+            "bind": 0.43925946950912476,
+            "opt": 0.15138421952724457
+          }
+        ]
+      },
+      "gene": "USP7",
+      "role": "partner",
+      "domain_len": 1102
+    },
+    "ovn-ws1-design-KDM1A": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5661543607711792,
+        "bindconf_median": 0.3339996933937073,
+        "optscore_max": 0.3239767551422119,
+        "top": [
+          {
+            "smiles": "COC(=O)c1cc(C#Cc2cccc3cc(C(=O)O)oc23)ccc1OC(F)(F)F",
+            "bind": 0.5661543607711792,
+            "opt": 0.06161213293671608
+          },
+          {
+            "smiles": "COc1c(C#N)ccc2ccsc12",
+            "bind": 0.5040098428726196,
+            "opt": 0.10692112892866135
+          },
+          {
+            "smiles": "Cc1ccc(N(Cc2ccco2)C(=O)c2ccc([N+](=O)[O-])cc2)cc1",
+            "bind": 0.48853957653045654,
+            "opt": 0.18560941517353058
+          },
+          {
+            "smiles": "NCc1cc(NCCc2cccc3nccn23)ccn1",
+            "bind": 0.4141594171524048,
+            "opt": 0.3239767551422119
+          },
+          {
+            "smiles": "NCCCCCC(=O)NCCCCC(Cl)C(=O)O",
+            "bind": 0.40979301929473877,
+            "opt": 0.03194379806518555
+          }
+        ]
+      },
+      "gene": "KDM1A",
+      "role": "partner",
+      "domain_len": 852
+    },
+    "ovn-ws1-design-DOT1L": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5567289590835571,
+        "bindconf_median": 0.25204455852508545,
+        "optscore_max": 0.3317846953868866,
+        "top": [
+          {
+            "smiles": "COC(=O)c1cccc(NC(=O)Nc2ccc(F)c(C(F)(F)F)c2)c1",
+            "bind": 0.5567289590835571,
+            "opt": 0.26151251792907715
+          },
+          {
+            "smiles": "CCOC(=O)c1ccc(NC(=S)Nc2n[nH]c3nccnc23)cc1",
+            "bind": 0.5312737822532654,
+            "opt": 0.15530069172382355
+          },
+          {
+            "smiles": "CC(C)(C)OC(=O)NCc1cccc(-c2nc(-c3ncccc3C(F)(F)F)n[nH]2)c1",
+            "bind": 0.4971884489059448,
+            "opt": 0.21717825531959534
+          },
+          {
+            "smiles": "O=Cc1cccc(NCc2cccc3c(Br)cccc23)c1[N+](=O)[O-]",
+            "bind": 0.4579290449619293,
+            "opt": 0.28312647342681885
+          },
+          {
+            "smiles": "C#Cc1nnn(C(C)CNC(=O)c2ccc(Br)cc2F)n1",
+            "bind": 0.40067028999328613,
+            "opt": 0.1977461874485016
+          }
+        ]
+      },
+      "gene": "DOT1L",
+      "role": "partner",
+      "domain_len": 1537
+    },
+    "ovn-ws1-design-WDR5": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.4026973247528076,
+        "bindconf_median": 0.2063674032688141,
+        "optscore_max": 0.3429553210735321,
+        "top": [
+          {
+            "smiles": "COc1ccc(CNc2ccc([N+](=O)[O-])c(NS(=O)(=O)CCC3CC4(CCC4)CO3)n2)cc1",
+            "bind": 0.4026973247528076,
+            "opt": 0.19159120321273804
+          },
+          {
+            "smiles": "COc1ccc(Oc2ccc(-c3n[nH]c(-c4sccc4N)n3)nc2)cc1",
+            "bind": 0.38194626569747925,
+            "opt": 0.09579060971736908
+          },
+          {
+            "smiles": "Nc1ncc(CC(NC(=O)OCC2c3ccccc3-c3ccccc32)c2nc(C3(O)CNC3)n[nH]2)s1",
+            "bind": 0.3562312424182892,
+            "opt": 0.05018259957432747
+          },
+          {
+            "smiles": "Cc1c(C(C)(C)N)nnn1CC(=O)c1c(N)n(Cc2ccccc2)c(=O)n(C)c1=O",
+            "bind": 0.33883655071258545,
+            "opt": 0.0919141098856926
+          },
+          {
+            "smiles": "CCCC1CCC(OC(=O)c2cc(S(N)(=O)=O)cc(C)c2C)C(OC)C1",
+            "bind": 0.3367479741573334,
+            "opt": 0.17477785050868988
+          }
+        ]
+      },
+      "gene": "WDR5",
+      "role": "partner",
+      "domain_len": 334
+    },
+    "ovn-ws1-design-EP300": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6601137518882751,
+        "bindconf_median": 0.2832006812095642,
+        "optscore_max": 0.32947465777397156,
+        "top": [
+          {
+            "smiles": "CCN(C(=S)NC(=O)c1ccc(F)cc1)c1ccc(Cl)cc1N",
+            "bind": 0.6601137518882751,
+            "opt": 0.21284717321395874
+          },
+          {
+            "smiles": "CCOC(=O)c1cn2cc(C=CC3CC3C(=O)O)ccc2n1",
+            "bind": 0.6258498430252075,
+            "opt": 0.28502124547958374
+          },
+          {
+            "smiles": "COC(=O)C(C)(CNC(=O)c1nccc(C)c1N)NC(=O)OC(C)(C)C",
+            "bind": 0.4916323125362396,
+            "opt": 0.04535378888249397
+          },
+          {
+            "smiles": "O=C1OC(C(F)(F)F)CN1c1cccc2cc(-c3cccc([N+](=O)[O-])c3)[nH]c12",
+            "bind": 0.47815027832984924,
+            "opt": 0.2960250973701477
+          },
+          {
+            "smiles": "C(=Cc1nc2ccccc2n1CCc1ccccc1)c1ccc(-n2ccnc2)cc1",
+            "bind": 0.4739166498184204,
+            "opt": 0.22935107350349426
+          }
+        ]
+      },
+      "gene": "EP300",
+      "role": "partner",
+      "domain_len": 390
+    },
+    "ovn-ws1-design-CREBBP": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.5306327939033508,
+        "bindconf_median": 0.2695845663547516,
+        "optscore_max": 0.3781617283821106,
+        "top": [
+          {
+            "smiles": "Cc1cc(C(=O)c2ccc(S(N)(=O)=O)cc2Br)ccc1OCc1cccc(C(=O)O)c1",
+            "bind": 0.5306327939033508,
+            "opt": 0.27877938747406006
+          },
+          {
+            "smiles": "Cc1cccc(-n2c(SC(=O)C(C(C)C)S(=O)(=O)c3ccc(Br)cc3)nnc2-c2cccc(S(=O)(=O)N(C)C)c2)c1",
+            "bind": 0.510458767414093,
+            "opt": 0.3504266142845154
+          },
+          {
+            "smiles": "CC(C)(C)c1ccc(C(=O)CC(=O)c2c[nH]c3nc(F)ccc23)cc1",
+            "bind": 0.48374420404434204,
+            "opt": 0.1513010859489441
+          },
+          {
+            "smiles": "CCCN(CCC)S(=O)(=O)NC(c1ccc(Cl)cc1)c1cccc(OC)c1",
+            "bind": 0.4071933627128601,
+            "opt": 0.275778591632843
+          },
+          {
+            "smiles": "CCc1ccc(CNc2c([N+](=O)[O-])ccc(Cl)c2C(=O)OC)c(F)c1",
+            "bind": 0.39555421471595764,
+            "opt": 0.29052531719207764
+          }
+        ]
+      },
+      "gene": "CREBBP",
+      "role": "partner",
+      "domain_len": 580
+    },
+    "ovn-ws1-design-RBBP7": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.4774693250656128,
+        "bindconf_median": 0.19940021634101868,
+        "optscore_max": 0.18502329289913177,
+        "top": [
+          {
+            "smiles": "COC(=O)c1cc(C=CCNc2nc(C(=O)[O-])cs2)cc(S(N)(=O)=O)c1",
+            "bind": 0.4774693250656128,
+            "opt": 0.17952296137809753
+          },
+          {
+            "smiles": "Cc1cc(C)c(SC(=O)c2ccc3c(Cl)nccc3c2)s1",
+            "bind": 0.2885119318962097,
+            "opt": 0.1630983054637909
+          },
+          {
+            "smiles": "O=C(c1cnccn1)n1c(-c2ccc3ncccc3n2)nc2ccccc21",
+            "bind": 0.28539466857910156,
+            "opt": 0.10781564563512802
+          },
+          {
+            "smiles": "Cc1ccc(C(CC(=O)OC(C)C)Nc2c(C=O)cc([N+](=O)[O-])c(F)c2Cl)cc1",
+            "bind": 0.27843910455703735,
+            "opt": 0.18502329289913177
+          },
+          {
+            "smiles": "CCn1cc(NC(=S)NC2(c3ccc(Cl)cc3)CCCCC2)cn1",
+            "bind": 0.25798022747039795,
+            "opt": 0.08575569093227386
+          }
+        ]
+      },
+      "gene": "RBBP7",
+      "role": "partner",
+      "domain_len": 425
+    },
+    "ovn-ws1-design-EP400": {
+      "ws": "WS1",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6706814169883728,
+        "bindconf_median": 0.3060510456562042,
+        "optscore_max": 0.331187903881073,
+        "top": [
+          {
+            "smiles": "CC(=O)c1c[nH]c2cc(-c3noc(C=Cc4ccc[nH]4)n3)ccc12",
+            "bind": 0.6706814169883728,
+            "opt": 0.1485045701265335
+          },
+          {
+            "smiles": "Cc1sc(-c2nc(-c3ncc(C(F)(F)F)cc3F)n[nH]2)cc1I",
+            "bind": 0.5800542831420898,
+            "opt": 0.09654419869184494
+          },
+          {
+            "smiles": "N#Cc1ccc(NC(=O)Nc2ccc(OCc3ccccc3)c(F)c2)cc1F",
+            "bind": 0.5752061009407043,
+            "opt": 0.08852570503950119
+          },
+          {
+            "smiles": "CC1CN(Cc2ccccc2)CCC1CNc1c(N)cc(Br)cc1[N+](=O)[O-]",
+            "bind": 0.5014090538024902,
+            "opt": 0.20032234489917755
+          },
+          {
+            "smiles": "CC(C)(C)OC(=O)Nc1ccc(Cn2nnc(-c3ccccn3)c2-c2ccc3c(c2)nc(CCN)n3CC2CC2)nc1",
+            "bind": 0.47705018520355225,
+            "opt": 0.331187903881073
+          }
+        ]
+      },
+      "gene": "EP400",
+      "role": "partner",
+      "domain_len": 550
+    },
+    "ovn-ws2-DOT1L-inh": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.2,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.9580138921737671,
+        "ligand_iptm": 0.946281373500824,
+        "structure_confidence": 0.5586751699447632
+      },
+      "gene": "DOT1L",
+      "tag": "inh",
+      "ligand": "pinometostat"
+    },
+    "ovn-ws2-DOT1L-decoy": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.2,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.21454066038131714,
+        "ligand_iptm": 0.25613170862197876,
+        "structure_confidence": 0.41505953669548035
+      },
+      "gene": "DOT1L",
+      "tag": "decoy",
+      "ligand": "metformin"
+    },
+    "ovn-ws2-KDM1A-inh": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.1,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.39167627692222595,
+        "ligand_iptm": 0.8081974983215332,
+        "structure_confidence": 0.8178592920303345
+      },
+      "gene": "KDM1A",
+      "tag": "inh",
+      "ligand": "tranylcypromine"
+    },
+    "ovn-ws2-KDM1A-decoy": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.1,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.13455407321453094,
+        "ligand_iptm": 0.7576950192451477,
+        "structure_confidence": 0.8109502196311951
+      },
+      "gene": "KDM1A",
+      "tag": "decoy",
+      "ligand": "metformin"
+    },
+    "ovn-ws2-EP300-inh": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.05,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.23011404275894165,
+        "ligand_iptm": 0.9842046499252319,
+        "structure_confidence": 0.924550473690033
+      },
+      "gene": "EP300",
+      "tag": "inh",
+      "ligand": "A-485"
+    },
+    "ovn-ws2-EP300-decoy": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.05,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.12800772488117218,
+        "ligand_iptm": 0.8665792942047119,
+        "structure_confidence": 0.8934176564216614
+      },
+      "gene": "EP300",
+      "tag": "decoy",
+      "ligand": "metformin"
+    },
+    "ovn-ws2-CREBBP-inh": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.1,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.27407702803611755,
+        "ligand_iptm": 0.9692787528038025,
+        "structure_confidence": 0.906547486782074
+      },
+      "gene": "CREBBP",
+      "tag": "inh",
+      "ligand": "A-485"
+    },
+    "ovn-ws2-CREBBP-decoy": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.1,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.13424460589885712,
+        "ligand_iptm": 0.8436223864555359,
+        "structure_confidence": 0.8814037442207336
+      },
+      "gene": "CREBBP",
+      "tag": "decoy",
+      "ligand": "metformin"
+    },
+    "ovn-ws2-WDR5-inh": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.05,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.9760947227478027,
+        "ligand_iptm": 0.9814594984054565,
+        "structure_confidence": 0.9655429124832153
+      },
+      "gene": "WDR5",
+      "tag": "inh",
+      "ligand": "OICR-9429"
+    },
+    "ovn-ws2-WDR5-decoy": {
+      "ws": "WS2",
+      "status": "done",
+      "est": 0.05,
+      "kind": "sb",
+      "metrics": {
+        "binding_confidence": 0.49284180998802185,
+        "ligand_iptm": 0.9709514379501343,
+        "structure_confidence": 0.9571332335472107
+      },
+      "gene": "WDR5",
+      "tag": "decoy",
+      "ligand": "metformin"
+    },
+    "ovn-ws3-STXBP1-Syntaxin1A": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.7893280386924744,
+        "binding_confidence": 0.08524962514638901,
+        "ptm": null,
+        "structure_confidence": 4.671680642331921e-08
+      },
+      "label": "STXBP1\u2194Syntaxin1A",
+      "role": "pos"
+    },
+    "ovn-ws3-STXBP1-STMN2": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.5781170725822449,
+        "binding_confidence": 1.4376818398886826e-05,
+        "ptm": null,
+        "structure_confidence": 5.768248725890324e-12
+      },
+      "label": "STXBP1\u2194STMN2",
+      "role": "test"
+    },
+    "ovn-ws3-RPS17-USP7-TRAF": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.05,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.773908257484436,
+        "binding_confidence": 0.011749261990189552,
+        "ptm": null,
+        "structure_confidence": 0.17345288395881653
+      },
+      "label": "RPS17\u2194USP7-TRAF",
+      "role": "test"
+    },
+    "ovn-ws3-WDR26-RMND5A": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.2,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.3293757438659668,
+        "binding_confidence": 0.09330230951309204,
+        "ptm": null,
+        "structure_confidence": 2.4009836003049956e-13
+      },
+      "label": "WDR26\u2194RMND5A",
+      "role": "test"
+    },
+    "ovn-ws3-WDR26-MAEA": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.2,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.6975804567337036,
+        "binding_confidence": 0.13555006682872772,
+        "ptm": null,
+        "structure_confidence": 2.4429147940652207e-12
+      },
+      "label": "WDR26\u2194MAEA",
+      "role": "test"
+    },
+    "ovn-ws3-TSC2gap-RHEB": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.05,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.42987585067749023,
+        "binding_confidence": 4.853796326642623e-06,
+        "ptm": null,
+        "structure_confidence": 0.004674592986702919
+      },
+      "label": "TSC2gap\u2194RHEB",
+      "role": "test"
+    },
+    "ovn-ws3-PTEN-STMN2-neg-": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.5495359897613525,
+        "binding_confidence": 0.0011405708501115441,
+        "ptm": null,
+        "structure_confidence": 2.110896873963597e-10
+      },
+      "label": "PTEN\u2194STMN2(neg)",
+      "role": "neg"
+    },
+    "ovn-ws3-RPS17-STMN2-neg-": {
+      "ws": "WS3",
+      "status": "done",
+      "est": 0.05,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.4188540279865265,
+        "binding_confidence": 0.06344551593065262,
+        "ptm": null,
+        "structure_confidence": 1.586425851796136e-10
+      },
+      "label": "RPS17\u2194STMN2(neg)",
+      "role": "neg"
+    },
+    "ovn-ws4-design-TSC2_GAP": {
+      "ws": "WS4",
+      "status": "done",
+      "est": 0.6,
+      "kind": "design",
+      "metrics": {
+        "n": 24,
+        "bindconf_max": 0.6450149416923523,
+        "bindconf_median": 0.3349929749965668,
+        "optscore_max": 0.4248645007610321,
+        "top": [
+          {
+            "smiles": "FC(F)c1c(Cl)ccnc1C=CCNC(=S)NN=C(Cc1ccccc1)c1ccccn1",
+            "bind": 0.6450149416923523,
+            "opt": 0.3086170256137848
+          },
+          {
+            "smiles": "O=C(O)C1Nc2c(NCc3cccc4ccsc34)ccc([N+](=O)[O-])c2C2C=CCC12",
+            "bind": 0.6439098119735718,
+            "opt": 0.4248645007610321
+          },
+          {
+            "smiles": "CC1CCc2c(sc3nc(SC(=O)c4cc(CNC(=O)OCC5c6ccccc6-c6ccccc65)ccc4F)n(Cc4ccco4)c(=O)c23)C1",
+            "bind": 0.5307631492614746,
+            "opt": 0.419979453086853
+          },
+          {
+            "smiles": "CC(C)(C)OC(=O)Nc1cccc(C(Br)C(=O)O)c1Cl",
+            "bind": 0.48207879066467285,
+            "opt": 0.11597538739442825
+          },
+          {
+            "smiles": "O=C(NC(=S)Nc1nc(Cl)cc(C(F)(F)F)n1)c1ccccc1F",
+            "bind": 0.43065643310546875,
+            "opt": 0.23388414084911346
+          }
+        ]
+      },
+      "gene": "TSC2-GAP",
+      "role": "deep",
+      "domain_len": 230
+    },
+    "ovn-ws5-design48-TSC2_GAP": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 1.2,
+      "kind": "design",
+      "metrics": {
+        "n": 48,
+        "bindconf_max": 0.5554366707801819,
+        "bindconf_median": 0.24299034476280212,
+        "optscore_max": 0.3844435513019562,
+        "top": [
+          {
+            "smiles": "COC(=O)c1c(Br)ccc(Br)c1NS(=O)(=O)Cc1ccccc1[N+](=O)[O-]",
+            "bind": 0.5554366707801819,
+            "opt": 0.18147438764572144
+          },
+          {
+            "smiles": "C=CCC(CC=C)C(=O)c1ccc2c(c1)C(=O)N(CCc1c[nH]c3ccccc13)C2=O",
+            "bind": 0.5446369647979736,
+            "opt": 0.3586468994617462
+          },
+          {
+            "smiles": "C=C(Br)CN(CC=Cc1cnc(Cl)nc1OCC)C(=O)OC(C)(C)C",
+            "bind": 0.5032015442848206,
+            "opt": 0.29051315784454346
+          },
+          {
+            "smiles": "N#Cc1cc(F)c2c(c1F)C(=O)C(=O)N2",
+            "bind": 0.5006794929504395,
+            "opt": 0.2133372575044632
+          },
+          {
+            "smiles": "COC(=O)C(CC(Cl)n1nnc(Cc2ccc(Br)cc2I)n1)N(C(=O)OC(C)(C)C)C(=O)OC(C)(C)C",
+            "bind": 0.48748573660850525,
+            "opt": 0.2612028121948242
+          }
+        ]
+      },
+      "gene": "TSC2-GAP",
+      "role": "deep-deepen",
+      "domain_len": 230
+    },
+    "ovn-ws5-design48-WDR26": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 1.2,
+      "kind": "design",
+      "metrics": {
+        "n": 48,
+        "bindconf_max": 0.44277673959732056,
+        "bindconf_median": 0.22365081310272217,
+        "optscore_max": 0.27514761686325073,
+        "top": [
+          {
+            "smiles": "Cc1sc(NC(=O)NCC2C=CCC2)nc1-c1ccc2c(c1)OCO2",
+            "bind": 0.44277673959732056,
+            "opt": 0.12389609217643738
+          },
+          {
+            "smiles": "COC(=O)c1nc(C2OCCO2)c(-c2nc3cc(Cl)ccc3s2)s1",
+            "bind": 0.3836369514465332,
+            "opt": 0.15207108855247498
+          },
+          {
+            "smiles": "N#Cc1ccc(CCNc2ncnc3nc[nH]c23)c(Cl)c1",
+            "bind": 0.3646421432495117,
+            "opt": 0.13759420812129974
+          },
+          {
+            "smiles": "NCC1CCC(C#Cc2ccccc2CNCCn2ccnc2)CC1",
+            "bind": 0.3566746115684509,
+            "opt": 0.10426364839076996
+          },
+          {
+            "smiles": "COC(=O)c1cc(C#CC2CCC(N)C2)cc(S(=O)(=O)F)c1",
+            "bind": 0.3476119339466095,
+            "opt": 0.12660977244377136
+          }
+        ]
+      },
+      "gene": "WDR26",
+      "role": "deep-deepen",
+      "domain_len": 661
+    },
+    "ovn-ws5-HNRNPK-USP7-TRAF": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.6521230936050415,
+        "binding_confidence": 0.001928639248944819,
+        "ptm": null,
+        "structure_confidence": 0.01091152522712946
+      },
+      "label": "HNRNPK\u2194USP7-TRAF",
+      "role": "test"
+    },
+    "ovn-ws5-STXBP1-USP7-TRAF": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.4805505871772766,
+        "binding_confidence": 0.0013835818972438574,
+        "ptm": null,
+        "structure_confidence": 1.4074790669837967e-05
+      },
+      "label": "STXBP1\u2194USP7-TRAF",
+      "role": "test"
+    },
+    "ovn-ws5-PTEN-USP7-TRAF": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.6789251565933228,
+        "binding_confidence": 0.0057060872204601765,
+        "ptm": null,
+        "structure_confidence": 0.0042991675436496735
+      },
+      "label": "PTEN\u2194USP7-TRAF",
+      "role": "test"
+    },
+    "ovn-ws5-KCNQ2-STXBP1-neg-size-": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.28977447748184204,
+        "binding_confidence": 0.07987663894891739,
+        "ptm": null,
+        "structure_confidence": 2.7053921050694237e-15
+      },
+      "label": "KCNQ2\u2194STXBP1(neg-size)",
+      "role": "test"
+    },
+    "ovn-ws5-TSC2gap-TBC1D7": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.29102903604507446,
+        "binding_confidence": 9.297059477830771e-06,
+        "ptm": null,
+        "structure_confidence": 3.457519826000066e-10
+      },
+      "label": "TSC2gap\u2194TBC1D7",
+      "role": "test"
+    },
+    "ovn-ws5-WDR26-GID8": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.557949423789978,
+        "binding_confidence": 0.13652722537517548,
+        "ptm": null,
+        "structure_confidence": 3.302799456150751e-08
+      },
+      "label": "WDR26\u2194GID8",
+      "role": "test"
+    },
+    "ovn-ws5-HNRNPK-STMN2-neg-": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.1491796374320984,
+        "binding_confidence": 0.09745423495769501,
+        "ptm": null,
+        "structure_confidence": 1.7671186237390446e-13
+      },
+      "label": "HNRNPK\u2194STMN2(neg)",
+      "role": "neg"
+    },
+    "ovn-ws5-PTEN-TBC1D7-neg-": {
+      "ws": "WS5",
+      "status": "done",
+      "est": 0.1,
+      "kind": "screen",
+      "metrics": {
+        "iptm": 0.17590436339378357,
+        "binding_confidence": 0.0009417919209226966,
+        "ptm": null,
+        "structure_confidence": 1.4190702835037428e-08
+      },
+      "label": "PTEN\u2194TBC1D7(neg)",
+      "role": "neg"
+    }
+  },
+  "spent_est": 18.85
+}

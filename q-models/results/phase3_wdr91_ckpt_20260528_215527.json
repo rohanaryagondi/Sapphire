@@ -1,0 +1,30 @@
+{
+  "timestamp": "20260528_215527",
+  "ckpt_head_trained": false,
+  "ckpt_info": {
+    "n_keys": 294,
+    "has_head": true,
+    "head_allclose_base": true,
+    "head_max_abs_diff_vs_base": 0.0,
+    "head_norm_ckpt": 0.5688846111297607,
+    "head_norm_base": 0.5688846111297607,
+    "bias_ckpt": -0.014453362673521042,
+    "bias_base": -0.014453362673521042,
+    "encoder_relL2_vs_base": 0.02350916899740696
+  },
+  "live_head_norm": 0.56888,
+  "smiles_only": {
+    "auroc": 0.4339,
+    "auroc_flipped": 0.5661,
+    "median_active": -0.0121,
+    "median_decoy": 0.0188,
+    "spearman_score_vs_pKd": -0.331
+  },
+  "protein_smiles": {
+    "auroc": 0.5621,
+    "auroc_flipped": 0.4379,
+    "median_active": 0.0293,
+    "median_decoy": 0.0279,
+    "spearman_score_vs_pKd": 0.121
+  }
+}

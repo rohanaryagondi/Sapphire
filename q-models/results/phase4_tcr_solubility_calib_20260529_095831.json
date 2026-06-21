@@ -1,0 +1,19 @@
+{
+  "timestamp": "20260529_095831",
+  "TCR_epitope": {
+    "n": 200,
+    "pos_rate": 0.5,
+    "auroc": 0.9592,
+    "saturation_frac": 0.28,
+    "TPR_at_0.5": 0.94,
+    "TNR_at_0.5": 0.79
+  },
+  "protein_solubility": {
+    "n": 199,
+    "pos_rate": 0.563,
+    "auroc": 0.8503,
+    "saturation_frac": 0.166,
+    "TPR_at_0.5": 0.616,
+    "TNR_at_0.5": 0.839
+  }
+}

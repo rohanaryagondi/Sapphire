@@ -1,0 +1,185 @@
+{
+  "test": "prostt5_layer_sweep_crispr_n_panel",
+  "timestamp": "2026-06-12T15:52:51.516591",
+  "model": "Rostlab/ProstT5",
+  "n_hidden_states": 25,
+  "embedding_dim": 1024,
+  "last_layer_nn": {
+    "raw": 0.725,
+    "centered": 0.7
+  },
+  "best_layer": {
+    "idx": 11,
+    "nn_raw": 0.825,
+    "nn_centered": 0.75,
+    "used": "raw",
+    "per_family_nn_recall": {
+      "kinase": 1.0,
+      "gpcr": 1.0,
+      "ion_channel": 0.875,
+      "nuclear_receptor": 0.6666666666666666,
+      "e3_ligase": 0.5,
+      "lipid_kinase": 0.0,
+      "phosphatase": 0.0
+    }
+  },
+  "per_layer": [
+    {
+      "idx": 0,
+      "nn_raw": 0.575,
+      "nn_centered": 0.525,
+      "best": 0.575
+    },
+    {
+      "idx": 1,
+      "nn_raw": 0.625,
+      "nn_centered": 0.65,
+      "best": 0.65
+    },
+    {
+      "idx": 2,
+      "nn_raw": 0.625,
+      "nn_centered": 0.675,
+      "best": 0.675
+    },
+    {
+      "idx": 3,
+      "nn_raw": 0.7,
+      "nn_centered": 0.6,
+      "best": 0.7
+    },
+    {
+      "idx": 4,
+      "nn_raw": 0.725,
+      "nn_centered": 0.65,
+      "best": 0.725
+    },
+    {
+      "idx": 5,
+      "nn_raw": 0.75,
+      "nn_centered": 0.7,
+      "best": 0.75
+    },
+    {
+      "idx": 6,
+      "nn_raw": 0.725,
+      "nn_centered": 0.7,
+      "best": 0.725
+    },
+    {
+      "idx": 7,
+      "nn_raw": 0.8,
+      "nn_centered": 0.725,
+      "best": 0.8
+    },
+    {
+      "idx": 8,
+      "nn_raw": 0.775,
+      "nn_centered": 0.7,
+      "best": 0.775
+    },
+    {
+      "idx": 9,
+      "nn_raw": 0.725,
+      "nn_centered": 0.7,
+      "best": 0.725
+    },
+    {
+      "idx": 10,
+      "nn_raw": 0.775,
+      "nn_centered": 0.725,
+      "best": 0.775
+    },
+    {
+      "idx": 11,
+      "nn_raw": 0.825,
+      "nn_centered": 0.75,
+      "best": 0.825
+    },
+    {
+      "idx": 12,
+      "nn_raw": 0.775,
+      "nn_centered": 0.75,
+      "best": 0.775
+    },
+    {
+      "idx": 13,
+      "nn_raw": 0.8,
+      "nn_centered": 0.75,
+      "best": 0.8
+    },
+    {
+      "idx": 14,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "idx": 15,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "idx": 16,
+      "nn_raw": 0.8,
+      "nn_centered": 0.8,
+      "best": 0.8
+    },
+    {
+      "idx": 17,
+      "nn_raw": 0.775,
+      "nn_centered": 0.775,
+      "best": 0.775
+    },
+    {
+      "idx": 18,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "idx": 19,
+      "nn_raw": 0.8,
+      "nn_centered": 0.775,
+      "best": 0.8
+    },
+    {
+      "idx": 20,
+      "nn_raw": 0.775,
+      "nn_centered": 0.725,
+      "best": 0.775
+    },
+    {
+      "idx": 21,
+      "nn_raw": 0.75,
+      "nn_centered": 0.725,
+      "best": 0.75
+    },
+    {
+      "idx": 22,
+      "nn_raw": 0.7,
+      "nn_centered": 0.725,
+      "best": 0.725
+    },
+    {
+      "idx": 23,
+      "nn_raw": 0.7,
+      "nn_centered": 0.675,
+      "best": 0.7
+    },
+    {
+      "idx": 24,
+      "nn_raw": 0.725,
+      "nn_centered": 0.7,
+      "best": 0.725
+    }
+  ],
+  "references": {
+    "esm2_650M_best": 0.875,
+    "mammal_best": 0.85,
+    "esmc_600M_best": 0.825,
+    "saprot_gpcr": 1.0,
+    "bar": 0.8
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "timestamp": "20260607_124159",
+  "test": "named_suze_nav18",
+  "metric": "named_beats_all_negatives",
+  "bar": "binary (named strictly > all 6 negatives)",
+  "n_named": 1,
+  "n_negatives": 6,
+  "cells": {
+    "MAMMAL": {
+      "value": "FAIL",
+      "z_margin": -0.691,
+      "named_raw": 7.00465,
+      "max_negative_raw": 7.60063,
+      "per_pair": {
+        "suzetrigine\u2192Nav1.8": 7.00465,
+        "suzetrigine\u2192CA2": 7.0937,
+        "suzetrigine\u2192DHFR": 6.26672,
+        "suzetrigine\u2192ACHE": 4.92446,
+        "metformin\u2192Nav1.8": 6.47222,
+        "caffeine\u2192Nav1.8": 6.95543,
+        "ibuprofen\u2192Nav1.8": 7.60063
+      },
+      "seq_handling": "DTI truncates target to 1250 aa"
+    },
+    "ConPLex": {
+      "value": "FAIL",
+      "z_margin": -2.346,
+      "named_raw": 0.04722,
+      "max_negative_raw": 0.26101,
+      "per_pair": {
+        "suzetrigine\u2192Nav1.8": 0.04722,
+        "suzetrigine\u2192CA2": 0.01461,
+        "suzetrigine\u2192DHFR": 0.03391,
+        "suzetrigine\u2192ACHE": 0.00253,
+        "metformin\u2192Nav1.8": 0.14004,
+        "caffeine\u2192Nav1.8": 0.07776,
+        "ibuprofen\u2192Nav1.8": 0.26101
+      },
+      "seq_handling": "ConPLex internal cap"
+    },
+    "Boltz-2": {
+      "value": "N/A \u2014 pending AWS"
+    }
+  }
+}

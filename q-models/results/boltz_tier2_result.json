@@ -1,0 +1,651 @@
+{
+  "T4_adme": [
+    {
+      "id": "suzetrigine",
+      "status": "succeeded",
+      "lipophilicity": 3.4700047969818115,
+      "permeability": 1.1773909330368042,
+      "solubility": "medium-confidence"
+    },
+    {
+      "id": "A-803467",
+      "status": "succeeded",
+      "lipophilicity": 3.822329521179199,
+      "permeability": 0.866104781627655,
+      "solubility": "high-risk"
+    },
+    {
+      "id": "lidocaine",
+      "status": "succeeded",
+      "lipophilicity": 0.7470861077308655,
+      "permeability": 1.6197147369384766,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "mexiletine",
+      "status": "succeeded",
+      "lipophilicity": 0.47805166244506836,
+      "permeability": 1.728581428527832,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "ranolazine",
+      "status": "succeeded",
+      "lipophilicity": 2.586458206176758,
+      "permeability": 1.0845990180969238,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "carbamazepine",
+      "status": "succeeded",
+      "lipophilicity": 2.831613779067993,
+      "permeability": 1.0294711589813232,
+      "solubility": "medium-confidence"
+    },
+    {
+      "id": "lacosamide",
+      "status": "succeeded",
+      "lipophilicity": 0.5451398491859436,
+      "permeability": 1.2765017747879028,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "metformin",
+      "status": "succeeded",
+      "lipophilicity": -1.0643311738967896,
+      "permeability": -0.5360164642333984,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "caffeine",
+      "status": "succeeded",
+      "lipophilicity": -0.21463100612163544,
+      "permeability": 1.35556960105896,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "ibuprofen",
+      "status": "succeeded",
+      "lipophilicity": -1.0705333948135376,
+      "permeability": 0.9460835456848145,
+      "solubility": "high-confidence"
+    },
+    {
+      "id": "atenolol",
+      "status": "succeeded",
+      "lipophilicity": -1.14658522605896,
+      "permeability": -0.2921163737773895,
+      "solubility": "high-confidence"
+    }
+  ],
+  "T5_submitted": 51,
+  "T5_returned": 44,
+  "T5_dropped": [
+    "act-12-p8.8",
+    "inact-17-p4.8",
+    "inact-2-p4.3",
+    "inact-5-p4.6",
+    "inact-6-p4.6",
+    "panel-carbamazepine",
+    "panel-metformin"
+  ],
+  "T5_auroc_optimization_score": 0.8084,
+  "T5_auroc_binding_confidence": 0.6779,
+  "T5_auroc_iptm": 0.52,
+  "T5_auroc_optscore_panel": 0.8889,
+  "T5_n_panel": 9,
+  "T5_auroc_optscore_chembl": 0.8586,
+  "T5_n_chembl": 35,
+  "T5_rows": [
+    {
+      "id": "act-11-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.4155268371105194,
+      "binding_confidence": 0.21162857115268707,
+      "iptm": 0.6038298010826111
+    },
+    {
+      "id": "act-17-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.37055256962776184,
+      "binding_confidence": 0.1937871277332306,
+      "iptm": 0.49149760603904724
+    },
+    {
+      "id": "act-3-p9.1",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.3664986193180084,
+      "binding_confidence": 0.32750755548477173,
+      "iptm": 0.5518829226493835
+    },
+    {
+      "id": "act-9-p8.9",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.3603758215904236,
+      "binding_confidence": 0.1897888481616974,
+      "iptm": 0.4592011570930481
+    },
+    {
+      "id": "inact-15-p4.8",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.3242720663547516,
+      "binding_confidence": 0.23759831488132477,
+      "iptm": 0.41515979170799255
+    },
+    {
+      "id": "act-2-p9.3",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.31265899538993835,
+      "binding_confidence": 0.32180458307266235,
+      "iptm": 0.4731699526309967
+    },
+    {
+      "id": "act-4-p9.1",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.31191182136535645,
+      "binding_confidence": 0.38416188955307007,
+      "iptm": 0.43341636657714844
+    },
+    {
+      "id": "act-1-p9.4",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.3068174421787262,
+      "binding_confidence": 0.2626994252204895,
+      "iptm": 0.5865180492401123
+    },
+    {
+      "id": "act-18-p8.7",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.3060392141342163,
+      "binding_confidence": 0.24622558057308197,
+      "iptm": 0.48310837149620056
+    },
+    {
+      "id": "inact-8-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.2975502014160156,
+      "binding_confidence": 0.37680375576019287,
+      "iptm": 0.4652557373046875
+    },
+    {
+      "id": "act-16-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2890912592411041,
+      "binding_confidence": 0.19260548055171967,
+      "iptm": 0.4912275969982147
+    },
+    {
+      "id": "act-7-p9.0",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2766576111316681,
+      "binding_confidence": 0.1915311962366104,
+      "iptm": 0.46898365020751953
+    },
+    {
+      "id": "panel-ranolazine",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0.27570196986198425,
+      "binding_confidence": 0.328837513923645,
+      "iptm": 0.5574806928634644
+    },
+    {
+      "id": "act-8-p9.0",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2718466818332672,
+      "binding_confidence": 0.23973576724529266,
+      "iptm": 0.5092583894729614
+    },
+    {
+      "id": "panel-A-803467",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0.2671546936035156,
+      "binding_confidence": 0.5871864557266235,
+      "iptm": 0.4835379123687744
+    },
+    {
+      "id": "act-13-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2652215361595154,
+      "binding_confidence": 0.35302478075027466,
+      "iptm": 0.5278217792510986
+    },
+    {
+      "id": "act-15-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2592064142227173,
+      "binding_confidence": 0.30702856183052063,
+      "iptm": 0.521100640296936
+    },
+    {
+      "id": "inact-12-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.2568266689777374,
+      "binding_confidence": 0.30431658029556274,
+      "iptm": 0.5226629376411438
+    },
+    {
+      "id": "inact-18-p4.8",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.2475290298461914,
+      "binding_confidence": 0.159857377409935,
+      "iptm": 0.5437867641448975
+    },
+    {
+      "id": "act-19-p8.7",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.24305255711078644,
+      "binding_confidence": 0.26724156737327576,
+      "iptm": 0.5578479170799255
+    },
+    {
+      "id": "act-0-p9.5",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2411593496799469,
+      "binding_confidence": 0.3177611529827118,
+      "iptm": 0.42185071110725403
+    },
+    {
+      "id": "panel-suzetrigine",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0.23994922637939453,
+      "binding_confidence": 0.3310624361038208,
+      "iptm": 0.4585281312465668
+    },
+    {
+      "id": "act-14-p8.8",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.2309068739414215,
+      "binding_confidence": 0.30562713742256165,
+      "iptm": 0.4933781623840332
+    },
+    {
+      "id": "act-6-p9.0",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.22013983130455017,
+      "binding_confidence": 0.5996168851852417,
+      "iptm": 0.4297131597995758
+    },
+    {
+      "id": "inact-16-p4.8",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.21946389973163605,
+      "binding_confidence": 0.22004342079162598,
+      "iptm": 0.4316592514514923
+    },
+    {
+      "id": "inact-1-p4.2",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.21606934070587158,
+      "binding_confidence": 0.4570956528186798,
+      "iptm": 0.5536646842956543
+    },
+    {
+      "id": "panel-mexiletine",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0.2157958298921585,
+      "binding_confidence": 0.4564265310764313,
+      "iptm": 0.5954612493515015
+    },
+    {
+      "id": "act-10-p8.9",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.21432264149188995,
+      "binding_confidence": 0.30695462226867676,
+      "iptm": 0.5305839776992798
+    },
+    {
+      "id": "inact-9-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.21288184821605682,
+      "binding_confidence": 0.44022902846336365,
+      "iptm": 0.5432842969894409
+    },
+    {
+      "id": "act-5-p9.1",
+      "label": 1,
+      "src": "chembl_active",
+      "optimization_score": 0.20735742151737213,
+      "binding_confidence": 0.2107556313276291,
+      "iptm": 0.4641970992088318
+    },
+    {
+      "id": "inact-19-p4.8",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.20726624131202698,
+      "binding_confidence": 0.20918159186840057,
+      "iptm": 0.4765956401824951
+    },
+    {
+      "id": "inact-13-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.17419201135635376,
+      "binding_confidence": 0.20297938585281372,
+      "iptm": 0.4906134009361267
+    },
+    {
+      "id": "inact-4-p4.5",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.17380061745643616,
+      "binding_confidence": 0.16922450065612793,
+      "iptm": 0.47826439142227173
+    },
+    {
+      "id": "inact-10-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.17062267661094666,
+      "binding_confidence": 0.1408156007528305,
+      "iptm": 0.49092400074005127
+    },
+    {
+      "id": "inact-11-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.1607612818479538,
+      "binding_confidence": 0.21921202540397644,
+      "iptm": 0.5049630999565125
+    },
+    {
+      "id": "inact-14-p4.8",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.14480720460414886,
+      "binding_confidence": 0.15643900632858276,
+      "iptm": 0.499894380569458
+    },
+    {
+      "id": "inact-7-p4.7",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.1167285293340683,
+      "binding_confidence": 0.10536598414182663,
+      "iptm": 0.4335174560546875
+    },
+    {
+      "id": "inact-3-p4.5",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.08098623156547546,
+      "binding_confidence": 0.43596506118774414,
+      "iptm": 0.48683735728263855
+    },
+    {
+      "id": "inact-0-p4.0",
+      "label": 0,
+      "src": "chembl_inactive",
+      "optimization_score": 0.07368098199367523,
+      "binding_confidence": 0.09877605736255646,
+      "iptm": 0.5394039154052734
+    },
+    {
+      "id": "panel-lidocaine",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0.015524320304393768,
+      "binding_confidence": 0.08663070201873779,
+      "iptm": 0.5482247471809387
+    },
+    {
+      "id": "panel-atenolol",
+      "label": 0,
+      "src": "panel",
+      "optimization_score": 0.0011081695556640625,
+      "binding_confidence": 0.04453250765800476,
+      "iptm": 0.5369343161582947
+    },
+    {
+      "id": "panel-lacosamide",
+      "label": 1,
+      "src": "panel",
+      "optimization_score": 0,
+      "binding_confidence": 0.0371520034968853,
+      "iptm": 0.49852460622787476
+    },
+    {
+      "id": "panel-caffeine",
+      "label": 0,
+      "src": "panel",
+      "optimization_score": 0,
+      "binding_confidence": 0.10363627970218658,
+      "iptm": 0.5533527135848999
+    },
+    {
+      "id": "panel-ibuprofen",
+      "label": 0,
+      "src": "panel",
+      "optimization_score": 0,
+      "binding_confidence": 0.091469906270504,
+      "iptm": 0.5119091868400574
+    }
+  ],
+  "T6_n": 24,
+  "T6_valid": 24,
+  "T6_novel_scaffold": 22,
+  "T6_median_max_tanimoto": 0.192,
+  "T6_generated": [
+    {
+      "smiles": "C#CCNC(=O)c1ccc(N2CCc3c([nH]c4ccc(OC)cc34)C2c2cccc3ccccc23)nc1",
+      "optimization_score": 0.3534024953842163,
+      "binding_confidence": 0.6022590398788452,
+      "valid": true,
+      "max_tanimoto_to_known": 0.202,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CCOC(=O)C(Cc1ccc2ccccc2n1)c1n[nH]c(C2(F)CN(C(=O)OC(C)(C)C)CC2C2CC2)n1",
+      "optimization_score": 0.3014449179172516,
+      "binding_confidence": 0.31267014145851135,
+      "valid": true,
+      "max_tanimoto_to_known": 0.162,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CCOc1cc(Cc2n[nH]c(C(=O)C=Cc3cccnc3)n2)cc(Br)c1OCC(F)(F)F",
+      "optimization_score": 0.2921198308467865,
+      "binding_confidence": 0.3358954191207886,
+      "valid": true,
+      "max_tanimoto_to_known": 0.237,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CCCn1c(C(F)(F)F)ccc(NC(=S)NCc2ccccc2Cl)c1=O",
+      "optimization_score": 0.27912354469299316,
+      "binding_confidence": 0.5430701971054077,
+      "valid": true,
+      "max_tanimoto_to_known": 0.282,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CCOC(=O)C(c1n[nH]c(CSc2nnc(-c3ccc(C(C)(C)C)cc3)n2-c2ccc(OC)cc2)n1)C1CC1",
+      "optimization_score": 0.26186424493789673,
+      "binding_confidence": 0.5402200818061829,
+      "valid": true,
+      "max_tanimoto_to_known": 0.253,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC(c1cccnc1Cl)n1cc(-c2ccc(C=O)c(F)c2)nn1",
+      "optimization_score": 0.24740231037139893,
+      "binding_confidence": 0.14874106645584106,
+      "valid": true,
+      "max_tanimoto_to_known": 0.222,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC(C)(C)N(Cc1ccc(F)cc1)c1c(F)cc([N+](=O)[O-])cc1Br",
+      "optimization_score": 0.23182491958141327,
+      "binding_confidence": 0.4802079200744629,
+      "valid": true,
+      "max_tanimoto_to_known": 0.148,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "O=C(OCc1ccccc1)N1CCC(S(=O)(=O)Nc2ccc(OC3CCC3)cc2)C1",
+      "optimization_score": 0.22460344433784485,
+      "binding_confidence": 0.39362001419067383,
+      "valid": true,
+      "max_tanimoto_to_known": 0.192,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC1CN(C(=O)OC(C)(C)C)CC1NS(=O)(=O)Cc1cc(Cl)cc(Br)c1",
+      "optimization_score": 0.20515456795692444,
+      "binding_confidence": 0.33944061398506165,
+      "valid": true,
+      "max_tanimoto_to_known": 0.183,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "C#Cc1cncc(-c2n[nH]c(-c3nc(CNC(=O)OCc4ccccc4)n[nH]3)n2)c1",
+      "optimization_score": 0.19363658130168915,
+      "binding_confidence": 0.2085382640361786,
+      "valid": true,
+      "max_tanimoto_to_known": 0.315,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC(C)(C)OCC(=O)c1cc(S(=O)[O-])c(Cl)cc1OC(F)F",
+      "optimization_score": 0.17546655237674713,
+      "binding_confidence": 0.18613341450691223,
+      "valid": true,
+      "max_tanimoto_to_known": 0.203,
+      "novel_scaffold": false
+    },
+    {
+      "smiles": "CC(C)(C)OC(=O)NCc1cc(-c2nc(CC(=O)NC3CC3)no2)cs1",
+      "optimization_score": 0.16517779231071472,
+      "binding_confidence": 0.10636229813098907,
+      "valid": true,
+      "max_tanimoto_to_known": 0.179,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CCc1ncnc(Br)c1F",
+      "optimization_score": 0.15511487424373627,
+      "binding_confidence": 0.08339838683605194,
+      "valid": true,
+      "max_tanimoto_to_known": 0.159,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "NC1(C(=O)c2ccccc2C(=O)N2CCCNCC2)CCSC1",
+      "optimization_score": 0.13262218236923218,
+      "binding_confidence": 0.04344124719500542,
+      "valid": true,
+      "max_tanimoto_to_known": 0.172,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "COc1ccc(S(=O)(=O)N(Cc2ccccc2)CC(Cl)C(=O)O)cc1",
+      "optimization_score": 0.12139914929866791,
+      "binding_confidence": 0.14091888070106506,
+      "valid": true,
+      "max_tanimoto_to_known": 0.267,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC(C)(C)OC(=O)N1CC1CCl",
+      "optimization_score": 0.11660641431808472,
+      "binding_confidence": 0.20312175154685974,
+      "valid": true,
+      "max_tanimoto_to_known": 0.145,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CNC(=O)NCCC(=O)OCC1=CCC(C(C)=Cc2ccnc3cc(O)ccc23)CC1",
+      "optimization_score": 0.11463845521211624,
+      "binding_confidence": 0.30441194772720337,
+      "valid": true,
+      "max_tanimoto_to_known": 0.157,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CNC(=O)COc1c(Cl)cc(Br)c(O)c1C(=O)O",
+      "optimization_score": 0.10489559918642044,
+      "binding_confidence": 0.242318794131279,
+      "valid": true,
+      "max_tanimoto_to_known": 0.195,
+      "novel_scaffold": false
+    },
+    {
+      "smiles": "COC(=O)c1cn(Cc2ccccc2)nc1NC(=O)NC1CCOC1",
+      "optimization_score": 0.1042848527431488,
+      "binding_confidence": 0.10284163057804108,
+      "valid": true,
+      "max_tanimoto_to_known": 0.225,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "NNC(=O)CC(n1nncc1-c1cc(F)c(N)c(F)c1)C(F)(F)F",
+      "optimization_score": 0.09884562343358994,
+      "binding_confidence": 0.11315672099590302,
+      "valid": true,
+      "max_tanimoto_to_known": 0.189,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "CC(C)N1CC(CNS(=O)(=O)CC23CCC(CO2)C3)CC1=O",
+      "optimization_score": 0.07752513885498047,
+      "binding_confidence": 0.014584999531507492,
+      "valid": true,
+      "max_tanimoto_to_known": 0.155,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "Cc1nn(C)c(OC(=O)CCCP(=O)(O)O)c1F",
+      "optimization_score": 0,
+      "binding_confidence": 0.08573958277702332,
+      "valid": true,
+      "max_tanimoto_to_known": 0.165,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "COC(=O)C(Cn1cncn1)Nc1ncccc1C=CC(=O)O",
+      "optimization_score": 0,
+      "binding_confidence": 0.11979949474334717,
+      "valid": true,
+      "max_tanimoto_to_known": 0.211,
+      "novel_scaffold": true
+    },
+    {
+      "smiles": "O=C(O)c1c(C2CCOC2)nnn1C=Cc1ccccc1",
+      "optimization_score": 0,
+      "binding_confidence": 0.10053983330726624,
+      "valid": true,
+      "max_tanimoto_to_known": 0.171,
+      "novel_scaffold": true
+    }
+  ]
+}

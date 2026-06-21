@@ -1,0 +1,126 @@
+{
+  "timestamp": "20260529_095537",
+  "K": 8,
+  "heads": {
+    "BBBP": {
+      "n_molecules": 6,
+      "n_with_class_flip": 0,
+      "molecules": [
+        {
+          "canonical": "[Cl].CC(C)NCC(O)COc1cccc2ccccc12",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "CNC(/NCCSCc1oc(CN(C)C)cc1)=C\\[N+]([O-])=O",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "CN1CCN=C(c2ccccc2)c3cc(Cl)ccc13",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "C1=CC=CC3=C1N=C([N]2C(=NC(=N2)C)C3)N4CCN(C)CC4",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "C5=C3C1=C(OC4C12C(C(N(CC2)C)C3)CC=C4C)C(=C5)O",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "C1=CC=C2C(=C1)C3C4=C(C2(CNC)CC3)C=CC=C4",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 1.0,
+          "p_max": 1.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        }
+      ]
+    },
+    "ClinTox-tox": {
+      "n_molecules": 6,
+      "n_with_class_flip": 1,
+      "molecules": [
+        {
+          "canonical": "*C(=O)[C@H](CCCCNC(=O)OCCOC)NC(=O)OCCOC",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "c1ccc(cc1)[C@H](C(=O)N[C@H]2[C@@H]3N(C2=O)C(=C(CS3)CSc4nnnn4CS(=O)(=O)[O-])C(=O)[O-])O",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "C[C@H](/C=C/[C@H](C1CC1)O)[C@H]2CC[C@@H]\\\\3[C@@]2(CCC/C3=C\\\\C=C/4\\\\C[C@H](C[C@@H](C4=C)O)O)C",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.875,
+          "p_spread": 0.875,
+          "class_flips": true
+        },
+        {
+          "canonical": "CC(C)C[C@@H](C(=O)N[C@@H](CCCN=C(N)N)C(=O)N1CCC[C@H]1C(=O)NNC(=O)N)NC(=O)[C@@H](COC(C)(C)C)NC(=O)[C@H](CC2=CC=C(C=C2)O)NC(=O)[C@H](CO)NC(=O)[C@H](CC3=CNC4=CC=CC=C43)NC(=O)[C@H](CC5=CN=CN5)NC(=O)[C@@H]6CCC(=O)N6",
+          "label": 1,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "C=C1CC[C@]2([C@H]3Cc4ccc(c5c4[C@]2([C@H]1O5)CC[NH+]3CC6CC6)O)O",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        },
+        {
+          "canonical": "CCCCCCCCc1ccc(cc1)CCC(CO)(CO)[NH3+]",
+          "label": 0,
+          "n_variants": 8,
+          "p_min": 0.0,
+          "p_max": 0.0,
+          "p_spread": 0.0,
+          "class_flips": false
+        }
+      ]
+    }
+  }
+}

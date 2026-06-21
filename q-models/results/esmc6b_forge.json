@@ -1,0 +1,38 @@
+{
+  "test": "esmc_6b_forge_final_embedding_crispr_n_panel",
+  "timestamp": "2026-06-12T21:12:09.537928",
+  "model": "esmc-6b-2024-12 (Forge/biohub API)",
+  "embedding_dim": 2560,
+  "LICENSE": "NON-COMMERCIAL RESEARCH ONLY (ESM-C 6B). Runs on EvolutionaryScale cloud. Not shippable.",
+  "READOUT_CAVEAT": "FINAL-layer embedding only (API gives no hidden_states). This is the last-layer 'trap' readout -- ESM-C 600M's final embedding was 0.625 vs best-layer 0.825. So this is a LOWER BOUND, not a fair best-layer number.",
+  "final_embedding_nn": {
+    "raw": 0.6,
+    "centered": 0.575
+  },
+  "per_family_raw": {
+    "kinase": 0.75,
+    "gpcr": 0.625,
+    "ion_channel": 0.75,
+    "nuclear_receptor": 0.3333333333333333,
+    "e3_ligase": 0.5,
+    "lipid_kinase": 0.0,
+    "phosphatase": 0.0
+  },
+  "per_family_centered": {
+    "kinase": 0.8333333333333334,
+    "gpcr": 0.625,
+    "ion_channel": 0.5,
+    "nuclear_receptor": 0.3333333333333333,
+    "e3_ligase": 0.5,
+    "lipid_kinase": 0.0,
+    "phosphatase": 0.0
+  },
+  "references": {
+    "esm2_650M_best": 0.875,
+    "esm3_best": 0.875,
+    "mammal_best": 0.85,
+    "esmc_600M_best": 0.825,
+    "esmc_600M_FINAL_trap": 0.625,
+    "bar": 0.8
+  }
+}

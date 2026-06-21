@@ -1,0 +1,14 @@
+[
+  {
+    "smiles": "C=CC(Nc1ccc(CC(NC2(COC2)c2ccccc2)=O)cc1)=O",
+    "compound": "17",
+    "kd_uM": 0.0,
+    "rmax": 0.0
+  },
+  {
+    "smiles": "C=CC(N1CCCc2c(cccc12)C(NC(C1CCCCC1)c1ccc(cc1)F)=O)=O",
+    "compound": "20",
+    "kd_uM": 0.0,
+    "rmax": 0.0
+  }
+]

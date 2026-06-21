@@ -1,0 +1,57 @@
+# Model weights — ~17 GB of local checkpoints, never commit. Fetch via scripts/download_models.sh
+models/
+
+# Large / re-downloadable data (auto-downloaded by the experiment loaders, or via TDC).
+# Curated small test sets under data/wdr91 and data/pgk2 ARE committed (hard to regenerate).
+data/solubility/
+data/bindingdb_kd.tab
+data/weber.tab
+
+# Claude Code session state
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# HuggingFace / torch caches
+.cache/
+hf_cache/
+**/.huggingface/
+~/.cache/huggingface
+
+# OS / editor
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# scratch
+/tmp/
+*.log
+
+# AWS fine-tune pilot — secrets / transients (keep scripts + data, never the key)
+aws/*.pem
+aws/.launch_vars
+aws/userdata.sh
+
+# AWS run logs capture userdata set -x traces (may contain secrets) — never commit
+results/*_run.log
+
+# PyTDC raw dataset downloads (regenerable cache)
+data/
+
+# Boltz-API per-fold downloads (CIF/npz/tarballs — regenerable via idempotent re-download)
+results/boltz_tier1_runs/
+results/boltz_tier2_runs/
+results/boltz_tier3_runs/
+results/boltz_overnight_runs/
+data/overnight_seqs.json
+aws/txgemma_farood_panels.json
+results/boltz_partner_runs/
+data/partner_chembl_cache.json

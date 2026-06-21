@@ -1,0 +1,87 @@
+{
+  "timestamp": "20260528_194239",
+  "checkpoint": "dti_bindingdb_pkd_peer",
+  "device": "mps",
+  "n_pairs": 10,
+  "spearman": 0.4303,
+  "pearson": 0.3104,
+  "verdict_vs_our_pairs": "PASS",
+  "named_suzetrigine_nav18": 7.0046,
+  "cold_split_spearman_for_reference": -0.03,
+  "pred_range": [
+    5.3151,
+    9.3019
+  ],
+  "pairs": [
+    {
+      "drug": "imatinib",
+      "target": "ABL1",
+      "smiles": "Cc1ccc(NC(=O)c2ccc(CN3CCN(C)CC3)cc2)cc1Nc1nccc(-c2cccnc2)n1",
+      "exp_pchembl": 6.66,
+      "pred_pKd": 6.4943
+    },
+    {
+      "drug": "dasatinib",
+      "target": "ABL1",
+      "smiles": "Cc1nc(Nc2ncc(C(=O)Nc3c(C)cccc3Cl)s2)cc(N2CCN(CCO)CC2)n1.O",
+      "exp_pchembl": 9.0,
+      "pred_pKd": 6.3965
+    },
+    {
+      "drug": "gefitinib",
+      "target": "EGFR",
+      "smiles": "COc1cc2ncnc(Nc3ccc(F)c(Cl)c3)c2cc1OCCCN1CCOCC1",
+      "exp_pchembl": 7.81,
+      "pred_pKd": 5.3151
+    },
+    {
+      "drug": "erlotinib",
+      "target": "EGFR",
+      "smiles": "C#Cc1cccc(Nc2ncnc3cc(OCCOC)c(OCCOC)cc23)c1",
+      "exp_pchembl": 7.63,
+      "pred_pKd": 5.5438
+    },
+    {
+      "drug": "fluoxetine",
+      "target": "SERT",
+      "smiles": "CNCCC(Oc1ccc(C(F)(F)F)cc1)c1ccccc1",
+      "exp_pchembl": 8.03,
+      "pred_pKd": 9.3019
+    },
+    {
+      "drug": "paroxetine",
+      "target": "SERT",
+      "smiles": "Fc1ccc([C@@H]2CCNC[C@H]2COc2ccc3c(c2)OCO3)cc1",
+      "exp_pchembl": 9.42,
+      "pred_pKd": 8.259
+    },
+    {
+      "drug": "haloperidol",
+      "target": "DRD2",
+      "smiles": "O=C(CCCN1CCC(O)(c2ccc(Cl)cc2)CC1)c1ccc(F)cc1",
+      "exp_pchembl": 8.8,
+      "pred_pKd": 7.7514
+    },
+    {
+      "drug": "risperidone",
+      "target": "DRD2",
+      "smiles": "Cc1nc2n(c(=O)c1CCN1CCC(c3noc4cc(F)ccc34)CC1)CCCC2",
+      "exp_pchembl": 8.22,
+      "pred_pKd": 8.0506
+    },
+    {
+      "drug": "propranolol",
+      "target": "ADRB2",
+      "smiles": "CC(C)NCC(O)COc1cccc2ccccc12",
+      "exp_pchembl": 9.12,
+      "pred_pKd": 7.5589
+    },
+    {
+      "drug": "lidocaine",
+      "target": "Nav1.5",
+      "smiles": "CCN(CC)CC(=O)Nc1c(C)cccc1C",
+      "exp_pchembl": 4.3,
+      "pred_pKd": 6.7499
+    }
+  ]
+}
