@@ -86,9 +86,21 @@ def rebuild_index() -> dict:
     return idx
 
 
-# recall + record_outcome are added in Tasks 2 and 3.
-def recall(*a, **k):  # placeholder replaced in Task 2
-    raise NotImplementedError
+def recall(entities, types=None, k=5) -> list:
+    if isinstance(entities, dict):
+        wanted = {v for vals in entities.values() for v in vals}
+    else:
+        wanted = set(entities)
+    scored = []
+    for r in read_all():
+        if types and r.get("type") not in types:
+            continue
+        rec_ents = {v for vals in r.get("entities", {}).values() for v in vals}
+        overlap = len(wanted & rec_ents)
+        if overlap:
+            scored.append((overlap, r.get("ts", ""), r))
+    scored.sort(key=lambda t: (t[0], t[1]), reverse=True)
+    return [r for _, _, r in scored[:k]]
 
 
 def record_outcome(*a, **k):  # placeholder replaced in Task 3
