@@ -20,5 +20,8 @@ class TestProvenance(unittest.TestCase):
     def test_non_string_invalid(self):
         self.assertFalse(is_valid_provenance(None))
 
+    def test_moat_real_valid(self):
+        self.assertTrue(is_valid_provenance("moat-real"))
+
 if __name__ == "__main__":
     unittest.main()

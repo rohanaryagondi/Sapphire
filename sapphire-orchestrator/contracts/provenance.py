@@ -7,6 +7,8 @@ PROVENANCE = frozenset({
     "emet-live", "emet-mcp", "memory-recall", "persona-judgment", "synthesis",
     # existing
     "live-local", "gpu-async", "gpu-disabled", "stub", "unavailable", "mock",
+    # real Quiver CNS_DFP moat
+    "moat-real",
 })
 
 
