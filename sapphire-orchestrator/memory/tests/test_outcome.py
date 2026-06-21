@@ -26,11 +26,12 @@ class TestOutcome(unittest.TestCase):
 
     def test_refuted_outcome_opens_blindspot(self):
         p = proposal()
-        record_outcome(p["id"], {"result": "refuted", "data": "moat missed the persistent current", "source": "wetlab"})
+        o = record_outcome(p["id"], {"result": "refuted", "data": "moat missed the persistent current", "source": "wetlab"})
         types = [r["type"] for r in read_all()]
         self.assertIn("moat_blindspot", types)
         bs = next(r for r in read_all() if r["type"] == "moat_blindspot")
         self.assertIn(p["id"], bs["links"])
+        self.assertIn(o["id"], bs["links"])
         self.assertEqual(bs["entities"]["genes"], ["SCN11A"])
 
 if __name__ == "__main__":
