@@ -1,0 +1,6 @@
+{
+  "level": "tiered",
+  "auto_apply": {"memory": true, "skills": false, "specs": false, "scenarios": false, "routes": false},
+  "freshness_days": 90,
+  "authoring_trigger_count": 3
+}
