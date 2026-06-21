@@ -17,6 +17,8 @@ two-bucket "firm":
 `source/Sapphire Prompt Work_Feb 2026/Sapphire Prompts and Queries_For ExpoAI.docx` — and harder.
 
 ## Start here (in order)
+0. **[`docs/README.md`](docs/README.md)** — the documentation hub (index of every spec, plan, report, and
+   subsystem) + **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the consolidated end-to-end walkthrough.
 1. `sapphire-orchestrator/AGENTS.md` — the operating model + full roster + the 7 operating rules.
 2. `sapphire-orchestrator/dossier_schema.md` — the "done" definition for the fact bucket.
 3. `HANDOFF.md` — full narrative: vision, decisions + rationale, status, next steps.
