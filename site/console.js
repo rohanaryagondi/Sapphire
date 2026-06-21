@@ -37,19 +37,47 @@
   const looksLikeEngagement = q => { const m = (q || "").toLowerCase(); return ENGAGE_KW.some(w => m.includes(w)) || !!scenarioFor(q) || /\b[A-Z][A-Z0-9]{2,}\b/.test(q || ""); };
 
   /* ---------- systems status (the standing honesty surface) ---------- */
+  const SYS_STATE = {
+    "live": ["sys-live", "live"], "live-local": ["sys-live", "live · local"],
+    "stub": ["sys-mock", "stub"], "mock": ["sys-mock", "mock"],
+    "not-wired": ["sys-off", "not wired"], "down": ["sys-off", "down"],
+  };
   function renderSystems() {
     const s = BRIDGE.subsystems;
     const row = (name, state, meaning) => {
-      const cls = state === "live" ? "sys-live" : state === "mock" ? "sys-mock" : "sys-off";
-      const label = state === "live" ? "live" : state === "mock" ? "mock" : state === "not-wired" ? "not wired" : "down";
+      const [cls, label] = SYS_STATE[state] || ["sys-off", state || "—"];
       return `<div class="sys-row"><span class="sys-dot ${cls}"></span><span class="sys-name">${name}</span><span class="sys-state ${cls}">${label}</span><span class="sys-why">${meaning}</span></div>`;
     };
+    const qm = s.qmodels;
+    const qmWhy = qm === "live-local" ? "DTI / BBBP / Tox served live (CPU) — callable now via the model registry"
+      : qm === "stub" ? "endpoint up, placeholder predictions — run setup to make CPU tools live"
+      : "binding / ADMET / selectivity — endpoint down (start serve_local.sh); GPU tools via the launcher";
     inspSystems.innerHTML = `<div class="insp-h">Systems</div>` +
       row("Claude", s.claude === "live" ? "live" : "down", "the reasoning — your subscription") +
       row("EMET", s.emet, "BenchSci — not wired to the web; only shipped scenarios carry real EMET evidence") +
-      row("Q-Models", s.qmodels, "binding / ADMET / selectivity — mock (AWS next)") +
+      row("Q-Models", qm, qmWhy) +
       row("internal moat", s.moat, "Quiver EP-CRISPR latent space — mock") +
-      `<div class="sys-note">On the web only <b>Claude</b> is live. In a live answer, dossier facts are Claude's reconstruction — not tool output.</div>`;
+      `<div class="sys-note">Claude is live. Q-Models exposes <b>${MODELS.length || "—"}</b> callable tools (registry). In a live <i>chat</i> answer, dossier facts are Claude's reconstruction; tool calls via the model registry carry their own provenance.</div>`;
+  }
+
+  // the callable Q-Models tool menu (from /api/tools) — the visible "any model" surface
+  let MODELS = [];
+  const TIER_LABEL = { "local-cpu": "CPU · sync", "gpu-launch": "GPU · async", "endpoint": "endpoint", "batch-ec2": "batch" };
+  const STATUS_CLS = { "live-local": "pv-emet", "live": "pv-emet", "eval": "pv-mock", "experimental": "pv-mock", "deprecated": "pv-other", "todo": "pv-other" };
+  async function loadModels() {
+    let card = $("#inspModels");
+    if (!card) { card = el("div", "insp-card", ""); card.id = "inspModels"; inspSystems.after(card); }
+    try { MODELS = (await (await fetch("/api/tools", { cache: "no-store" })).json()).tools || []; }
+    catch (e) { MODELS = []; }
+    if (!MODELS.length) { card.innerHTML = `<div class="insp-h">Models</div><div class="insp-empty">Tool registry unavailable (start the bridge: serve.py).</div>`; renderSystems(); return; }
+    const byTier = {};
+    MODELS.forEach(m => { (byTier[m.tier] = byTier[m.tier] || []).push(m); });
+    const groups = Object.keys(byTier).map(tier =>
+      `<div class="mdl-grp"><div class="mdl-tier">${TIER_LABEL[tier] || tier}</div>` +
+      byTier[tier].map(m => `<div class="mdl-row"><span class="mdl-id">${esc(m.label || m.id)}</span><span class="pvtag ${STATUS_CLS[m.status] || 'pv-other'}">${esc(m.status)}</span></div>`).join("") +
+      `</div>`).join("");
+    card.innerHTML = `<div class="insp-h">Models <span class="insp-sub">${MODELS.length} callable via the orchestrator</span></div>${groups}`;
+    renderSystems();
   }
 
   async function health() {
@@ -130,8 +158,8 @@
        ${banner}
        <details open class="insp-sec"><summary>Dossier · ${d.dossier.length} facts <span class="sec-tag">${esc(d.status || "")}</span></summary>
          <div class="dossier">${dossier}</div>${flagLines}</details>
-       <details class="insp-sec"><summary>Validate · Q-Models <span class="sec-tag mock">mock</span></summary>
-         ${(run.validate.runs || []).map(r => `<div class="qrow"><span class="qmodel">${esc(r.model)}</span><span class="qout">${esc(r.out)}</span></div>`).join("")}
+       <details class="insp-sec"><summary>Validate · Q-Models <span class="sec-tag mock">${live ? "claude" : "mock"}</span></summary>
+         ${(run.validate.runs || []).map(r => { const pv = r.provenance || (live ? "claude" : "mock"); return `<div class="qrow"><span class="qmodel">${provBadge(pv)} ${esc(r.model)}</span><span class="qout">${esc(r.out)}</span></div>`; }).join("")}
          <div class="ob-result">→ ${esc(run.validate.result)}</div></details>
        <details open class="insp-sec"><summary>Roundtable · ${c.round1.length} partners, 2 rounds</summary>
          <div class="pgrid">${panel}</div>
@@ -191,4 +219,5 @@
   inspRun.innerHTML = `<div class="insp-h">Active run</div><div class="insp-empty">Ask a question or pick a scenario — the dossier, roundtable, and synthesis appear here, each fact tagged with its source.</div>`;
   thread.append(el("div", "msg msg-bot", `<div class="bot-mark">◆</div><div class="bubble bot-reply">I'm the Sapphire orchestrator. Ask me to prioritize targets, validate a hypothesis, or assess fundability for a CNS program — I'll plan it, gather a cited dossier, convene a partner roundtable, and recommend. Try a preset below, or type your own.</div>`));
   health();
+  loadModels();
 })();
