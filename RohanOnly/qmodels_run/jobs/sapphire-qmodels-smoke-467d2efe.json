@@ -1,0 +1,13 @@
+{
+  "job_id": "sapphire-qmodels-smoke-467d2efe",
+  "kind": "smoke",
+  "mode": "dry-run",
+  "status": "dry-run-validated",
+  "tool_id": null,
+  "eval_script": null,
+  "instance_type": "t3.micro",
+  "inputs": {},
+  "created": "2026-06-21T05:03:58.384029+00:00",
+  "est_usd": 0.0052,
+  "userdata": "#!/bin/bash\nset -x\n# backstop self-terminate (parachute) in case the explicit teardown ever fails\nshutdown -h +30 &\nRESULT=/tmp/result.json\necho '{\"job\":\"sapphire-qmodels-smoke-467d2efe\",\"kind\":\"smoke\",\"ran\":true,\"host\":\"'$(hostname)'\",\"ts\":\"'$(date -u +%FT%TZ)'\"}' > $RESULT\naws s3 cp $RESULT s3://sapphire-qmodels-scratch/sapphire-qmodels-smoke-467d2efe/result.json --region us-east-1 || true\n# done \u2014 terminate now (initiated-shutdown-behavior=terminate makes this a terminate)\nshutdown -h now\n"
+}

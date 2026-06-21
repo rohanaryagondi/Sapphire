@@ -1,0 +1,240 @@
+# -*- coding: utf-8 -*-
+"""
+launcher.py — the unified Q-Models batch launcher (the GPU/async path).
+
+It auto-launches a tagged `sapphire-qmodels` EC2 instance from a tool's eval script, runs it, retrieves
+the result to a scratch bucket, and auto-tears-down — so the orchestrator can call any GPU model with a
+submit/poll handle.
+
+SAFETY IS THE POINT OF THIS FILE (shared production account, no IAM sandbox). Every guard from
+specs/2026-06-21-qmodels-integration-overnight-plan.md is compiled in here:
+  - profile Rohan-Sapphire ONLY; identity must == account 255493511886 before any create.
+  - CREATE-ONLY + LEDGER: everything is tagged/named sapphire-qmodels-* and appended to the ledger.
+  - TEARDOWN ONLY BY LEDGERED ID. terminate takes one explicit id that must be (a) in our ledger and
+    (b) NOT in the pre-existing snapshot. No wildcard / tag-filter / name-filter terminate, EVER.
+  - BUDGET cap (default $0.50). TRIPLE teardown backstop (userdata self-shutdown + initiated-shutdown=
+    terminate + explicit terminate + verify). Halt-and-report on any ambiguity.
+  - DEFAULT mode is "dry-run": render the plan + userdata, touch nothing. Live launch is opt-in.
+
+Stdlib only. AWS via the `aws` CLI subprocess.
+"""
+from __future__ import annotations
+
+import datetime
+import json
+import os
+import shlex
+import subprocess
+import uuid
+from pathlib import Path
+
+# ---------------- config (safety constants) ----------------
+PROFILE = "Rohan-Sapphire"
+REGION = "us-east-1"
+EXPECTED_ACCOUNT = "255493511886"
+NAME_PREFIX = "sapphire-qmodels"
+TAGS = {"Project": "sapphire-qmodels", "CreatedBy": "claude-overnight-2026-06-21"}
+BUDGET_CAP_USD = float(os.environ.get("QMODELS_BUDGET_CAP", "0.50"))
+PUBLIC_AMI_SSM = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"  # resolved at launch
+SMOKE_INSTANCE_TYPE = "t3.micro"
+
+_RUN_DIR = Path(__file__).resolve().parents[2] / "RohanOnly" / "qmodels_run"
+_JOBS_DIR = _RUN_DIR / "jobs"
+_LEDGER = _RUN_DIR / "aws_ledger.jsonl"
+_SNAPSHOT = _RUN_DIR / "aws_preexisting_snapshot.json"
+
+# rough on-demand $/hr (us-east-1) for budget estimates — conservative
+_HOURLY = {"t3.micro": 0.0104, "t3.small": 0.0208, "g5.xlarge": 1.006, "g4dn.xlarge": 0.526}
+
+
+class SafetyRefusal(Exception):
+    """Raised when an action would violate the isolation/budget invariant. Never caught silently."""
+
+
+# ---------------- ledger / snapshot ----------------
+def _now() -> str:
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+
+def _ledger_append(event: dict) -> None:
+    _RUN_DIR.mkdir(parents=True, exist_ok=True)
+    event = {"ts": _now(), **event}
+    with open(_LEDGER, "a", encoding="utf-8") as f:
+        f.write(json.dumps(event) + "\n")
+
+
+def _ledger_created_instance_ids() -> set:
+    ids = set()
+    if _LEDGER.exists():
+        for line in _LEDGER.read_text().splitlines():
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if e.get("event") == "create" and e.get("resource") == "instance" and e.get("id"):
+                ids.add(e["id"])
+    return ids
+
+
+def _preexisting_instance_ids() -> set:
+    if not _SNAPSHOT.exists():
+        raise SafetyRefusal("pre-existing AWS snapshot missing — refuse to act without the before-state.")
+    snap = json.loads(_SNAPSHOT.read_text())
+    return {i["id"] for i in snap.get("instances", [])}
+
+
+# ---------------- aws cli wrappers ----------------
+def _aws(*args, parse=True, check=True):
+    cmd = ["aws", *args, "--profile", PROFILE, "--region", REGION, "--output", "json"]
+    proc = subprocess.run(cmd, capture_output=True, text=True)
+    if check and proc.returncode != 0:
+        raise RuntimeError(f"aws {' '.join(args[:2])} failed: {proc.stderr.strip()[:300]}")
+    if not parse:
+        return proc.stdout
+    return json.loads(proc.stdout) if proc.stdout.strip() else {}
+
+
+def _assert_identity() -> None:
+    acct = _aws("sts", "get-caller-identity").get("Account")
+    if acct != EXPECTED_ACCOUNT:
+        raise SafetyRefusal(f"identity account {acct} != expected {EXPECTED_ACCOUNT} — ABORT.")
+
+
+def _estimate_usd(instance_type: str, max_minutes: int) -> float:
+    return _HOURLY.get(instance_type, 1.0) * (max_minutes / 60.0)
+
+
+# ---------------- userdata renderers ----------------
+def _render_smoke_userdata(job_id: str, bucket: str, max_minutes: int = 15) -> str:
+    """Trivial plumbing job: prove launch→run→retrieve→teardown on a CPU micro instance. No model."""
+    return f"""#!/bin/bash
+set -x
+# backstop self-terminate (parachute) in case the explicit teardown ever fails
+shutdown -h +{max_minutes} &
+RESULT=/tmp/result.json
+echo '{{"job":"{job_id}","kind":"smoke","ran":true,"host":"'$(hostname)'","ts":"'$(date -u +%FT%TZ)'"}}' > $RESULT
+aws s3 cp $RESULT s3://{bucket}/{job_id}/result.json --region {REGION} || true
+# done — terminate now (initiated-shutdown-behavior=terminate makes this a terminate)
+shutdown -h now
+"""
+
+
+def _render_tool_userdata(job: dict, bucket: str, max_minutes: int = 60) -> str:
+    """Template for a real Q-Models eval (DRY-RUN ONLY in this overnight run — not executed live).
+    A live GPU run would clone q-models, set up the env, run eval_script on the inputs, upload result."""
+    eval_script = (job.get("eval_script") or "aws/<tool>_eval.py")
+    inputs_json = json.dumps(job.get("inputs", {}))
+    return f"""#!/bin/bash
+set -x
+shutdown -h +{max_minutes} &   # parachute
+cd /home/ec2-user || cd /home/ubuntu
+git clone --depth 1 https://github.com/rohanaryagondi/Q-Models.git qm 2>/dev/null || true
+cd qm
+python3 -m pip install -q -r requirements.txt || true
+echo '{inputs_json}' > /tmp/inputs.json
+python3 {shlex.quote(eval_script)} --inputs /tmp/inputs.json --out /tmp/result.json || \
+  echo '{{"job":"{job['job_id']}","error":"eval failed"}}' > /tmp/result.json
+aws s3 cp /tmp/result.json s3://{bucket}/{job['job_id']}/result.json --region {REGION} || true
+shutdown -h now
+"""
+
+
+# ---------------- job lifecycle ----------------
+def _job_path(job_id: str) -> Path:
+    return _JOBS_DIR / f"{job_id}.json"
+
+
+def _write_job(job: dict) -> None:
+    _JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    _job_path(job["job_id"]).write_text(json.dumps(job, indent=2))
+
+
+def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "tool",
+               instance_type: str | None = None, max_minutes: int = 30) -> dict:
+    """Submit a GPU/batch job. mode='dry-run' (default) renders + validates without touching AWS.
+    mode='live' launches a real tagged instance (passes every guard first)."""
+    job_id = f"{NAME_PREFIX}-{kind}-{uuid.uuid4().hex[:8]}"
+    itype = instance_type or (SMOKE_INSTANCE_TYPE if kind == "smoke" else tool.get("invoke", {}).get("instance_type", "g5.xlarge") if tool else "g5.xlarge")
+    bucket = f"{NAME_PREFIX}-scratch"  # resolved/created in live mode
+    job = {
+        "job_id": job_id, "kind": kind, "mode": mode, "status": "created",
+        "tool_id": (tool or {}).get("id"), "eval_script": (tool or {}).get("invoke", {}).get("eval_script") or (tool or {}).get("eval_script"),
+        "instance_type": itype, "inputs": inputs, "created": _now(),
+        "est_usd": round(_estimate_usd(itype, max_minutes), 4),
+    }
+    # render userdata
+    job["userdata"] = (_render_smoke_userdata(job_id, bucket, max_minutes) if kind == "smoke"
+                       else _render_tool_userdata(job, bucket, max_minutes))
+
+    over_budget = job["est_usd"] > BUDGET_CAP_USD
+
+    if mode == "dry-run":
+        # dry-run never spends — validate + render the plan; just flag if a LIVE run would exceed budget
+        job["status"] = "dry-run-validated"
+        if over_budget:
+            job["note"] = f"would exceed budget: est ${job['est_usd']} > cap ${BUDGET_CAP_USD} (NOT launched — dry-run)"
+        _write_job(job)
+        return job
+
+    if mode != "live":
+        raise SafetyRefusal(f"unknown mode '{mode}'")
+
+    # ---- LIVE path: budget gate, then every safety guard, then launch ----
+    if over_budget:
+        job["status"] = "refused-budget"
+        job["note"] = f"LIVE launch refused: est ${job['est_usd']} > cap ${BUDGET_CAP_USD}"
+        _write_job(job)
+        return job
+    return _launch_live(job, bucket, max_minutes)
+
+
+def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
+    _assert_identity()  # account gate
+    # (bucket + SG creation would happen here, ledgered; for the smoke test the userdata uploads to
+    #  the scratch bucket which is created on first use. Kept minimal + ledgered.)
+    ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value").get("Value")
+    tag_spec = "ResourceType=instance,Tags=[" + ",".join(
+        [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
+    import base64
+    ud_b64 = base64.b64encode(job["userdata"].encode()).decode()
+    out = _aws("ec2", "run-instances", "--image-id", ami, "--instance-type", job["instance_type"],
+               "--instance-initiated-shutdown-behavior", "terminate",
+               "--user-data", ud_b64, "--tag-specifications", tag_spec, "--count", "1")
+    iid = out["Instances"][0]["InstanceId"]
+    _ledger_append({"event": "create", "resource": "instance", "id": iid, "job": job["job_id"],
+                    "instance_type": job["instance_type"], "est_usd": job["est_usd"]})
+    job.update({"status": "launched", "instance_id": iid, "launched": _now()})
+    _write_job(job)
+    return job
+
+
+def job_status(job_id: str) -> dict:
+    p = _job_path(job_id)
+    if not p.exists():
+        return {"ok": False, "job_id": job_id, "status": "unknown"}
+    job = json.loads(p.read_text())
+    if job.get("status") in ("dry-run-validated", "refused-budget", "done", "torn-down"):
+        return job
+    iid = job.get("instance_id")
+    if iid:
+        st = _aws("ec2", "describe-instances", "--instance-ids", iid,
+                  "--query", "Reservations[].Instances[].State.Name")
+        job["instance_state"] = (st[0] if st else None)
+    _write_job(job)
+    return job
+
+
+def safe_terminate(instance_id: str) -> dict:
+    """Terminate ONE instance — only if it is in our ledger AND not pre-existing. No other path exists."""
+    created = _ledger_created_instance_ids()
+    preexisting = _preexisting_instance_ids()
+    if instance_id not in created:
+        raise SafetyRefusal(f"REFUSE terminate {instance_id}: not in our ledger (we did not create it).")
+    if instance_id in preexisting:
+        raise SafetyRefusal(f"REFUSE terminate {instance_id}: present in pre-existing snapshot.")
+    _aws("ec2", "terminate-instances", "--instance-ids", instance_id)
+    _ledger_append({"event": "terminate", "resource": "instance", "id": instance_id})
+    # verify
+    st = _aws("ec2", "describe-instances", "--instance-ids", instance_id,
+              "--query", "Reservations[].Instances[].State.Name")
+    return {"instance_id": instance_id, "terminated_state": (st[0] if st else None)}

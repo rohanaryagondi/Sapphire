@@ -1,0 +1,14 @@
+{
+  "job_id": "sapphire-qmodels-tool-b7442003",
+  "kind": "tool",
+  "mode": "live",
+  "status": "refused-budget",
+  "tool_id": "structure_binding",
+  "eval_script": "q-models/aws/boltz_runner.py",
+  "instance_type": "g5.xlarge",
+  "inputs": {},
+  "created": "2026-06-21T05:04:46.376073+00:00",
+  "est_usd": 2.012,
+  "userdata": "#!/bin/bash\nset -x\nshutdown -h +120 &   # parachute\ncd /home/ec2-user || cd /home/ubuntu\ngit clone --depth 1 https://github.com/rohanaryagondi/Q-Models.git qm 2>/dev/null || true\ncd qm\npython3 -m pip install -q -r requirements.txt || true\necho '{}' > /tmp/inputs.json\npython3 q-models/aws/boltz_runner.py --inputs /tmp/inputs.json --out /tmp/result.json ||   echo '{\"job\":\"sapphire-qmodels-tool-b7442003\",\"error\":\"eval failed\"}' > /tmp/result.json\naws s3 cp /tmp/result.json s3://sapphire-qmodels-scratch/sapphire-qmodels-tool-b7442003/result.json --region us-east-1 || true\nshutdown -h now\n",
+  "note": "LIVE launch refused: est $2.012 > cap $0.5"
+}
