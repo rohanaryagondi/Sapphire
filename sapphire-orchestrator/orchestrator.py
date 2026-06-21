@@ -241,7 +241,33 @@ class Orchestrator:
     def validate(self, scenario: dict) -> dict:
         v = dict(scenario["validate"])
         v["mock"] = True  # demo: shaped MOCK outputs; prod: AWS launch, same contract
+        # canned scenario Q-Models outputs are shaped placeholders — stamp provenance honestly
+        for r in v.get("runs", []):
+            r.setdefault("provenance", "mock")
         return v
+
+    # ---- Q-Models: the orchestrator can call any model (registry.json) ----
+    def _qmodels(self):
+        if getattr(self, "_qm", None) is None:
+            import sys as _sys
+            if HERE not in _sys.path:
+                _sys.path.insert(0, HERE)
+            from qmodels.client import QModelsClient
+            self._qm = QModelsClient()
+        return self._qm
+
+    def call_model(self, tool_id: str, inputs: dict) -> dict:
+        """Call any Q-Models tool by id. CPU tools → synchronous result row; GPU/batch tools → async
+        job handle (poll with model_job_status). Every return carries provenance."""
+        return self._qmodels().call(tool_id, inputs)
+
+    def model_job_status(self, job_id: str) -> dict:
+        return self._qmodels().poll(job_id)
+
+    def tools_catalog(self) -> list:
+        """Every callable Q-Models tool (id/label/task/tier/status) — the orchestrator's tool menu."""
+        return [{"id": t.get("id"), "label": t.get("label") or t.get("name"), "task": t.get("task"),
+                 "tier": t.get("tier"), "status": t.get("status")} for t in self._qmodels().tools()]
 
     # =========================================================================
     # BUCKET 2 — Roundtable Moderator: round 1 + round 2 + spread

@@ -234,6 +234,18 @@ def _run_live(query: str) -> dict:
     return _stamp(run, "live")
 
 
+def _qmodels_status() -> str:
+    """Real Q-Models status for the systems panel: live-local (CPU endpoint serving real joblibs) /
+    stub (endpoint up, placeholder) / mock (endpoint down)."""
+    try:
+        h = ENGINE._qmodels().health()
+        if h.get("reachable"):
+            return "live-local" if h.get("live_tracks") else "stub"
+    except Exception:
+        pass
+    return "mock"
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=SITE, **k)
@@ -254,7 +266,9 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"live": have, "model": CLAUDE_MODEL or "subscription default (Opus)",
                                "scenarios": list(SCENARIOS),
                                "subsystems": {"claude": "live" if have else "down",
-                                              "emet": "not-wired", "qmodels": "mock", "moat": "mock"}})
+                                              "emet": "not-wired", "qmodels": _qmodels_status(), "moat": "mock"}})
+        if parsed.path == "/api/tools":
+            return self._json({"tools": ENGINE.tools_catalog()})
         if parsed.path == "/api/run":
             q = urllib.parse.parse_qs(parsed.query).get("q", [""])[0].strip()
             if not q:
@@ -271,13 +285,20 @@ class Handler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
-        if parsed.path != "/api/chat":
+        if parsed.path not in ("/api/chat", "/api/tool"):
             return self._json({"error": "not found"}, 404)
         length = int(self.headers.get("Content-Length", "0") or 0)
         try:
             req = json.loads(self.rfile.read(length) or "{}")
         except json.JSONDecodeError:
             return self._json({"error": "bad json"}, 400)
+
+        if parsed.path == "/api/tool":
+            # the orchestrator calls any Q-Models model: {tool_id, inputs}
+            tool_id = (req.get("tool_id") or "").strip()
+            if not tool_id:
+                return self._json({"error": "missing tool_id"}, 400)
+            return self._json(ENGINE.call_model(tool_id, req.get("inputs") or {}))
         msg = (req.get("message") or "").strip()
         if not msg:
             return self._json({"error": "missing message"}, 400)
