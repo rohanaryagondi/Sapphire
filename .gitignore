@@ -7,3 +7,6 @@ __pycache__/
 
 # Hayes' semantic-agents source doc lives in Downloads; excluded from this branch by request
 SemanticAgents/
+
+# isolated venv for the vendored Q-Models Explorer (local-cpu endpoint)
+.qm-venv/
