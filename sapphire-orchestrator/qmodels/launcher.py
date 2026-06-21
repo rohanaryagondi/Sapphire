@@ -195,7 +195,7 @@ def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
     _assert_identity()  # account gate
     # (bucket + SG creation would happen here, ledgered; for the smoke test the userdata uploads to
     #  the scratch bucket which is created on first use. Kept minimal + ledgered.)
-    ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value").get("Value")
+    ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value")
     tag_spec = "ResourceType=instance,Tags=[" + ",".join(
         [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
     import base64

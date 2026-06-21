@@ -1,0 +1,57 @@
+{
+  "started": "2026-06-21T05:15:22.405187+00:00",
+  "dry_run": false,
+  "steps": [
+    {
+      "step": "identity_gate",
+      "ts": "2026-06-21T05:15:23.292350+00:00",
+      "ok": true,
+      "account": "255493511886"
+    },
+    {
+      "step": "default_vpc",
+      "ts": "2026-06-21T05:15:24.273560+00:00",
+      "found": true,
+      "vpc": "vpc-bca9c6d8"
+    },
+    {
+      "step": "resolve_ami",
+      "ts": "2026-06-21T05:15:25.123068+00:00",
+      "ami": "ami-0521cb2d60cfbb1a6"
+    },
+    {
+      "step": "budget",
+      "ts": "2026-06-21T05:15:25.123164+00:00",
+      "est_usd": 0.0017333333333333333,
+      "cap": 0.5,
+      "ok": true
+    },
+    {
+      "step": "launched",
+      "ts": "2026-06-21T05:15:27.422362+00:00",
+      "instance_id": "i-020f68795ea74a1be"
+    },
+    {
+      "step": "console_marker",
+      "ts": "2026-06-21T05:18:40.751671+00:00",
+      "found": false,
+      "note": "instance already terminated before console populated"
+    },
+    {
+      "step": "safe_terminate",
+      "ts": "2026-06-21T05:18:44.266209+00:00",
+      "instance_id": "i-020f68795ea74a1be",
+      "terminated_state": "terminated"
+    },
+    {
+      "step": "verify_terminated",
+      "ts": "2026-06-21T05:19:00.726524+00:00",
+      "final_state": "terminated"
+    }
+  ],
+  "instance_id": "i-020f68795ea74a1be",
+  "console_marker_found": false,
+  "final_state": "terminated",
+  "status": "ok",
+  "spend_estimate_usd": 0.0017
+}
