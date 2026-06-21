@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "title": "Sapphire science-geared scenario suite (spec §5)",
+    "note": "captured = full cited dossier shipped; stub = capture live via capture.py with a BenchSci session (not fabricated).",
+    "primary_user": "science"
+  },
+  "scenarios": [
+    {"id": "nav1_8", "title": "Nav1.8/Nav1.9 non-opioid analgesic", "disease": "pain", "variety_axis": "go_no_go", "status": "captured"},
+    {"id": "tsc2", "title": "TSC2 / mTOR", "disease": "epilepsy/TSC", "variety_axis": "selectivity", "status": "captured"},
+    {"id": "scn2a_epilepsy", "title": "SCN2A epilepsy — GoF vs LoF", "disease": "epilepsy", "variety_axis": "mechanism", "status": "stub"},
+    {"id": "c9orf72_als", "title": "C9orf72 ALS — ASO vs small molecule", "disease": "ALS", "variety_axis": "modality", "status": "stub"},
+    {"id": "lrrk2_pd", "title": "LRRK2 Parkinson's kinase inhibitor", "disease": "Parkinson's", "variety_axis": "admet_bbb", "status": "stub"},
+    {"id": "gba1_pd", "title": "GBA1 Parkinson's / Gaucher", "disease": "Parkinson's", "variety_axis": "biomarker", "status": "stub"},
+    {"id": "kcnt1_dee", "title": "KCNT1 developmental epileptic encephalopathy", "disease": "rare CNS", "variety_axis": "selectivity", "status": "stub"},
+    {"id": "novel_ad_target", "title": "Novel Alzheimer's target (thin evidence)", "disease": "Alzheimer's", "variety_axis": "abstain", "status": "stub"},
+    {"id": "moat_divergence", "title": "Internal-vs-literature signal", "disease": "channelopathy", "variety_axis": "divergence", "status": "stub"},
+    {"id": "rare_cns_payer", "title": "Rare CNS therapy value story", "disease": "rare CNS", "variety_axis": "payer", "status": "stub"},
+    {"id": "competitor_ip_gate", "title": "Competitor-IP / prior-CRL gate", "disease": "cross-cutting", "variety_axis": "ip_veto", "status": "stub"}
+  ]
+}
