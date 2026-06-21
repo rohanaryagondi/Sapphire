@@ -1,0 +1,101 @@
+{
+  "_meta": {
+    "title": "Sapphire agent registry — the contracts the harness enforces",
+    "purpose": "One entry per callable agent. 'spec' points to the architecture/*.md (reasoning); the rest is the machine envelope the harness checks. Mirrors qmodels/registry.json.",
+    "honesty": "provenance + guardrails are enforced mechanically, not by trust."
+  },
+  "schemas": {
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["persona", "stance", "conviction", "rationale", "fact_claims"],
+      "properties": {
+        "persona": {"type": "string"},
+        "stance": {"type": "string", "enum": ["pass", "conditional", "hold", "no_go"]},
+        "conviction": {"type": "integer"},
+        "rationale": {"type": "string"},
+        "top_risk": {"type": "string"},
+        "ask": {"type": "string"},
+        "fact_claims": {"type": "array", "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim", "cite"],
+          "properties": {"claim": {"type": "string"}, "cite": {"type": "string"}}
+        }},
+        "fact_requests": {"type": "array", "items": {"type": "string"}},
+        "provenance": {"type": "string"}
+      }
+    },
+    "findings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["candidate", "facts"],
+      "properties": {
+        "candidate": {"type": "string"},
+        "facts": {"type": "array", "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "source", "tier"],
+          "properties": {
+            "value": {"type": "string"},
+            "source": {"type": "string"},
+            "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+            "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]}
+          }
+        }},
+        "provenance": {"type": "string"}
+      }
+    }
+  },
+  "agents": [
+    {
+      "id": "company-partner",
+      "role": "Bucket2 persona — verdict on the dossier through a company mandate",
+      "spec": "architecture/bucket2/company-partner-template.md",
+      "kind": "claude-subagent",
+      "param": "persona_file",
+      "output_schema": {"$ref": "#/schemas/verdict"},
+      "tools_allowed": [],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
+      "provenance_label": "persona-judgment",
+      "timeout_s": 120,
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "fda-institutional-memory",
+      "role": "Bucket1 semantic veto-class — FDA precedent + dispositive veto",
+      "spec": "architecture/bucket1/semantic/fda-institutional-memory.md",
+      "kind": "claude-subagent",
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "veto_is_gate", "stamp_provenance"],
+      "provenance_label": "fda-primary",
+      "veto_class": true,
+      "timeout_s": 180,
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "emet-runner",
+      "role": "EMET (BenchSci) driver via Playwright — the single door to the BEKG",
+      "spec": "architecture/bucket1/scientific/emet-analyst.md",
+      "kind": "emet-playwright",
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["mcp__playwright"],
+      "guardrails": ["data_boundary", "public_identifiers_only", "facts_only_cited", "emet_tab_discipline", "stamp_provenance"],
+      "provenance_label": "emet-live",
+      "timeout_s": 300,
+      "retry": {"max_repair": 1, "on_hard_fail": "escalate"}
+    },
+    {
+      "id": "q-models-runner",
+      "role": "Bucket1 — runs a Q-Models tool on a named pair (delegates to QModelsClient)",
+      "spec": "architecture/bucket1/scientific/q-models-runner.md",
+      "kind": "qmodels-delegate",
+      "tools_allowed": ["qmodels"],
+      "guardrails": ["data_boundary", "public_identifiers_only", "stamp_provenance"],
+      "provenance_label": "qmodels",
+      "timeout_s": 60,
+      "retry": {"max_repair": 0, "on_hard_fail": "abstain"}
+    }
+  ]
+}
