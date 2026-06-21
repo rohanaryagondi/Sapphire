@@ -2,6 +2,7 @@
 Input guards BLOCK (return violations) — they never strip-and-proceed."""
 from __future__ import annotations
 
+import copy
 import json
 import re
 from dataclasses import dataclass
@@ -57,3 +58,57 @@ def data_boundary(inputs) -> "list[Violation]":
 def public_identifiers_only(inputs) -> "list[Violation]":
     # Stricter complement: same blocklist, reported under its own guardrail name.
     return [Violation("public_identifiers_only", v.detail, v.path) for v in data_boundary(inputs)]
+
+
+def facts_only_cited(contract, output, ctx) -> list:
+    """Every row in output["facts"] needs non-empty source + a tier.
+    A row with flag == "VETO" must have tier == "T1" (else a violation)."""
+    viols = []
+    for i, row in enumerate(output.get("facts", []) or []):
+        if not (row.get("source") or "").strip():
+            viols.append(Violation("facts_only_cited", "fact row missing source", f"facts[{i}]"))
+        if not row.get("tier"):
+            viols.append(Violation("facts_only_cited", "fact row missing tier", f"facts[{i}]"))
+        if row.get("flag") == "VETO" and row.get("tier") != "T1":
+            viols.append(Violation("facts_only_cited", "VETO fact must be tier T1", f"facts[{i}]"))
+    return viols
+
+
+def must_cite_dossier(contract, output, ctx) -> list:
+    """Every item in output["fact_claims"] must have a cite present in ctx["dossier_fields"]."""
+    valid = set(ctx.get("dossier_fields", []) or [])
+    viols = []
+    for i, claim in enumerate(output.get("fact_claims", []) or []):
+        cite = claim.get("cite")
+        if cite not in valid:
+            viols.append(Violation("must_cite_dossier", f"claim cites unknown dossier field {cite!r}", f"fact_claims[{i}]"))
+    return viols
+
+
+def veto_is_gate(contract, output, ctx) -> list:
+    """If output marks a veto (stance == "no_go" or any fact flag == "VETO")
+    it must not also set output.get("action") == "drop" (veto is a surfaced gate, never silent kill)."""
+    is_veto = output.get("stance") == "no_go" or any(
+        (row.get("flag") == "VETO") for row in (output.get("facts", []) or [])
+    )
+    if is_veto and output.get("action") == "drop":
+        return [Violation("veto_is_gate", "veto must be surfaced as a gate, not a silent drop", "action")]
+    return []
+
+
+def emet_tab_discipline(contract, output, ctx) -> list:
+    """An emet output must carry a non-empty provenance/evidence trail;
+    minimally a violation if output lacks facts."""
+    if "facts" not in output:
+        return [Violation("emet_tab_discipline", "emet output carries no evidence trail (no facts)", "facts")]
+    return []
+
+
+def stamp_provenance(contract, output) -> dict:
+    """Returns a copy of output with provenance set to contract.provenance_label
+    (and stamped onto each facts row if present). Raises nothing; the only transform guard."""
+    out = copy.deepcopy(output)
+    out["provenance"] = contract.provenance_label
+    for row in out.get("facts", []) or []:
+        row["provenance"] = contract.provenance_label
+    return out
