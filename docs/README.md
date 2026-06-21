@@ -54,6 +54,12 @@ Captured from the live app (`emet.benchsci.com`, signed in, 2026-06-21).
 - [`.claude/skills/emet-runner/SKILL.md`](../.claude/skills/emet-runner/SKILL.md) — the reusable, harness-callable EMET skill (MCP-swappable seam).
 - [`architecture/bucket1/scientific/emet-experts.md`](../architecture/bucket1/scientific/emet-experts.md) — paste-in Sapphire EMET Experts.
 
+## 4b. Loka (prior Quiver vendor) — what to reuse
+[`LOKA.md`](LOKA.md) — analysis of Loka's "GenAI Accelerator" shared folder: their Chainlit/AWS/Bedrock
+Drug Discovery Agent (source in the private repo `q-state-biosciences/drug-discovery-agent`), and the
+**real Quiver moat data** they left us (`CNS_DFP_distance` parquet — 38.4M perturbation-distance rows) that
+can retire Sapphire's mock moat. Includes the reuse plan + the asks to Quiver.
+
 ## 5. The agent specs (the firm)
 `architecture/` holds every agent spec, organized as the firm. A README at each level.
 - `architecture/orchestrator/` — control: Engagement Lead · Research Manager · Roundtable Moderator.
