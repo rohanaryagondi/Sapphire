@@ -24,5 +24,16 @@ class TestInputGuards(unittest.TestCase):
         v = public_identifiers_only({"s_internal": 1})
         self.assertEqual(v[0].guardrail, "public_identifiers_only")
 
+    def test_internal_term_as_string_value_blocked(self):
+        # internal scoring identifiers embedded in a free-text VALUE must be caught
+        self.assertTrue(data_boundary({"note": "filtering on crispr_score=0.94"}))
+        self.assertTrue(data_boundary({"q": "run latent_vector extraction"}))
+        self.assertTrue(data_boundary({"x": "internal_score was high"}))
+        self.assertTrue(data_boundary({"x": "see candidate_id below"}))
+
+    def test_clean_value_text_still_passes(self):
+        # ordinary scientific text must NOT trip the guard (no false positives)
+        self.assertEqual(data_boundary({"note": "SCN11A gain-of-function in neuropathic pain"}), [])
+
 if __name__ == "__main__":
     unittest.main()

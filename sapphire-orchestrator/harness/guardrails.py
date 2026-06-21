@@ -15,10 +15,10 @@ class Violation:
 
 
 # Internal-only keys that must never leave Quiver to EMET / web / Q-Models.
-_INTERNAL_KEYS = {
+_INTERNAL_KEYS = frozenset({
     "s_internal", "internal_score", "ep_crispr", "latent_vector",
     "functional_traces", "candidate_id", "crispr_score",
-}
+})
 # Patterns of internal identifiers/fields (defense in depth over key names).
 _FORBIDDEN_PATTERNS = [
     re.compile(r"\bQS\d{3,}\b"),              # internal candidate ids e.g. QS00123
@@ -27,6 +27,9 @@ _FORBIDDEN_PATTERNS = [
     re.compile(r"functional[_-]?trace"),
     re.compile(r"\bep[_-]?crispr\b", re.IGNORECASE),
 ]
+# Every internal key is ALSO a value-side pattern, so an internal term embedded in a
+# string value (not just used as a key) is blocked too. Word-boundary, escaped.
+_FORBIDDEN_PATTERNS += [re.compile(r"\b" + re.escape(k) + r"\b") for k in sorted(_INTERNAL_KEYS)]
 
 
 def _walk_keys(obj):
@@ -39,7 +42,7 @@ def _walk_keys(obj):
             yield from _walk_keys(item)
 
 
-def data_boundary(inputs) -> list:
+def data_boundary(inputs) -> "list[Violation]":
     viols = []
     for key in _walk_keys(inputs):
         if isinstance(key, str) and key in _INTERNAL_KEYS:
@@ -51,6 +54,6 @@ def data_boundary(inputs) -> list:
     return viols
 
 
-def public_identifiers_only(inputs) -> list:
+def public_identifiers_only(inputs) -> "list[Violation]":
     # Stricter complement: same blocklist, reported under its own guardrail name.
     return [Violation("public_identifiers_only", v.detail, v.path) for v in data_boundary(inputs)]
