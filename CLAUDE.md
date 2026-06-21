@@ -89,7 +89,9 @@ two-bucket "firm":
 - **Veto facts** (FDA-memory, IP) = gates the roundtable adjudicates, never silent kills.
 - **Demo fidelity, label it:** EMET = live, personas = live, **Q-Models = REAL** (CPU tracks `live-local`;
   GPU tracks via the live-proven async launcher; remaining tracks marked `stub`/`eval` in the registry —
-  never silently mocked), **internal moat = MOCK** (user is wiring internal data — assume it lands).
+  never silently mocked), **internal moat = REAL** (reads from the Loka CNS_DFP data via
+  `sapphire-orchestrator/moat/` — `MoatClient` + `moat_facts`; provenance `moat-real`; degrades honestly
+  to `[]`/mock if `RohanOnly/moat/moat.sqlite` hasn't been built from the parquet).
 - **Empirical culture:** *"SOTA on shit is still shit."* Mark `proven` vs `paper-claim`; never oversell a
   mock or a paper benchmark.
 
@@ -97,7 +99,7 @@ two-bucket "firm":
 | Path | What |
 |---|---|
 | `architecture/` | **The agent specs**, organized as the firm: `orchestrator/` (control) · `bucket1/` (facts — `scientific/` + `semantic/`) · `bucket2/` (partners + `institutional/`). A README at every level + a top-level agent report. |
-| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `engagement.py` (loop wrapper: recall→trace→reflect) · `serve.py` (subscription bridge) · `contracts/` (shared P5 contracts: validator + provenance + schemas) · `harness/` (the agent harness — one runtime every agent runs through) · `emet/` (live EMET adapter+handler) · `memory/` (durable memory store) · `selfimprove/` (governance · reflect · authoring · metrics · CLI) · `qmodels/` (**real launchpad**) · `scenarios/` (+ `manifest.json`, `capture.py`) · `AGENTS.md` · `dossier_schema.md`. |
+| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `engagement.py` (loop wrapper: recall→trace→reflect) · `serve.py` (subscription bridge) · `contracts/` (shared P5 contracts: validator + provenance + schemas) · `harness/` (the agent harness — one runtime every agent runs through) · `emet/` (live EMET adapter+handler) · `memory/` (durable memory store) · `selfimprove/` (governance · reflect · authoring · metrics · CLI) · `qmodels/` (**real launchpad**) · `moat/` (**real internal moat**: `MoatClient` + `moat_facts`; provenance `moat-real`; reads from Loka CNS_DFP SQLite) · `scenarios/` (+ `manifest.json`, `capture.py`) · `AGENTS.md` · `dossier_schema.md`. |
 | `q-models/` | **Vendored Q-Models toolset** (full code; source repo retired — see `q-models/VENDORED.md`). The 24 tools the orchestrator can call. |
 | `RohanOnly/qmodels_run/` | Q-Models overnight run artifacts: AWS pre-existing snapshot, append-only ledger, smoke result, and `REPORT.md` (the integration report). |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |

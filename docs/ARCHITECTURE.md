@@ -16,7 +16,7 @@ Claude is the reasoning at each box.
         └───────────────────────────────────┬────────────────────────────────────────┘
                                              ▼
         ┌──────────────── BUCKET 1 · FACTS (junior analysts) ────────────────┐
-        │  Internal moat (MOCK)  ·  EMET (live)  ·  Q-Models  ·  13 semantic  │
+        │  Internal moat (REAL, moat-real)  ·  EMET (live)  ·  Q-Models  ·  13 semantic  │
         │  → cited fact DOSSIER; Research Manager runs completeness /          │
         │    contradiction / VETO / DIVERGENCE / KNOWN_UNKNOWN rules           │
         └───────────────────────────────────┬────────────────────────────────┘
@@ -143,9 +143,12 @@ later:  selfimprove record-outcome  → experiment_outcome (+ moat_blindspot if 
 ## 9. Provenance & honesty
 Every rendered artifact carries a provenance label (`emet-live` · `qmodels:<tool>`/`live-local`/`gpu-*` ·
 `memory-recall` · `persona-judgment` · `synthesis` · `stub`/`mock`). Nothing is silently mocked. **Still
-mock/stub:** the internal moat (synthetic), 8 of 10 scenarios (honest `stub`, captured live — never
-fabricated), some Q-Models tracks (`stub`/`eval` in the registry). The legacy engine still serves canned
-evidence per agent-seam — the harness is proven and callable; the per-seam rewiring is Phase 6.
+mock/stub:** 8 of 10 scenarios (honest `stub`, captured live — never fabricated), some Q-Models tracks
+(`stub`/`eval` in the registry). **The internal moat is now REAL** (`moat-real`): the Loka CNS_DFP parquet
+→ `RohanOnly/moat/moat.sqlite` (build via `_build/build_moat_db.py`), accessed read-only through
+`MoatClient` and surfaced as dossier facts by `moat_facts` in `sapphire-orchestrator/moat/`; degrades
+honestly to `[]` if the SQLite hasn't been built. The legacy engine still serves canned evidence per
+agent-seam — the harness is proven and callable; the per-seam rewiring is Phase 6.
 
 ## 10. Safety model (enforced mechanically by the harness)
 - **Data boundary:** internal scores / candidate IDs (`QS…`) / EP-CRISPR / functional traces can never

@@ -59,11 +59,10 @@ The four workflows: gene-gene, gene-drug, drug-gene, drug-drug — each similar 
 
 ## How Sapphire leverages this
 **Immediately, in-hand (no Loka code needed):**
-1. **Retire the MOCK moat → real moat.** Build a small `moat` data layer over the parquet exposing
-   similar/opposite perturbation lookups (gene/drug, by `match_effect`), and wire it into the Internal
-   Science Lead / `validate` so the dossier carries real perturbation-similarity evidence. This is the
-   highest-value win and directly closes Sapphire's biggest remaining mock. (The Phase-5 self-improvement
-   `moat_blindspot` loop then has a real substrate to update.)
+1. **Retire the MOCK moat → real moat.** ✅ **WIRED (real)** — see `sapphire-orchestrator/moat/`
+   (`MoatClient` + `moat_facts`, provenance `moat-real`) + `_build/build_moat_db.py` (parquet → SQLite).
+   The dossier now carries real CNS_DFP perturbation-similarity evidence (similar genes + rescue compounds).
+   The Phase-5 self-improvement `moat_blindspot` loop has a real substrate to update.
 2. **Adopt Loka's reasoning designs** — the 4 perturbation workflows + the 2 use-case flowcharts map onto
    our agents; the multi-model Pro/Haiku split, the scratchpad pattern, and their LLM-as-judge eval harness
    are reusable patterns.
