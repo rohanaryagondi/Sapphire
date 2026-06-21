@@ -122,8 +122,11 @@ shutdown -h now
 def _render_tool_userdata(job: dict, bucket: str, max_minutes: int = 60) -> str:
     """Template for a real Q-Models eval (DRY-RUN ONLY in this overnight run — not executed live).
     A live GPU run would clone q-models, set up the env, run eval_script on the inputs, upload result."""
+    import base64
     eval_script = (job.get("eval_script") or "aws/<tool>_eval.py")
-    inputs_json = json.dumps(job.get("inputs", {}))
+    # SECURITY: base64-encode inputs so no user JSON ever reaches a shell with metacharacters
+    # (base64 alphabet is shell-safe). The instance decodes it back to JSON.
+    inputs_b64 = base64.b64encode(json.dumps(job.get("inputs", {})).encode()).decode()
     return f"""#!/bin/bash
 set -x
 shutdown -h +{max_minutes} &   # parachute
@@ -131,7 +134,7 @@ cd /home/ec2-user || cd /home/ubuntu
 git clone --depth 1 https://github.com/rohanaryagondi/Q-Models.git qm 2>/dev/null || true
 cd qm
 python3 -m pip install -q -r requirements.txt || true
-echo '{inputs_json}' > /tmp/inputs.json
+echo {inputs_b64} | base64 -d > /tmp/inputs.json
 python3 {shlex.quote(eval_script)} --inputs /tmp/inputs.json --out /tmp/result.json || \
   echo '{{"job":"{job['job_id']}","error":"eval failed"}}' > /tmp/result.json
 aws s3 cp /tmp/result.json s3://{bucket}/{job['job_id']}/result.json --region {REGION} || true

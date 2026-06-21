@@ -1,0 +1,17 @@
+{
+  "job_id": "sapphire-qmodels-tool-d678a18a",
+  "kind": "tool",
+  "mode": "dry-run",
+  "status": "dry-run-validated",
+  "tool_id": "structure_binding",
+  "eval_script": "q-models/aws/boltz_runner.py",
+  "instance_type": "g5.xlarge",
+  "inputs": {
+    "smiles": "CC'); rm -rf /  #",
+    "note": "x"
+  },
+  "created": "2026-06-21T05:09:01.034284+00:00",
+  "est_usd": 0.503,
+  "userdata": "#!/bin/bash\nset -x\nshutdown -h +30 &   # parachute\ncd /home/ec2-user || cd /home/ubuntu\ngit clone --depth 1 https://github.com/rohanaryagondi/Q-Models.git qm 2>/dev/null || true\ncd qm\npython3 -m pip install -q -r requirements.txt || true\necho eyJzbWlsZXMiOiAiQ0MnKTsgcm0gLXJmIC8gICMiLCAibm90ZSI6ICJ4In0= | base64 -d > /tmp/inputs.json\npython3 q-models/aws/boltz_runner.py --inputs /tmp/inputs.json --out /tmp/result.json ||   echo '{\"job\":\"sapphire-qmodels-tool-d678a18a\",\"error\":\"eval failed\"}' > /tmp/result.json\naws s3 cp /tmp/result.json s3://sapphire-qmodels-scratch/sapphire-qmodels-tool-d678a18a/result.json --region us-east-1 || true\nshutdown -h now\n",
+  "note": "would exceed budget: est $0.503 > cap $0.5 (NOT launched \u2014 dry-run)"
+}
