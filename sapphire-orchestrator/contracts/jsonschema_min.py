@@ -9,6 +9,13 @@ _TYPES = {
 }
 
 
+def _types(schema):
+    t = schema.get("type")
+    if t is None:
+        return []
+    return t if isinstance(t, list) else [t]
+
+
 def _resolve(ref: str, root: dict):
     if not ref.startswith("#/"):
         raise ValueError(f"unsupported $ref {ref!r} (only #/ local refs)")
@@ -43,7 +50,7 @@ def validate(instance, schema, root=None, path="$") -> list[str]:
     if "enum" in schema and instance not in schema["enum"]:
         errors.append(f"{path}: {instance!r} not in enum {schema['enum']}")
 
-    if schema.get("type") == "object" and isinstance(instance, dict):
+    if "object" in _types(schema) and isinstance(instance, dict):
         for req in schema.get("required", []):
             if req not in instance:
                 errors.append(f"{path}.{req}: required field missing")
@@ -56,7 +63,7 @@ def validate(instance, schema, root=None, path="$") -> list[str]:
             if k in instance:
                 errors += validate(instance[k], subschema, root, f"{path}.{k}")
 
-    if schema.get("type") == "array" and isinstance(instance, list):
+    if "array" in _types(schema) and isinstance(instance, list):
         item_schema = schema.get("items")
         if item_schema:
             for i, item in enumerate(instance):

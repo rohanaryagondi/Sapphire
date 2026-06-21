@@ -48,5 +48,17 @@ class TestValidate(unittest.TestCase):
         self.assertEqual(validate({"v": "s"}, root), [])
         self.assertTrue(validate({"v": 1}, root))
 
+    def test_list_type_object_children_validated(self):
+        s = {"type": ["object", "null"], "required": ["a"],
+             "additionalProperties": False, "properties": {"a": {"type": "string"}}}
+        self.assertEqual(validate(None, s), [])            # null branch allowed
+        self.assertEqual(validate({"a": "x"}, s), [])      # valid object
+        self.assertTrue(any("$.a: required field missing" == e for e in validate({}, s)))
+
+    def test_list_type_scalar(self):
+        s = {"type": ["string", "null"]}
+        self.assertEqual(validate(None, s), [])
+        self.assertTrue(validate(5, s))
+
 if __name__ == "__main__":
     unittest.main()
