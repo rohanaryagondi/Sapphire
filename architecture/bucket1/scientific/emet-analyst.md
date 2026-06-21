@@ -21,7 +21,10 @@ validation, pathway, or drug-safety context.
    | pathway / network | Pathway Analysis |
    | effect sizes | Quantitative Evidence |
    | prevalence / general | Database Q&A |
-2. Run in **Thorough** mode; one tab per query; read and **cite** every claim (PMID / source).
+2. Run each query via the **`emet-runner` skill** (`.claude/skills/emet-runner/SKILL.md`) — the single,
+   harness-callable Playwright driver: Thorough mode, one tab per query, cite every claim (PMID / source).
+   The harness adapter normalizes the returned EMET envelope into cited **T2** dossier facts stamped
+   `emet-live`; a login screen escalates (`login-required`) rather than guessing.
 3. Batch the semantic agents' flagged literature questions into a single pass; return each answer to
    its requester before their synthesis.
 4. Hand structured, cited claims to the Research Manager.
