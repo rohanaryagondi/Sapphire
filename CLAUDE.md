@@ -56,9 +56,26 @@ two-bucket "firm":
   (live-local / stub / gpu / deprecated). **Live AWS plumbing proven** by `qmodels/smoke_test.py` (one
   t3.micro, verified teardown, ~$0.0017; full report in `RohanOnly/qmodels_run/REPORT.md`). Safety: profile
   `Rohan-Sapphire`, account-gated, create-only + ledger, **teardown only by ledgered id**.
-- **Phase 5 ideas (TODO):** wire the remaining `stub`/`eval` tracks live; swap the mock moat for the real
-  Quiver latent space; capture more `scenarios/*.json`; add the cross-engagement memory / active-learning loop.
-- **Then:** wire the orchestrator end-to-end; upgrade the `site/` Console to drive it.
+- **Phase 5 — harness + live EMET + self-improvement loop + scenario suite DONE** (`Rohan`, 2026-06-21;
+  built subagent-driven, every task spec+quality reviewed; ~137 stdlib-only tests; full report
+  `docs/superpowers/PHASE5-REPORT.md`). Five workstreams behind shared contracts (`sapphire-orchestrator/contracts/`):
+  - **Agent harness** (`harness/`) — one runtime every agent runs through: declare→dispatch→validate→guard→
+    stamp→trace. `harness.run(agent_id, inputs)`; registry `agents.json`; dispatch by kind
+    (claude/qmodels/python/emet); mechanical guardrails (data-boundary BLOCKS, personas no-tools+must-cite,
+    veto-is-a-gate, provenance stamped); fail-safe abstain/escalate (never fabricates); append-only trace at
+    `RohanOnly/engagements/<id>/trace.jsonl`.
+  - **Live EMET** (`emet/` + `.claude/skills/emet-runner/`) — a Playwright skill behind an MCP-swappable
+    `make_emet_handler()` seam; login→escalate; cited **T2** facts; never emits a formal VETO.
+  - **Self-improvement loop** (`memory/` + `selfimprove/`) — append-only public-only memory; entity `recall`;
+    active-learning spine (`record_outcome` refuted → `moat_blindspot`); **tiered governance** (`governance.json`:
+    memory auto, behavior-change gated to `proposed/`; flip flags → autonomous); metrics → `selfimprove/REPORT.md`.
+  - **Integration** (`engagement.py`) — `run_engagement()` wraps the engine ADDITIVELY (orchestrator.py
+    untouched): recall priors in → harness trace → reflect memory out. `python -m selfimprove record-outcome …`.
+  - **Scenario suite** (`scenarios/manifest.json` + `capture.py`) — 10-axis variety matrix; nav1_8+tsc2
+    captured, the rest honest `stub` (capture live via `_build/capture_scenario.py`, never fabricated).
+- **Phase 6 ideas (TODO):** rewire each orchestrator agent-seam through `harness.run` (the legacy engine
+  still uses canned evidence); capture the 8 stub scenarios live; wire remaining Q-Models `stub`/`eval`
+  tracks; swap the mock moat for the real Quiver latent space; upgrade the `site/` Console to drive the loop.
 
 ## Hard rules (non-negotiable)
 - **Data boundary:** Quiver internal EP/CRISPR data + scores NEVER leave to EMET / web / Q-Models. Public
@@ -78,7 +95,7 @@ two-bucket "firm":
 | Path | What |
 |---|---|
 | `architecture/` | **The agent specs**, organized as the firm: `orchestrator/` (control) · `bucket1/` (facts — `scientific/` + `semantic/`) · `bucket2/` (partners + `institutional/`). A README at every level + a top-level agent report. |
-| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `serve.py` (subscription bridge) · `qmodels/` (**real launchpad**: `registry.json` · `client.py` two-speed router · `launcher.py` safe async EC2 · `adapters.py` · `smoke_test.py`) · `scenarios/` · `AGENTS.md` · `dossier_schema.md`. |
+| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `engagement.py` (loop wrapper: recall→trace→reflect) · `serve.py` (subscription bridge) · `contracts/` (shared P5 contracts: validator + provenance + schemas) · `harness/` (the agent harness — one runtime every agent runs through) · `emet/` (live EMET adapter+handler) · `memory/` (durable memory store) · `selfimprove/` (governance · reflect · authoring · metrics · CLI) · `qmodels/` (**real launchpad**) · `scenarios/` (+ `manifest.json`, `capture.py`) · `AGENTS.md` · `dossier_schema.md`. |
 | `q-models/` | **Vendored Q-Models toolset** (full code; source repo retired — see `q-models/VENDORED.md`). The 24 tools the orchestrator can call. |
 | `RohanOnly/qmodels_run/` | Q-Models overnight run artifacts: AWS pre-existing snapshot, append-only ledger, smoke result, and `REPORT.md` (the integration report). |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |
