@@ -44,7 +44,7 @@ ask ─▶ ORCHESTRATOR (control)         plan & scope, own the loop, write the 
 **Bucket 1 — scientific core**
 - **Internal Science Lead** — the Quiver EP-CRISPR moat; authors the ranked hypothesis (MOCK in demo).
 - **EMET Analyst** — the single door to EMET (BenchSci); cited biomedical evidence (live).
-- **Q-Models Runner** — specialist models on demand: binding / ADMET / cardiac / selectivity (MOCK).
+- **Q-Models Runner** — specialist models on demand: binding / ADMET / cardiac / selectivity (**REAL**: 24 tools by id; CPU live-local, GPU via the safe async launcher).
 
 **Bucket 1 — semantic intelligence (13)**
 - **FDA Institutional Memory ⛔** · **Patent & IP ⛔** — the two veto-class agents.
@@ -65,10 +65,13 @@ ask ─▶ ORCHESTRATOR (control)         plan & scope, own the loop, write the 
 ## What's real vs. mock (today)
 - **Claude** — live (the reasoning, on the Quiver subscription).
 - **EMET** — real evidence captured in the shipped scenarios; not yet wired to live web queries.
-- **Q-Models** — MOCK (shaped placeholders; AWS GPU launches next).
-- **Internal moat** — MOCK (synthetic stand-in until the real EP-CRISPR data + AWS land).
+- **Q-Models** — **REAL** (vendored in-repo; orchestrator calls any of 24 tools by id; CPU tracks
+  `live-local`, GPU tracks via the live-proven async EC2 launcher; remaining tracks marked `stub`/`eval`
+  in `qmodels/registry.json` — never silently mocked).
+- **Internal moat** — MOCK (synthetic stand-in until the real EP-CRISPR data lands).
 
-Every fact in the Console carries a provenance badge (✓ EMET-captured / ◇ Claude-reconstructed / ◍ mock).
+Every fact in the Console carries a provenance badge (✓ EMET-captured / ◇ Claude-reconstructed / ◍ mock;
+Q-Models rows additionally carry live-local / gpu / stub / unavailable).
 
 ## Agent file format (every spec follows it)
 `Bucket/layer` · `One-liner` · `Activate when` · `Inputs` · `Procedure` · `Output (contract)` ·

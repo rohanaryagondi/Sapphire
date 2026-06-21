@@ -39,15 +39,25 @@ two-bucket "firm":
   query intake + a JS planner mirror (PLAN stage for any query), dossier with tier/flag chips, and the
   round-1→round-2 rebuttal. `_build/build_orch_data.py` runs the engine to generate the Console data
   (one source of truth). The `/sapphire` skill drives a live query (planner → cascade/EMET → Q-Models →
-  persona subagents → synthesis). Facts MOCK where labeled (Q-Models, internal moat); EMET + personas live.
+  persona subagents → synthesis). EMET + personas live; **Q-Models real** (CPU live-local, GPU via launcher);
+  internal moat still MOCK (labeled).
   The **front-facing site is Console-first** (`site/index.html`); the full-flow explainer moved to
   `site/explainer.html`. **`sapphire-orchestrator/serve.py` is the subscription bridge** — serves the site
   and runs novel queries through **Claude Code headless on the user's subscription** (no API key; one
   `claude -p --json-schema` call returns the structured run) via `/api/run`, with graceful fallback to the
   canned scenarios + engagement plan on static hosting. "Claude under the hood" = the engine is the harness
   that enforces the rules; Claude is the reasoning at each box.
-- **Phase 4 ideas (TODO):** wire Q-Models to real AWS launches; swap the mock moat for the real Quiver
-  latent space; capture more `scenarios/*.json`; add the cross-engagement memory / active-learning loop.
+- **Phase 4 — Q-Models integration DONE** (`Rohan` branch, overnight 2026-06-21): the **full Q-Models
+  toolset is vendored into `q-models/`** (source repo retired) and the **orchestrator can call any of the
+  24 tools** by id via `call_model(tool_id, inputs)`. Two-speed routing: **`local-cpu` → sync HTTP** (real
+  predictions, `provenance: live-local`, $0) and **`gpu-launch`/`endpoint`/`batch` → async launcher**
+  (auto-launch tagged self-terminating EC2 → run `*_eval.py` → retrieve → auto-teardown; dry-run by default,
+  live opt-in behind every safety guard). Per-tool status is marked honestly in `qmodels/registry.json`
+  (live-local / stub / gpu / deprecated). **Live AWS plumbing proven** by `qmodels/smoke_test.py` (one
+  t3.micro, verified teardown, ~$0.0017; full report in `RohanOnly/qmodels_run/REPORT.md`). Safety: profile
+  `Rohan-Sapphire`, account-gated, create-only + ledger, **teardown only by ledgered id**.
+- **Phase 5 ideas (TODO):** wire the remaining `stub`/`eval` tracks live; swap the mock moat for the real
+  Quiver latent space; capture more `scenarios/*.json`; add the cross-engagement memory / active-learning loop.
 - **Then:** wire the orchestrator end-to-end; upgrade the `site/` Console to drive it.
 
 ## Hard rules (non-negotiable)
@@ -58,8 +68,9 @@ two-bucket "firm":
 - **Internal↔external contradictions = `DIVERGENCE` findings** — surface, do NOT auto-reconcile. Often the
   alpha (Quiver sees what the literature can't). Only external↔external conflicts trigger re-fetch.
 - **Veto facts** (FDA-memory, IP) = gates the roundtable adjudicates, never silent kills.
-- **Demo fidelity, label it:** EMET = live, personas = live, **Q-Models = MOCK**, **internal moat = MOCK**
-  (user is wiring AWS + internal data — assume those land; don't block on them).
+- **Demo fidelity, label it:** EMET = live, personas = live, **Q-Models = REAL** (CPU tracks `live-local`;
+  GPU tracks via the live-proven async launcher; remaining tracks marked `stub`/`eval` in the registry —
+  never silently mocked), **internal moat = MOCK** (user is wiring internal data — assume it lands).
 - **Empirical culture:** *"SOTA on shit is still shit."* Mark `proven` vs `paper-claim`; never oversell a
   mock or a paper benchmark.
 
@@ -67,7 +78,9 @@ two-bucket "firm":
 | Path | What |
 |---|---|
 | `architecture/` | **The agent specs**, organized as the firm: `orchestrator/` (control) · `bucket1/` (facts — `scientific/` + `semantic/`) · `bucket2/` (partners + `institutional/`). A README at every level + a top-level agent report. |
-| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `serve.py` (subscription bridge) · `qmodels/` (launchpad mock) · `scenarios/` · `AGENTS.md` (operating model) · `dossier_schema.md`. |
+| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `serve.py` (subscription bridge) · `qmodels/` (**real launchpad**: `registry.json` · `client.py` two-speed router · `launcher.py` safe async EC2 · `adapters.py` · `smoke_test.py`) · `scenarios/` · `AGENTS.md` · `dossier_schema.md`. |
+| `q-models/` | **Vendored Q-Models toolset** (full code; source repo retired — see `q-models/VENDORED.md`). The 24 tools the orchestrator can call. |
+| `RohanOnly/qmodels_run/` | Q-Models overnight run artifacts: AWS pre-existing snapshot, append-only ledger, smoke result, and `REPORT.md` (the integration report). |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |
 | `personas/` | James' 59 company personas (md, by archetype). Wrapped by `company-partner-template.md`. |
 | `capability_map.xlsx`, `model_landscape.md`, `integration_map.md`, `orchestration_brief_hayes.md`, `expert-agent/` | **Research foundation** — what to build, which models per capability, the 3-layer data vision, the CAP-15 expert-agent design (regulator partner reuses it). |

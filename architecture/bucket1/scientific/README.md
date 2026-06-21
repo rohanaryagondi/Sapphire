@@ -5,4 +5,4 @@ that gates and boosts it. Full 2–3-line summaries are in the [Bucket 1 README]
 
 - **[Internal Science Lead](internal-science-lead.md)** — the Quiver EP-CRISPR moat; authors the ranked hypothesis (MOCK).
 - **[EMET Analyst](emet-analyst.md)** — the single door to EMET (BenchSci); cited biomedical evidence (live).
-- **[Q-Models Runner](q-models-runner.md)** — specialist models on demand: binding / ADMET / cardiac / selectivity (MOCK).
+- **[Q-Models Runner](q-models-runner.md)** — specialist models on demand: binding / ADMET / cardiac / selectivity (**REAL**: 24 tools callable by id; CPU `live-local`, GPU via the safe async launcher; per-tool status in `qmodels/registry.json`).
