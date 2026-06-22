@@ -1,0 +1,176 @@
+{
+  "id": "scn2a_epilepsy",
+  "title": "SCN2A epilepsy — GoF vs LoF mechanism and precision therapy",
+  "query": "What is the GoF vs LoF mechanistic dichotomy in SCN2A epilepsy and how does it determine therapeutic strategy?",
+  "headline": "SCN2A disorders bifurcate sharply along a GoF/LoF axis: early neonatal DEE (GoF, blocker-responsive) vs later-onset epilepsy/ASD (LoF, blocker-contraindicated) — with a first-in-human ASO proof of concept (elsunersen) for GoF.",
+  "_provenance_note": "discover facts captured LIVE from EMET (Thorough) 2026-06-22; real PMIDs; chat_url https://emet.benchsci.com/chat/cbb64717-180d-4977-9379-34dfec2c6724.",
+  "discover": {
+    "source": "EMET (live 2026-06-22, Thorough) + internal moat (real)",
+    "summary": "A live EMET Thorough run on SCN2A epilepsy surfaced a sharply bifurcated GoF/LoF mechanism with strong human cohort evidence (n=201, n=81, n=179) and a clear therapeutic implication: GoF→SCBs/ASO knockdown; LoF→upregulation strategies. First-in-human elsunersen ASO (Nat Med 2025) established proof of concept for GoF DEE. Binary classification is complicated by mixed/intermediate variants in infant-onset cases. SCBs may worsen LoF cases.",
+    "result": "SCN2A GoF: neonatal DEE, SCBs effective, elsunersen (ASO) first-in-human 2025. SCN2A LoF: later-onset/ASD, SCBs contraindicated, CRISPRa/AAV-KV1.1 preclinical. Mechanism split is the program gate for any Nav1.2 modulator."
+  },
+  "validate": {
+    "source": "Q-Models launchpad",
+    "runs": [
+      {"model": "Boltz-2", "out": "Nav1.2 channel-state-dependent inhibitor structure/affinity prediction applicable; not run in this capture.", "provenance": "stub"},
+      {"model": "Quiver ion-channel fine-tune", "out": "GoF variant functional classification (DAPC-benchmarked) applicable; not run in this capture.", "provenance": "stub"}
+    ],
+    "result": "Q-Models structure/function compute is applicable to Nav1.2 inhibitor design and variant classification; not executed in this capture.",
+    "mock": true
+  },
+  "panel": [
+    {
+      "persona": "Dr. CSO, Rare Pediatric Epilepsy Biotech",
+      "role": "Chief Scientific Officer",
+      "lens": "scientific",
+      "stance": "conditional",
+      "conviction": 4,
+      "headline": "The GoF/LoF mechanistic dichotomy is as clean as it gets in channelopathies — but functional classification must precede any therapeutic decision",
+      "rationale": "The Berg 2024 cohort (n=81, P<0.0001 function-phenotype correlation; PMID:38651838) and Berecki 2022 DAPC analysis (n=179; PMID:35637276) leave no ambiguity: GoF variants drive neonatal DEE and respond to SCBs; LoF variants drive later-onset epilepsy and ASD, and SCBs are contraindicated and documented to worsen seizures (PMID:28379373). The elsunersen first-in-human case (PMID:40263630) is a landmark proof of concept. The unresolved complication is infant-onset cases — Thompson 2023 (28 variants, automated patch-clamp; PMID:37578743) shows many exhibit mixed GoF/LoF biophysics not captured by binary classification, and these overlap with the epileptic spasms phenotype (67% infant-onset vs 22% neonatal-onset; PMID:38651838). Any program targeting SCN2A must commit to DAPC-validated variant classification before dosing.",
+      "top_risk": "Misclassification of variant function in infant-onset/mixed cases — wrong therapeutic arm causes harm",
+      "ask": "Establish a validated functional classification pipeline (DAPC + iPSC-MEA) as a companion diagnostic before any clinical dosing decision in the infant-onset subgroup"
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Pediatric Neurology",
+      "role": "Regulatory / Safety",
+      "lens": "regulatory",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "Elsunersen first-in-human case is encouraging but a single expanded-access patient; the SCB-worsening risk in LoF makes functional classification a regulatory imperative",
+      "rationale": "The Nat Med 2025 elsunersen case (PMID:40263630; >60% seizure reduction over 20 months) is compelling first-in-human ASO evidence for GoF SCN2A DEE. However, it is a single expanded-access patient in a preterm neonate — a Phase II program must resolve sample size, dosing, and the biomarker endpoint. The critical regulatory risk is the documented seizure-worsening potential of SCBs in LoF patients (Wolff 2017; PMID:28379373) — any companion diagnostic (CD) for functional classification will need analytical and clinical validation. PRAX-222 (oral Nav1.2 partial inhibitor) has FDA orphan designation for GoF SCN2A epilepsy, which shapes the competitive landscape for a novel GoF agent.",
+      "top_risk": "Regulatory requirement for a validated companion diagnostic (functional variant classification) before approval — absent one, trial enrichment is impossible",
+      "ask": "A pre-IND meeting to align on the companion diagnostic for variant functional classification and the primary endpoint for a neonatal GoF DEE trial"
+    },
+    {
+      "persona": "Dr. Pharma BD, Rare Neurogenetics",
+      "role": "External Innovation & BD",
+      "lens": "commercial",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "Strong validation story for GoF; LoF is a separate, earlier-stage program — do not conflate them in a deal",
+      "rationale": "GoF SCN2A DEE is a well-genetically-validated, mechanistically understood ultra-rare DEE with a first-in-human ASO proof of concept — this is a textbook rare-disease program. The Wolff 2017 foundational cohort (PMID:28379373) and Berg 2024 (PMID:38651838) give robust natural history. The commercial risk is orphan-level market size and the emerging competition from PRAX-222 (oral GoF). The LoF arm (CRISPRa, AAV-KV1.1) is preclinical and earlier — Wang 2024 CRISPRa in mice (PMID:38412857) and Zhang 2025 preprint (AAV-KV1.1; PMID:40501831) are promising but not clinical-ready. A deal structured around the GoF ASO arm with an option on the LoF upregulation program is the rational shape.",
+      "top_risk": "PRAX-222 (oral GoF Nav1.2 partial inhibitor) reaching phase 2 before an ASO-based competitor and capturing the GoF label",
+      "ask": "Deal structured around GoF ASO arm (milestone-heavy on Phase II readout) + option on LoF upregulation program once a clinical biomarker is defined"
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "role": "Kill-the-thesis",
+      "lens": "adversarial",
+      "stance": "hold",
+      "conviction": 2,
+      "headline": "The mechanism is clean but the mixed/intermediate variant problem may unravel the GoF/LoF binary in a real clinical trial",
+      "rationale": "The Thompson 2023 automated patch-clamp study (PMID:37578743) of 28 variants shows diverse, complex mixed GoF/LoF biophysics that are not captured by binary classification. Brunklaus 2022 (PMID:35037686) notes that structural domain location predicts function imperfectly in variants with novel structural positions. In a real clinical trial, functional misclassification in the infant-onset subgroup — where epileptic spasms are the dominant phenotype and SCBs are harmful in LoF — would cause harm, generate a clinical hold, and destroy the program. The thesis rests on functional classification being tractable in a clinical setting, which is not proven at scale. DAPC is a research tool, not a validated CD.",
+      "top_risk": "Mixed-biophysics variants causing misclassification and iatrogenic harm (SCBs worsening LoF) in a trial without a validated companion diagnostic",
+      "ask": "Show that DAPC-based or iPSC-MEA functional classification is feasible and validated as a companion diagnostic in a multi-centre setting before program commitment"
+    }
+  ],
+  "facts": [
+    {
+      "field": "A1 target/modality",
+      "value": "SCN2A encodes Nav1.2, a voltage-gated sodium channel in excitatory cortical neurons; therapeutic modalities split by function: GoF→SCBs (acute) + ASO knockdown (precision); LoF→upregulation (CRISPRa, AAV gene therapy).",
+      "source": "EMET (live 2026-06-22); PMID:28379373; PMID:31904126",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B1 human genetics / GoF phenotype",
+      "value": "Wolff et al. 2017 (n=201): GoF missense variants drive neonatal/early-infantile (<3 months) DEE; LoF/truncating variants drive later-onset epilepsy (≥3 months) and ASD/ID. SCB use associated with seizure reduction only in the early-infantile (<3 month) GoF group.",
+      "source": "EMET (live 2026-06-22); PMID:28379373",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B1 human genetics / systematic phenotyping",
+      "value": "Berg et al. Brain 2024 (n=81, 69 unique variants): function–phenotype correlation P<0.0001; GoF/mixed predominates in neonatal-onset DEE; severe/complete LoF in later-onset epilepsy and ASD. Non-seizure severity (motor, gastrostomy, cortical visual impairment) highest in neonatal GoF.",
+      "source": "EMET (live 2026-06-22); PMID:38651838",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B2 biophysical mechanism / DAPC",
+      "value": "Berecki et al. Commun Biol 2022 (n=179, 38 recurrent variants, DAPC on 13): 36/38 recurrent variants associate with only one phenotypic group; DAPC superior to standard voltage clamp for predicting neuronal-firing impact; GoF→early-infantile; LoF→later-onset.",
+      "source": "EMET (live 2026-06-22); PMID:35637276",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B2 biophysical mechanism / fast inactivation",
+      "value": "Berecki et al. Brain 2025: DEE-associated Nav1.2 variants prevent fast inactivation via disruption of N1662–Q1494 hydrogen bond (IFM-motif docking), producing non-inactivating currents that paradoxically increase excitability at low channel densities.",
+      "source": "EMET (live 2026-06-22); PMID:38939966",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C1 therapeutic response — GoF / SCBs",
+      "value": "Mao et al. J Neurosci 2024: phenytoin rescues excitability of iPSC-derived GoF p.R1882Q neurons to control levels; no benefit in LoF p.R853Q neurons. Jia et al. J Neurochem 2024 (MEA): GoF networks (p.R1882Q) hyperexcitable, reduced by phenytoin and levetiracetam; LoF networks (p.R853Q) hypoexcitable, differential drug response.",
+      "source": "EMET (live 2026-06-22); PMID:38148154; PMID:38544375",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C2 precision therapy — GoF ASO (elsunersen)",
+      "value": "Li et al. J Clin Invest 2021: gapmer ASO knockdown in Q/+ (GoF p.R1882Q) mice significantly reduced spontaneous seizures and extended lifespan. Wagner et al. Nat Med 2025: first-in-human elsunersen in a preterm neonate with GoF SCN2A status epilepticus — >60% seizure reduction over 20 months of treatment (19 intrathecal administrations); no severe adverse events.",
+      "source": "EMET (live 2026-06-22); PMID:34850743; PMID:40263630",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C3 LoF therapeutic strategies (preclinical)",
+      "value": "Wang et al. Neuron 2024: CRISPRa upregulation of endogenous Scn2a rescues cerebellar VOR plasticity in LoF heterozygous mice — a proposed translatable endpoint. Zhang et al. bioRxiv 2025: AAV-KV1.1 reduces spike-wave discharge burden in Scn2a-deficient DBA/2J mice; KV1.1 downregulation also observed in human SCN2A-deficient cerebral organoids.",
+      "source": "EMET (live 2026-06-22); PMID:38412857; PMID:40501831",
+      "tier": "T2",
+      "confidence": "med"
+    },
+    {
+      "field": "open question — mixed variant classification",
+      "value": "Thompson et al. J Gen Physiol 2023 (28 variants, automated patch-clamp): many variants exhibit complex mixed GoF/LoF biophysical signatures not captured by binary classification; infant-onset patients (epileptic spasms 67%) may carry intermediate-function variants — binary GoF/LoF therapeutic assignment is uncertain for this subgroup.",
+      "source": "EMET (live 2026-06-22); PMID:37578743",
+      "tier": "T2",
+      "confidence": "med",
+      "flag": "DIVERGENCE"
+    }
+  ],
+  "rebuttal": [
+    {
+      "persona": "Dr. CSO, Rare Pediatric Epilepsy Biotech",
+      "revised": false,
+      "conviction": 4,
+      "shift": "Holds conviction 4. The adversarial concern about mixed variants is real (PMID:37578743) but sharpens rather than invalidates the ask: a validated DAPC/iPSC-MEA companion diagnostic is non-negotiable before dosing infant-onset patients — that is the program gate, not a reason to kill the thesis."
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Pediatric Neurology",
+      "revised": true,
+      "conviction": 3,
+      "shift": "Revised slightly upward confidence in the GoF arm given the elsunersen first-in-human evidence (PMID:40263630) and PRAX-222 orphan designation as a precedent for the regulatory path. Holds conviction 3. The companion diagnostic requirement remains the gating regulatory item."
+    },
+    {
+      "persona": "Dr. Pharma BD, Rare Neurogenetics",
+      "revised": false,
+      "conviction": 3,
+      "shift": "Unmoved. The commercial case for a GoF-only ASO deal is intact; PRAX-222 entering Phase 2 would compress the deal window, not improve it. Recommends a milestone structure that can accelerate on GoF ASO if PRAX-222 reads out negative."
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "revised": false,
+      "conviction": 2,
+      "shift": "Holds skepticism. Three lenses converge on the companion diagnostic as the program gate — which confirms the adversarial point: the GoF/LoF binary is not self-evident at the bedside, and the trial design must solve functional classification before dosing. The thesis is conditionally supportable only if the CD is validated."
+    }
+  ],
+  "synthesize": {
+    "recommendation": "Advance a GoF-arm ASO program (elsunersen/analog) with functional variant classification as a co-developed companion diagnostic; treat the LoF-arm (CRISPRa/AAV-KV1.1) as a separate, earlier-stage program. Do not conflate the two arms in a single clinical trial or deal structure.",
+    "consensus": "Unanimous: the GoF/LoF mechanistic bifurcation is real, reproducible across three large human cohorts, and pharmacologically validated — it is the strongest precision-medicine dichotomy in pediatric epilepsy genetics.",
+    "dissent": "Conviction 4 (CSO) vs 3 (regulator, BD) vs 2 (red-team). Red-team and regulator both flag that binary GoF/LoF classification is not validated as a companion diagnostic in a clinical multi-centre setting — the program's safety and efficacy rest on resolving this.",
+    "convergent_gate": "All four converge on the SAME gate: functional variant classification (DAPC/iPSC-MEA) must be validated as a companion diagnostic before any clinical trial can enrich by mechanism and avoid SCB harm to LoF patients.",
+    "proposed_experiment": "Validate a DAPC-based or iPSC-derived neuronal MEA functional classification pipeline as a companion diagnostic in a multi-centre retrospective cohort of ≥100 SCN2A variant carriers across phenotypic groups (neonatal DEE / infant-onset / ASD), with prospective validation in at least 20 new patients — closing the classification uncertainty before IND filing.",
+    "confidence": "Biology: HIGH (GoF/LoF dichotomy extremely well-evidenced). Program (GoF ASO): CONDITIONAL on companion diagnostic validation. Program (LoF upregulation): EARLY — CRISPRa/AAV-KV1.1 preclinical only.",
+    "entities": [
+      {"name": "SCN2A", "type": "gene"},
+      {"name": "Nav1.2", "type": "protein"},
+      {"name": "SCN2A-related epilepsy", "type": "disease"},
+      {"name": "developmental epileptic encephalopathy", "type": "disease"},
+      {"name": "autism spectrum disorder", "type": "disease"},
+      {"name": "elsunersen", "type": "drug"},
+      {"name": "PRAX-222", "type": "drug"}
+    ]
+  }
+}

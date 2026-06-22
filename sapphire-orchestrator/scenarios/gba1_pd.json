@@ -1,0 +1,186 @@
+{
+  "id": "gba1_pd",
+  "title": "GBA1 Parkinson's disease — biomarker and BBB access strategy",
+  "query": "Is GBA1-targeted therapy viable for Parkinson's disease given the blood-brain barrier challenge, and what biomarkers can track CNS target engagement?",
+  "headline": "GBA1 is the largest genetic risk factor for PD (OR 5.43); lysosomal GCase→GlcSph→α-synuclein feedforward is the mechanism; CNS access (BBB) is the program gate — with plasma GL-1/glucosylsphingosine and CSF GL-1 as validated pharmacodynamic biomarkers.",
+  "_provenance_note": "discover facts captured LIVE from EMET (Thorough) 2026-06-22; real PMIDs; chat_url https://emet.benchsci.com/chat/ad734624-af32-40a6-a4a8-9008978bf3b8.",
+  "discover": {
+    "source": "EMET (live 2026-06-22, Thorough) + internal moat (real)",
+    "summary": "A live EMET Thorough run on GBA1-PD surfaced: (1) strong genetic evidence (Sidransky 2009, GWAS, African-ancestry non-coding variant); (2) converging lysosomal mechanism (GCase→GlcSph→CMA impairment→α-synuclein feedforward; ER stress/UPR); (3) BBB as the critical pharmacological obstacle (ERT excluded; SRT/chaperones with CNS data; engineered AAV capsids enabling IV delivery); (4) plasma glucosylceramide and CSF GL-1 as validated PD biomarkers. Venglustat (SRT) achieved CNS GL-1 −74% but failed clinically, raising target-engagement-vs-clinical-benefit questions. Ambroxol (chaperone) shows CSF penetration and Phase 2 RCTs ongoing.",
+    "result": "GBA1-PD: genetic risk confirmed (OR 5.43); mechanism = lysosomal GCase deficiency + GlcSph/α-syn feedforward. BBB is the key gate: ERT excluded; SRT proved CNS penetration but failed clinically; chaperones (ambroxol) Phase 2; engineered AAV (BI-hTFR1) best preclinical BBB solution. Plasma GL-1 and CSF GL-1 are validated PD biomarkers."
+  },
+  "validate": {
+    "source": "Q-Models launchpad",
+    "runs": [
+      {"model": "Boltz-2", "out": "GCase-chaperone binding prediction (N370S/L444P misfolded GCase) applicable; not run in this capture.", "provenance": "stub"},
+      {"model": "Quiver BBB-ADMET fine-tune", "out": "CNS penetration prediction for small-molecule chaperones and SRT inhibitors applicable; not run in this capture.", "provenance": "stub"}
+    ],
+    "result": "Q-Models structure/ADMET compute applicable to chaperone CNS penetration and GCase-binding prediction; not executed in this capture.",
+    "mock": true
+  },
+  "panel": [
+    {
+      "persona": "Dr. CSO, Neurodegeneration Biotech (lysosomal disease)",
+      "role": "Chief Scientific Officer",
+      "lens": "scientific",
+      "stance": "conditional",
+      "conviction": 4,
+      "headline": "GBA1-PD is the best mechanistically-understood, genetically-validated PD subtype — the BBB problem has a credible preclinical solution but no clinical proof yet",
+      "rationale": "The Sidransky 2009 multicentric study (PMID:19846850; OR 5.43) and Nalls 2014 GWAS (PMID:25064009) make GBA1 the numerically largest genetic risk factor for PD. The lysosomal mechanism is mechanistically converged: Navarro-Romero 2022 (PMID:36202848) shows GCase deficiency → lysosomal dysfunction → CMA impairment → α-syn accumulation; Gündner 2019 path analysis (PMID:30236861) demonstrates the GCase→glucosylsphingosine→pSer129/α-syn axis in human substantia nigra. The BBB problem is real: ERT (large glycoproteins) excluded (PMID:28218669); venglustat (SRT) achieved CSF GL-1 −74% (PMID:34897099) but failed clinically in manifest PD. The most promising preclinical solution is BI-hTFR1 engineered AAV — 40–50× greater CNS gene delivery than AAV9 after IV (PMID:38753766) — but this is a 2024 preclinical result, not clinical data. Ambroxol's 35% CSF GCase protein increase (PMID:31930374) and three ongoing Phase 2 RCTs are the current clinical frontier.",
+      "top_risk": "CNS target engagement does not translate to clinical benefit (venglustat precedent: CSF GL-1 −74% but no MDS-UPDRS improvement) — biomarker→clinical endpoint translation is unproven",
+      "ask": "Establish a mechanistic biomarker cascade (GCase activity → GlcSph/GL-1 → pSer129 α-syn → clinical) with validated surrogate endpoints before Phase 2 go/no-go — not just target engagement"
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Neurodegenerative Disease",
+      "role": "Regulatory / Safety",
+      "lens": "regulatory",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "Ambroxol Phase 2 readouts will define whether a biomarker-enriched GBA1-PD trial is approvable; the venglustat failure raises the bar for the surrogate endpoint",
+      "rationale": "The venglustat failure in MOVES-PD Part 2 is a regulatory cautionary tale: robust CSF GL-1 pharmacodynamics (PMID:34897099) did not translate to clinical benefit on MDS-UPDRS. This means FDA will require either a clinical endpoint (not a biomarker surrogate alone) or a validated biomarker-to-clinical conversion argument. The ambroxol AMBITIOUS Phase 2 RCT (NCT05287503; primary endpoint MoCA + MCI/dementia frequency in GBA-PD; PMID:38027469) is the pivotal test. The den Heijer 2023 biomarker study (PMID:36916660) establishing plasma glucosylceramide as distinguishing GBA-PD from iPD with acceptable within-subject variability (5.8–44.5%) is a useful foundation for trial enrichment and pharmacodynamic monitoring, but is not a validated surrogate. African-ancestry GBA1 non-coding variant (rs3115534-G, OR 1.58; PMID:37633302) may require a separate enrichment strategy.",
+      "top_risk": "Surrogate biomarker (GL-1/GlcSph) not accepted as a primary endpoint by FDA — requires clinical endpoint (motor/cognitive function), which is harder to power and longer to execute",
+      "ask": "Pre-Phase 3 alignment meeting with FDA on biomarker surrogate endpoint validity for GBA1-enriched PD trial, citing MOVES-PD failure as the regulatory precedent"
+    },
+    {
+      "persona": "Dr. Pharma BD, Rare Neurogenetics / Movement Disorders",
+      "role": "External Innovation & BD",
+      "lens": "commercial",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "GBA1-PD is a well-validated, commercially interesting precision PD subtype — but the venglustat failure reset the bar; the deal is now in the gene therapy / engineered AAV lane",
+      "rationale": "The 5–15% of PD patients carrying GBA1 mutations (PMID:35455941) represents a meaningful patient segment for a precision biomarker-enriched label — larger than most rare disease programs. Ambroxol's three ongoing Phase 2 RCTs (AMBITIOUS, ANeED, PDD; PMIDs 38027469, 37304077, 30738426) are near-term readout catalysts. However, the venglustat failure means the SRT small-molecule lane is depleted until a better surrogate or clinical endpoint strategy is established. The most differentiated opportunity is AAV gene therapy with engineered CNS-penetrating capsids: BI-hTFR1 (PMID:38753766; Huang, Science 2024) and AAV.GMU01 SS3-GBA1 / Prevail-Lilly (PMID:41376160) represent the next wave. A deal in the AAV/gene therapy lane with a milestone on Phase 1/2 safety + CSF GCase restoration is the rational structure.",
+      "top_risk": "Ambroxol Phase 2 RCTs fail, creating sector-wide skepticism for GBA1-targeted pharmacological approaches before the gene therapy programs mature",
+      "ask": "Option/milestone deal in the AAV-gene-therapy lane (BI-hTFR1 or SS3-GBA1 analog) gated on NHP safety + brain-wide GCase restoration; separate from the pharmacological (SRT/chaperone) track"
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "role": "Kill-the-thesis",
+      "lens": "adversarial",
+      "stance": "hold",
+      "conviction": 2,
+      "headline": "The venglustat failure is the base case: CNS target engagement does not equal clinical benefit in manifest PD — the field may be dosing too late with the wrong biomarker",
+      "rationale": "The venglustat MOVES-PD failure (CSF GL-1 −74% but no clinical benefit; PMID:34897099) is the strongest adverse data point. Three plausible explanations each demand a different solution: (1) GL-1 reduction alone is insufficient — need GCase activity restoration, not just substrate reduction; (2) manifest PD is too late — need prodromal enrichment; (3) CSF GL-1 is not the pathogenic substrate — glucosylsphingosine (lyso-Gb1) in the relevant brain compartment is. None of these has a clinical resolution. The ambroxol Phase 2 trials (AMBITIOUS, ANeED) will determine whether the chaperone lane is viable, but they are still running. The BI-hTFR1 AAV data (PMID:38753766) are in mice with human TFRC knock-in — not a clinical result. The African-ancestry non-coding variant rs3115534-G (PMID:37633302) may act via transcriptional reduction, making chaperone strategies irrelevant for 39% of African-ancestry cases. This is a scientifically rich but clinically unproven program.",
+      "top_risk": "All three major therapeutic modalities (SRT, chaperone, AAV) may face the same 'too late / wrong compartment' failure mode without a prodromal enrichment strategy and a validated mechanistic biomarker cascade",
+      "ask": "Demonstrate that at least one modality achieves GCase activity restoration AND reverses the GCase→GlcSph→α-syn cascade in a human-relevant CNS model before any program commitment"
+    }
+  ],
+  "facts": [
+    {
+      "field": "A1 target/modality",
+      "value": "GBA1 encodes glucocerebrosidase (GCase), a lysosomal acid hydrolase; GCase deficiency is the mechanism. Therapeutic modalities: SRT (small-molecule GCS inhibitors, brain-penetrant), pharmacological chaperones (ambroxol), AAV gene therapy (engineered capsids for BBB crossing).",
+      "source": "EMET (live 2026-06-22); PMID:35455941; PMID:35183702",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B1 human genetics — genetic risk",
+      "value": "Sidransky et al. N Engl J Med 2009 (n=5,691 PD / 4,898 controls, 16 centres): any GBA1 mutation OR 5.43; L444P and N370S in 15% of Ashkenazi Jewish PD patients vs 3% controls; 7% of non-Ashkenazi patients carry GBA1 mutations on full sequencing. GBA1 accounts for 5–15% of PD patients by ancestry.",
+      "source": "EMET (live 2026-06-22); PMID:19846850",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B1 human genetics — GWAS and African ancestry",
+      "value": "Nalls et al. Nat Genet 2014: GBA among 24 independent genome-wide significant PD risk loci (13,708 cases). Rizig et al. Lancet Neurol 2023: rs3115534-G non-coding GBA1 variant in African/African admixed populations (197,918 individuals; OR 1.58; p=2.4×10⁻¹⁴; 39% carrier frequency in affected African-ancestry individuals); mechanism = decreased GCase activity without coding variant.",
+      "source": "EMET (live 2026-06-22); PMID:25064009; PMID:37633302",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B2 lysosomal mechanism — GCase → GlcSph → α-synuclein",
+      "value": "Navarro-Romero et al. NPJ Parkinsons Dis 2022 (N370S/L444P cell lines + GBA1-KO): GCase deficiency → lysosomal dysfunction → CMA impairment → α-synuclein accumulation. Gündner et al. Neurobiol Dis 2019 (post-mortem n=45): path analysis in substantia nigra shows GCase↓ → glucosylsphingosine↑ → pSer129/total α-syn↑ — GlcSph partially mediates GCase→α-syn relationship.",
+      "source": "EMET (live 2026-06-22); PMID:36202848; PMID:30236861",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C1 BBB — ERT excluded",
+      "value": "Standard Gaucher ERT (imiglucerase, velaglucerase) does not cross the intact BBB at therapeutically meaningful concentrations — explaining why visceral Gaucher disease responds to ERT but neurological GBA1-PD does not. CNS-penetrating agents required.",
+      "source": "EMET (live 2026-06-22); PMID:28218669",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C2 BBB — SRT (venglustat) CNS target engagement vs clinical failure",
+      "value": "Peterschmitt et al. J Parkinsons Dis 2022 (MOVES-PD Part 1; n=29, randomised, placebo-controlled): venglustat achieved CSF GL-1 reduction of 72–74% at highest dose — confirming CNS target engagement. MOVES-PD Part 2: no clinical benefit on MDS-UPDRS → SRT programme discontinued. Timing (manifest PD), substrate specificity, or biomarker mismatch unresolved.",
+      "source": "EMET (live 2026-06-22); PMID:34897099",
+      "tier": "T2",
+      "confidence": "high",
+      "flag": "DIVERGENCE"
+    },
+    {
+      "field": "C3 BBB — chaperone (ambroxol) CNS penetration and clinical signal",
+      "value": "Mullin et al. JAMA Neurol 2020 (n=17, open-label; 1.26 g/day): mean CSF ambroxol 156 ng/mL at day 186; CSF GCase protein +35%; MDS-UPDRS Part 3 −6.8 pts (in GBA1 carriers and non-carriers). Three Phase 2 RCTs ongoing: AMBITIOUS (NCT05287503; GBA-PD dementia), ANeED (DLB), PDD trial.",
+      "source": "EMET (live 2026-06-22); PMID:31930374; PMID:38027469; PMID:37304077",
+      "tier": "T2",
+      "confidence": "med"
+    },
+    {
+      "field": "C4 BBB — engineered AAV gene therapy",
+      "value": "Huang et al. Science 2024: BI-hTFR1 capsid engineered to bind human transferrin receptor 1 (TfR1) enables active transcytosis — 40–50× greater CNS gene delivery than AAV9 after IV in human TFRC knock-in mice; increased brain/CSF GCase activity when loaded with GBA1. Ayllo et al. Mol Ther 2026: AAV.GMU01 SS3-GBA1 (secretable GCase; Prevail/Lilly) achieves near-physiological brain GCase in NHP; clinical candidate.",
+      "source": "EMET (live 2026-06-22); PMID:38753766; PMID:41376160",
+      "tier": "T2",
+      "confidence": "med"
+    },
+    {
+      "field": "D1 biomarker — plasma glucosylceramide and CSF GL-1",
+      "value": "den Heijer et al. Mov Disord 2023 (multi-study biomarker analysis): plasma glucosylceramide distinguishes GBA-PD from idiopathic PD and healthy volunteers; within-subject day-to-day variability 5.8–44.5% in plasma — acceptable for pharmacodynamic monitoring. CSF GL-1 is robustly pharmacodynamically responsive (venglustat −74%). Glucosylsphingosine (lyso-Gb1) stable in plasma but pre-analytical standardisation required for PBMCs.",
+      "source": "EMET (live 2026-06-22); PMID:36916660; PMID:34897099",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "open question — clinical biomarker → clinical benefit translation",
+      "value": "Whether CSF GL-1 or plasma glucosylceramide reduction translates to clinical benefit is unresolved (venglustat failure). The GCase activity → GlcSph → pSer129 α-synuclein cascade is mechanistically proposed but not validated as a surrogate endpoint in a controlled trial.",
+      "source": "-",
+      "tier": "-",
+      "confidence": "low",
+      "flag": "KNOWN_UNKNOWN"
+    }
+  ],
+  "rebuttal": [
+    {
+      "persona": "Dr. CSO, Neurodegeneration Biotech (lysosomal disease)",
+      "revised": false,
+      "conviction": 4,
+      "shift": "Holds conviction 4. The red-team correctly elevates the venglustat failure as the base case — the ask for a mechanistic biomarker cascade (GCase activity → GlcSph → pSer129 α-syn → clinical) rather than just GL-1 target engagement is exactly the right reframe. Program commitment must await ambroxol Phase 2 readouts AND a pre-clinical AAV CNS delivery demonstration in a non-human primate at clinical-dose range."
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Neurodegenerative Disease",
+      "revised": true,
+      "conviction": 3,
+      "shift": "Revised to incorporate the red-team's prodromal timing point — the regulatory path may require a GBA1-enriched prodromal PD trial rather than manifest PD. The den Heijer 2023 plasma glucosylceramide biomarker (PMID:36916660) offers a minimally invasive enrichment tool. Holds conviction 3, conditional on ambroxol Phase 2 readout and FDA biomarker surrogate alignment."
+    },
+    {
+      "persona": "Dr. Pharma BD, Rare Neurogenetics / Movement Disorders",
+      "revised": false,
+      "conviction": 3,
+      "shift": "Confirms AAV gene therapy lane (BI-hTFR1, SS3-GBA1) as the differentiated deal opportunity. The ambroxol Phase 2 negative-readout risk reinforces a milestone-heavy structure for the pharmacological lane — avoids the sunk-cost dynamic of a venglustat-style program."
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "revised": false,
+      "conviction": 2,
+      "shift": "Holds skepticism. Three lenses converge on 'ambroxol Phase 2 is the near-term gate' — which confirms the adversarial point: all present data are preclinical or open-label signals. The rs3115534-G non-coding variant (PMID:37633302) affecting 39% of African-ancestry cases via transcriptional reduction — not misfolding — is an unaddressed modality-mismatch concern for chaperone strategies in this population."
+    }
+  ],
+  "synthesize": {
+    "recommendation": "Advance GBA1-PD in parallel lanes: (1) chaperone (ambroxol/analog), gated on AMBITIOUS/ANeED Phase 2 readouts — if positive, pursue a GBA1-enriched Phase 3 with plasma glucosylceramide as the pharmacodynamic biomarker and cognition as the primary endpoint; (2) engineered AAV gene therapy (BI-hTFR1/SS3-GBA1 analog), gated on NHP safety + CSF GCase restoration data. Do not restart SRT (SRT/venglustat lane depleted unless a better prodromal-stage strategy is established).",
+    "consensus": "GBA1 is the numerically largest genetic risk factor for PD (OR 5.43); the lysosomal GCase→GlcSph→α-synuclein feedforward is mechanistically supported across human post-mortem, cell, and animal studies; plasma glucosylceramide and CSF GL-1 are validated pharmacodynamic biomarkers.",
+    "dissent": "Conviction 4 (CSO) vs 3 (regulator, BD) vs 2 (red-team). Red-team and regulator both flag the venglustat failure as a hard precedent — clinical benefit unproven despite robust CNS target engagement. The African-ancestry non-coding variant (rs3115534-G) raises a modality-mismatch risk for chaperone strategies that none of the other lenses have fully resolved.",
+    "convergent_gate": "All four converge on the SAME gate: clinical biomarker → clinical benefit translation is unproven (venglustat precedent) — the next program must either demonstrate a validated mechanistic cascade (GCase activity → GlcSph → clinical endpoint) or enrich into prodromal GBA1-PD where disease modification is more plausible.",
+    "proposed_experiment": "In a GBA1-enriched cohort (N370S/L444P heterozygotes, prodromal PD or early manifest), measure GCase activity + plasma glucosylceramide + CSF GL-1 + CSF pSer129/total α-syn at baseline and at 6 and 12 months during ambroxol treatment (AMBITIOUS readout), establishing whether the full GCase → GlcSph → α-syn mechanistic biomarker cascade tracks clinical progression — closing the surrogate-endpoint validation gap before a Phase 3 go/no-go.",
+    "confidence": "Biology (genetic risk + lysosomal mechanism): HIGH. BBB penetration (chaperone/engineered AAV): MED (clinical for ambroxol; preclinical for AAV). Clinical benefit: LOW-MED — conditional on ambroxol Phase 2 and prodromal trial design.",
+    "entities": [
+      {"name": "GBA1", "type": "gene"},
+      {"name": "glucocerebrosidase", "type": "protein"},
+      {"name": "GBA1-associated Parkinson's disease", "type": "disease"},
+      {"name": "Parkinson's disease", "type": "disease"},
+      {"name": "Gaucher disease", "type": "disease"},
+      {"name": "ambroxol", "type": "drug"},
+      {"name": "venglustat", "type": "drug"},
+      {"name": "elsunersen", "type": "drug"},
+      {"name": "BI-hTFR1", "type": "drug"}
+    ]
+  }
+}

@@ -42,7 +42,7 @@ SCENARIO_DIR = os.path.join(HERE, "scenarios")
 QMODELS_DIR = os.path.join(HERE, "qmodels")
 
 # --- which shipped scenarios the demo can run end-to-end on canned evidence ---
-SCENARIOS = ("nav1_8", "tsc2", "lrrk2_pd")
+SCENARIOS = ("nav1_8", "tsc2", "lrrk2_pd", "scn2a_epilepsy", "gba1_pd")
 
 # --- disease routing: keyword -> (disease key, the auto-convened panel seating) ---
 # Mirrors the routing table in ARCHITECTURE.md (one persona per lens, disease-matched).
