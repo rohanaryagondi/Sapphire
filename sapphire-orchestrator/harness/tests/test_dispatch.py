@@ -33,9 +33,20 @@ class TestDispatch(unittest.TestCase):
 
     def test_dispatch_qmodels_delegates(self):
         c = Contract(id="q-models-runner", role="", kind="qmodels-delegate")
+        # Client returns raw {tool_id, out} shape (no "facts" key) — adapter wraps into findings.
         client = SimpleNamespace(call=lambda tool, inp: {"tool_id": tool, "out": "p=0.5"})
-        out = D.dispatch_qmodels(c, {"tool_id": "bbbp", "inputs": {"smiles": "CCO"}}, client=client)
-        self.assertEqual(out["tool_id"], "bbbp")
+        out = D.dispatch_qmodels(c, {"tool_id": "bbbp", "candidate": "CCO", "inputs": {"smiles": "CCO"}}, client=client)
+        self.assertIn("facts", out)
+        self.assertTrue(len(out["facts"]) >= 1)
+        self.assertEqual(out["facts"][0]["source"], "Q-Models")
+
+    def test_dispatch_qmodels_passthrough_if_findings(self):
+        c = Contract(id="q-models-runner", role="", kind="qmodels-delegate")
+        # Client already returns findings shape — adapter passes through unchanged.
+        findings = {"candidate": "X", "facts": [{"value": "v", "source": "Q-Models", "tier": "T2"}]}
+        client = SimpleNamespace(call=lambda tool, inp: findings)
+        out = D.dispatch_qmodels(c, {"tool_id": "bbbp"}, client=client)
+        self.assertEqual(out, findings)
 
     def test_dispatch_python_calls_fn(self):
         c = Contract(id="step", role="", kind="python")

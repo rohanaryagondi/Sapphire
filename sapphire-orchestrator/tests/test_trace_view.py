@@ -161,6 +161,34 @@ class TestTraceView(unittest.TestCase):
         # Full JSON should show the raw fact text
         self.assertIn("AMG-510", out)
 
+    # -- non-dict output does not crash -------------------------------------
+
+    def test_render_non_dict_output_does_not_raise(self):
+        """A trace row with a string output must not crash render (FIX 3)."""
+        eid = "test-eid-nondict"
+        _write_trace(self.tmp, eid, [
+            {**_OPEN, "engagement_id": eid},
+            {
+                "engagement_id": eid,
+                "agent_id": "string-output-agent",
+                "kind": "findings",
+                "inputs_hash": "aaa",
+                "status": "ok",
+                "provenance": "test",
+                "error": None,
+                "repairs": [],
+                "guardrails_run": [],
+                "output": "raw string output from agent",
+                "ts": "2026-06-22T00:00:00+00:00",
+            },
+            {**_CLOSE, "engagement_id": eid},
+        ])
+        try:
+            out = render(eid)
+        except Exception as exc:
+            self.fail(f"render raised on non-dict output: {exc}")
+        self.assertIn("string-output-agent", out)
+
     # -- main() return codes -------------------------------------------------
 
     def test_main_returns_0_for_valid_eid(self):

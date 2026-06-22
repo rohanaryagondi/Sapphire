@@ -163,14 +163,11 @@
     "convergent_gate": "All four converge on the SAME gate: functional variant classification (DAPC/iPSC-MEA) must be validated as a companion diagnostic before any clinical trial can enrich by mechanism and avoid SCB harm to LoF patients.",
     "proposed_experiment": "Validate a DAPC-based or iPSC-derived neuronal MEA functional classification pipeline as a companion diagnostic in a multi-centre retrospective cohort of ≥100 SCN2A variant carriers across phenotypic groups (neonatal DEE / infant-onset / ASD), with prospective validation in at least 20 new patients — closing the classification uncertainty before IND filing.",
     "confidence": "Biology: HIGH (GoF/LoF dichotomy extremely well-evidenced). Program (GoF ASO): CONDITIONAL on companion diagnostic validation. Program (LoF upregulation): EARLY — CRISPRa/AAV-KV1.1 preclinical only.",
-    "entities": [
-      {"name": "SCN2A", "type": "gene"},
-      {"name": "Nav1.2", "type": "protein"},
-      {"name": "SCN2A-related epilepsy", "type": "disease"},
-      {"name": "developmental epileptic encephalopathy", "type": "disease"},
-      {"name": "autism spectrum disorder", "type": "disease"},
-      {"name": "elsunersen", "type": "drug"},
-      {"name": "PRAX-222", "type": "drug"}
-    ]
+    "entities": {
+      "genes": ["SCN2A"],
+      "smiles": [],
+      "diseases": ["SCN2A-related epilepsy", "developmental epileptic encephalopathy", "autism spectrum disorder"],
+      "drugs": ["elsunersen", "PRAX-222"]
+    }
   }
 }

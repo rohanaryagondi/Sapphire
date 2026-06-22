@@ -34,8 +34,9 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
         CLAUDE_BIN, "-p", build_prompt(contract, inputs),
         "--output-format", "json",
         "--json-schema", json.dumps(contract.output_schema or {}),
-        "--allowedTools", ",".join(contract.tools_allowed),
     ]
+    if contract.tools_allowed:
+        cmd += ["--allowedTools", ",".join(contract.tools_allowed)]
     if runner is None:
         def runner(cmd):
             return subprocess.run(cmd, capture_output=True, text=True,
@@ -57,7 +58,16 @@ def dispatch_qmodels(contract, inputs, client=None) -> dict:
         client = QModelsClient()
     tool_id = inputs.get("tool_id", contract.id)
     payload = inputs.get("inputs", inputs)
-    return client.call(tool_id, payload)
+    raw = client.call(tool_id, payload)
+    # If the client returned the raw {model, out, provenance} shape, wrap into findings.
+    if "facts" not in raw:
+        summary = str(raw.get("out", ""))
+        raw = {
+            "candidate": inputs.get("candidate", ""),
+            "facts": [{"value": summary, "source": "Q-Models", "tier": "T2"}],
+            "provenance": raw.get("provenance", "qmodels"),
+        }
+    return raw
 
 
 def dispatch_python(contract, inputs, fn) -> dict:

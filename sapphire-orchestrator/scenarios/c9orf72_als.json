@@ -143,7 +143,7 @@
     {
       "field": "D1 clinical precedent — tofersen/SOD1 lesson",
       "value": "Tofersen (intrathecal gapmer ASO, SOD1-ALS): VALOR phase 3 missed primary ALSFRS-R endpoint at 28 weeks (diff 1.2 pts, P=0.97) but reduced CSF SOD1 and plasma NfL robustly. OLE early-starters 3.5 pts better at 52 weeks. FDA accelerated approval on NfL surrogate endpoint. Lessons: (1) biomarker-led accelerated approval achievable; (2) 28 weeks too short — pre-symptomatic trials needed; (3) target engagement ≠ short-term function; (4) gain-of-function removal is disease-modifying if deployed early. For C9orf72: CSF poly-GP + NfL as proposed PD biomarkers (PMID:37847372).",
-      "source": "EMET (live); PMID:36129998; PMID:40640528; PMID:41850233",
+      "source": "EMET (live); PMID:36129998; PMID:40640528",
       "tier": "T2",
       "confidence": "high"
     }

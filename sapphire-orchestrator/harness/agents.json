@@ -92,6 +92,7 @@
       "role": "Bucket1 — runs a Q-Models tool on a named pair (delegates to QModelsClient)",
       "spec": "architecture/bucket1/scientific/q-models-runner.md",
       "kind": "qmodels-delegate",
+      "output_schema": {"$ref": "#/schemas/findings"},
       "tools_allowed": ["qmodels"],
       "guardrails": ["data_boundary", "public_identifiers_only", "stamp_provenance"],
       "provenance_label": "qmodels",

@@ -141,7 +141,7 @@ class TestRunLive(unittest.TestCase):
 
     # ── test 2: harness trace records ────────────────────────────────────────
     def test_trace_has_sufficient_records(self):
-        """The harness trace file must have ≥ (bucket1 agents + personas + 2 brackets) records."""
+        """The harness trace file must have ≥ (bucket1 agents dispatched + personas) records."""
         result = self._run()
         eid = result["engagement_id"]
         trace_path = os.path.join(self._eng_dir, eid, "trace.jsonl")
@@ -150,15 +150,22 @@ class TestRunLive(unittest.TestCase):
         with open(trace_path, encoding="utf-8") as f:
             lines = [l for l in f.read().splitlines() if l.strip()]
 
-        # Minimum: open + close brackets + at least some agent records.
+        # Compute expected minimum: agents actually dispatched in Bucket 1 + personas in panel.
+        bucket1_dispatched = len(result["discover"]["agents"])
+        personas_dispatched = len(result["consult"]["round1"])
+        # +2 for the engagement_open and engagement_close bracket records.
+        min_expected = bucket1_dispatched + personas_dispatched + 2
         self.assertGreaterEqual(
-            len(lines), 3,
-            f"Expected ≥3 trace records; got {len(lines)}"
+            len(lines), min_expected,
+            f"Expected ≥{min_expected} trace records (bucket1={bucket1_dispatched}, "
+            f"personas={personas_dispatched}); got {len(lines)}"
         )
 
     # ── test 3: consult round1 non-empty + harness provenance ───────────────
     def test_consult_round1_non_empty_and_stamped(self):
-        """round1 must be non-empty and every verdict must carry a provenance field."""
+        """round1 must be non-empty, every verdict must carry provenance, and
+        after FIX 1 (dossier_fields wired into ctx) at least one verdict must
+        have status=='ok' with a real stance (not 'hold'/abstained)."""
         result = self._run()
         round1 = result["consult"]["round1"]
         self.assertTrue(len(round1) > 0, "consult round1 is empty")
@@ -167,6 +174,18 @@ class TestRunLive(unittest.TestCase):
                 "provenance", v,
                 f"verdict missing provenance: {v}"
             )
+        # Proof that must_cite_dossier is now correctly wired: at least one
+        # verdict must pass all guardrails and carry a real stance.
+        real_stances = {"pass", "conditional", "no_go"}
+        ok_verdicts = [
+            v for v in round1
+            if v.get("status") == "ok" and v.get("stance") in real_stances
+        ]
+        self.assertTrue(
+            len(ok_verdicts) >= 1,
+            f"Expected ≥1 verdict with status=='ok' and real stance; "
+            f"got stances={[(v.get('status'), v.get('stance')) for v in round1]}"
+        )
 
     # ── test 4: data-boundary guardrail blocks internal id ──────────────────
     def test_guardrail_blocks_internal_id(self):

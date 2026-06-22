@@ -171,16 +171,11 @@
     "convergent_gate": "All four converge on the SAME gate: clinical biomarker → clinical benefit translation is unproven (venglustat precedent) — the next program must either demonstrate a validated mechanistic cascade (GCase activity → GlcSph → clinical endpoint) or enrich into prodromal GBA1-PD where disease modification is more plausible.",
     "proposed_experiment": "In a GBA1-enriched cohort (N370S/L444P heterozygotes, prodromal PD or early manifest), measure GCase activity + plasma glucosylceramide + CSF GL-1 + CSF pSer129/total α-syn at baseline and at 6 and 12 months during ambroxol treatment (AMBITIOUS readout), establishing whether the full GCase → GlcSph → α-syn mechanistic biomarker cascade tracks clinical progression — closing the surrogate-endpoint validation gap before a Phase 3 go/no-go.",
     "confidence": "Biology (genetic risk + lysosomal mechanism): HIGH. BBB penetration (chaperone/engineered AAV): MED (clinical for ambroxol; preclinical for AAV). Clinical benefit: LOW-MED — conditional on ambroxol Phase 2 and prodromal trial design.",
-    "entities": [
-      {"name": "GBA1", "type": "gene"},
-      {"name": "glucocerebrosidase", "type": "protein"},
-      {"name": "GBA1-associated Parkinson's disease", "type": "disease"},
-      {"name": "Parkinson's disease", "type": "disease"},
-      {"name": "Gaucher disease", "type": "disease"},
-      {"name": "ambroxol", "type": "drug"},
-      {"name": "venglustat", "type": "drug"},
-      {"name": "elsunersen", "type": "drug"},
-      {"name": "BI-hTFR1", "type": "drug"}
-    ]
+    "entities": {
+      "genes": ["GBA1"],
+      "smiles": [],
+      "diseases": ["GBA1-associated Parkinson's disease", "Parkinson's disease", "Gaucher disease"],
+      "drugs": ["ambroxol", "venglustat", "BI-hTFR1"]
+    }
   }
 }

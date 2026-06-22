@@ -50,6 +50,8 @@ def _glyph(status: str | None) -> str:
 def _output_summary(output: dict | None, full: bool) -> str:
     if not output:
         return ""
+    if not isinstance(output, dict):
+        return str(output)[:80]
     if full:
         return json.dumps(output, indent=4)
     # findings: report fact count

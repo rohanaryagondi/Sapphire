@@ -218,13 +218,14 @@ def run_live(
                 "dossier_fields": dossier_fields,
             },
             engagement_id=eid,
-            ctx=ctx,
+            ctx={**ctx, "dossier_fields": dossier_fields},
             registry=registry,
         )
 
         if res.ok and res.output:
             verdict = dict(res.output)
             verdict.setdefault("provenance", res.provenance)
+            verdict["status"] = res.status
             round1.append(verdict)
         else:
             round1.append({
