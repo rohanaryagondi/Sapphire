@@ -44,7 +44,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _DEFAULT_DB = _REPO_ROOT / "RohanOnly" / "moat" / "moat.sqlite"
 _DEFAULT_PARQUET = (
     Path.home()
-    / "Library/CloudStorage/OneDrive-YaleUniversity/Career/Quiver/Sapphire"
+    / "Desktop/Projects/Quiver"
     / "Loka - Shared Folder/Data/CNS_DFP_distance_20251215.parquet"
 )
 
