@@ -1,0 +1,189 @@
+{
+  "id": "c9orf72_als",
+  "title": "C9orf72 ALS/FTD — ASO vs small molecule vs gene therapy (modality)",
+  "query": "Which therapeutic modality — ASO knockdown, small molecule, or gene therapy — best addresses C9orf72 hexanucleotide repeat ALS/FTD given the three-mechanism pathology and the tofersen/SOD1 lesson?",
+  "headline": "C9orf72 is the most common genetic ALS/FTD cause, but a three-way mechanism debate (haploinsufficiency vs RNA foci vs DPR gain-of-function) creates a fundamental modality dilemma: knockdown reduces DPRs but worsens LoF; the dominant executioner is unresolved — and the tofersen lesson says biomarker-driven approval is achievable but short trials won't show function.",
+  "_provenance_note": "discover facts captured LIVE from EMET (Thorough) 2026-06-22; real PMIDs; chat_url https://emet.benchsci.com/chat/da99c861-b7c4-4817-b716-d0c1f6a9f04b.",
+  "discover": {
+    "source": "EMET (live 2026-06-22, Thorough) + internal moat (real)",
+    "summary": "A live EMET Thorough run on C9orf72 ALS/FTD returned genetics (single European founder haplotype ~6,300 ya; 20–50% fALS; PMID:22692064), three competing pathomechanisms (haploinsufficiency/LoF via autophagy disruption PMID:29400714; RNA foci/RBP sequestration via G-quadruplex condensates PMID:38092738, PMID:24139042; DPR gain-of-function from RAN translation — arginine-rich poly-GR/PR most toxic PMID:25575510, PMID:26555807), and a full modality analysis (ASO clinically most mature PMID:24139042, PMID:37847372; small-molecule G4 ligands + RAN inhibitors + proteostasis enhancers PMID:38092738, PMID:34654821, PMID:37576491; gene therapy dual-modality concept PMID:27349438). Tofersen/SOD1 lesson captured: NfL reduction enabled accelerated FDA approval despite non-significant primary endpoint; pre-symptomatic trial timing critical (PMID:36129998, PMID:40640528).",
+    "result": "C9orf72 ALS/FTD: DPR gain-of-function (poly-GR/PR) is the leading executioner candidate; haploinsufficiency amplifies damage via impaired autophagy; RNA foci co-contribute. ASO knockdown is clinically most advanced but worsens LoF — the mechanism gate. Pre-symptomatic, biomarker-led trials (CSF poly-GP + NfL) are the tofersen-taught path."
+  },
+  "validate": {
+    "source": "Q-Models launchpad",
+    "runs": [
+      {
+        "model": "Boltz-2",
+        "out": "G-quadruplex RNA ligand co-folding with GGGGCC repeat mG4 structure is applicable for small-molecule selectivity work; not run in this capture.",
+        "provenance": "stub"
+      },
+      {
+        "model": "ADMET-Predictor",
+        "out": "CNS-penetrance and oral bioavailability profiling applicable for G4 small-molecule candidates; not run in this capture.",
+        "provenance": "stub"
+      }
+    ],
+    "result": "Structure/affinity and ADMET compute applicable to G4-targeting small-molecule and RAN-inhibitor candidates; not executed in this capture.",
+    "mock": true
+  },
+  "panel": [
+    {
+      "persona": "Dr. CSO, Neurodegeneration Biotech (ALS/RNA medicine)",
+      "role": "Chief Scientific Officer",
+      "lens": "scientific",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "DPR mechanism strong enough to warrant ASO — but haploinsufficiency is the design constraint, not a footnote",
+      "rationale": "The DPR gain-of-function evidence is now compelling: arginine-rich poly-GR/PR cause nucleolar stress and phase separation at a ~25–30 repeat threshold (PMID:25575510; PMID:32730793), poly-GA accumulates years pre-symptom (PMID:26373655), and BAC mice with DPR burden show neurodegeneration proportional to load (PMID:27112499). That validates knockdown as the mechanistic target. But Shi et al. (PMID:29400714) showed that restoring C9orf72 protein rescued patient iMN survival — haploinsufficiency is not epiphenomenal. A non-selective transcript ASO that worsens LoF could hit a ceiling on efficacy and safety. My ask is allele-selective or repeat-targeted ASO design that maximally reduces DPR while minimising further C9orf72 protein loss.",
+      "top_risk": "Non-selective ASO deepens haploinsufficiency; further impairing autophagy/DPR clearance (PMID:29400714)",
+      "ask": "Demonstrate allele-selective knockdown (>80% expanded, <20% total C9orf72 loss) in patient iPSC-derived motor neurons before IND-enabling"
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Neurology / Rare Disease",
+      "role": "Regulatory / Safety",
+      "lens": "regulatory",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "Tofersen shows biomarker-accelerated approval is achievable — but the mechanism uncertainty is a review risk for C9orf72",
+      "rationale": "Tofersen received accelerated approval on NfL reduction as surrogate endpoint, despite VALOR missing the 28-week ALSFRS-R primary (PMID:36129998). The OLE showed a 3.5-point benefit in early starters — confirming SOD1 gain-of-function is the correct target. For C9orf72, the analogy holds only if DPR is definitively the primary executioner — a point the field has not fully settled (PMID:27619540; PMID:37847372). A CSF poly-GP pharmacodynamic biomarker is the proposed surrogate, but unlike NfL (already qualified), poly-GP as a regulatory endpoint requires prospective validation. A trial design with DPR + NfL as co-primary PD endpoints plus a pre-symptomatic enrichment arm is the regulatory-viable path.",
+      "top_risk": "Unresolved mechanism weight (DPR vs foci vs LoF) may complicate surrogate endpoint qualification at FDA",
+      "ask": "Prospectively qualify CSF poly-GP as a pharmacodynamic surrogate before pivotal; design pre-symptomatic expansion-carrier cohort for functional endpoint separation"
+    },
+    {
+      "persona": "Dr. Pharma BD, Large-cap Neurodegeneration",
+      "role": "External Innovation & BD",
+      "lens": "commercial",
+      "stance": "conditional",
+      "conviction": 3,
+      "headline": "ASO is the dealable modality today; small molecule and gene therapy are differentiation options but pre-revenue",
+      "rationale": "IONIS/Biogen ASO programs for C9orf72 are clinically active and closest to value inflection — that is where the BD market is pricing risk. The tofersen precedent (accelerated approval → label expansion in OLE) has made the ALS ASO category commercially credible (PMID:40640528). Small molecules (G4 ligands, RAN inhibitors, propranolol analog — PMID:38092738, PMID:34654821, PMID:37576491) carry mechanism upside but require CNS penetration data and selectivity before dealability. Dual-modality gene therapy (silence + restore, PMID:27349438) is a compelling concept but AAV cargo-size constraints (PMID:29400714) push it beyond a 5-year deal horizon. Milestone-heavy structures gated on poly-GP PD reduction in Phase 1 are the current deal template.",
+      "top_risk": "Clinical programs from IONIS/Biogen may already own the modality space; differentiation requires allele-selectivity or pre-symptomatic positioning",
+      "ask": "Position on allele-selectivity or pre-symptomatic indication — two dimensions where the current clinical programs are not yet definitive"
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "role": "Kill-the-thesis",
+      "lens": "adversarial",
+      "stance": "hold",
+      "conviction": 2,
+      "headline": "Three mechanisms in parallel — the convergence point is unproven; any single modality addresses at most two of three",
+      "rationale": "The mechanism weight table is not resolved: RNA foci are abundant in cerebellar neurons that do NOT degenerate (spatial dissociation from DPRs — PMID:26373655); DPRs accumulate pre-symptomatically but so do lots of things that don't cause disease; and C9orf72 KO mice don't develop ALS-like neurodegeneration (PMID:27619540). The Edbauer/Haass cascade model (PMID:26555807) is elegant but unvalidated as a clinical hypothesis. The tofersen lesson actually cuts both ways: SOD1 is a single clean gain-of-function mechanism — C9orf72 has at least three in parallel, any one of which could be the dominant driver in any given patient. A modality that addresses DPR but worsens LoF could accelerate disease in the subset where haploinsufficiency dominates. The field does not have a biomarker to stratify those patients.",
+      "top_risk": "Mechanism heterogeneity may mean no single modality works in the full C9orf72 population; patient stratification by dominant mechanism is absent",
+      "ask": "Establish a dominant-mechanism biomarker (e.g., CSF DPR species ratios, TDP-43 fragment profile) for patient stratification before committing to a single modality"
+    }
+  ],
+  "facts": [
+    {
+      "field": "A1 target/genetics",
+      "value": "C9orf72 GGGGCC hexanucleotide repeat expansion (HRE) in intron 1: 2–10 copies normal, hundreds–thousands in disease. Accounts for ~20–50% of familial ALS and up to 5–20% of sporadic ALS in European populations. Single founder haplotype ~6,300 years ago; highest prevalence in northern European cohorts (73% fALS Sweden, 86% Belgium).",
+      "source": "EMET (live); PMID:22692064; PMID:25261695; PMID:32338076",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "A2 neuropathology",
+      "value": "Hallmark C9orf72 pathology: TDP-43 NCIs + p62-positive/TDP-43-negative inclusions (DPR aggregates). DPR-positive inclusions in 97.2% of cerebellar neurons and 97.1% of hippocampal neurons in C9orf72 cases (systematic review of 261 brains), distinguishing C9orf72-ALS/FTD neuropathologically from other subtypes.",
+      "source": "EMET (live); PMID:26373655",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B1 mechanism I — haploinsufficiency/LoF",
+      "value": "Repeat expansion impairs C9orf72 transcription and promotes CpG methylation → functional haploinsufficiency. C9orf72 is a DENN-domain GEF for Rab1a/RAB5, rate-limiting for autophagosome formation. In patient iPSC-derived motor neurons, LoF disrupted endolysosomal trafficking and AMPA receptor surface accumulation → excitotoxicity; restoring C9orf72 or activating RAB5 rescued iMN survival. KO mice do NOT develop ALS (immune dysregulation only) → LoF amplifies DPR damage, not sufficient alone.",
+      "source": "EMET (live); PMID:29400714; PMID:27768524; PMID:27774051",
+      "tier": "T2",
+      "confidence": "high",
+      "flag": "DIVERGENCE"
+    },
+    {
+      "field": "B2 mechanism II — RNA foci/RBP sequestration",
+      "value": "Sense GGGGCC and antisense CCCCGG repeat transcripts form intranuclear RNA foci. Foci sequester RBPs including ADARB2, hnRNP-H, SRSF1/2, Purα → splicing/export disruption. GGGGCC RNA forms multimolecular G-quadruplex (mG4) structures that nucleate protein-free condensates via liquid–liquid phase separation. Antisense foci accumulate preferentially in ALS/FTD-vulnerable populations in BAC mice. KEY CAVEAT: foci are abundant in cerebellar neurons that do NOT degenerate — spatial dissociation weakens foci as primary executioner.",
+      "source": "EMET (live); PMID:24139042; PMID:38092738; PMID:38318532; PMID:27112499",
+      "tier": "T2",
+      "confidence": "high",
+      "flag": "DIVERGENCE"
+    },
+    {
+      "field": "B3 mechanism III — DPR gain-of-function (primary executioner candidate)",
+      "value": "GGGGCC/CCCCGG RAN translation yields 5 DPRs (poly-GA, GP, GR from sense; poly-PR, PA, PG from antisense). Arginine-rich poly-GR and poly-PR are most neurotoxic: displace NPM1 from nucleolus, suppress rRNA synthesis, impair stress granules (nucleolar stress). Poly-GR/PR undergo length-dependent LLPS with ~25–30 repeat threshold matching clinical toxicity. Poly-GA (most abundant) impairs proteasome. eIF2D promotes RAN translation of poly-GA/GP; eIF2D LoF extends lifespan in C. elegans 75×GGGGCC model. DPR inclusions detectable pre-symptomatically; BAC mice neurodegeneration proportional to DPR load.",
+      "source": "EMET (live); PMID:25575510; PMID:32730793; PMID:34654821; PMID:37675986; PMID:26555807",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "B4 mechanism debate — unresolved dominant executioner",
+      "value": "Spatial dissociation: RNA foci abundant in non-degenerating cerebellum; DPRs enriched in degenerating hippocampus/frontal cortex. KO mice lack ALS phenotype. Current consensus (PMID:27619540; PMID:29453960; PMID:37006471): DPR toxicity (poly-GR/PR) is leading primary executioner; RNA foci are significant co-contributor; haploinsufficiency amplifies via impaired DPR clearance. But no validated patient-stratification biomarker for dominant mechanism in an individual.",
+      "source": "EMET (live); PMID:27619540; PMID:29453960; PMID:37006471",
+      "tier": "T2",
+      "confidence": "med",
+      "flag": "DIVERGENCE"
+    },
+    {
+      "field": "C1 modality — ASO (clinically most advanced)",
+      "value": "Intrathecal gapmer ASOs targeting C9orf72 transcript: reduce RNA foci, restore dysregulated gene expression, rescue excitotoxicity in patient iPSC neurons (PMID:24139042). BAC mouse studies confirmed DPR reduction. IONIS/Biogen programs in clinical trials (PMID:37847372). CRITICAL RISK: non-selective ASO worsens haploinsufficiency; ideal design is allele-selective (repeat-targeted) or isoform-sparing. Antisense transcripts not addressed by sense-targeted ASOs — potential therapeutic gap.",
+      "source": "EMET (live); PMID:24139042; PMID:24809691; PMID:27112499; PMID:37847372",
+      "tier": "T2",
+      "confidence": "high"
+    },
+    {
+      "field": "C2 modality — small molecule (preclinical)",
+      "value": "Three small-molecule targets: (1) G4-RNA ligands to disrupt mG4 condensates/RBP sequestration — G4-unfolding rapidly disassembles GGGGCC RNA condensates in vitro (PMID:38092738); (2) RAN translation inhibitors via eIF2D (PMID:34654821); (3) proteostasis enhancers — propranolol reduces poly-GA aggregates and improves iMN survival via C9orf72 protein upregulation (PMID:37576491). Advantage: oral/systemic delivery vs intrathecal. Challenge: CNS penetrance, G4 selectivity across genome.",
+      "source": "EMET (live); PMID:38092738; PMID:34654821; PMID:37576491; PMID:27349438",
+      "tier": "T2",
+      "confidence": "med"
+    },
+    {
+      "field": "C3 modality — gene therapy (preclinical concept)",
+      "value": "AAV-shRNA or artificial miRNA for repeat-transcript silencing: durable CNS delivery, allele-selective options. Dual-vector concept: repeat-silencing hairpin + codon-optimised C9orf72 cDNA to address both GoF and LoF simultaneously. Key constraints: C9orf72 cDNA + silencing hairpin exceeds standard AAV cargo limit; next-gen capsids or split-intein systems required. Shi et al. (PMID:29400714) provides the LoF rescue rationale for the restoration arm.",
+      "source": "EMET (live); PMID:27349438; PMID:29400714",
+      "tier": "T2",
+      "confidence": "med",
+      "flag": "KNOWN_UNKNOWN"
+    },
+    {
+      "field": "D1 clinical precedent — tofersen/SOD1 lesson",
+      "value": "Tofersen (intrathecal gapmer ASO, SOD1-ALS): VALOR phase 3 missed primary ALSFRS-R endpoint at 28 weeks (diff 1.2 pts, P=0.97) but reduced CSF SOD1 and plasma NfL robustly. OLE early-starters 3.5 pts better at 52 weeks. FDA accelerated approval on NfL surrogate endpoint. Lessons: (1) biomarker-led accelerated approval achievable; (2) 28 weeks too short — pre-symptomatic trials needed; (3) target engagement ≠ short-term function; (4) gain-of-function removal is disease-modifying if deployed early. For C9orf72: CSF poly-GP + NfL as proposed PD biomarkers (PMID:37847372).",
+      "source": "EMET (live); PMID:36129998; PMID:40640528; PMID:41850233",
+      "tier": "T2",
+      "confidence": "high"
+    }
+  ],
+  "rebuttal": [
+    {
+      "persona": "Dr. CSO, Neurodegeneration Biotech (ALS/RNA medicine)",
+      "revised": false,
+      "conviction": 3,
+      "shift": "Unmoved — the DPR mechanism weight is sufficient to warrant an ASO program if allele-selective. The red-team's heterogeneity point sharpens the ask: stratify by CSF poly-GP burden in the Phase 1 expansion cohort before picking the pivotal population."
+    },
+    {
+      "persona": "Dr. ex-FDA Reviewer, Neurology / Rare Disease",
+      "revised": true,
+      "conviction": 3,
+      "shift": "Partially revised — the red-team's point about patient-stratification absence is a real regulatory gap. Adds ask: a poly-GP SIMOA biomarker qualification study nested within Phase 1/2 as a regulatory-enabling deliverable before Phase 3 design."
+    },
+    {
+      "persona": "Dr. Pharma BD, Large-cap Neurodegeneration",
+      "revised": false,
+      "conviction": 3,
+      "shift": "Holds — the commercial read is unchanged: ASO with allele-selectivity or pre-symptomatic positioning is the differentiation. Convergence with CSO and regulator on poly-GP as the PD endpoint validates the deal milestone structure."
+    },
+    {
+      "persona": "Dr. Adversarial Red-Team",
+      "revised": false,
+      "conviction": 2,
+      "shift": "Holds at 2. Three partners converge on DPR as the target — but that convergence is itself based on the same unvalidated mechanism hierarchy from the EMET dossier. The patient-stratification gap remains open; consensus does not close it."
+    }
+  ],
+  "synthesize": {
+    "recommendation": "Advance an allele-selective or repeat-targeted ASO for C9orf72 ALS/FTD, positioning for pre-symptomatic expansion-carrier trials with CSF poly-GP + NfL as co-primary pharmacodynamic endpoints — following the tofersen biomarker-to-accelerated-approval template. Small-molecule RAN inhibitors and G4 ligands are the differentiated second track, contingent on CNS penetrance and selectivity data. Gene therapy (dual silence + restore) is a viable but longer-horizon concept gated on AAV cargo solutions.",
+    "consensus": "DPR gain-of-function (poly-GR/PR) is the strongest executioner candidate and the primary mechanistic rationale for knockdown strategies. Tofersen demonstrates the biomarker-driven approval path. All partners agree on the modality hierarchy: ASO > small molecule > gene therapy (by clinical readiness).",
+    "dissent": "Red-team holds conviction 2 — mechanism heterogeneity and absence of a patient-stratification biomarker mean any single modality may fail in a subset where a different mechanism dominates. CSO, regulator, BD hold conviction 3 conditional. No unconditional champion.",
+    "convergent_gate": "All four partners flag the SAME unresolved problem: the dominant-mechanism debate (DPR vs RNA foci vs haploinsufficiency) is not patient-stratified, and any ASO knockdown that worsens haploinsufficiency is a programme risk until allele-selectivity is demonstrated in patient neurons.",
+    "proposed_experiment": "Two parallel experiments: (1) Allele-selectivity assay — patient iPSC-derived motor neurons treated with repeat-targeted vs exon-targeted ASOs; measure C9orf72 total protein, expanded-allele mRNA, poly-GP by SIMOA, and iMN survival to define the therapeutic ratio. (2) CSF poly-GP SIMOA qualification in Phase 1 C9orf72 ASO trial — prospective biomarker-qualification study to establish poly-GP as a validated surrogate for FDA accelerated approval pathway.",
+    "confidence": "Biology (DPR as dominant executioner): MEDIUM-HIGH — strongest mechanistic candidate but mechanism debate not fully closed. Modality (allele-selective ASO): CONDITIONAL — mechanistically justified but allele-selectivity and haploinsufficiency safety gap must be demonstrated before IND-enabling. Overall programme: CONDITIONAL on the allele-selectivity gate.",
+    "entities": {
+      "genes": ["C9orf72"],
+      "diseases": ["ALS", "FTD", "ALS-FTD"]
+    }
+  }
+}
