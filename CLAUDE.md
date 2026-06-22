@@ -132,6 +132,11 @@ two-bucket "firm":
 ## Conventions
 - Agent `.md` files follow one template (see end of `AGENTS.md`): Bucket/layer · One-liner · Activate-when
   · Inputs · Procedure · Output (contract) · Sources/tools or Persona-grounding · Rules · Hands-off-to.
-- Work on the **`Rohan`** branch (the project bedrock). `main` also receives parallel pushes from other
-  sessions — rebase on `origin/main` before pushing if it has moved.
+- **`main` is the bedrock** (formerly the `Rohan` branch, promoted 2026-06-22; old `main` preserved at
+  `main-backup-2026-06-22`). **Sapphire is now built by a 3-person team** (rohan · hayes · gavin), each
+  driving their own Claude — see the **collaborative dev harness** in `dev/` (`CONTRIBUTORS.md`,
+  `DELEGATION.md`, `PR_REVIEW.md`).
+- **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** `main` is branch-protected —
+  nobody pushes to it directly. **Only Rohan's Claude reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`).
+  Every commit carries `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

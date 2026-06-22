@@ -1,0 +1,5 @@
+# Code owners for Sapphire.
+# Every PR to a protected branch requires review from the owner(s) below.
+# Rohan is the sole approver/merger for main (see dev/CONTRIBUTORS.md + dev/PR_REVIEW.md).
+
+* @rohanaryagondi

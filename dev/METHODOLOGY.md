@@ -28,11 +28,16 @@ Reviewer ≠ Implementer ≠ Verifier — separation of powers is mandatory. The
               Anything that doesn't actually work → back to FIX. (This gate is non-negotiable — see GATES.md.)
 7. (repeat 2–6 per task)
 8. BRANCH     When the feature is complete: WHOLE-BRANCH REVIEW (opus) over the full range.
-9. LEDGER     Append the outcome to dev/LEDGER.md (what, commits, tests, gaps).
-10. SHIP      Run the gates (GATES.md). If all green → commit (conventional message) and push origin/Rohan.
+9. PR         Open a PR `<handle>/<slug>` → `main`, filling the PR template with the Gate 1–5 evidence.
+10. APPROVE   Rohan's Claude re-establishes the gates on the PR + runs Gate 6 (PR_REVIEW.md), then merges to
+              `main`, deletes the branch, and appends the dev/LEDGER.md entry (Built-By + merged by rohan).
 ```
 
-`pipeline` it when you can: a task can be in VERIFY while the next is still in IMPLEMENT. But **commits are serialized** — only one agent commits at a time (cloud/file-system git locks bite otherwise).
+Contributors do steps 1–9 on their own branch; **only Rohan's Claude does step 10** (approve + merge). A
+contributor never merges their own PR.
+
+`pipeline` it when you can: a task can be in VERIFY while the next is still in IMPLEMENT. But **merges are
+serialized** — Rohan's Claude merges one PR at a time (cloud/file-system git locks bite otherwise).
 
 ## Tiers (right-size the ceremony)
 
