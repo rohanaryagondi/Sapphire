@@ -327,7 +327,9 @@
               "provenance": {"type": "string"}
             }
           }},
-          "provenance": {"type": "string"}
+          "provenance": {"type": "string"},
+          "invalid_sequences": {"type": "array", "items": {"type": "string"}},
+          "error": {"type": "string"}
         }
       },
       "tools_allowed": [],

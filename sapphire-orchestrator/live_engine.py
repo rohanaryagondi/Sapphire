@@ -11,6 +11,7 @@ Usage:
 """
 from __future__ import annotations
 
+import re
 import sys
 import os
 
@@ -49,6 +50,40 @@ _BUCKET1_AGENTS = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# ASO sequence extraction helper
+# ---------------------------------------------------------------------------
+
+# Strict pattern: standalone token that is pure A/T/G/C (uppercase only), length ≥ 15.
+# Gene symbols (e.g. TSC2, SCN2A) always contain digits or non-ATGC letters — they
+# never match.  Lowercase text, mixed case, and ordinary words are excluded by design.
+_ASO_RE = re.compile(r"\b[ATGC]{15,}\b")
+
+
+def _extract_aso_sequences(query: str) -> list[str]:
+    """
+    Extract standalone ASO candidate sequences embedded in a query string.
+
+    A token qualifies only when it:
+      - consists entirely of uppercase A, T, G, C characters
+      - is at least 15 characters long
+      - appears as a word boundary token
+
+    This is intentionally strict to avoid false-positives on gene symbols,
+    accession numbers, ordinary words, or mixed-case text.
+
+    Returns a deduplicated list preserving first-occurrence order.
+    """
+    seen: set[str] = set()
+    result: list[str] = []
+    for m in _ASO_RE.finditer(query):
+        seq = m.group(0)
+        if seq not in seen:
+            seen.add(seq)
+            result.append(seq)
+    return result
+
+
 def _known_agent_ids(registry) -> set:
     """Return the set of agent ids present in the registry dict."""
     if registry is None:
@@ -73,6 +108,7 @@ def _build_moat_agent():
 def run_live(
     query: str,
     *,
+    sequences: list[str] | None = None,
     ctx: dict | None = None,
     registry=None,
     engine: Orchestrator | None = None,
@@ -82,10 +118,17 @@ def run_live(
 
     Parameters
     ----------
-    query    : the free-text question / task.
-    ctx      : optional harness context dict (inject mock backends for testing).
-    registry : optional pre-loaded agents.json dict (default: harness.load_registry()).
-    engine   : optional Orchestrator instance (default: new Orchestrator()).
+    query     : the free-text question / task.
+    sequences : optional list of ASO candidate sequences (e.g. ["GCACTTGAATTTCACGTTGT"]).
+                When provided, sequences are threaded into every Bucket-1 agent's inputs
+                so the aso-tox agent can score them.  If None (default), the function
+                falls back to extracting pure A/T/G/C tokens of length ≥ 15 from the
+                query text via _extract_aso_sequences().
+                NOTE: this is the documented handoff point for the future ASO-Design tool —
+                that tool will pass its designed sequences here after its own dispatch.
+    ctx       : optional harness context dict (inject mock backends for testing).
+    registry  : optional pre-loaded agents.json dict (default: harness.load_registry()).
+    engine    : optional Orchestrator instance (default: new Orchestrator()).
 
     Returns
     -------
@@ -98,6 +141,16 @@ def run_live(
     # -----------------------------------------------------------------------
     engine = engine or Orchestrator()
     ctx = dict(ctx or {})
+
+    # Resolve the sequences channel.
+    # Precedence: explicit param > query-text extractor.
+    # The explicit param is always used when provided (even if empty list).
+    # When None, fall back to the strict query extractor (_extract_aso_sequences).
+    # This channel is the handoff point for the future ASO-Design tool.
+    if sequences is None:
+        resolved_sequences: list[str] = _extract_aso_sequences(query)
+    else:
+        resolved_sequences = list(sequences)
 
     # Load registry once (used for id-set lookups + harness.run).
     if registry is None:
@@ -149,6 +202,11 @@ def run_live(
         "candidate": target,
         "disease": tri.get("disease_label", ""),
         "query": query,
+        # sequences: ASO candidates threaded through to the aso-tox agent.
+        # Populated from the explicit sequences= param (preferred) or the
+        # query-text extractor.  Empty list when no sequences are present —
+        # aso-tox will return facts=[] (honest empty) in that case.
+        "sequences": resolved_sequences,
     }
 
     for agent_id in _BUCKET1_AGENTS:
