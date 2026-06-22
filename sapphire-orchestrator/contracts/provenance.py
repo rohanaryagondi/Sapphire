@@ -9,6 +9,8 @@ PROVENANCE = frozenset({
     "live-local", "gpu-async", "gpu-disabled", "stub", "unavailable", "mock",
     # real Quiver CNS_DFP moat
     "moat-real",
+    # Quiver ASO acute-toxicity delegate (subprocess; sklearn env)
+    "aso-tox",
 })
 
 

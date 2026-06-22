@@ -303,6 +303,38 @@
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
       "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "aso-tox",
+      "role": "Bucket-1 safety fact source — sequence-based acute ASO toxicity screen (Hagedorn + Zhang GBR; threshold >1.0 = Toxic). External subprocess delegate; fires only when ASO sequences are present in inputs.",
+      "spec": "tools/aso_tox/README.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance"],
+      "provenance_label": "aso-tox",
+      "timeout_s": 120,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
     }
   ]
 }

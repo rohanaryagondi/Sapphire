@@ -26,6 +26,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
+from tools import aso_tox_seam
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -42,6 +43,9 @@ _BUCKET1_AGENTS = [
     "post-market-safety",
     "payer",
     "financial",
+    # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
+    # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
+    "aso-tox",
 ]
 
 
@@ -127,6 +131,10 @@ def run_live(
     ctx.setdefault("python_fns", {})
     if "internal-science-lead" not in ctx["python_fns"]:
         ctx["python_fns"]["internal-science-lead"] = _build_moat_agent()
+    # Wire the ASO acute-tox seam (stdlib-only orchestrator; sklearn lives in the subprocess).
+    # Passes sequences through inputs — fires only when ASO sequences are present.
+    if "aso-tox" not in ctx["python_fns"]:
+        ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents

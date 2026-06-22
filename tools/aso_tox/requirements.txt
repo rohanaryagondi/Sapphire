@@ -1,0 +1,5 @@
+pandas
+numpy
+# model pkl was pickled with scikit-learn 1.8.0; verified to load+predict on 1.6.1 with an InconsistentVersionWarning. Pin 1.8.0 for production fidelity (confirm with model author).
+scikit-learn
+joblib
