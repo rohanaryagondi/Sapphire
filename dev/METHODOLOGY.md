@@ -10,8 +10,8 @@ A self-contained, subagent-driven development (SDD) lifecycle. Owned in-repo; no
 | **Planner** | `.claude/agents/sapphire-dev-planner` | opus | Turns a goal into a sequenced plan of small, independently-verifiable tasks with explicit Definition of Done. |
 | **Implementer** | `.claude/agents/sapphire-dev-implementer` | sonnet | Builds ONE task, test-first, and self-tests. Stays inside the brief — no scope creep. |
 | **Reviewer** | `.claude/agents/sapphire-dev-reviewer` | sonnet | Independent spec-compliance + code-quality review of one task's diff. Never reviews its own work. |
-| **Verifier** | `.claude/agents/sapphire-dev-verifier` | sonnet (opus for critical) | **Functional gate**: actually *runs* the change, adversarially, and asks "does this really work?" Surfaces fixes. |
-| **Integrator** | `.claude/agents/sapphire-dev-integrator` | sonnet | Whole-branch review before a feature ships; resolves the ledger; performs the gated commit/push. |
+| **Verifier** | `.claude/agents/sapphire-dev-verifier` | sonnet (controller overrides to opus for critical paths) | **Functional gate**: actually *runs* the change, adversarially, and asks "does this really work?" Surfaces fixes. |
+| **Integrator** | `.claude/agents/sapphire-dev-integrator` | opus | Whole-branch review before a feature ships; resolves the ledger; performs the gated commit/push. |
 
 Reviewer ≠ Implementer ≠ Verifier — separation of powers is mandatory. The controller may also run an **opus whole-branch review** directly for a feature-sized change.
 
@@ -54,4 +54,4 @@ When unsure, go one tier heavier. The cost of a wasted review is small; the cost
 
 ## Plans live in the repo
 
-Feature plans go in `docs/superpowers/plans/<date>-<slug>.md` (existing convention) or `dev/plans/`. A plan is a contract: the Reviewer checks the diff against it.
+Feature plans go in `docs/superpowers/plans/<date>-<slug>.md` (existing convention) or `dev/plans/`. A plan is a contract: the Reviewer checks the diff against it. (Plans live in `docs/superpowers/plans/`; create the dir if it's a fresh repo.)
