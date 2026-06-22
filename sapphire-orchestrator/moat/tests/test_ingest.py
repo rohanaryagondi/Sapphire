@@ -7,6 +7,9 @@ Does NOT import pyarrow or read any parquet file.
 Direction semantics (verified against real parquet):
   similar  = k smallest-cosine rows where direction == 'Original'
   opposite = k smallest-cosine rows where direction == 'Antipodal'
+
+Partitioning: per (query, effect, ref_type) — genes and compounds each get
+their own top-K list; ranks restart at 1 within each group.
 """
 import importlib.util
 import sys
@@ -34,14 +37,20 @@ def _make_rows():
     """
     Small synthetic dataset for query TSC2, with direction column.
 
-    Original rows (similar candidates):
-        gene_a cosine=0.1, gene_b cosine=0.4, gene_c cosine=0.7
-    Antipodal rows (opposite candidates):
-        gene_d cosine=0.2, gene_e cosine=0.5, gene_f cosine=0.8
+    Original rows (similar candidates) — mixed ref_types:
+        gene_a cosine=0.1  ref_type=gene
+        gene_b cosine=0.4  ref_type=compound
+        gene_c cosine=0.7  ref_type=gene
+    Antipodal rows (opposite candidates) — mixed ref_types:
+        gene_d cosine=0.2  ref_type=compound
+        gene_e cosine=0.5  ref_type=gene
+        gene_f cosine=0.8  ref_type=compound
 
-    Expected with k=2:
-        similar  (Original, smallest cosine): gene_a(rank1,0.1), gene_b(rank2,0.4)
-        opposite (Antipodal, smallest cosine): gene_d(rank1,0.2), gene_e(rank2,0.5)
+    With k=2, per-(query, effect, ref_type) partitioning:
+        similar-gene:     gene_a(rank1,0.1), gene_c(rank2,0.7)
+        similar-compound: gene_b(rank1,0.4)
+        opposite-compound: gene_d(rank1,0.2), gene_f(rank2,0.8)
+        opposite-gene:    gene_e(rank1,0.5)
 
     Self-pair (ref==query, both TSC2) must be EXCLUDED entirely.
     Unrelated query MTOR must not bleed into TSC2 results.
@@ -85,30 +94,53 @@ class TestTopkNeighborsSelfExclusion(unittest.TestCase):
 
 class TestTopkNeighborsSimilar(unittest.TestCase):
     """
-    effect='similar': k smallest-cosine Original rows, rank ascending 1..k.
+    effect='similar': k smallest-cosine Original rows per ref_type, rank 1..k within each group.
     Must NOT include any Antipodal rows.
+    Grouping is per (query, effect, ref_type): genes and compounds each get their own ranked list.
     """
 
     def setUp(self):
         self.result = topk_neighbors(_make_rows(), k=2)
         self.similar = [r for r in self.result if r["query"] == "TSC2" and r["effect"] == "similar"]
-        self.similar_sorted = sorted(self.similar, key=lambda r: r["rank"])
 
     def test_similar_count(self):
-        self.assertEqual(len(self.similar), 2)
+        # similar-gene: gene_a(0.1), gene_c(0.7) = 2 rows
+        # similar-compound: gene_b(0.4) = 1 row
+        # total = 3
+        self.assertEqual(len(self.similar), 3)
 
-    def test_similar_refs(self):
-        """k=2 smallest Original cosines: gene_a(0.1), gene_b(0.4)."""
-        refs = [r["ref"] for r in self.similar_sorted]
-        self.assertEqual(refs, ["gene_a", "gene_b"])
+    def test_similar_gene_refs(self):
+        """k=2 smallest Original cosines for ref_type=gene: gene_a(0.1), gene_c(0.7)."""
+        sim_gene = sorted(
+            [r for r in self.similar if r["ref_type"] == "gene"],
+            key=lambda r: r["rank"]
+        )
+        refs = [r["ref"] for r in sim_gene]
+        self.assertEqual(refs, ["gene_a", "gene_c"])
 
-    def test_similar_ranks(self):
-        ranks = [r["rank"] for r in self.similar_sorted]
+    def test_similar_gene_ranks_restart(self):
+        """Ranks within similar-gene restart at 1."""
+        sim_gene = sorted(
+            [r for r in self.similar if r["ref_type"] == "gene"],
+            key=lambda r: r["rank"]
+        )
+        ranks = [r["rank"] for r in sim_gene]
         self.assertEqual(ranks, [1, 2])
 
-    def test_similar_cosine_ascending(self):
-        cosines = [r["cosine"] for r in self.similar_sorted]
-        self.assertLess(cosines[0], cosines[1])
+    def test_similar_compound_refs(self):
+        """k=2 smallest Original cosines for ref_type=compound: gene_b(0.4) only 1 row."""
+        sim_cpd = sorted(
+            [r for r in self.similar if r["ref_type"] == "compound"],
+            key=lambda r: r["rank"]
+        )
+        refs = [r["ref"] for r in sim_cpd]
+        self.assertEqual(refs, ["gene_b"])
+
+    def test_similar_compound_rank_starts_at_1(self):
+        """similar-compound rank starts at 1 independently of similar-gene."""
+        sim_cpd = [r for r in self.similar if r["ref_type"] == "compound"]
+        self.assertEqual(len(sim_cpd), 1)
+        self.assertEqual(sim_cpd[0]["rank"], 1)
 
     def test_similar_only_from_original_rows(self):
         """Antipodal ref names (gene_d, gene_e, gene_f) must not appear in similar."""
@@ -120,29 +152,61 @@ class TestTopkNeighborsSimilar(unittest.TestCase):
 
 class TestTopkNeighborsOpposite(unittest.TestCase):
     """
-    effect='opposite': k smallest-cosine Antipodal rows, rank ascending 1..k.
+    effect='opposite': k smallest-cosine Antipodal rows per ref_type, rank 1..k within each group.
     Must NOT include any Original rows.
+    Grouping is per (query, effect, ref_type): genes and compounds each get their own ranked list.
     """
 
     def setUp(self):
         self.result = topk_neighbors(_make_rows(), k=2)
         self.opposite = [r for r in self.result if r["query"] == "TSC2" and r["effect"] == "opposite"]
-        self.opposite_sorted = sorted(self.opposite, key=lambda r: r["rank"])
 
     def test_opposite_count(self):
-        self.assertEqual(len(self.opposite), 2)
+        # opposite-compound: gene_d(0.2), gene_f(0.8) = 2 rows
+        # opposite-gene:    gene_e(0.5) = 1 row
+        # total = 3
+        self.assertEqual(len(self.opposite), 3)
 
-    def test_opposite_refs(self):
-        """k=2 smallest Antipodal cosines: gene_d(0.2), gene_e(0.5)."""
-        refs = [r["ref"] for r in self.opposite_sorted]
-        self.assertEqual(refs, ["gene_d", "gene_e"])
+    def test_opposite_compound_refs(self):
+        """k=2 smallest Antipodal cosines for ref_type=compound: gene_d(0.2), gene_f(0.8)."""
+        opp_cpd = sorted(
+            [r for r in self.opposite if r["ref_type"] == "compound"],
+            key=lambda r: r["rank"]
+        )
+        refs = [r["ref"] for r in opp_cpd]
+        self.assertEqual(refs, ["gene_d", "gene_f"])
 
-    def test_opposite_ranks(self):
-        ranks = [r["rank"] for r in self.opposite_sorted]
+    def test_opposite_compound_ranks_restart(self):
+        """Ranks within opposite-compound restart at 1."""
+        opp_cpd = sorted(
+            [r for r in self.opposite if r["ref_type"] == "compound"],
+            key=lambda r: r["rank"]
+        )
+        ranks = [r["rank"] for r in opp_cpd]
         self.assertEqual(ranks, [1, 2])
 
-    def test_opposite_cosine_ascending(self):
-        cosines = [r["cosine"] for r in self.opposite_sorted]
+    def test_opposite_gene_refs(self):
+        """k=2 smallest Antipodal cosines for ref_type=gene: gene_e(0.5) only 1 row."""
+        opp_gene = sorted(
+            [r for r in self.opposite if r["ref_type"] == "gene"],
+            key=lambda r: r["rank"]
+        )
+        refs = [r["ref"] for r in opp_gene]
+        self.assertEqual(refs, ["gene_e"])
+
+    def test_opposite_gene_rank_starts_at_1(self):
+        """opposite-gene rank starts at 1 independently of opposite-compound."""
+        opp_gene = [r for r in self.opposite if r["ref_type"] == "gene"]
+        self.assertEqual(len(opp_gene), 1)
+        self.assertEqual(opp_gene[0]["rank"], 1)
+
+    def test_opposite_compound_cosine_ascending(self):
+        """Within opposite-compound, cosines are ascending by rank."""
+        opp_cpd = sorted(
+            [r for r in self.opposite if r["ref_type"] == "compound"],
+            key=lambda r: r["rank"]
+        )
+        cosines = [r["cosine"] for r in opp_cpd]
         self.assertLess(cosines[0], cosines[1])
 
     def test_opposite_only_from_antipodal_rows(self):
@@ -228,10 +292,102 @@ class TestTopkNeighborsIsolation(unittest.TestCase):
             self.assertNotEqual(r["ref"], "gene_x", "gene_x belongs to MTOR, not TSC2")
 
 
+class TestTopkNeighborsPerRefType(unittest.TestCase):
+    """
+    Per-(query, effect, ref_type) partitioning: genes and compounds must each get their own
+    top-K ranked list. Ranks restart at 1 within each (query, effect, ref_type) group.
+    A query with both gene and compound refs in both directions must produce four separate
+    ranked groups: similar-gene, similar-compound, opposite-gene, opposite-compound.
+    """
+
+    def _make_mixed_rows(self):
+        """
+        Query BRCA1 with 3 gene + 3 compound refs in each direction.
+        similar-gene candidates (Original, ref_type=gene):
+            gA cosine=0.1, gB cosine=0.3, gC cosine=0.5
+        similar-compound candidates (Original, ref_type=compound):
+            cA cosine=0.2, cB cosine=0.4, cC cosine=0.6
+        opposite-gene candidates (Antipodal, ref_type=gene):
+            gD cosine=0.15, gE cosine=0.35, gF cosine=0.55
+        opposite-compound candidates (Antipodal, ref_type=compound):
+            cD cosine=0.25, cE cosine=0.45, cF cosine=0.65
+        """
+        return [
+            # similar-gene
+            {"query": "BRCA1", "query_type": "gene", "ref": "gA", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.1,  "euclidean": 0.1, "direction": "Original"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "gB", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.3,  "euclidean": 0.3, "direction": "Original"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "gC", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.5,  "euclidean": 0.5, "direction": "Original"},
+            # similar-compound
+            {"query": "BRCA1", "query_type": "gene", "ref": "cA", "ref_type": "compound", "ref_dose": "5",  "cosine": 0.2,  "euclidean": 0.2, "direction": "Original"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "cB", "ref_type": "compound", "ref_dose": "5",  "cosine": 0.4,  "euclidean": 0.4, "direction": "Original"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "cC", "ref_type": "compound", "ref_dose": "5",  "cosine": 0.6,  "euclidean": 0.6, "direction": "Original"},
+            # opposite-gene
+            {"query": "BRCA1", "query_type": "gene", "ref": "gD", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.15, "euclidean": 0.15, "direction": "Antipodal"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "gE", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.35, "euclidean": 0.35, "direction": "Antipodal"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "gF", "ref_type": "gene",     "ref_dose": "1",  "cosine": 0.55, "euclidean": 0.55, "direction": "Antipodal"},
+            # opposite-compound
+            {"query": "BRCA1", "query_type": "gene", "ref": "cD", "ref_type": "compound", "ref_dose": "10", "cosine": 0.25, "euclidean": 0.25, "direction": "Antipodal"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "cE", "ref_type": "compound", "ref_dose": "10", "cosine": 0.45, "euclidean": 0.45, "direction": "Antipodal"},
+            {"query": "BRCA1", "query_type": "gene", "ref": "cF", "ref_type": "compound", "ref_dose": "10", "cosine": 0.65, "euclidean": 0.65, "direction": "Antipodal"},
+        ]
+
+    def setUp(self):
+        self.rows = self._make_mixed_rows()
+        self.result = topk_neighbors(self.rows, k=2)
+        self.brca1 = [r for r in self.result if r["query"] == "BRCA1"]
+
+    def test_four_groups_present(self):
+        """All four (effect, ref_type) groups must appear: similar-gene, similar-compound, opposite-gene, opposite-compound."""
+        groups = {(r["effect"], r["ref_type"]) for r in self.brca1}
+        self.assertIn(("similar",  "gene"),     groups)
+        self.assertIn(("similar",  "compound"), groups)
+        self.assertIn(("opposite", "gene"),     groups)
+        self.assertIn(("opposite", "compound"), groups)
+
+    def test_similar_gene_top2(self):
+        sim_gene = sorted([r for r in self.brca1 if r["effect"] == "similar" and r["ref_type"] == "gene"], key=lambda r: r["rank"])
+        self.assertEqual([r["ref"] for r in sim_gene], ["gA", "gB"])
+        self.assertEqual([r["rank"] for r in sim_gene], [1, 2])
+
+    def test_similar_compound_top2(self):
+        sim_cpd = sorted([r for r in self.brca1 if r["effect"] == "similar" and r["ref_type"] == "compound"], key=lambda r: r["rank"])
+        self.assertEqual([r["ref"] for r in sim_cpd], ["cA", "cB"])
+        self.assertEqual([r["rank"] for r in sim_cpd], [1, 2])
+
+    def test_opposite_gene_top2(self):
+        opp_gene = sorted([r for r in self.brca1 if r["effect"] == "opposite" and r["ref_type"] == "gene"], key=lambda r: r["rank"])
+        self.assertEqual([r["ref"] for r in opp_gene], ["gD", "gE"])
+        self.assertEqual([r["rank"] for r in opp_gene], [1, 2])
+
+    def test_opposite_compound_top2(self):
+        opp_cpd = sorted([r for r in self.brca1 if r["effect"] == "opposite" and r["ref_type"] == "compound"], key=lambda r: r["rank"])
+        self.assertEqual([r["ref"] for r in opp_cpd], ["cD", "cE"])
+        self.assertEqual([r["rank"] for r in opp_cpd], [1, 2])
+
+    def test_ranks_restart_per_ref_type(self):
+        """Rank 1 must appear exactly once per (effect, ref_type) group — it restarts within each group."""
+        for effect in ("similar", "opposite"):
+            for ref_type in ("gene", "compound"):
+                group = [r for r in self.brca1 if r["effect"] == effect and r["ref_type"] == ref_type]
+                rank1_count = sum(1 for r in group if r["rank"] == 1)
+                self.assertEqual(rank1_count, 1, f"Expected exactly one rank=1 in ({effect}, {ref_type}) group")
+
+    def test_compounds_not_crowded_out_by_genes(self):
+        """With k=2, compounds must appear even alongside genes — compound group is independent."""
+        sim_cpd = [r for r in self.brca1 if r["effect"] == "similar" and r["ref_type"] == "compound"]
+        self.assertEqual(len(sim_cpd), 2, "Compounds must not be crowded out by genes — per-ref_type partitioning must give compounds their own k=2 slots")
+
+    def test_self_excluded_across_all_groups(self):
+        """Self-pairs must be excluded in all (effect, ref_type) groups."""
+        refs = {r["ref"] for r in self.brca1}
+        self.assertNotIn("BRCA1", refs)
+
+
 class TestTopkNeighborsKBound(unittest.TestCase):
-    """Output per (query, effect) must not exceed k."""
+    """Output per (query, effect, ref_type) must not exceed k."""
 
     def test_k_bound(self):
+        # 20 gene refs in each direction — only ref_type=gene; each group capped at k=3
         rows = (
             [{"query": "TSC2", "query_type": "gene", "ref": f"g{i}", "ref_type": "gene", "ref_dose": "1",
               "cosine": i * 0.01, "euclidean": i * 0.01, "direction": "Original"}
@@ -242,10 +398,29 @@ class TestTopkNeighborsKBound(unittest.TestCase):
              for i in range(20)]
         )
         result = topk_neighbors(rows, k=3)
-        similar = [r for r in result if r["query"] == "TSC2" and r["effect"] == "similar"]
-        opposite = [r for r in result if r["query"] == "TSC2" and r["effect"] == "opposite"]
-        self.assertLessEqual(len(similar), 3)
-        self.assertLessEqual(len(opposite), 3)
+        # With only gene refs, similar-gene and opposite-gene each capped at k=3
+        similar_gene = [r for r in result if r["query"] == "TSC2" and r["effect"] == "similar" and r["ref_type"] == "gene"]
+        opposite_gene = [r for r in result if r["query"] == "TSC2" and r["effect"] == "opposite" and r["ref_type"] == "gene"]
+        self.assertLessEqual(len(similar_gene), 3)
+        self.assertLessEqual(len(opposite_gene), 3)
+
+    def test_k_bound_per_ref_type_independent(self):
+        """Each (effect, ref_type) group gets its own k-capped list; both gene and compound can each have up to k rows."""
+        rows = (
+            [{"query": "TSC2", "query_type": "gene", "ref": f"g{i}", "ref_type": "gene",     "ref_dose": "1",
+              "cosine": i * 0.01, "euclidean": i * 0.01, "direction": "Original"}
+             for i in range(10)]
+            +
+            [{"query": "TSC2", "query_type": "gene", "ref": f"c{i}", "ref_type": "compound", "ref_dose": "5",
+              "cosine": i * 0.01, "euclidean": i * 0.01, "direction": "Original"}
+             for i in range(10)]
+        )
+        result = topk_neighbors(rows, k=3)
+        similar_gene = [r for r in result if r["query"] == "TSC2" and r["effect"] == "similar" and r["ref_type"] == "gene"]
+        similar_cpd  = [r for r in result if r["query"] == "TSC2" and r["effect"] == "similar" and r["ref_type"] == "compound"]
+        # Each ref_type group independently capped at k=3
+        self.assertEqual(len(similar_gene), 3)
+        self.assertEqual(len(similar_cpd),  3)
 
 
 class TestTopkNeighborsMissingDirection(unittest.TestCase):

@@ -10,3 +10,4 @@ SemanticAgents/
 
 # isolated venv for the vendored Q-Models Explorer (local-cpu endpoint)
 .qm-venv/
+RohanOnly/moat/
