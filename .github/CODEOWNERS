@@ -1,5 +1,8 @@
 # Code owners for Sapphire.
-# Every PR to a protected branch requires review from the owner(s) below.
+# Every PR to a protected branch requires review from the owner below.
 # Rohan is the sole approver/merger for main (see dev/CONTRIBUTORS.md + dev/PR_REVIEW.md).
+# @rohanaryagondi-quiver is Rohan's identity on the canonical Quiver repo
+# (rohanaryagondi-quiver/Sapphire). Enforcement activates once that account is on GitHub Pro
+# (see dev/enable-branch-protection.sh); until then CODEOWNERS routes review by convention.
 
-* @rohanaryagondi
+* @rohanaryagondi-quiver

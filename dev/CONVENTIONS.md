@@ -6,11 +6,12 @@ Every change to Sapphire follows these. They are not style preferences; they are
 - **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
   `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
   a reviewed PR.
-  > **Enforcement status (2026-06-22):** GitHub *hard* enforcement (branch protection / rulesets) is gated
-  > behind a paid plan this private repo doesn't have yet (the API returns 403). Until the plan is upgraded
-  > (or the repo moved to a paid Quiver org), the no-direct-push rule is **convention + CODEOWNERS
-  > review-routing**, not machine-enforced — anyone with write access *could* bypass it. Treat it as binding
-  > regardless. Resolving this is a tracked follow-up; do **not** grant Hayes/Gavin write access until it is.
+  > **Enforcement status (2026-06-22):** the canonical repo is `rohanaryagondi-quiver/Sapphire` (Quiver-owned).
+  > That account is currently **GitHub free**, where branch protection + rulesets return 403. So hard
+  > enforcement is **one step away**: enable **GitHub Pro** on `rohanaryagondi-quiver` (~$4/mo), then run
+  > `bash dev/enable-branch-protection.sh` (token-free; reads `GH_TOKEN`). Until then the no-direct-push rule
+  > is **convention + CODEOWNERS review-routing**, not machine-enforced — anyone with write access *could*
+  > bypass it. Treat it as binding regardless, and do **not** grant Hayes/Gavin access until protection is live.
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,

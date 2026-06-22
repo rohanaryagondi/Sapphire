@@ -137,8 +137,9 @@ two-bucket "firm":
   driving their own Claude — see the **collaborative dev harness** in `dev/` (`CONTRIBUTORS.md`,
   `DELEGATION.md`, `PR_REVIEW.md`).
 - **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** **Only Rohan's Claude
-  reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). GitHub *hard* enforcement (branch protection / no
-  direct push) requires a paid plan the repo doesn't yet have — until then the rule holds by **convention +
-  CODEOWNERS review-routing** (see the enforcement note in `dev/CONVENTIONS.md` §1). Every commit carries
-  `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
+  reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). Canonical repo: **`rohanaryagondi-quiver/Sapphire`**
+  (Quiver-owned). GitHub *hard* enforcement (branch protection) is one step away — enable GitHub Pro on that
+  account, then run `dev/enable-branch-protection.sh`; until then the rule holds by **convention + CODEOWNERS
+  review-routing** (see `dev/CONVENTIONS.md` §1). Every commit carries `Built-By: <handle>` + the Claude
+  `Co-Authored-By` trailer.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

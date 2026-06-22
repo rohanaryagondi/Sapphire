@@ -12,11 +12,11 @@ protection, not just convention.
 ## Decisions (locked with Rohan, 2026-06-22)
 1. **Attribution:** git-native — branch prefix `<handle>/<slug>` + mandatory `Built-By: <handle>` commit
    trailer + `dev/CONTRIBUTORS.md` registry + `Built-By` in the ledger. No in-file headers (avoid churn).
-2. **Enforcement:** intended via GitHub branch protection on `main` (PR + CODEOWNERS review required, only
-   Rohan merges, no direct pushes). **BLOCKED (2026-06-22):** branch protection + rulesets require a paid
-   plan this private free-tier repo lacks (API returns 403). Interim: CODEOWNERS routes review to Rohan +
-   the rule is convention-backed. Resolution (upgrade plan / move to paid Quiver org / accept convention) is
-   a decision surfaced to Rohan — tracked, not silently dropped.
+2. **Enforcement:** via GitHub branch protection on `main` (PR + CODEOWNERS review required, only Rohan
+   merges, no direct pushes). Repo moved to the Quiver-owned **`rohanaryagondi-quiver/Sapphire`** (Rohan's
+   decision, 2026-06-22). That account is currently GitHub **free**, where protection + rulesets still 403,
+   so hard enforcement is **one step away**: enable GitHub Pro on `rohanaryagondi-quiver`, then run
+   `dev/enable-branch-protection.sh`. Interim: CODEOWNERS routes review + the rule is convention-backed.
 3. **Reporting:** tracked `dev/reports/<handle>/`; `dev/LEDGER.md` stays the canonical merge log.
 4. **Branch surgery (DONE before this plan):** old `main` → `main-backup-2026-06-22`; `main` fast-forwarded
    to the former `Rohan` bedrock; `Rohan` branch retired. Everyone now branches off `main`.

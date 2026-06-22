@@ -7,12 +7,16 @@ The people building Sapphire and the Claude each one drives. This is the source 
 
 | Handle | Person | GitHub | Drives | Role |
 |---|---|---|---|---|
-| `rohan` | Rohan Aryagondi | `@rohanaryagondi` | this Claude | **Lead + sole approver/merger** |
+| `rohan` | Rohan Aryagondi | `@rohanaryagondi-quiver` (Quiver; personal `@rohanaryagondi`) | this Claude | **Lead + sole approver/merger** |
 | `hayes` | Hayes | `@TBD` *(confirm)* | their Claude | Contributor |
 | `gavin` | Gavin | `@TBD` *(confirm)* | their Claude | Contributor |
 
+> **Canonical repo:** `rohanaryagondi-quiver/Sapphire` (Quiver-owned). `@rohanaryagondi-quiver` is the
+> approver/CODEOWNER there.
 > GitHub usernames for Hayes and Gavin are placeholders until confirmed. They must be added as repo
-> collaborators (write access) before they can push feature branches / open PRs.
+> collaborators before they can open PRs — **but do not grant access until branch protection is live**
+> (currently pending a GitHub Pro upgrade on `rohanaryagondi-quiver`; see `dev/CONVENTIONS.md` §1). On the
+> free tier a collaborator can push to `main` directly, bypassing the approver.
 
 ## Ownership (default areas — see `dev/DELEGATION.md` for live assignments)
 
