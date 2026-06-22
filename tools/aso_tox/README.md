@@ -78,5 +78,6 @@ When no sequences are present in the inputs (a normal target-level query), `pred
 
 ## What's missing
 
-- **Training CSVs** `UBE3A_ATS_ASO_info_v2.csv` and `GFAP_ASO_withICV_score_v2.csv` are not included in this repo — they are needed only to retrain or validate from scratch. Contact the model author for access.
+- **Sequence-input path in `run_live` (active task).** The orchestrator dispatches `aso-tox` in Bucket-1, but `run_live` has no channel to pass ASO sequences to it — so in a live run it always receives zero sequences and returns `facts: []`. The tool is correct; the *feed* is missing. Tracked at `docs/superpowers/plans/2026-06-22-aso-tox-sequence-wiring.md`. This is the same channel the forthcoming ASO-Design tool will populate.
+- **Training CSVs** `UBE3A_ATS_ASO_info_v2.csv` and `GFAP_ASO_withICV_score_v2.csv` are not included in this repo — they are needed only to retrain or validate from scratch. Contact the model author (Hongkang) for access.
 - **scikit-learn version pin:** The pkl was serialized with scikit-learn 1.8.0. Loading on 1.6.1 works but emits an `InconsistentVersionWarning`. Pin `scikit-learn==1.8.0` in `requirements.txt` for production fidelity; confirm the exact version with the model author.
