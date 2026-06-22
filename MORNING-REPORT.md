@@ -56,5 +56,9 @@ python3 ../_build/loop_and_trace_demo.py   # regenerate the loop+trace demo ($0)
 ## EMET capture URLs (tonight, for reference)
 SCN2A `…/chat/cbb64717-…` · GBA1 `…/chat/ad734624-…` · C9orf72 `…/chat/da99c861-…`
 
-## Push
-Pushed to `origin/Rohan` — see the final note appended below after the push attempt.
+## Final whole-branch review (opus) — **Ready to merge**
+No Critical, no Important findings. Independently verified: `run_live` genuinely routes every agent + persona through `harness.run` (not a canned shortcut), the real moat DB is read live (TSC2 → Isorhamnetin/Momelotinib, `moat-real`), guardrails fire on the **negative path** (data-boundary blocks `QS00123`; `must_cite_dossier` forced all 5 personas to abstain after 2 repairs in trace `eng_6444d0e8`), scenario PMIDs are real with honest `KNOWN_UNKNOWN` flagging, runtime stays stdlib-only, no secrets/binaries.
+Two **Minor** follow-ups (non-blocking): (1) add a direct unit assertion for the `must_cite_dossier` persona-block (already proven by the live trace); (2) `live_engine.py` `dossier_fields` truncates cited values to 80 chars — cosmetic, only ever narrows the cite allow-set.
+
+## Push — done ✅
+Pushed to `origin/Rohan` (`aed3803..8f5a839`, then this report). The full overnight build is on the remote.
