@@ -34,9 +34,11 @@ expected reviewer-of-record and the person who keeps that area coherent.
    `Co-Authored-By` line (the Claude that did the work):
    ```
    Built-By: hayes
-   Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
+   Co-Authored-By: Claude <model-used> <noreply@anthropic.com>
    ```
-   `git log --grep` / `git blame` then answer "who built this" natively, with no file churn.
+   Use the model id of the session that did the work (e.g. `Claude Opus 4.8`, `Claude Sonnet 4.6`); the stable
+   identifier is the `noreply@anthropic.com` email, not the display name. `git log --grep=Built-By` / `git blame`
+   then answer "who built this" natively, with no file churn.
 3. **Ledger:** each `dev/LEDGER.md` entry records `Built-By: <handle>` and the merging approver.
 4. **Reports:** per-contributor under `dev/reports/<handle>/`.
 

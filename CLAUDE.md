@@ -84,7 +84,7 @@ two-bucket "firm":
   downstream of the future ASO Design tool. Requires scikit-learn==1.8.0 in the tool subprocess only;
   engine remains stdlib-only. Per the 2026-06-19 sprint deck: **Loka is the front-end/orchestrator scaffold**;
   Quiver tools (OPAL, ASO Design, ASO toxicity [this], chronic-tox roadmap, Experiment Design) plug into it.
-- **Tests: 268, all green.**
+- **Tests: 278, all green.**
 - **Still TODO:** wire `run_live` to the front door (`serve.py`/Console still use the canned path); wire
   ASO Design tool to feed sequences into `aso-tox`; broaden captured scenario coverage.
 
@@ -136,7 +136,9 @@ two-bucket "firm":
   `main-backup-2026-06-22`). **Sapphire is now built by a 3-person team** (rohan · hayes · gavin), each
   driving their own Claude — see the **collaborative dev harness** in `dev/` (`CONTRIBUTORS.md`,
   `DELEGATION.md`, `PR_REVIEW.md`).
-- **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** `main` is branch-protected —
-  nobody pushes to it directly. **Only Rohan's Claude reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`).
-  Every commit carries `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
+- **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** **Only Rohan's Claude
+  reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). GitHub *hard* enforcement (branch protection / no
+  direct push) requires a paid plan the repo doesn't yet have — until then the rule holds by **convention +
+  CODEOWNERS review-routing** (see the enforcement note in `dev/CONVENTIONS.md` §1). Every commit carries
+  `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

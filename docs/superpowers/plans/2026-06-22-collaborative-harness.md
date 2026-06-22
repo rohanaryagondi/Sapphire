@@ -12,8 +12,11 @@ protection, not just convention.
 ## Decisions (locked with Rohan, 2026-06-22)
 1. **Attribution:** git-native — branch prefix `<handle>/<slug>` + mandatory `Built-By: <handle>` commit
    trailer + `dev/CONTRIBUTORS.md` registry + `Built-By` in the ledger. No in-file headers (avoid churn).
-2. **Enforcement:** Rohan's Claude configures GitHub branch protection on `main` via the API (admin token
-   present): PR required, CODEOWNERS review required, only Rohan merges, no direct pushes, no force/delete.
+2. **Enforcement:** intended via GitHub branch protection on `main` (PR + CODEOWNERS review required, only
+   Rohan merges, no direct pushes). **BLOCKED (2026-06-22):** branch protection + rulesets require a paid
+   plan this private free-tier repo lacks (API returns 403). Interim: CODEOWNERS routes review to Rohan +
+   the rule is convention-backed. Resolution (upgrade plan / move to paid Quiver org / accept convention) is
+   a decision surfaced to Rohan — tracked, not silently dropped.
 3. **Reporting:** tracked `dev/reports/<handle>/`; `dev/LEDGER.md` stays the canonical merge log.
 4. **Branch surgery (DONE before this plan):** old `main` → `main-backup-2026-06-22`; `main` fast-forwarded
    to the former `Rohan` bedrock; `Rohan` branch retired. Everyone now branches off `main`.
@@ -34,16 +37,16 @@ protection, not just convention.
 7. **Orientation update** — root `CLAUDE.md`: replace "work on the `Rohan` branch" with the feature-branch +
    PR-to-`main` model.
 8. **Ship via the new flow** — open a PR `rohan/collab-harness` → `main`; Rohan's Claude reviews + approves +
-   merges (inaugural reference PR). THEN apply branch protection via the API (CODEOWNERS must be on `main`
-   first).
+   merges (inaugural reference PR). Branch protection would be applied here (CODEOWNERS must be on `main`
+   first) — but it is BLOCKED by the plan tier (see decision #2); apply once the plan is resolved.
 
 ## Definition of Done
 - [ ] All files above exist, internally consistent (no contradictions across README/METHODOLOGY/GATES/CONVENTIONS).
 - [ ] `.github/CODEOWNERS` is syntactically valid; PR template renders.
 - [ ] Branch surgery verified: `main` = bedrock, backup preserved, `Rohan` gone.
 - [ ] This change merged to `main` via a PR through the documented flow.
-- [ ] Branch protection on `main` active and verified via the API: PR + CODEOWNERS review required, no direct
-      push, no force-push/delete.
+- [~] Branch protection on `main` — BLOCKED by plan tier (403); deferred to the enforcement decision. CODEOWNERS
+      in place so it can be turned on the moment the plan is upgraded.
 - [ ] Full test suite still green (no runtime code touched, but confirm — 278).
 - [ ] Ledger entry with `Built-By: rohan`.
 

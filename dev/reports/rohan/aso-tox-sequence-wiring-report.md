@@ -2,7 +2,7 @@
 
 **Task:** Feed ASO sequences into `run_live` so `aso-tox` produces dossier facts.
 **Date:** 2026-06-22
-**Branch:** Rohan
+**Branch:** Rohan (the pre-2026-06-22 bedrock — promoted to `main` in the branch surgery; `Rohan` retired)
 
 ## What Changed
 

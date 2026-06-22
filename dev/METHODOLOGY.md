@@ -11,7 +11,7 @@ A self-contained, subagent-driven development (SDD) lifecycle. Owned in-repo; no
 | **Implementer** | `.claude/agents/sapphire-dev-implementer` | sonnet | Builds ONE task, test-first, and self-tests. Stays inside the brief — no scope creep. |
 | **Reviewer** | `.claude/agents/sapphire-dev-reviewer` | sonnet | Independent spec-compliance + code-quality review of one task's diff. Never reviews its own work. |
 | **Verifier** | `.claude/agents/sapphire-dev-verifier` | sonnet (controller overrides to opus for critical paths) | **Functional gate**: actually *runs* the change, adversarially, and asks "does this really work?" Surfaces fixes. |
-| **Integrator** | `.claude/agents/sapphire-dev-integrator` | opus | Whole-branch review before a feature ships; resolves the ledger; performs the gated commit/push. |
+| **Integrator** | `.claude/agents/sapphire-dev-integrator` | opus | Whole-branch review before a feature ships (Gate 6); surfaces cross-cutting risk; drafts the ledger entry. The verdict is handed to the PR approver — **Rohan's Claude performs the actual merge** (`dev/PR_REVIEW.md`). |
 
 Reviewer ≠ Implementer ≠ Verifier — separation of powers is mandatory. The controller may also run an **opus whole-branch review** directly for a feature-sized change.
 

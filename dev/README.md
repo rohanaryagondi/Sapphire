@@ -46,7 +46,9 @@ Sapphire is built by three contributors, each driving their own Claude. The mode
   `Co-Authored-By`) + the `CONTRIBUTORS.md` registry. No in-file tags. `git log`/`blame` answer "who built this".
 - **Contributors run the full local lifecycle** (Gates 1–5) and **ship by opening a PR** — they never merge.
 - **Only Rohan's Claude reviews, approves, and merges to `main`** — re-establishing the gates independently on
-  the PR (`PR_REVIEW.md`), enforced by GitHub branch protection (CODEOWNERS review required, no direct pushes).
+  the PR (`PR_REVIEW.md`). `.github/CODEOWNERS` routes every PR to Rohan for review; *hard* enforcement
+  (branch protection / no direct push) is pending a GitHub plan upgrade (see the enforcement note in
+  `CONVENTIONS.md` §1) — until then the rule is convention-backed, treated as binding.
 
 Runnable assets (so the process is enforced, not just described):
 - `.claude/agents/sapphire-dev-{planner,implementer,reviewer,verifier,integrator}.md` — the builder roles.

@@ -36,10 +36,15 @@ Apply `dev/GATES.md` to the PR:
 - **Approve + merge** only when every applicable gate is green. Then:
   ```
   gh pr review <num> --approve --body "Gates 1–6 green. <one-line summary>."
-  gh pr merge <num> --squash --delete-branch     # squash keeps main history clean; preserve the Built-By trailer
+  # squash keeps main history clean; pass the body EXPLICITLY so the Built-By trailer survives
+  # (gh does NOT carry trailers from branch commits into a squash by default):
+  gh pr merge <num> --squash --delete-branch \
+    --subject "<conventional title> (#<num>)" \
+    --body "Built-By: <handle>
+  Co-Authored-By: Claude <model-used> <noreply@anthropic.com>"
   ```
-  Confirm the merge commit carries the `Built-By: <handle>` attribution (squash body), and append a
-  `dev/LEDGER.md` entry (with `Built-By` + "merged by rohan").
+  Confirm the merge commit carries the `Built-By: <handle>` attribution (`git log -1 --format=%b main`), and
+  append a `dev/LEDGER.md` entry (with `Built-By` + "merged by rohan").
 
 ## Hard rules
 - **Never merge your own unreviewed work blind.** Even for `rohan`'s PRs, run the gates and have an independent
