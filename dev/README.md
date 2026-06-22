@@ -25,9 +25,30 @@ Never conflate them. A "reviewer" in the runtime harness is a *persona judging a
 |---|---|
 | [`METHODOLOGY.md`](METHODOLOGY.md) | The build lifecycle (in-repo SDD) and the dev-agent roles |
 | [`CONVENTIONS.md`](CONVENTIONS.md) | The binding engineering rules every change must follow |
-| [`GATES.md`](GATES.md) | Definition of Done — the mandatory gates before anything lands on `Rohan` |
-| [`LEDGER.md`](LEDGER.md) | Append-only build log (what shipped, when, which commit) |
+| [`GATES.md`](GATES.md) | Definition of Done — the mandatory gates before anything lands on `main` |
+| [`CONTRIBUTORS.md`](CONTRIBUTORS.md) | Who builds Sapphire, the Claude each drives, attribution, ownership |
+| [`DELEGATION.md`](DELEGATION.md) | The live task-assignment board + the claim protocol |
+| [`PR_REVIEW.md`](PR_REVIEW.md) | The approver playbook — how Rohan's Claude gates a PR before merge |
+| [`LEDGER.md`](LEDGER.md) | Append-only build log (what shipped, when, which commit, `Built-By`) |
+| [`reports/`](reports/) | Per-contributor build reports (`reports/<handle>/`) |
 | [`templates/`](templates/) | Reusable prompts: task brief, code review, functional verify |
+
+GitHub plumbing: [`.github/CODEOWNERS`](../.github/CODEOWNERS) (every PR needs Rohan's review) and
+[`.github/pull_request_template.md`](../.github/pull_request_template.md) (gate-evidence checklist).
+
+## Collaboration model (rohan · hayes · gavin)
+
+Sapphire is built by three contributors, each driving their own Claude. The model:
+
+- **Everyone branches off `main`** as `<handle>/<slug>` (e.g. `hayes/aso-design-tool`). The former `Rohan`
+  bedrock branch *is* `main` now; the pre-collaboration `main` is preserved at `main-backup-2026-06-22`.
+- **Attribution is git-native:** branch prefix + a `Built-By: <handle>` commit trailer (alongside the Claude
+  `Co-Authored-By`) + the `CONTRIBUTORS.md` registry. No in-file tags. `git log`/`blame` answer "who built this".
+- **Contributors run the full local lifecycle** (Gates 1–5) and **ship by opening a PR** — they never merge.
+- **Only Rohan's Claude reviews, approves, and merges to `main`** — re-establishing the gates independently on
+  the PR (`PR_REVIEW.md`). `.github/CODEOWNERS` routes every PR to Rohan for review; *hard* enforcement
+  (branch protection / no direct push) is pending a GitHub plan upgrade (see the enforcement note in
+  `CONVENTIONS.md` §1) — until then the rule is convention-backed, treated as binding.
 
 Runnable assets (so the process is enforced, not just described):
 - `.claude/agents/sapphire-dev-{planner,implementer,reviewer,verifier,integrator}.md` — the builder roles.
@@ -40,12 +61,17 @@ Runnable assets (so the process is enforced, not just described):
 The **controller** (the main Claude loop, or a human lead) owns an engagement and never writes feature code directly when it can delegate. The flow:
 
 ```
+on your branch <handle>/<slug>:
 PLAN ─▶ per task: TASK-BRIEF ─▶ IMPLEMENT ─▶ REVIEW ─▶ fix ─▶ VERIFY (does it actually work?) ─▶ fix
                                                                           │
-                          (feature complete) ─▶ WHOLE-BRANCH REVIEW ─▶ LEDGER ─▶ COMMIT/PUSH
+                          (feature complete) ─▶ WHOLE-BRANCH REVIEW ─▶ OPEN PR ─▶ [Rohan's Claude gates + merges]
 ```
 
-Every arrow into `COMMIT/PUSH` is blocked by the [gates](GATES.md). The single most important gate — added because "tests pass" is not the same as "it works" — is **functional verification**: a `sapphire-dev-verifier` agent that actually runs the thing, adversarially, and sends it back for fixes if it doesn't behave.
+A contributor's branch ships by **opening a PR to `main`**. Rohan's Claude is the sole approver: it
+re-establishes the [gates](GATES.md) on the PR, then merges and writes the [ledger](LEDGER.md) entry. The
+single most important gate — added because "tests pass" is not the same as "it works" — is **functional
+verification**: a `sapphire-dev-verifier` agent that actually runs the thing, adversarially, and sends it
+back for fixes if it doesn't behave.
 
 Start a build by invoking the **`sapphire-build`** skill, or by reading `METHODOLOGY.md` and driving it manually.
 

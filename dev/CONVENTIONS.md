@@ -2,11 +2,26 @@
 
 Every change to Sapphire follows these. They are not style preferences; they are the invariants that keep a long-term, high-stakes build correct and trustworthy. A change that breaks one of these does not merge.
 
-## 1. Repository & branch
-- **Work on `Rohan`.** It is the project bedrock. Never commit to `main` (outdated/parallel). Push only when the [gates](GATES.md) pass.
+## 1. Repository, branches & attribution
+- **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
+  `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
+  a reviewed PR.
+  > **Enforcement status (2026-06-22):** GitHub *hard* enforcement (branch protection / rulesets) is gated
+  > behind a paid plan this private repo doesn't have yet (the API returns 403). Until the plan is upgraded
+  > (or the repo moved to a paid Quiver org), the no-direct-push rule is **convention + CODEOWNERS
+  > review-routing**, not machine-enforced — anyone with write access *could* bypass it. Treat it as binding
+  > regardless. Resolving this is a tracked follow-up; do **not** grant Hayes/Gavin write access until it is.
+- **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
+  (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
+- **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,
+  then open a PR. **Only Rohan's Claude reviews, approves, and merges** (`dev/PR_REVIEW.md`).
 - **The repo lives on local disk** (`~/Desktop/Projects/Quiver/sapphire-capability-map`). **Never run a live `.git` from inside a cloud-sync folder** (OneDrive/Dropbox/iCloud) — Files-On-Demand dehydration stalls git and corrupts copies. (We learned this the hard way; the repo was moved off OneDrive for exactly this reason.)
-- **Conventional commits** ending with the trailer:
-  `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>`
+- **Conventional commits** ending with BOTH attribution trailers — the human builder and the Claude:
+  ```
+  Built-By: <handle>
+  Co-Authored-By: Claude <model-used> <noreply@anthropic.com>
+  ```
+  (Use the session's model id; the stable identifier is the `noreply@anthropic.com` email, not the name.)
 
 ## 2. The runtime stays stdlib-only
 - The Sapphire **engine** (`sapphire-orchestrator/`, esp. `orchestrator.py`, `live_engine.py`, `harness/`, `moat/`, `memory/`, `selfimprove/`, `trace_view.py`) imports **only the Python standard library** (`sqlite3` counts as stdlib). No pandas/numpy/sklearn/pyarrow/requests in the runtime path.

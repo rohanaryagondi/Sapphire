@@ -1,8 +1,13 @@
 # Gates — Definition of Done
 
-Nothing lands on `Rohan` until it passes these. They are listed in the order you run them. A "Feature"-tier change runs all of them; a "Standard"-tier change runs 1–5; a "Trivial"-tier change runs 1 (+ common sense). See tiers in [`METHODOLOGY.md`](METHODOLOGY.md).
+Nothing lands on `main` until it passes these. They are listed in the order you run them. A "Feature"-tier change runs all of them; a "Standard"-tier change runs 1–5; a "Trivial"-tier change runs 1 (+ common sense). See tiers in [`METHODOLOGY.md`](METHODOLOGY.md).
 
 A change is **Done** when every applicable gate is green **and** the [ledger](LEDGER.md) records it.
+
+**Two passes in the collaborative model:** the contributor runs Gates 1–5 *locally on their branch* before
+opening the PR (paste the evidence into the PR template). Then **Rohan's Claude re-establishes the gates
+independently on the PR** and runs Gate 6 before merging — see [`PR_REVIEW.md`](PR_REVIEW.md). "Their suite
+passed" is a claim; the approver re-proves it. Only Rohan's Claude merges to `main`.
 
 ---
 
@@ -40,13 +45,14 @@ Before a feature ships, an **opus** integrator/reviewer reads the full commit ra
 
 ---
 
-## The merge checklist (paste into the ledger entry)
+## The merge checklist (Rohan's Claude completes this on the PR, then pastes into the ledger entry)
 ```
-[ ] Gate 1  full suite green        (N tests)
-[ ] Gate 2  independent review      Approved
+[ ] Gate 1  full suite green        (N tests)   — re-run on the PR branch
+[ ] Gate 2  independent review      Approved     — different agent than the implementer
 [ ] Gate 3  provenance + no secrets/binaries
 [ ] Gate 4  stdlib runtime + verbatim vendor (if applicable)
 [ ] Gate 5  functional verification — RAN it, adversarial, behaves as claimed
 [ ] Gate 6  whole-branch review     Ready to merge   (feature tier only)
-[ ] Ledger updated · conventional commit · pushed origin/Rohan
+[ ] PR approved by Rohan's Claude (CODEOWNERS) · merged to main · branch deleted
+[ ] Ledger updated (Built-By: <handle> · merged by rohan) · conventional commit with Built-By trailer
 ```

@@ -1,6 +1,6 @@
 # Build Ledger
 
-Append-only log of what shipped to `Rohan`. Newest at the top. One entry per feature-sized change. Format:
+Append-only log of what shipped to `main`. Newest at the top. One entry per feature-sized change. Format:
 
 ```
 ## <date> — <title>   (<commit range or SHA>)
@@ -10,6 +10,22 @@ Append-only log of what shipped to `Rohan`. Newest at the top. One entry per fea
 ```
 
 ---
+
+## 2026-06-22 — Collaborative dev harness (multi-contributor, PR-gated)  (`main`, PR #1)
+- Built-By: `rohan` · merged by `rohan`.
+- What: Turned the solo `dev/` harness into a 3-contributor harness (rohan · hayes · gavin), each driving
+  their own Claude. Git-native attribution (branch prefix `<handle>/<slug>` + `Built-By` commit trailer +
+  `dev/CONTRIBUTORS.md`); `dev/DELEGATION.md` task board + claim protocol; `dev/PR_REVIEW.md` approver
+  playbook; `.github/CODEOWNERS` + PR template (gate-evidence checklist); tracked `dev/reports/<handle>/`
+  (inaugural ASO-tox report migrated in). Refreshed README/METHODOLOGY/CONVENTIONS/GATES + root CLAUDE.md to
+  the multi-contributor, `main`-is-bedrock model. Branch surgery: old `main` → `main-backup-2026-06-22`;
+  `main` fast-forwarded to the former `Rohan` bedrock; `Rohan` retired. Dogfooded via PR #1.
+- Gates: 278 tests green (docs/config-only; runtime untouched) · independent review **Approved-with-nits**
+  (all findings fixed) · whole-branch integrator **Ready to merge** · no secrets/binaries.
+- Gaps/Follow-ups: **GitHub branch protection BLOCKED** — private free-tier repo returns 403 for protection
+  + rulesets; the sole-approver rule is convention + CODEOWNERS routing until a plan upgrade / paid Quiver
+  org (decision surfaced to Rohan). Do NOT grant Hayes/Gavin write access until enforcement is resolved.
+  Need Hayes/Gavin GitHub usernames. CI automation of gates is future scope.
 
 ## 2026-06-22 — ASO sequences wired into `run_live` → live aso-tox dossier facts  (Rohan)
 - What: Gave `run_live(query, *, sequences=None, ...)` a sequence-input channel — the documented handoff point for the future ASO-Design tool. Sequences (explicit param, else a strict `\b[ATGC]{15,}\b` query-text extractor) thread into Bucket-1 `inputs`, so the `aso-tox` agent scores them and emits real GBR T2 facts (provenance `aso-tox`) into `discover["dossier"]`. Hardened the seam (`tools/aso_tox_seam.py`) to validate input: non-ATGC sequences are rejected (never scored), surfaced honestly in `invalid_sequences`; lowercase atgc normalized to uppercase. Extended the `aso-tox` `output_schema` in `harness/agents.json` (`invalid_sequences`+`error`, `additionalProperties:false` retained) — the load-bearing fix without which the harness silently abstained on any output carrying rejected sequences (would have dropped valid facts in the mixed case). First exercise of the dev harness (`dev/`).
