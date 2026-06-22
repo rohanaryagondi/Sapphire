@@ -3,6 +3,8 @@
 Orientation for a new session. Read this, then `sapphire-orchestrator/AGENTS.md`. Spend tokens on the
 work, not re-deriving context.
 
+> **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from the product runtime harness in `sapphire-orchestrator/harness/`.
+
 ## What we're building
 **Sapphire** = an agentic CNS drug-discovery decision system. A user-facing **orchestrator** runs a
 two-bucket "firm":
@@ -59,7 +61,7 @@ two-bucket "firm":
   t3.micro, verified teardown, ~$0.0017; full report in `RohanOnly/qmodels_run/REPORT.md`). Safety: profile
   `Rohan-Sapphire`, account-gated, create-only + ledger, **teardown only by ledgered id**.
 - **Phase 5 — harness + live EMET + self-improvement loop + scenario suite DONE** (`Rohan`, 2026-06-21;
-  built subagent-driven, every task spec+quality reviewed; ~137 stdlib-only tests; full report
+  built subagent-driven, every task spec+quality reviewed; full report
   `docs/superpowers/PHASE5-REPORT.md`). Five workstreams behind shared contracts (`sapphire-orchestrator/contracts/`):
   - **Agent harness** (`harness/`) — one runtime every agent runs through: declare→dispatch→validate→guard→
     stamp→trace. `harness.run(agent_id, inputs)`; registry `agents.json`; dispatch by kind
@@ -75,9 +77,16 @@ two-bucket "firm":
     untouched): recall priors in → harness trace → reflect memory out. `python -m selfimprove record-outcome …`.
   - **Scenario suite** (`scenarios/manifest.json` + `capture.py`) — 10-axis variety matrix; nav1_8+tsc2
     captured, the rest honest `stub` (capture live via `_build/capture_scenario.py`, never fabricated).
-- **Phase 6 ideas (TODO):** rewire each orchestrator agent-seam through `harness.run` (the legacy engine
-  still uses canned evidence); capture the 8 stub scenarios live; wire remaining Q-Models `stub`/`eval`
-  tracks; swap the mock moat for the real Quiver latent space; upgrade the `site/` Console to drive the loop.
+- **Phase 6 — ASO tox tool integrated** (`Rohan`, 2026-06-22): **`aso-tox` agent** added to the harness
+  registry (22 agents total). `tools/aso_tox/` contains Hongkang's GBR model (notebook +
+  `aso_tox_gbr_model.pkl` + `predict.py`); stdlib-only seam at `sapphire-orchestrator/tools/aso_tox_seam.py`
+  (kind `python`, provenance `aso-tox`). Fires in `live_engine` Bucket-1 when ASO sequences are present,
+  downstream of the future ASO Design tool. Requires scikit-learn==1.8.0 in the tool subprocess only;
+  engine remains stdlib-only. Per the 2026-06-19 sprint deck: **Loka is the front-end/orchestrator scaffold**;
+  Quiver tools (OPAL, ASO Design, ASO toxicity [this], chronic-tox roadmap, Experiment Design) plug into it.
+- **Tests: 268, all green.**
+- **Still TODO:** wire `run_live` to the front door (`serve.py`/Console still use the canned path); wire
+  ASO Design tool to feed sequences into `aso-tox`; broaden captured scenario coverage.
 
 ## Hard rules (non-negotiable)
 - **Data boundary:** Quiver internal EP/CRISPR data + scores NEVER leave to EMET / web / Q-Models. Public
@@ -91,7 +100,13 @@ two-bucket "firm":
   GPU tracks via the live-proven async launcher; remaining tracks marked `stub`/`eval` in the registry —
   never silently mocked), **internal moat = REAL** (reads from the Loka CNS_DFP data via
   `sapphire-orchestrator/moat/` — `MoatClient` + `moat_facts`; provenance `moat-real`; degrades honestly
-  to `[]`/mock if `RohanOnly/moat/moat.sqlite` hasn't been built from the parquet).
+  to `[]`/mock if `RohanOnly/moat/moat.sqlite` hasn't been built from the parquet). **ASO tox** = live
+  GBR model (`tools/aso_tox/`) — real predictions when ASO sequences present, stubs otherwise.
+- **Two execution paths (important):** (1) **Canned path** `orchestrator.run(sid)` — runs pre-captured
+  scenario JSONs, $0, deterministic; used by `run.py`/`serve.py`/Console today. (2) **Live harnessed
+  path** `live_engine.run_live(query)` — dispatches EVERY agent + persona through `harness.run`
+  (guard-enforced, schema-validated, provenance-stamped, traced); verified OFFLINE with mock backends +
+  REAL moat; **NOT yet wired to the front door** (the keystone remaining task).
 - **Empirical culture:** *"SOTA on shit is still shit."* Mark `proven` vs `paper-claim`; never oversell a
   mock or a paper benchmark.
 
@@ -99,7 +114,8 @@ two-bucket "firm":
 | Path | What |
 |---|---|
 | `architecture/` | **The agent specs**, organized as the firm: `orchestrator/` (control) · `bucket1/` (facts — `scientific/` + `semantic/`) · `bucket2/` (partners + `institutional/`). A README at every level + a top-level agent report. |
-| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `run.py` · `engagement.py` (loop wrapper: recall→trace→reflect) · `serve.py` (subscription bridge) · `contracts/` (shared P5 contracts: validator + provenance + schemas) · `harness/` (the agent harness — one runtime every agent runs through) · `emet/` (live EMET adapter+handler) · `memory/` (durable memory store) · `selfimprove/` (governance · reflect · authoring · metrics · CLI) · `qmodels/` (**real launchpad**) · `moat/` (**real internal moat**: `MoatClient` + `moat_facts`; provenance `moat-real`; reads from Loka CNS_DFP SQLite) · `scenarios/` (+ `manifest.json`, `capture.py`) · `AGENTS.md` · `dossier_schema.md`. |
+| `sapphire-orchestrator/` | **The engine.** `orchestrator.py` · `live_engine.py` (`run_live` — the live harnessed firm) · `run.py` · `engagement.py` (loop wrapper: recall→trace→reflect) · `serve.py` (subscription bridge) · `trace_view.py` (CLI transparency) · `contracts/` (shared P5 contracts: validator + provenance + schemas) · `harness/` (the agent harness — 22-agent registry, one runtime every agent runs through) · `emet/` (live EMET adapter+handler) · `tools/` (tool seams: `aso_tox_seam.py`) · `memory/` (durable memory store) · `selfimprove/` (governance · reflect · authoring · metrics · CLI) · `qmodels/` (**real launchpad**) · `moat/` (**real internal moat**: `MoatClient` + `moat_facts`; provenance `moat-real`; reads from Loka CNS_DFP SQLite) · `scenarios/` (+ `manifest.json`, `capture.py`) · `AGENTS.md` · `dossier_schema.md`. |
+| `tools/` | **Quiver tool implementations** (separate from the engine). `aso_tox/` = Hongkang's GBR acute-tox model (notebook + `aso_tox_gbr_model.pkl` + `predict.py`). The engine seam is `sapphire-orchestrator/tools/aso_tox_seam.py`. |
 | `q-models/` | **Vendored Q-Models toolset** (full code; source repo retired — see `q-models/VENDORED.md`). The 24 tools the orchestrator can call. |
 | `RohanOnly/qmodels_run/` | Q-Models overnight run artifacts: AWS pre-existing snapshot, append-only ledger, smoke result, and `REPORT.md` (the integration report). |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |

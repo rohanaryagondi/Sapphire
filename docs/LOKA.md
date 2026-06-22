@@ -1,5 +1,23 @@
 # Loka — what it is, what's in the shared folder, and how Sapphire leverages it
 
+## Architecture framing (2026-06-19 sprint deck)
+
+**Loka is the front-end + orchestrator scaffold.** Quiver's tools plug into it as discrete, callable modules:
+
+| Tool | Status |
+|---|---|
+| OPAL | Planned |
+| ASO Design | Planned |
+| **ASO toxicity** | ✅ **Integrated** — `tools/aso_tox/` + `sapphire-orchestrator/tools/aso_tox_seam.py`; Hongkang's GBR model |
+| Chronic-tox | Roadmap |
+| Experiment Design | Planned |
+
+Sapphire's **orchestrator + harness + 22-agent registry** is the agentic reasoning layer that connects these tools into a cited decision pipeline. **Loka provides the front-end and conversation scaffold; Quiver's tools provide the proprietary predictive capability; Sapphire provides the multi-agent deliberation layer.**
+
+The ASO tox tool fires in `live_engine` Bucket-1 when ASO sequences are present — it will naturally pair with the ASO Design tool once that is integrated (Design → sequence → tox screen).
+
+---
+
 Findings from `~/Downloads/Loka - Shared Folder.zip`, extracted to
 `Career/Quiver/Sapphire/Loka - Shared Folder/` (meeting **recordings** excluded on extract, per request —
 they were the 7 GB bulk; the small **meeting notes** PDFs were kept). Captured 2026-06-21.

@@ -1,3 +1,5 @@
+**Note:** See [`REPORT.md`](REPORT.md) for the living architecture document.
+
 # Morning Report — Overnight of 2026-06-22
 
 **Branch:** `Rohan` · **Repo:** `~/Desktop/Projects/Quiver/sapphire-capability-map` (local, off OneDrive)

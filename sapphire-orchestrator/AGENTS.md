@@ -4,13 +4,12 @@ The orchestrator runs like a **firm**: junior analysts gather facts (Bucket 1), 
 (Bucket 2), and a management layer decides what to run and writes the report. This doc is the index +
 the operating rules. Per-agent specs now live under [`/architecture/`](../architecture/) — `orchestrator/`, `bucket1/`, `bucket2/`, each with its own README.
 
-> Status: **Phase 1 + Phase 2 done.** Phase 1 = 3 control agents + 3 scientific-core fact agents + 4
-> institutional partners + the [dossier schema](dossier_schema.md). Phase 2 = all **13 semantic
-> (non-scientific) fact agents** built (from Hayes' draft + 2 project additions). Company partners reuse
-> [`../personas/`](../personas/). **Phase 3 done:** the orchestrator runs end-to-end —
-> [`orchestrator.py`](orchestrator.py) + [`run.py`](run.py) execute control → Bucket 1 (dossier) →
-> Bucket 2 (two-round roundtable) → synthesis; the `site/` Console drives it live (real query intake,
-> PLAN/dossier/round-2 stages). Run: `python run.py nav1_8`, or the `/sapphire` skill for a live query.
+> **Status: all phases done.** Harness registry = **22 agents**; 268 tests green; moat REAL; EMET live; aso-tox integrated.
+> Two execution paths: (1) **canned** `orchestrator.run(sid)` — $0, deterministic, used by CLI/Console today;
+> (2) **live harnessed** `live_engine.run_live(query)` — every agent + persona through `harness.run`, verified offline,
+> not yet wired to the front door. Run: `python run.py nav1_8`, or `python trace_view.py <eid>` to inspect.
+>
+> **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from this product runtime harness.
 
 ## The two buckets
 
@@ -66,7 +65,7 @@ the operating rules. Per-agent specs now live under [`/architecture/`](../archit
 | EMET Analyst (+ EMET interface) | [`../architecture/bucket1/scientific/emet-analyst.md`](../architecture/bucket1/scientific/emet-analyst.md) |
 | Q-Models Runner | [`../architecture/bucket1/scientific/q-models-runner.md`](../architecture/bucket1/scientific/q-models-runner.md) |
 
-### Bucket 1 — semantic intelligence *(Phase 2 — all 13 built, from Hayes' draft + 2 project additions)*
+### Bucket 1 — semantic intelligence *(13 built from Hayes' draft + 2 project additions)*
 Each maps to dossier fields (see `dossier_schema.md`). Two carry ⛔ veto power.
 - **Veto-class:** [FDA Institutional Memory ⛔](../architecture/bucket1/semantic/fda-institutional-memory.md) (C3/D2) ·
   [Patent & IP ⛔](../architecture/bucket1/semantic/patent-ip.md) (E1)
@@ -86,6 +85,12 @@ Each maps to dossier fields (see `dossier_schema.md`). Two carry ⛔ veto power.
 > adapted to Quiver's CNS context. DEA Scheduling + Reputational/Institutional are the project's two
 > additions beyond Hayes' 11. All route literature sub-questions through the EMET Analyst interface.
 
+### Bucket 1 — tool agents
+- **`aso-tox`** — fires when ASO sequences are present in the engagement plan; invokes
+  `tools/aso_tox_seam.py` → `tools/aso_tox/predict.py` (Hongkang's GBR model); kind `python`;
+  provenance `aso-tox`. Downstream of the future ASO Design tool. Requires scikit-learn==1.8.0
+  in the tool subprocess; engine stays stdlib-only.
+
 ### Bucket 2 — partners
 - **Company partners** — reuse [`../personas/`](../personas/) via the
   [company-partner template](../architecture/bucket2/company-partner-template.md): Pharma BD · Biotech CSO · VC GP · Pharma R&D SVP.
@@ -93,7 +98,8 @@ Each maps to dossier fields (see `dossier_schema.md`). Two carry ⛔ veto power.
   [Adversarial Red-Team](../architecture/bucket2/institutional/adversarial-red-team.md) ·
   [Payer / Market-Access](../architecture/bucket2/institutional/payer-market-access.md) ·
   [KOL / Academic](../architecture/bucket2/institutional/kol-academic.md).
-- **Modality specialists** *(later, as needed)*: ASO · gene-therapy · small-molecule chemist.
+
+> **Total harness registry: 22 agents** (3 control + 3 scientific core + 13 semantic + aso-tox + 4 institutional personas + company-partner template). All registered in `harness/agents.json`.
 
 ## Agent file format (the template every spec follows)
 `Bucket/layer` · `One-liner` · `Activate when` · `Inputs` · `Procedure` · `Output (contract)` ·

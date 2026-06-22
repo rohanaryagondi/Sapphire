@@ -3,6 +3,8 @@
 How the whole system fits together, end to end. Companion to the [docs hub](README.md) and
 [`CLAUDE.md`](../CLAUDE.md). This is the single place to understand the moving parts and the seams.
 
+> **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from the product runtime harness in `sapphire-orchestrator/harness/`.
+
 ---
 
 ## 1. The firm (control + two buckets)
@@ -17,6 +19,7 @@ Claude is the reasoning at each box.
                                              ▼
         ┌──────────────── BUCKET 1 · FACTS (junior analysts) ────────────────┐
         │  Internal moat (REAL, moat-real)  ·  EMET (live)  ·  Q-Models  ·  13 semantic  │
+        │  aso-tox (fires when ASO sequences present)                                    │
         │  → cited fact DOSSIER; Research Manager runs completeness /          │
         │    contradiction / VETO / DIVERGENCE / KNOWN_UNKNOWN rules           │
         └───────────────────────────────────┬────────────────────────────────┘
@@ -72,16 +75,16 @@ The single definitions every layer imports, so nothing drifts.
   `memory-recall`, `synthesis`, … + `qmodels:<tool>`) and `is_valid_provenance`.
 - `schemas.py` — `EMET_ENVELOPE_SCHEMA` (§3.1), `MEMORY_RECORD_SCHEMA` (§3.2), `MEMORY_RECORD_TYPES`.
 
-## 4. The agent harness — `sapphire-orchestrator/harness/`  (D, 51 tests)
-**One runtime every agent runs through.** The orchestrator decides *which* agents run; the harness
+## 4. The agent harness — `sapphire-orchestrator/harness/`  (D)
+**One runtime every agent runs through** (22 agents in registry). The orchestrator decides *which* agents run; the harness
 guarantees every output is well-formed, in-policy, provenanced, traced — or a fail-safe abstain/escalate.
 
 `run(agent_id, inputs, *, engagement_id, ctx) -> AgentResult`:
-1. **resolve** the contract from `agents.json` (unknown id → `unknown-agent`).
+1. **resolve** the contract from `agents.json` (**22 agents**; unknown id → `unknown-agent`).
 2. **idempotency** — cache on `inputs_hash` within an engagement.
 3. **input guards** — `data_boundary` / `public_identifiers_only` BLOCK *before dispatch* (never strip).
 4. **dispatch by kind** — `claude-subagent` (headless `claude -p --json-schema`) · `qmodels-delegate`
-   (the real QModelsClient) · `python` (a deterministic step) · `emet-playwright` (the EMET seam).
+   (the real QModelsClient) · `python` (a deterministic step — e.g. `aso-tox` seam) · `emet-playwright` (the EMET seam).
 5. **validate** output against its JSON schema; **bounded repair** loop on failure (re-prompt with the
    exact failing path).
 6. **output guards** — `facts_only_cited` (+ veto-must-be-T1), `must_cite_dossier` (personas),
@@ -93,6 +96,8 @@ guarantees every output is well-formed, in-policy, provenanced, traced — or a 
 
 Contracts live in `harness/agents.json` (per agent: id, role, `kind`, input/output schema, `tools_allowed`
 — empty for personas, `guardrails`, `provenance_label`, `timeout_s`, `retry`).
+
+**Tool seams** (`sapphire-orchestrator/tools/`) provide stdlib-only wrappers for Quiver tool implementations in `tools/`. Current: `aso_tox_seam.py` wraps Hongkang's GBR model (`tools/aso_tox/predict.py`); invoked by the `aso-tox` agent (kind `python`, provenance `aso-tox`) when ASO sequences are present in Bucket-1.
 
 ## 5. Live EMET — `sapphire-orchestrator/emet/` + `.claude/skills/emet-runner/`  (A, 18 tests)
 EMET (BenchSci) as a harness-callable agent.
@@ -116,13 +121,13 @@ EMET (BenchSci) as a harness-callable agent.
   `reflect.py` (post-engagement: trace → memory) · `authoring.py` (Tier-2 drafts to `proposed/`) ·
   `metrics.py` → `selfimprove/REPORT.md` (prediction accuracy, blind spots) · `cli.py` (`record-outcome`).
 
-## 7. Integration — `engagement.py`  (B, 12 tests; integration verified live)
+## 7. Integration — `engagement.py`
 `run_engagement(sid_or_query)` wraps the existing `Orchestrator` **additively** (orchestrator.py
 untouched): derive entities → `recall` priors (`run["priors"]`) → harness **trace** (open → a dossier
 agent-row → close with synthesis carrying entities) → `reflect` to memory (`run["reflection"]`). This is
 how the loop runs end-to-end on real engagements (verified: one run wrote 10 recallable records).
-Scenario suite: `scenarios/manifest.json` (10 variety axes), `capture.py` (repeatable draft capture),
-2 captured (`nav1_8`, `tsc2`) + 8 honest stubs.
+Scenario suite: `scenarios/manifest.json`, `capture.py` (repeatable draft capture), **6 captured**
+(`nav1_8`, `tsc2`, `lrrk2_pd`, `scn2a_epilepsy`, `gba1_pd`, `c9orf72_als` — last 3 from live EMET) + stubs.
 
 ---
 
@@ -142,9 +147,9 @@ later:  selfimprove record-outcome  → experiment_outcome (+ moat_blindspot if 
 
 ## 9. Provenance & honesty
 Every rendered artifact carries a provenance label (`emet-live` · `qmodels:<tool>`/`live-local`/`gpu-*` ·
-`memory-recall` · `persona-judgment` · `synthesis` · `stub`/`mock`). Nothing is silently mocked. **Still
-mock/stub:** 8 of 10 scenarios (honest `stub`, captured live — never fabricated), some Q-Models tracks
-(`stub`/`eval` in the registry). **The internal moat is now REAL** (`moat-real`): the Loka CNS_DFP parquet
+`memory-recall` · `persona-judgment` · `synthesis` · `aso-tox` · `stub`/`mock`). Nothing is silently mocked. **Still
+mock/stub:** stub scenarios in the manifest (honest `stub`, captured live — never fabricated), some Q-Models tracks
+(`stub`/`eval` in the registry); `run_live` verified offline (real moat + mock LLM/EMET). **The internal moat is REAL** (`moat-real`): the Loka CNS_DFP parquet
 → `RohanOnly/moat/moat.sqlite` (build via `_build/build_moat_db.py`), accessed read-only through
 `MoatClient` and surfaced as dossier facts by `moat_facts` in `sapphire-orchestrator/moat/`; degrades
 honestly to `[]` if the SQLite hasn't been built. The legacy engine still serves canned evidence per
@@ -159,9 +164,8 @@ agent-seam — the harness is proven and callable; the per-seam rewiring is Phas
   (skills/specs/routes) without a human approving the `proposed/` draft.
 - **Never fabricate:** every failure path is a typed abstain/escalate.
 
-## 11. Test surface (~137 tests, stdlib only, offline)
-`contracts` 22 · `harness` 51 · `emet` 18 · `memory` 14 · `selfimprove` 20 · top-level `tests` 12 (engagement
-+ scenarios + capture). Run:
+## 11. Test surface (268 tests, stdlib only, offline)
+268 total. Run:
 `cd sapphire-orchestrator && for s in contracts harness emet memory selfimprove; do python -m unittest discover -s $s/tests; done && python -m unittest discover -s tests`
 
 ## 12. Extension points (Phase 6)

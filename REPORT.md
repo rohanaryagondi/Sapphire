@@ -1,6 +1,6 @@
 # Sapphire — Architecture & Status Report
 
-*Last updated: 2026-06-22 · branch `Rohan` · repo `~/Desktop/Projects/Quiver/sapphire-capability-map` (local).*
+*Last updated: 2026-06-22 · branch `Rohan` · repo `~/Desktop/Projects/Quiver/sapphire-capability-map` (local). **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from the product runtime harness in `sapphire-orchestrator/harness/`.*
 *This is the orientation document: what Sapphire is, how it's built, what works, and what's missing. For the overnight change log see [`MORNING-REPORT.md`](MORNING-REPORT.md); for agent specs see [`architecture/`](architecture/); for the engine see [`sapphire-orchestrator/`](sapphire-orchestrator/).*
 
 ---
@@ -32,6 +32,7 @@ Every question flows through the same four stages. The agent *specs* (org chart)
           │     clinical-trial-registry, post-market-safety, financial,   │
           │     payer, manufacturing-cmc, patient-advocacy, kol-social,   │
           │     policy-legislative, reputational      (* = veto class)     │
+          │   aso-tox (fires when ASO sequences present)                  │
           │   Research-Manager rules: completeness · contradiction-by-    │
           │     tier · VETO · DIVERGENCE · KNOWN_UNKNOWN                   │
           └─────────────────────────────────────────────────────────────┘
@@ -67,11 +68,12 @@ The canned path is what the Console/CLI run today; the live path (`run_live`) is
 
 ## 3. Core subsystems
 
-- **Agent harness** (`harness/`) — one runtime every agent goes through: `run(agent_id, inputs, *, engagement_id, ctx) → AgentResult`. Per call it: resolves the **contract** from `agents.json` (21 agents), runs **input guardrails**, **dispatches** by kind (`python` · `claude-subagent` · `qmodels-delegate` · `emet-playwright`), **validates output** against a JSON schema, runs **output guardrails**, **stamps provenance**, and **writes a trace record**. Fail-safe: on hard failure an agent **abstains/escalates** — it never fabricates. Guardrails enforced: `data_boundary` (no internal IDs leave Quiver), `facts_only_cited` / `must_cite_dossier`, `veto_is_gate`, `stamp_provenance`.
+- **Agent harness** (`harness/`) — one runtime every agent goes through: `run(agent_id, inputs, *, engagement_id, ctx) → AgentResult`. Per call it: resolves the **contract** from `agents.json` (**22 agents**), runs **input guardrails**, **dispatches** by kind (`python` · `claude-subagent` · `qmodels-delegate` · `emet-playwright`), **validates output** against a JSON schema, runs **output guardrails**, **stamps provenance**, and **writes a trace record**. Fail-safe: on hard failure an agent **abstains/escalates** — it never fabricates. Guardrails enforced: `data_boundary` (no internal IDs leave Quiver), `facts_only_cited` / `must_cite_dossier`, `veto_is_gate`, `stamp_provenance`.
 - **Internal moat** (`moat/`) — **REAL**. `MoatClient` + `moat_facts()` query a SQLite (`RohanOnly/moat/moat.sqlite`, gitignored) materialized from the 38.4M-row Loka `CNS_DFP` embedding-distance parquet via `_build/build_moat_db.py`. Direction-aware: `similar` (mimic) vs `opposite` (rescue), top-K per ref_type. Provenance `moat-real`; degrades honestly to `[]` if absent.
 - **EMET** (`emet/`) — evidence from BenchSci's EMET (`emet.benchsci.com`), driven **live via Playwright** (Thorough mode, real cited PMIDs). MCP-swap ready (`emet-mcp` provenance reserved).
 - **Q-Models** (`qmodels/`, top-level `q-models/`) — Quiver's predictive models on AWS Bedrock/GPU. CPU tracks run locally; GPU runs are **dry-run** by default (no AWS spend) and gated.
 - **Memory + self-improvement** (`memory/`, `selfimprove/`) — append-only, **public-IDs-only** cross-engagement memory; `recall` surfaces priors at the start of a run; `record_outcome` feeds wet-lab results back and opens a `moat_blindspot` on a refuted prediction; `reflect` + `metrics` + tiered `governance` (advisory → autonomous). `engagement.run_engagement` brackets a run with recall→trace→reflect.
+- **ASO tox tool** (`tools/aso_tox/` + `sapphire-orchestrator/tools/aso_tox_seam.py`) — Hongkang's GBR acute-tox model (notebook + `aso_tox_gbr_model.pkl` + `predict.py`). Stdlib-only seam; agent kind `python`, provenance `aso-tox`. Fires in `live_engine` Bucket-1 when ASO sequences are present; downstream of the future ASO Design tool. Requires scikit-learn==1.8.0 in the tool subprocess only. Per the 2026-06-19 sprint deck: **Loka is the front-end/orchestrator scaffold**; Quiver tools (OPAL, ASO Design, ASO toxicity, chronic-tox roadmap, Experiment Design) plug into it.
 - **Transparency** (`trace_view.py`) — `python trace_view.py <engagement_id>` prints the run as an agent-by-agent timeline (kind · status ✓/⚠/⛔ · provenance · guardrails · output). Sample in `docs/sample-trace.txt`.
 - **Front door** (`serve.py`, `site/`) — a stdlib bridge that serves the Console and runs queries on the user's **Claude subscription** (headless), with a provenance-honest UI.
 
@@ -87,17 +89,20 @@ architecture/           Agent specs = the firm org chart (orchestrator/ control,
                         bucket1/scientific + bucket1/semantic, bucket2/institutional)
 sapphire-orchestrator/  THE ENGINE
   orchestrator.py         canned deterministic pipeline + SCENARIOS registry
-  live_engine.py          run_live() — the live harnessed firm
-  harness/                runtime · dispatch · guardrails · contracts · agents.json · trace
+  live_engine.py          run_live() — the live harnessed firm (22-agent dispatch)
+  harness/                runtime · dispatch · guardrails · contracts · agents.json (22 agents) · trace
   moat/                   MoatClient + moat_facts (REAL)
   emet/                   EMET seam
   qmodels/                Q-Models integration
+  tools/                  tool seams: aso_tox_seam.py (ASO acute-tox)
   memory/ selfimprove/    cross-engagement memory + self-improvement loop
   engagement.py           run_engagement (recall→trace→reflect)
   trace_view.py           CLI transparency
   scenarios/              6 captured scenario dossiers + manifest
   serve.py · run.py       subscription bridge + CLI
   contracts/provenance.py provenance vocabulary
+tools/                  Quiver tool implementations (aso_tox/ = Hongkang's GBR model)
+dev/                    Dev Harness (methodology/conventions/gates for agents building Sapphire)
 site/                   Console (chat UI + inspector)
 _build/                 build tools (build_moat_db.py, loop_and_trace_demo.py — pyarrow OK here only)
 docs/                   ARCHITECTURE.md, LOKA.md, plans/, sample-trace.txt
@@ -114,14 +119,15 @@ CLAUDE.md · HANDOFF.md · MORNING-REPORT.md · REPORT.md (this file)
 |---|---|
 | The firm runs end-to-end (canned) | ✅ triage→dossier→roundtable→synthesis; CLI + Console + subscription bridge |
 | **Live harnessed engine** (`run_live`) | ✅ every agent + persona dispatched via `harness.run`; verified **offline, $0** |
-| Agent harness + 21-agent registry | ✅ guard-enforced, schema-validated, provenance-stamped, traced |
+| Agent harness + **22-agent registry** | ✅ guard-enforced, schema-validated, provenance-stamped, traced |
+| **ASO tox tool** (`aso-tox` agent) | ✅ Hongkang's GBR model; `tools/aso_tox/` + `tools/aso_tox_seam.py`; fires on ASO sequences |
 | Guardrails (real, negative-path proven) | ✅ data-boundary blocks internal IDs; personas forced to abstain on uncited claims |
 | **Internal moat — REAL** | ✅ CNS_DFP SQLite; direction-aware mimic/rescue; `moat-real` |
 | **EMET — live** | ✅ Playwright on `emet.benchsci.com`; real cited captures |
 | CLI transparency (`trace_view`) | ✅ agent-by-agent timeline |
 | Self-improvement loop | ✅ memory accumulates, recall, outcome→blind-spot, metrics report |
 | Captured scenarios (6) | ✅ `nav1_8, tsc2, lrrk2_pd, scn2a_epilepsy, gba1_pd, c9orf72_als` (3 new from live EMET, real PMIDs) |
-| Tests | ✅ **252**, all green |
+| Tests | ✅ **268**, all green |
 | Reviews | ✅ opus whole-branch + 2-reviewer pass; 2 Critical bugs found & fixed |
 
 ---
@@ -133,7 +139,7 @@ CLAUDE.md · HANDOFF.md · MORNING-REPORT.md · REPORT.md (this file)
 3. **Institutional personas aren't individually dispatched.** `run_live` seats every Bucket-2 slot through the generic `company-partner` template; `ex-fda-regulator`, `adversarial-red-team`, `payer-partner`, `kol-partner` are registered but not invoked. Either wire them per-seat or formally adopt the template approach (and stop implying otherwise in tests).
 4. **Q-Models depth.** CPU tracks + GPU **dry-run** only; **one real GPU eval has never been run**; some tracks are stubs.
 5. **Moat scoring vs. Loka.** The real EP-distance substrate works, but Loka's higher-level rescue scoring (e.g. reproducing "rapamycin rescues TSC2") is **not** reproduced — gated on getting Loka's repo + 7-stage workflow doc (the external asks).
-6. **Scenario coverage.** 6 of the ~300 target questions captured; 5 named stubs remain (`kcnt1_dee, novel_ad_target, moat_divergence, rare_cns_payer, competitor_ip_gate`). The capture pipeline is proven (one live-EMET pass each); the system can already *run* any query via `run_live`.
+6. **Scenario coverage.** 6 of the ~300 target questions captured (`nav1_8, tsc2, lrrk2_pd, scn2a_epilepsy, gba1_pd, c9orf72_als`); named stubs remain in the manifest. The capture pipeline is proven (one live-EMET pass each); the system can already *run* any query via `run_live`.
 7. **The loop needs real outcomes.** It runs on seeded/demo outcomes; real wet-lab `record_outcome`s are needed for the blind-spot/calibration machinery to actually improve predictions, and to justify moving governance from advisory toward autonomous.
 8. **Transparency is terminal-only.** No Console/web view of the trace yet (deliberately deferred — "no fancy UI").
 9. **Smaller gaps.** `recall` keys on genes, so a disease-only query that plans as "general CNS" recalls 0 priors; EMET is Playwright (an EMET **MCP** would replace the browser seam); the moat DB must be rebuilt locally (`python3 _build/build_moat_db.py`) since it's gitignored.
@@ -154,4 +160,4 @@ python3 ../_build/loop_and_trace_demo.py   # regenerate the loop + trace demo ($
 python3 ../_build/build_moat_db.py      # (re)build the real moat SQLite from the parquet
 # run_live(query, ctx=...) is the harnessed live path; supply live backends in ctx for a real run
 ```
-Full test surface: `cd sapphire-orchestrator && for s in contracts harness emet memory selfimprove moat tests; do python -m unittest discover -s $s/tests; done`
+Full test surface (268 tests): `cd sapphire-orchestrator && for s in contracts harness emet memory selfimprove moat tests; do python -m unittest discover -s $s/tests; done`

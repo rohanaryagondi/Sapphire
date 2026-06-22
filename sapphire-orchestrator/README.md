@@ -3,89 +3,89 @@
 A front-facing **router agent** that turns a single question into a four-stage pipeline:
 
 ```
- user ⇄ ROUTER  →  DISCOVER (EMET)  →  VALIDATE (Q-Models)  →  CONSULT (persona panel)  →  SYNTHESIZE
+ user ⇄ ROUTER  →  DISCOVER (internal moat + EMET)  →  VALIDATE (Q-Models + ASO tox)  →  CONSULT (persona panel)  →  SYNTHESIZE
 ```
 
 It **composes**, not replaces, the existing [`../sapphire-cascade/`](../sapphire-cascade/): the cascade
 *is* Discover+Validate (internal moat → context **gate** → predictivity **boost**). The orchestrator
-adds the two pieces the cascade didn't have — an **on-demand compute step (Q-Models)** and a
+adds the two pieces the cascade didn't have — an **on-demand compute step (Q-Models + ASO tox)** and a
 **persona-consult panel** — behind one conversational face.
 
-> Realizes the architecture in [`../orchestration_brief_hayes.md`](../orchestration_brief_hayes.md)
-> and the user's three-workflow vision (EMET · Q-Models · personas).
->
 > **The four stages below are the happy-path view.** The full operating model — the two-bucket "firm"
-> (junior analysts → partners), the agent roster, the iterate-until-complete fact loop, contradiction/
+> (junior analysts → partners), the 22-agent roster, the iterate-until-complete fact loop, contradiction/
 > veto/divergence handling, and the dossier "done" definition — lives in **[`AGENTS.md`](AGENTS.md)**
 > and **[`dossier_schema.md`](dossier_schema.md)**. Start there.
+>
+> **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from this product runtime harness in `harness/`.
+
+## Two execution paths
+
+| | **Canned path** — `orchestrator.run(sid)` | **Live harnessed path** — `live_engine.run_live(query)` |
+|---|---|---|
+| Evidence | pre-captured scenario JSON (`scenarios/*.json`) | dispatched live: each agent via `harness.run` |
+| Agents | logic only (facts are authored) | **every agent + persona actually dispatched (22 agents)** |
+| Cost | $0, instant, deterministic | real backends (mockable for $0 verification) |
+| Used by | `run.py`, `serve.py`/Console | harnessed live firm (verified offline; **not yet wired to front door**) |
+
+**Keystone next step:** wire `run_live` into `serve.py`/Console so any user question runs the full harnessed firm.
 
 ## The four stages
 
-| Stage | Subsystem | Produces | Demo fidelity |
+| Stage | Subsystem | Produces | Status |
 |---|---|---|---|
-| **Discover** | EMET (BenchSci) + internal moat | hypotheses + cited evidence; the ranked candidate list | EMET **live** in the cascade; moat **mock** |
-| **Validate** | [Q-Models launchpad](qmodels/catalog.json) | quantitative predictions (Boltz binding, ADMET, ion-channel selectivity) on the specific pairs Discover surfaced | **mock** (no AWS yet; same I/O contract) |
-| **Consult** | auto-convened roundtable — [company partners](../architecture/bucket2/company-partner-template.md) + [institutional partners](../architecture/bucket2/institutional/) | multi-viewpoint verdicts (scientific / commercial / investability / regulatory / payer / academic / adversarial), grounded in the dossier, dissent surfaced | persona deliberation is **live** (real LLM agents on the real persona files) |
-| **Synthesize** | the [Engagement Lead](../architecture/orchestrator/engagement-lead.md) (+ [Research Manager](../architecture/orchestrator/research-manager.md), [Moderator](../architecture/orchestrator/roundtable-moderator.md)) | one recommendation + consensus/dissent + confidence + proposed experiment | — |
+| **Discover** | internal moat (REAL) + EMET (live) | hypotheses + cited evidence; ranked candidate list | moat **REAL** (`moat-real`); EMET **live** (Playwright) |
+| **Validate** | Q-Models + ASO tox | quantitative predictions; ASO tox screen when sequences present | Q-Models CPU live / GPU dry-run; ASO tox **live** (GBR model) |
+| **Consult** | auto-convened roundtable — company + institutional partners | multi-viewpoint verdicts, dissent surfaced | persona deliberation **live** (verified offline) |
+| **Synthesize** | Engagement Lead + Research Manager + Moderator | recommendation + consensus/dissent + confidence + proposed experiment | — |
 
 ## Facts vs. judgment (the key design rule)
 
 EMET and Q-Models produce **facts** (retrieved evidence, computed predictions). Personas produce
-**opinions** (priorities, viewpoints) — and must ground every factual claim in the facts above. A
-persona supplies *its lens*, never invented data. This dodges the documented "persona prompting
-degrades accuracy" failure mode (see [`../expert-agent/PROPOSAL.md`](../expert-agent/PROPOSAL.md)).
+**opinions** (priorities, viewpoints) — and must ground every factual claim in the facts above.
+This is enforced mechanically by the harness (`must_cite_dossier` guardrail).
 
-## Auto-convening the panel
+## Tool seams (`tools/`)
 
-The router reads the question + disease area and convenes a 3–5 persona panel from the archetypes in
-[`../personas/`](../personas/) — see the routing table in [`ARCHITECTURE.md`](ARCHITECTURE.md).
+Stdlib-only Python wrappers that let the harness call Quiver tool implementations:
+- **`aso_tox_seam.py`** — wraps `../../tools/aso_tox/predict.py` (Hongkang's GBR model); invoked by
+  the `aso-tox` agent (kind `python`, provenance `aso-tox`) when ASO sequences are present in Bucket-1.
+  Requires scikit-learn==1.8.0 in the subprocess; engine stays stdlib-only.
 
-## Worked scenarios (real persona deliberation)
+## Worked scenarios (6 captured)
 
-- [`scenarios/nav1_8.json`](scenarios/nav1_8.json) — Nav1.9 #7→#1; panel converges on **cardiac
-  Nav1.5 selectivity** as the one gate.
-- [`scenarios/tsc2.json`](scenarios/tsc2.json) — RHEB #7→#1; panel **reframes** it from a small
-  molecule to an ASO/degrader genetic medicine.
+- `nav1_8`, `tsc2` — original; real persona deliberation.
+- `lrrk2_pd`, `scn2a_epilepsy`, `gba1_pd`, `c9orf72_als` — captured live from EMET (Thorough mode), real PMIDs.
 
-Both panels are real persona-agent runs (4 personas each) grounded in the cascade's cited EMET
-evidence + the Q-Models mock outputs.
+Run any: `python run.py scn2a_epilepsy`. The canned path runs any captured scenario at $0.
 
-## Run it (end-to-end)
+## Transparency
 
-The pipeline is a runnable engine — [`orchestrator.py`](orchestrator.py) — not just specs. The control
-flow, dossier rules (completeness / contradiction-by-tier / VETO / DIVERGENCE), panel seating, the
-two-round roundtable, and synthesis are all real, computed code; facts + persona verdicts come from the
-captured scenario evidence (live EMET + Q-Models mock + real persona deliberation) — or from live agents
-on a novel query.
+```bash
+python trace_view.py <engagement_id>          # agent-by-agent timeline: kind · status · provenance · output
+python trace_view.py <engagement_id> --full   # include full output payloads
+```
+
+Sample trace: `../docs/sample-trace.txt`.
+
+## Run it
 
 ```bash
 python sapphire-orchestrator/run.py                 # list scenarios
-python sapphire-orchestrator/run.py nav1_8          # full run: PLAN → DISCOVER(dossier) → VALIDATE → CONSULT(2 rounds) → SYNTHESIZE
+python sapphire-orchestrator/run.py nav1_8          # full run: PLAN → DISCOVER → VALIDATE → CONSULT → SYNTHESIZE
 python sapphire-orchestrator/run.py "is RHEB fundable for tuberous sclerosis?"   # free text → routed
 python sapphire-orchestrator/run.py --json tsc2     # the canonical run object the site consumes
 ```
 
-For a **novel** query with live EMET + persona agents, drive it via the **`/sapphire`** skill (the
-planner is live for any query; Bucket 1/2 run the cascade + persona subagents).
-
 **As a web app on your Claude subscription** — `serve.py` is the bridge: it serves the site and runs
-novel queries through **Claude Code headless on your subscription** (no API key), returning the same
-structured run the Console renders:
+novel queries through **Claude Code headless on your subscription** (no API key):
 
 ```bash
-python sapphire-orchestrator/serve.py     # http://localhost:8077 — Console (main) + /api/run live brain
+python sapphire-orchestrator/serve.py     # http://localhost:8077 — Console (main) + /api/run
 ```
-Shipped scenarios stay instant ($0, engine); only novel queries call Claude. On plain static hosting
-(no bridge) the Console falls back to the canned scenarios + the engagement plan.
+
+Note: `serve.py` currently uses the canned path; wiring it to `run_live` is the keystone remaining task.
 
 ## See it
-The interactive visualization is the **Console** section of the site ([`../site/`](../site/)):
-`cd site && python -m http.server 8077`, open `#console`. The Console renders exactly what the engine
-produces — `_build/build_orch_data.py` runs `orchestrator.py` to generate `site/orchestrator_data.js`.
-Type a question or pick a worked scenario; the planner scopes any query live.
 
-## Demo vs. production
-- **Now (demo):** EMET live (cascade), Q-Models mocked, personas live, internal moat mocked.
-- **Later:** Q-Models → real AWS launches (same contract); internal moat → real Quiver latent space;
-  EMET → external **+ internal** data once that lands. No contract changes — only the substrate under
-  each box.
+The interactive visualization is the **Console** section of the site ([`../site/`](../site/)):
+`cd site && python -m http.server 8077`, open `#console`. Type a question or pick a worked scenario.
