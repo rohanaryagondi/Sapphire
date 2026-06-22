@@ -1,0 +1,108 @@
+======================================================================
+ENGAGEMENT  eng_6444d0e8
+Deliverable a ranked, de-risked target list
+Disease     tuberous sclerosis / mTORopathy CNS
+Modality    small molecule (default)
+Opened      2026-06-22T04:44:08.772293+00:00
+======================================================================
+
+  ✓  internal-science-lead  ·  kind=python  ·  status=ok
+     provenance : moat-real
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 8 fact(s)
+     ts         : 2026-06-22T04:44:08.775143+00:00
+
+  ✓  emet-runner  ·  kind=emet-playwright  ·  status=ok
+     provenance : emet-live
+     guardrails : data_boundary, public_identifiers_only, facts_only_cited, emet_tab_discipline, stamp_provenance
+     output     : 1 fact(s)
+     ts         : 2026-06-22T04:44:08.775393+00:00
+
+  ✓  q-models-runner  ·  kind=qmodels-delegate  ·  status=ok
+     provenance : qmodels
+     guardrails : data_boundary, public_identifiers_only, stamp_provenance
+     output     : model: q-models-runner
+     ts         : 2026-06-22T04:44:08.775520+00:00
+
+  ✓  fda-institutional-memory  ·  kind=claude-subagent  ·  status=ok
+     provenance : fda-primary
+     guardrails : data_boundary, facts_only_cited, veto_is_gate, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.776049+00:00
+
+  ✓  patent-ip  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, veto_is_gate, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.776348+00:00
+
+  ✓  global-regulatory-divergence  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.776626+00:00
+
+  ✓  clinical-trial-registry  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.777119+00:00
+
+  ✓  post-market-safety  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.777520+00:00
+
+  ✓  payer  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.777892+00:00
+
+  ✓  financial  ·  kind=claude-subagent  ·  status=ok
+     provenance : semantic-web
+     guardrails : data_boundary, facts_only_cited, stamp_provenance
+     output     : 2 fact(s)
+     ts         : 2026-06-22T04:44:08.778102+00:00
+
+  ⚠  company-partner  ·  kind=claude-subagent  ·  status=abstained
+     provenance : persona-judgment
+     repairs    : 2
+     error      : guardrail-violation
+     output     : abstained: True
+     ts         : 2026-06-22T04:44:08.778490+00:00
+
+  ⚠  company-partner  ·  kind=claude-subagent  ·  status=abstained
+     provenance : persona-judgment
+     repairs    : 2
+     error      : guardrail-violation
+     output     : abstained: True
+     ts         : 2026-06-22T04:44:08.778784+00:00
+
+  ⚠  company-partner  ·  kind=claude-subagent  ·  status=abstained
+     provenance : persona-judgment
+     repairs    : 2
+     error      : guardrail-violation
+     output     : abstained: True
+     ts         : 2026-06-22T04:44:08.779072+00:00
+
+  ⚠  company-partner  ·  kind=claude-subagent  ·  status=abstained
+     provenance : persona-judgment
+     repairs    : 2
+     error      : guardrail-violation
+     output     : abstained: True
+     ts         : 2026-06-22T04:44:08.779339+00:00
+
+  ⚠  company-partner  ·  kind=claude-subagent  ·  status=abstained
+     provenance : persona-judgment
+     repairs    : 2
+     error      : guardrail-violation
+     output     : abstained: True
+     ts         : 2026-06-22T04:44:08.779605+00:00
+
+======================================================================
+Recommendation : Insufficient evidence to recommend; commission proposed experiment.
+Closed         : 2026-06-22T04:44:08.779706+00:00
+Agents: 15 total  ·  5 abstained  ·  0 escalated
+======================================================================
