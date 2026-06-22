@@ -11,7 +11,7 @@ from pathlib import Path
 PROVENANCE = "moat-real"
 
 # Default DB path relative to the repo root (two levels up from sapphire-orchestrator/)
-_REPO_ROOT = Path(__file__).resolve().parents[3]
+_REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_DB = _REPO_ROOT / "RohanOnly" / "moat" / "moat.sqlite"
 
 

@@ -138,6 +138,26 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
         self.assertEqual(h["meta"].get("version"), "test-1.0")
 
 
+class TestMoatClientDefaultPath(unittest.TestCase):
+    """Default db_path must resolve to <repo>/RohanOnly/moat/moat.sqlite."""
+
+    def test_default_db_path_ends_with_repo_relative_path(self):
+        # Unset env var so we fall through to the coded default
+        original = os.environ.pop("SAPPHIRE_MOAT_DB", None)
+        try:
+            from moat.client import MoatClient
+            client = MoatClient()
+            # Normalise to a forward-slash string for cross-platform checking
+            path = client.db_path.replace("\\", "/")
+            self.assertTrue(
+                path.endswith("sapphire-capability-map/RohanOnly/moat/moat.sqlite"),
+                f"Default db_path does not end with expected suffix: {path!r}",
+            )
+        finally:
+            if original is not None:
+                os.environ["SAPPHIRE_MOAT_DB"] = original
+
+
 class TestMoatClientMissingDB(unittest.TestCase):
     """MoatClient pointed at a non-existent path must be safe."""
 

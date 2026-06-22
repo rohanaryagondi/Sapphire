@@ -14,11 +14,15 @@ Environment variables:
 Pure, testable function (importable without pyarrow):
     topk_neighbors(rows, k) -> list[dict]
         rows: iterable of dicts with keys:
-              query, query_type, ref, ref_type, ref_dose, cosine, euclidean
+              query, query_type, ref, ref_type, ref_dose, cosine, euclidean,
+              direction ('Original'|'Antipodal')
         k: int
         Returns flat list of neighbour records, each:
               query(UPPER), query_type, ref, ref_type, ref_dose,
               effect, rank, cosine, euclidean
+        Direction semantics:
+              similar  = k smallest-cosine rows with direction=='Original'
+              opposite = k smallest-cosine rows with direction=='Antipodal'
 
 NOTE: pyarrow is imported ONLY inside main() — topk_neighbors has zero
 third-party dependencies so it can be loaded by tests without pyarrow installed.
@@ -43,13 +47,14 @@ _DEFAULT_PARQUET = (
 
 # ── Parquet column → internal field mapping ────────────────────────────────────
 _COL_MAP = {
-    "query_perturbationName":  "query",
-    "query_perturbationType":  "query_type",
-    "ref_perturbationName":    "ref",
-    "ref_perturbationType":    "ref_type",
-    "ref_perturbationDose":    "ref_dose",
-    "cosine_distance":         "cosine",
-    "euclidean_distance":      "euclidean",
+    "query_perturbationName":      "query",
+    "query_perturbationType":      "query_type",
+    "query_perturbationDirection": "direction",
+    "ref_perturbationName":        "ref",
+    "ref_perturbationType":        "ref_type",
+    "ref_perturbationDose":        "ref_dose",
+    "cosine_distance":             "cosine",
+    "euclidean_distance":          "euclidean",
 }
 
 
@@ -57,19 +62,20 @@ _COL_MAP = {
 
 def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
     """
-    Group rows by query, exclude self-pairs, and return for each query:
-      - k smallest-cosine records (effect='similar', rank 1..k ascending by cosine)
-      - k largest-cosine records  (effect='opposite', rank 1..k descending by cosine)
+    Direction-aware top-K neighbour extraction.
 
-    Tie-break: when cosines are equal, sort by ref name ascending (deterministic).
+    Group rows by query (uppercased), exclude self-pairs, then for each query:
+      - similar  = k smallest-cosine rows where direction == 'Original'
+                   ranked 1..k ascending by cosine (tie-break: ref ascending)
+      - opposite = k smallest-cosine rows where direction == 'Antipodal'
+                   ranked 1..k ascending by cosine (tie-break: ref ascending)
 
-    This function is unbounded-memory (collects all candidates per query, then
-    sorts and slices). For streaming 38M rows with bounded memory, use main()
-    which maintains per-query bounded heapq heaps with correct tie-break eviction.
+    The 'direction' key is consumed internally and does NOT appear in output records.
 
     Args:
         rows: iterable of dicts with keys:
-              query, query_type, ref, ref_type, ref_dose, cosine, euclidean
+              query, query_type, ref, ref_type, ref_dose, cosine, euclidean,
+              direction ('Original'|'Antipodal')
         k:    number of neighbours per effect per query
 
     Returns:
@@ -77,33 +83,42 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
             query (UPPERCASE), query_type, ref, ref_type, ref_dose,
             effect, rank, cosine, euclidean
     """
-    # Collect all non-self candidates per query
-    buckets: dict[str, list[dict]] = {}
+    # Collect non-self candidates split by direction
+    # sim_buckets[q] = Original rows; opp_buckets[q] = Antipodal rows
+    sim_buckets: dict[str, list[dict]] = {}
+    opp_buckets: dict[str, list[dict]] = {}
 
     for row in rows:
         q_upper = str(row["query"]).upper()
         ref_val = str(row["ref"])
 
-        # Exclude self-pairs (case-insensitive comparison)
+        # Exclude self-pairs (case-insensitive)
         if ref_val.upper() == q_upper:
             continue
 
-        if q_upper not in buckets:
-            buckets[q_upper] = []
-        buckets[q_upper].append(row)
+        direction = str(row.get("direction", "Original"))
+        if direction == "Antipodal":
+            bucket = opp_buckets
+        else:
+            bucket = sim_buckets
 
+        if q_upper not in bucket:
+            bucket[q_upper] = []
+        bucket[q_upper].append(row)
+
+    all_queries = sorted(set(sim_buckets) | set(opp_buckets))
     result: list[dict] = []
 
-    for q_upper in sorted(buckets):
-        candidates = buckets[q_upper]
-
-        # ── similar: k smallest cosines, tie-break ref ascending ────────────
-        sim_sorted = sorted(candidates, key=lambda r: (float(r["cosine"]), str(r["ref"])))
+    for q_upper in all_queries:
+        # ── similar: k smallest cosines from Original rows ──────────────────
+        sim_cands = sim_buckets.get(q_upper, [])
+        sim_sorted = sorted(sim_cands, key=lambda r: (float(r["cosine"]), str(r["ref"])))
         for rank, row in enumerate(sim_sorted[:k], start=1):
             result.append(_make_record(q_upper, row, "similar", rank))
 
-        # ── opposite: k largest cosines, rank 1=largest; tie-break ref asc ──
-        opp_sorted = sorted(candidates, key=lambda r: (-float(r["cosine"]), str(r["ref"])))
+        # ── opposite: k smallest cosines from Antipodal rows ────────────────
+        opp_cands = opp_buckets.get(q_upper, [])
+        opp_sorted = sorted(opp_cands, key=lambda r: (float(r["cosine"]), str(r["ref"])))
         for rank, row in enumerate(opp_sorted[:k], start=1):
             result.append(_make_record(q_upper, row, "opposite", rank))
 
@@ -149,9 +164,11 @@ def main() -> None:
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── per-query bounded heaps ────────────────────────────────────────────────
-    # sim_heaps[q] = min-heap of (-cosine, ref, cosine, euclidean, query_type, ref_type, ref_dose)
-    # opp_heaps[q] = min-heap of (cosine,  ref, cosine, euclidean, query_type, ref_type, ref_dose)
+    # ── per-query bounded heaps (direction-aware) ──────────────────────────────
+    # sim_heaps[q]: Original rows  — keep K smallest-cosine
+    #   stored as max-heap of size K via negated key: (-cosine, ref, payload...)
+    #   when heap > K, heappop evicts the *largest* cosine (least similar)
+    # opp_heaps[q]: Antipodal rows — keep K smallest-cosine (same structure)
     sim_heaps: dict[str, list] = {}
     opp_heaps: dict[str, list] = {}
     n_rows_seen = 0
@@ -170,6 +187,7 @@ def main() -> None:
         # Convert batch to Python lists for speed
         q_names   = batch.column("query_perturbationName").to_pylist()
         q_types   = batch.column("query_perturbationType").to_pylist()
+        q_dirs    = batch.column("query_perturbationDirection").to_pylist()
         r_names   = batch.column("ref_perturbationName").to_pylist()
         r_types   = batch.column("ref_perturbationType").to_pylist()
         r_doses   = batch.column("ref_perturbationDose").to_pylist()
@@ -185,26 +203,31 @@ def main() -> None:
                 n_self_excluded += 1
                 continue
 
+            direction    = str(q_dirs[i]) if q_dirs[i] is not None else "Original"
             cosine_val   = float(cosines[i])  if cosines[i]  is not None else 0.0
             euclidean_val= float(euclids[i])  if euclids[i]  is not None else 0.0
             ref_str      = ref_val
             payload      = (str(q_types[i] or ""), str(r_types[i] or ""), str(r_doses[i] or ""), cosine_val, euclidean_val)
 
-            # similar: max-heap on cosine → store (-cosine, ref, payload)
-            entry_sim = (-cosine_val, ref_str) + payload
-            if q_upper not in sim_heaps:
-                sim_heaps[q_upper] = []
-            heapq.heappush(sim_heaps[q_upper], entry_sim)
-            if len(sim_heaps[q_upper]) > K:
-                heapq.heappop(sim_heaps[q_upper])
+            # Both similar and opposite use a max-heap of size K keyed on cosine
+            # so that heappop evicts the largest cosine (keeping K smallest).
+            # Entry: (-cosine, ref, ...payload) — Python min-heap on negated cosine.
+            entry = (-cosine_val, ref_str) + payload
 
-            # opposite: min-heap on cosine → store (cosine, ref, payload)
-            entry_opp = (cosine_val, ref_str) + payload
-            if q_upper not in opp_heaps:
-                opp_heaps[q_upper] = []
-            heapq.heappush(opp_heaps[q_upper], entry_opp)
-            if len(opp_heaps[q_upper]) > K:
-                heapq.heappop(opp_heaps[q_upper])
+            if direction == "Antipodal":
+                # opposite: k smallest-cosine Antipodal rows
+                if q_upper not in opp_heaps:
+                    opp_heaps[q_upper] = []
+                heapq.heappush(opp_heaps[q_upper], entry)
+                if len(opp_heaps[q_upper]) > K:
+                    heapq.heappop(opp_heaps[q_upper])
+            else:
+                # similar: k smallest-cosine Original rows
+                if q_upper not in sim_heaps:
+                    sim_heaps[q_upper] = []
+                heapq.heappush(sim_heaps[q_upper], entry)
+                if len(sim_heaps[q_upper]) > K:
+                    heapq.heappop(sim_heaps[q_upper])
 
     n_queries = len(sim_heaps)
     print(f"[build_moat_db] done streaming: {n_rows_seen:,} rows, {n_self_excluded:,} self-excluded, {n_queries:,} queries")
@@ -215,18 +238,20 @@ def main() -> None:
     all_queries = sorted(set(sim_heaps) | set(opp_heaps))
     records: list[tuple] = []
     for q_upper in all_queries:
+        # Entry format: (-cosine_val, ref, qt, rt, rd, cosine_val, euclidean_val)
+        # t[0] = -cosine_val; to sort by cosine ascending: sort -t[0] ascending (i.e. -(-c) = c asc)
+        # tie-break: ref ascending (t[1])
+
         sim_items = sim_heaps.get(q_upper, [])
-        # sort: ascending cosine (-neg_cosine), then ref ascending
-        sim_sorted = sorted(sim_items, key=lambda t: (-t[0], t[1]))
+        sim_sorted = sorted(sim_items, key=lambda t: (-t[0], t[1]))  # cosine asc, ref asc
         for rank, entry in enumerate(sim_sorted, start=1):
             neg_c, ref, qt, rt, rd, cosv, eucv = entry
             records.append((q_upper, qt, ref, rt, rd, "similar", rank, cosv, eucv))
 
         opp_items = opp_heaps.get(q_upper, [])
-        # sort: descending cosine, then ref ascending
-        opp_sorted = sorted(opp_items, key=lambda t: (-t[0], t[1]))
+        opp_sorted = sorted(opp_items, key=lambda t: (-t[0], t[1]))  # cosine asc, ref asc
         for rank, entry in enumerate(opp_sorted, start=1):
-            cosv, ref, qt, rt, rd, _c2, eucv = entry
+            neg_c, ref, qt, rt, rd, cosv, eucv = entry
             records.append((q_upper, qt, ref, rt, rd, "opposite", rank, cosv, eucv))
 
     # ── write SQLite ───────────────────────────────────────────────────────────
@@ -273,7 +298,7 @@ def main() -> None:
 
     print(f"[build_moat_db] wrote {len(records):,} neighbor rows ({n_queries:,} queries x2 effects) → {db_path}")
 
-    # ── sanity: print top-5 similar + opposite for TSC2 ───────────────────────
+    # ── sanity: print top-5 similar (Original) + opposite (Antipodal) for TSC2 ─
     _print_sanity(str(db_path), "TSC2")
 
 
