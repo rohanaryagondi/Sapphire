@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Sapphire commit-msg guard — enforces attribution on every commit.
+# Installed by `bash dev/setup-contributor.sh <handle>` (sets core.hooksPath=.githooks).
+#
+# Rejects any commit message lacking a valid  `Built-By: <handle>`  trailer
+# (handle ∈ rohan|hayes|gavin). This is what makes `git log --grep=Built-By` a
+# complete attribution record. Merge commits are exempt.
+set -euo pipefail
+
+msg_file="$1"
+first_line="$(sed -n '1p' "$msg_file" || true)"
+
+# Exempt merge commits (their message starts with "Merge ").
+case "$first_line" in
+  "Merge "*) exit 0 ;;
+esac
+
+if ! grep -Eq '^Built-By: (rohan|hayes|gavin)\b' "$msg_file"; then
+  cat >&2 <<'EOF'
+
+  ✗ COMMIT REJECTED — missing a valid `Built-By:` trailer.
+
+  Every commit must end with BOTH attribution trailers, e.g.:
+
+      Built-By: hayes
+      Co-Authored-By: Claude <model-used> <noreply@anthropic.com>
+
+  (handle ∈ rohan | hayes | gavin). See dev/CONVENTIONS.md §1 and dev/CONTRIBUTOR_RULES.md.
+
+EOF
+  exit 1
+fi
+
+exit 0

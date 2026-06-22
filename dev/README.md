@@ -33,8 +33,11 @@ Never conflate them. A "reviewer" in the runtime harness is a *persona judging a
 | [`reports/`](reports/) | Per-contributor build reports (`reports/<handle>/`) |
 | [`templates/`](templates/) | Reusable prompts: task brief, code review, functional verify |
 
-GitHub plumbing: [`.github/CODEOWNERS`](../.github/CODEOWNERS) (every PR needs Rohan's review) and
-[`.github/pull_request_template.md`](../.github/pull_request_template.md) (gate-evidence checklist).
+GitHub plumbing: [`.github/CODEOWNERS`](../.github/CODEOWNERS) (every PR needs Rohan's review),
+[`.github/pull_request_template.md`](../.github/pull_request_template.md) (gate-evidence checklist), and
+[`.github/workflows/branch-guard.yml`](../.github/workflows/branch-guard.yml) (flags direct pushes to `main`).
+Branch-rule enforcement: [`.githooks/`](../.githooks/) + [`dev/setup-contributor.sh`](setup-contributor.sh)
+(client-side guards) and [`CONTRIBUTOR_RULES.md`](CONTRIBUTOR_RULES.md) (the hard rules for contributor agents).
 
 ## Collaboration model (rohan · hayes · gavin)
 
@@ -45,10 +48,13 @@ Sapphire is built by three contributors, each driving their own Claude. The mode
 - **Attribution is git-native:** branch prefix + a `Built-By: <handle>` commit trailer (alongside the Claude
   `Co-Authored-By`) + the `CONTRIBUTORS.md` registry. No in-file tags. `git log`/`blame` answer "who built this".
 - **Contributors run the full local lifecycle** (Gates 1–5) and **ship by opening a PR** — they never merge.
+  First thing in any clone: `bash dev/setup-contributor.sh <handle>` to install the branch guards. Contributor
+  agents (hayes/gavin) are bound by `CONTRIBUTOR_RULES.md`.
 - **Only Rohan's Claude reviews, approves, and merges to `main`** — re-establishing the gates independently on
-  the PR (`PR_REVIEW.md`). `.github/CODEOWNERS` routes every PR to Rohan for review; *hard* enforcement
-  (branch protection / no direct push) is pending a GitHub plan upgrade (see the enforcement note in
-  `CONVENTIONS.md` §1) — until then the rule is convention-backed, treated as binding.
+  the PR (`PR_REVIEW.md`). Enforcement is layered (`CONVENTIONS.md` §1): client-side hooks hard-block main
+  pushes / wrong branch names / missing `Built-By`; the `branch-guard` Action flags any direct push to `main`;
+  CODEOWNERS routes review. *Hard* server-side branch protection needs GitHub Pro (`dev/enable-branch-protection.sh`
+  applies it once upgraded); until then layers above hold the line and are treated as binding.
 
 Runnable assets (so the process is enforced, not just described):
 - `.claude/agents/sapphire-dev-{planner,implementer,reviewer,verifier,integrator}.md` — the builder roles.

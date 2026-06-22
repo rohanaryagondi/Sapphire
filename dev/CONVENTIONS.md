@@ -6,12 +6,19 @@ Every change to Sapphire follows these. They are not style preferences; they are
 - **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
   `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
   a reviewed PR.
-  > **Enforcement status (2026-06-22):** the canonical repo is `rohanaryagondi-quiver/Sapphire` (Quiver-owned).
-  > That account is currently **GitHub free**, where branch protection + rulesets return 403. So hard
-  > enforcement is **one step away**: enable **GitHub Pro** on `rohanaryagondi-quiver` (~$4/mo), then run
-  > `bash dev/enable-branch-protection.sh` (token-free; reads `GH_TOKEN`). Until then the no-direct-push rule
-  > is **convention + CODEOWNERS review-routing**, not machine-enforced — anyone with write access *could*
-  > bypass it. Treat it as binding regardless, and do **not** grant Hayes/Gavin access until protection is live.
+  > **Enforcement (2026-06-22)** on the canonical repo `rohanaryagondi/Sapphire`, layered defense-in-depth:
+  > 1. **Client-side hooks** (`.githooks/`, installed by `dev/setup-contributor.sh`): `pre-push` hard-blocks
+  >    pushes to `main`/protected branches and non-`<handle>/` branches; `commit-msg` requires the `Built-By`
+  >    trailer. The strongest *preventive* control for cooperating agents.
+  > 2. **`branch-guard` Action** (`.github/workflows/`): *detective* backstop — fails the check on bad PR
+  >    branch names and files an issue on any direct push to `main`.
+  > 3. **CODEOWNERS** routes every PR to the approver.
+  > 4. **`dev/CONTRIBUTOR_RULES.md`** binds the contributor agents (no main pushes, no merges, no `--no-verify`).
+  >
+  > The account is GitHub **free**, so true server-side branch protection still 403s — it's **one step away**:
+  > enable **GitHub Pro** (~$4/mo), then `bash dev/enable-branch-protection.sh`. Until then layers 1–4 hold the
+  > line but are bypassable by a non-cooperating actor; **do not grant Hayes/Gavin access until you accept that
+  > or upgrade.** Treat the rules as binding regardless.
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,
