@@ -3,7 +3,7 @@
 **Branch:** `Rohan` · **Repo:** `~/Desktop/Projects/Quiver/sapphire-capability-map` (local, off OneDrive)
 **Goal:** make the firm actually run through the harness on any query — verified without burning money or tokens — plus terminal transparency, captured scenarios, and the self-improvement loop running live.
 
-**TL;DR:** #1 (live harness wiring), #2 (transparency), #3 (scenarios), and #5 (active-learning loop) are **done, tested, and committed** — **250 tests green**, 7 commits, a final opus review. Verified under the "run it without spending" doctrine: personas + EMET mocked, Q-Models GPU **dry-run** (AWS untouched), **real local moat live**. I also captured **3 brand-new scenarios from live EMET** (6 captured total).
+**TL;DR:** #1 (live harness wiring), #2 (transparency), #3 (scenarios), and #5 (active-learning loop) are **done, tested, and committed** — **252 tests green**, 9 commits (incl. a review-driven fix pass), a final opus review. Verified under the "run it without spending" doctrine: personas + EMET mocked, Q-Models GPU **dry-run** (AWS untouched), **real local moat live**. I also captured **3 brand-new scenarios from live EMET** (6 captured total).
 
 ---
 
@@ -44,7 +44,7 @@ python3 ../_build/loop_and_trace_demo.py   # regenerate the loop+trace demo ($0)
 ```
 
 ## Tests
-**250 total, all green** — contracts 23 · harness 67 · emet 18 · memory 14 · selfimprove 20 · moat 68 · tests 40. New: `test_live_engine` (7), `test_trace_view` (13), `test_loop_demo` (8), `test_roster` (16), scenario tests updated.
+**252 total, all green** — contracts · harness · emet · memory · selfimprove · moat · tests (incl. hardened live-engine + trace-view tests from the fix pass). New: `test_live_engine` (7), `test_trace_view` (13), `test_loop_demo` (8), `test_roster` (16), scenario tests updated.
 
 ## Honest gaps (deliberately deferred / out of scope tonight)
 - **Live LLM in `run_live`:** the persona/semantic/EMET backends were **mocked** for verification (your "no token burn" rule). Wiring the real Claude runner + live EMET into `run_live` for a true end-to-end paid run is a flip of `ctx` backends — proven to dispatch, not yet run for real.
@@ -56,9 +56,17 @@ python3 ../_build/loop_and_trace_demo.py   # regenerate the loop+trace demo ($0)
 ## EMET capture URLs (tonight, for reference)
 SCN2A `…/chat/cbb64717-…` · GBA1 `…/chat/ad734624-…` · C9orf72 `…/chat/da99c861-…`
 
-## Final whole-branch review (opus) — **Ready to merge**
-No Critical, no Important findings. Independently verified: `run_live` genuinely routes every agent + persona through `harness.run` (not a canned shortcut), the real moat DB is read live (TSC2 → Isorhamnetin/Momelotinib, `moat-real`), guardrails fire on the **negative path** (data-boundary blocks `QS00123`; `must_cite_dossier` forced all 5 personas to abstain after 2 repairs in trace `eng_6444d0e8`), scenario PMIDs are real with honest `KNOWN_UNKNOWN` flagging, runtime stays stdlib-only, no secrets/binaries.
-Two **Minor** follow-ups (non-blocking): (1) add a direct unit assertion for the `must_cite_dossier` persona-block (already proven by the live trace); (2) `live_engine.py` `dossier_fields` truncates cited values to 80 chars — cosmetic, only ever narrows the cite allow-set.
+## Reviews & fixes
+**Opus whole-branch review** (overnight): verified `run_live` routes every agent + persona through `harness.run` (not canned), the real moat DB is read live (TSC2 → Isorhamnetin/Momelotinib, `moat-real`), scenario PMIDs real with honest `KNOWN_UNKNOWN` flagging, stdlib-only, no secrets/binaries.
+
+**Second pass — 2 sonnet reviewers (correctness + data honesty)** caught real issues the opus pass missed, all **fixed in `290530f`**:
+- **(Critical) `must_cite_dossier` was miswired** — `dossier_fields` was passed in *inputs* but the guardrail reads it from *ctx*, so the citation allow-set was always empty and **every persona was force-abstained → the roundtable never produced a verdict**. (This corrects the opus note above: those abstentions were a bug, not the guardrail "working.") Fixed — and the hardened test proves personas now produce real verdicts when they cite the dossier: **0 → 5/5 ok**.
+- **(Critical) Q-Models output silently dropped** — `q-models-runner` had no `output_schema` and returned no `facts`; it now returns findings-shaped output and contributes to the dossier.
+- **(Important)** `trace_view` crash on non-dict output (guarded); two **vacuous tests** that masked the bug above (hardened to assert real verdicts + a computed trace-record count).
+- **(Data)** `scn2a`/`gba1` `synthesize.entities` normalized to the canonical flat-dict shape; PMID `41850233` (a CSF-proteomics paper) removed from a tofersen-approval claim it didn't support.
+- Data reviewer **verified 14 PMIDs against live PubMed** — all real and matching; no fabrication, no secrets/binaries.
+
+**Result:** 252 tests green; roundtable produces real verdicts; honest citations intact.
 
 ## Push — done ✅
 Pushed to `origin/Rohan` (`aed3803..8f5a839`, then this report). The full overnight build is on the remote.
