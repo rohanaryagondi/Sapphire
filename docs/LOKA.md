@@ -63,6 +63,16 @@ The four workflows: gene-gene, gene-drug, drug-gene, drug-drug — each similar 
    (`MoatClient` + `moat_facts`, provenance `moat-real`) + `_build/build_moat_db.py` (parquet → SQLite).
    The dossier now carries real CNS_DFP perturbation-similarity evidence (similar genes + rescue compounds).
    The Phase-5 self-improvement `moat_blindspot` loop has a real substrate to update.
+   **Semantics (verified live):** `query_perturbationDirection` is Original (half) / Antipodal (half);
+   `ref` is always Original. **similar (mimic)** = nearest cosine among **Original**-query rows;
+   **rescue (opposite)** = nearest cosine among **Antipodal**-query rows; top-K is kept **per ref_type**
+   (genes + compounds separately) so compound rescues aren't crowded out by genes. Sanity: `TSC2` nearest
+   = `TSC1` (the TSC complex). **Caveat:** raw EP-antipodal-distance does NOT reproduce Loka's flagship
+   "rapamycin rescues TSC2" result — Sirolimus/Everolimus are not in TSC2's top-50 antipodal compounds
+   (top rescues are e.g. Isorhamnetin, an mTOR/autophagy modulator). Loka layers extra scoring on the raw
+   distance (their 40% rescue / 30% mechanistic / 30% safety weights + pathway/clinical reasoning, likely
+   dose-aware). Reproducing their exact ranking is gated on getting their repo + 7-stage workflow doc (the
+   asks below). Our moat is the **correct, real EP-distance substrate**; Loka's demo scoring sits on top.
 2. **Adopt Loka's reasoning designs** — the 4 perturbation workflows + the 2 use-case flowcharts map onto
    our agents; the multi-model Pro/Haiku split, the scratchpad pattern, and their LLM-as-judge eval harness
    are reusable patterns.
