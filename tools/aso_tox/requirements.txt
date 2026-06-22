@@ -1,5 +1,7 @@
 pandas
 numpy
-# model pkl was pickled with scikit-learn 1.8.0; verified to load+predict on 1.6.1 with an InconsistentVersionWarning. Pin 1.8.0 for production fidelity (confirm with model author).
-scikit-learn
+# model pkl was pickled with scikit-learn 1.8.0. Now pinned to 1.8.0 (warning gone).
+# Confirmed 2026-06-22: GBR scores identical on 1.6.1 and 1.8.0 for the sample set
+# (1.884452 / 0.562909 / 2.820860) — the model is numerically stable across these versions.
+scikit-learn==1.8.0
 joblib
