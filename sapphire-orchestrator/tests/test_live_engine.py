@@ -26,7 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
-from tools import gnomad_constraint_seam
+from tools import gnomad_constraint_seam, gtex_expression_seam
 
 
 # ── Fake runner helpers ──────────────────────────────────────────────────────
@@ -93,6 +93,13 @@ def _fake_gnomad_fn(inputs):
     return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "gnomad"}
 
 
+def _fake_gtex_fn(inputs):
+    """Offline stand-in for the GTEx seam: honest-empty, no network. The
+    TestGtexExpressionWiring tests pop this to exercise the real seam with _fetch
+    monkeypatched to recorded fixtures."""
+    return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "gtex"}
+
+
 def _build_ctx():
     """Build a ctx dict that mocks every backend except the real moat."""
     return {
@@ -101,7 +108,7 @@ def _build_ctx():
         "qmodels_client": _fake_qmodels_client(),
         # gnomad-constraint would hit a public network API via the real seam; mock it
         # (honest-empty) so the offline suite never touches the network.
-        "python_fns": {"gnomad-constraint": _fake_gnomad_fn},
+        "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn},
         # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
         #       that run_live wires the REAL moat + aso-tox backends by default.
     }
@@ -791,6 +798,113 @@ class TestGnomadConstraintWiring(unittest.TestCase):
         self.assertIsNotNone(agent)
         self.assertIn(agent["status"], ("abstained", "escalated"),
                       f"expected data_boundary to block gnomad; got {agent}")
+
+
+# ── GTEx seam fixtures (recorded TSC2 GTEx v2 responses) ─────────────────────
+_GTEX_GENE_TSC2 = {"data": [{"gencodeId": "ENSG00000103197.16", "geneSymbol": "TSC2",
+                            "geneSymbolUpper": "TSC2", "geneType": "protein coding"}]}
+_GTEX_EXPR_TSC2 = {"data": [
+    {"median": 133.226, "tissueSiteDetailId": "Brain_Cerebellum", "unit": "TPM"},
+    {"median": 94.3068, "tissueSiteDetailId": "Pituitary", "unit": "TPM"},
+    {"median": 38.1049, "tissueSiteDetailId": "Brain_Cortex", "unit": "TPM"},
+]}
+
+
+def _gtex_dispatch(path, params):
+    """Fake gtex _fetch routing the two-call flow to recorded fixtures."""
+    if "reference/gene" in path:
+        return _GTEX_GENE_TSC2
+    if "medianGeneExpression" in path:
+        return _GTEX_EXPR_TSC2
+    raise AssertionError(f"unexpected gtex path {path}")
+
+
+class TestGtexExpressionWiring(unittest.TestCase):
+    """The gtex-expression seam, wired into run_live, lands a real cited fact in the
+    dossier. Network is monkeypatched at the seam's _fetch boundary ($0, offline)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _ctx_with_real_gtex(self):
+        """Offline ctx, but pop the gtex mock so run_live wires the REAL seam."""
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("gtex-expression", None)
+        return ctx
+
+    def test_gtex_fact_lands_in_dossier(self):
+        with mock.patch.object(gtex_expression_seam, "_fetch", _gtex_dispatch):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_gtex(),
+            )
+        dossier = result["discover"]["dossier"]
+        gtex_facts = [f for f in dossier if f.get("provenance") == "gtex"]
+        self.assertTrue(
+            len(gtex_facts) >= 1,
+            f"expected ≥1 gtex fact; dossier provenances: "
+            f"{[f.get('provenance') for f in dossier]}"
+        )
+        val = gtex_facts[0]["value"]
+        self.assertIn("Brain Cerebellum 133.2", val, val)
+        self.assertIn("CNS-enriched", val, val)
+        self.assertEqual(gtex_facts[0]["tier"], "T1")
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gtex-expression"), None)
+        self.assertIsNotNone(agent, "gtex-expression not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
+
+    def test_no_gene_query_honest_empty_no_network(self):
+        with mock.patch.object(gtex_expression_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Outline a general CNS target-validation strategy.",
+                ctx=self._ctx_with_real_gtex(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gtex-expression"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "gtex"], [])
+
+    def test_api_down_degrades_no_crash(self):
+        import urllib.error
+
+        def _boom(path, params):
+            raise urllib.error.URLError("connection refused")
+
+        with mock.patch.object(gtex_expression_seam, "_fetch", _boom):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_gtex(),
+            )
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gtex-expression"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected honest 'ok' empty; got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "gtex"], [])
+
+    def test_internal_id_in_query_blocks_gtex(self):
+        with mock.patch.object(gtex_expression_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Assess QS00123 against TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_gtex(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gtex-expression"), None)
+        self.assertIsNotNone(agent)
+        self.assertIn(agent["status"], ("abstained", "escalated"),
+                      f"expected data_boundary to block gtex; got {agent}")
 
 
 if __name__ == "__main__":
