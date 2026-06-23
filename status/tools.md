@@ -20,13 +20,10 @@
 2. **Chronic-tox model** — roadmap; scope the integration. → backlog `chronic-tox` (suggested: hayes).
 3. **Retire/label remaining mocks** — audit every track; mark `proven` vs `paper-claim`; nothing silently
    mocked. → backlog `retire-mocks`.
-4. **Quantitative-fact seams** — add 4 structured numeric fact sources (gnomAD constraint, GTEx expression,
-   InterPro domains, g:Profiler enrichment — clean public APIs, no keys) as Bucket-1 seams in the `aso-tox`
-   pattern — hard numbers that complement EMET's narrative (EMET is an LLM knowledge source; these give the
-   value, not the prose). Reimplemented as our own stdlib seams; the ToolUniverse runtime is NOT adopted.
-   DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
-   **gnomAD ✅ (#6) + GTEx ✅ (#9) + InterPro ✅ (#11) merged**; **g:Profiler in review (PR-D)** — completes the four ·
-   [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
+4. **Quantitative-fact seams — ✅ COMPLETE** (`quant-fact-seams`, **hayes**): all 4 stdlib Bucket-1 seams
+   shipped — gnomAD constraint (#6), GTEx expression (#9), InterPro domains (#11), g:Profiler enrichment (#12).
+   Hard numbers (provenance `gnomad`/`gtex`/`interpro`/`gprofiler`) that complement EMET's narrative; ToolUniverse
+   runtime NOT adopted; DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based) — a possible later batch.
 5. **Experiment Design tool** — port Matt's `design-form-agent` (Otter meeting-notes → Quiver
    experiment-design-sheet JSON, Claude-based, Quiver optogenetics assay vocabulary) into Sapphire as a
    standalone Quiver tool (`tools/experiment_design/`). Phase 1: meeting-notes → filled design sheet

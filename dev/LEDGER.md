@@ -11,6 +11,24 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — g:Profiler enrichment seam — quant-fact-seams series ✅ COMPLETE  (`main`, PR #12)
+- **g:Profiler seam authored by `hayes`** (`Built-By: hayes`, fresh branch off latest main — staleness fixed);
+  merged by `rohan` directly (no integration branch needed — clean). Bookkeeping in PR #13.
+- What: stdlib g:Profiler g:GOSt **POST** seam (`tools/geneset_enrichment_seam.py`) — enrichment over the query
+  **gene set** (GO/HP/pathway terms + p-values), provenance `gprofiler`, tier **T2** (computed statistic, not a
+  measured value). Introduces `genes` as a first-class `bucket1_inputs` field (the seam reads the set; other
+  agents read `candidate`). Complete `output_schema` (incl. `error`); `data_boundary` guards the whole input
+  blob (an internal id anywhere in the gene list blocks dispatch).
+- Gates (approver, independent): Gate 1 **342 green** · Gate 2 **Approved** (3 Minor nits) · Gate 5 **PASS**
+  (fact lands via `run_live` with real term IDs/p-values; schema-complete error path; honest degradation across
+  6 paths; facts mock-derived; data boundary enforced on the gene LIST; non-vacuous tests).
+- **Milestone: the 4-seam `quant-fact-seams` series is COMPLETE** — Sapphire's Bucket 1 now emits hard
+  quantitative facts (constraint, expression, domains, enrichment) alongside EMET's narrative. Hayes's first
+  feature epic, shipped through the harness end-to-end.
+- Follow-ups: minor nits across the seams (p-value `:.2e`; a couple comment/assertion tightenings) — a cleanup
+  pass. Next for hayes: the **experiment-design** epic, **blocked on ED-1 source** (Matt's repo) — escalated to
+  Rohan; vendoring a snapshot is the plan.
+
 ## 2026-06-23 — InterPro protein-domains seam (quant-fact-seams PR-C)  (`main`, PR #11)
 - **InterPro seam authored by `hayes`** (commit c4fcfcb, `Built-By: hayes`); **integrated + merged by `rohan`**
   (clean auto-merge this time; this commit also does approver bookkeeping — workboard bump, HELP answer, a
