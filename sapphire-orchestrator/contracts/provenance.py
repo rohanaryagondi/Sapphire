@@ -14,6 +14,7 @@ PROVENANCE = frozenset({
     # quantitative-fact Bucket-1 seams (public APIs via stdlib urllib seams)
     "gnomad",
     "gtex",
+    "interpro",
 })
 
 

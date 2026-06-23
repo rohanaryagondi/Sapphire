@@ -11,6 +11,7 @@
 | **ASO-tox** | ✅ real | `aso-tox` | Hongkang's GBR model (`tools/aso_tox/`); stdlib seam `tools/aso_tox_seam.py`; real predictions when sequences present, honest-empty otherwise. Input validated (non-ATGC rejected). sklearn pinned 1.8.0 in the subprocess. |
 | **gnomAD constraint** | ✅ live | `gnomad` | Gene LoF-constraint (pLI, LOEUF, missense Z) via the public GraphQL API; stdlib seam `tools/gnomad_constraint_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise, honest error envelope when the API is down. First of the `quant-fact-seams` pilot (PR-A). |
 | **GTEx expression** | ✅ live | `gtex` | Tissue expression (median TPM) + CNS selectivity via the public REST API (dataset `gtex_v8`, pinned); stdlib seam `tools/gtex_expression_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise, honest error envelope when the API is down. `quant-fact-seams` PR-B. |
+| **InterPro domains** | ✅ live | `interpro` | Protein domain/family annotations (IPR accessions) via UniProt (symbol→accession) + the public InterPro REST API; stdlib seam `tools/interpro_domains_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise (incl. 404), honest error envelope when an API is down. `quant-fact-seams` PR-C. |
 
 ## Open items
 1. **ASO Design tool** — does not exist yet. Build it; its output feeds the `aso-tox` `sequences=` channel
@@ -23,7 +24,7 @@
    pattern — hard numbers that complement EMET's narrative (EMET is an LLM knowledge source; these give the
    value, not the prose). Reimplemented as our own stdlib seams; the ToolUniverse runtime is NOT adopted.
    DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
-   **gnomAD ✅ merged (PR-A, #6)**; **GTEx in review (PR-B)**; InterPro → g:Profiler follow as separate PRs ·
+   **gnomAD ✅ (#6) + GTEx ✅ (#9) merged**; **InterPro in review (PR-C)**; g:Profiler (PR-D) follows ·
    [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
 5. **Experiment Design tool** — port Matt's `design-form-agent` (Otter meeting-notes → Quiver
    experiment-design-sheet JSON, Claude-based, Quiver optogenetics assay vocabulary) into Sapphire as a

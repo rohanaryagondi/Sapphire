@@ -47,13 +47,18 @@ git checkout -b hayes/<slug>
 git commit            # message must include  Built-By: hayes
 # if main moved while you worked:  git fetch origin && git merge origin/main  (resolve, re-test)
 git push -u origin hayes/<slug>             # hook allows this; blocks main + wrong prefixes
-gh pr create --base main                    # YOU open the PR — don't just push and stop
+gh pr create --base main                    # open the PR yourself IF you have gh/a token (see below)
 # then wait for rohan's Claude to review. Address change-requests on the same branch + push.
 # rohan's Claude approves and merges. You never merge.
 ```
 Two musts that have slipped before: **(1) branch from the latest `main`** (and merge `origin/main` in if it
-moves) — stale branches cause merge conflicts the approver has to clean up; **(2) open your own PR** — a pushed
-branch with no PR is invisible to the flow.
+moves) — stale branches cause merge conflicts the approver has to clean up; **(2) get your branch in front of
+the approver**:
+- **If you have `gh`/a token:** open the PR yourself (`gh pr create --base main`) — don't just push and stop.
+- **If your environment has no `gh`/token** (e.g. a sandboxed Windows box — see the resolved HELP entry): this
+  is the **sanctioned token-less flow** — push the fully-gated `hayes/<slug>` branch and put the complete PR
+  body in `dev/reports/hayes/<slug>-report.md`; the approver opens + reviews + merges. Your board watcher will
+  see the merge (workboard bump) and cue your next task. This is not a workaround — it's a supported path.
 
 ## Autonomous operation — run without being prompted
 Contributor agents are expected to **run continuously**, not one task at a time. After setup, start the

@@ -20,20 +20,20 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **gnomAD ✅ (#6) · GTEx ✅ (PR-B) merged.** Remaining (one PR each): **InterPro (PR-C, next) → g:Profiler (PR-D)**. | next: `hayes/interpro-domains` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **gnomAD ✅ (#6) · GTEx ✅ (#9) · InterPro ✅ (PR-C) merged.** Remaining: **g:Profiler (PR-D, last)**. | next: `hayes/gprofiler-enrichment` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 | `experiment-design` | queued (after seams) | **Epic.** Port Matt's `design-form-agent` into Sapphire as a standalone tool: meeting-notes → filled experiment-design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the design sheet). Moat/firm wiring is a later epic. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 
-> **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
-> `dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running as a background Monitor and work your queue
-> without waiting for prompts. **Queue:** (1) finish `quant-fact-seams` — gnomAD ✅ + GTEx ✅ merged;
-> **InterPro (PR-C, next)** on `hayes/interpro-domains`, then g:Profiler; template =
-> `sapphire-orchestrator/tools/gnomad_constraint_seam.py` (or your gtex seam), one seam per PR, full Gates 1–5
-> each. (2) **THEN** the `experiment-design` epic (ED-1 first) —
+> **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): `git pull origin main`
+> first (the watcher `dev/watch-assignments.sh` now exists — launch it: `bash dev/watch-assignments.sh hayes
+> HayesStewart-QuiverBS`; on your gh-less box it runs board-only, which is your main signal). **Queue:**
+> (1) finish `quant-fact-seams` — gnomAD ✅ + GTEx ✅ + InterPro ✅ merged; **g:Profiler (PR-D, last)** on
+> `hayes/gprofiler-enrichment`; template = any merged seam (gnomAD/gtex/interpro), full Gates 1–5.
+> (2) **THEN** the `experiment-design` epic (ED-1 first) —
 > [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
-> **Two musts (both slipped on gnomAD+GTEx):** (a) branch from the **latest `main`** (`git pull` first; merge
-> `origin/main` if it moves) — avoids the conflicts I had to resolve; (b) **open your own PR**
-> (`gh pr create --base main`), don't just push. Blocked? post in `dev/HELP.md` and keep watching — the
-> answer wakes you.
+> **Musts:** (a) branch from the **latest `main`** (`git pull` first; merge `origin/main` if it moves);
+> (b) **token-less PR flow is sanctioned** — push the gated branch + put the PR body in your report; I open +
+> merge (your `gh`-less machine can't `gh pr create`, that's expected). Blocked? post in `dev/HELP.md`; the
+> answer (merged to main) wakes your board watcher.
 
 ## gavin  (`@GavinWongYF`) — contributor
 _No work assigned yet._
@@ -56,6 +56,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `quant-fact-seams` (PR-C InterPro) | hayes | 2026-06-23 | PR #11 |
+| `autonomous-contributors` | rohan | 2026-06-23 | PR #10 |
 | `quant-fact-seams` (PR-B GTEx) | hayes | 2026-06-23 | PR #9 |
 | `quant-fact-seams` (PR-A gnomAD) | hayes | 2026-06-23 | PR #6 |
 | `repo-streamline` | rohan | 2026-06-23 | PR #5 |
