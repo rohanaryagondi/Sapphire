@@ -30,10 +30,22 @@ ToolUniverse runtime/MCP/embedding model (we reimplement a handful of wrappers a
 adopt the system); Slurm/HPC (we don't use it); any EMET change.
 
 ## Sequencing — pilot-gate (mandatory)
-1. **PR-A: `gnomad-constraint` only.** Ship the pilot end-to-end through the full lifecycle. Rohan's Claude
-   reviews + functionally verifies + merges. This locks the proven pattern and puts a worked example in the repo.
+1. **PR-A: `gnomad-constraint` only.** ✅ **MERGED (PR #6, 2026-06-23).** Approved + Gate-5 verified.
 2. **PR-B, C, D:** each remaining seam as its own Standard-tier PR, reusing the merged pilot as the template.
-Do **not** open PR-B until PR-A is merged. One seam per PR; small PRs, full gates each.
+One seam per PR; small PRs, full gates each. **Next: GTEx (PR-B).**
+
+> **✅ Use `sapphire-orchestrator/tools/gnomad_constraint_seam.py` as your template** — copy its `_fetch`
+> network-boundary indirection, the `findings()` structure, the three honest-degradation branches
+> (no-target / not-found-honest-empty / backend-error-envelope), and the `_build_fact` / `_num` helpers
+> (`_num` guards against bool-as-number). Copy the gnomAD `agents.json` block (schema lists `error`;
+> `additionalProperties:false`; includes `data_boundary`). Two refinements the pilot review surfaced — apply
+> to every new seam:
+> - **Version the source label.** Don't hard-code a dataset version in the provenance `source` string unless
+>   the query pins it. Either pin the dataset/release in the request, or use a version-agnostic label + a
+>   `# version: <X> at authoring` comment (gnomAD used `"gnomAD v4 constraint (GraphQL)"` — fine, but the
+>   query doesn't pin v4; just be deliberate).
+> - **No silent field drift.** If you fetch a metric, surface it in the fact (or comment why you omit it).
+>   The pilot omits gnomAD's `syn_z` (not used in the fact) — that's fine, just don't leave it ambiguous.
 
 ---
 

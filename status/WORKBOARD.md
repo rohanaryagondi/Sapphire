@@ -20,12 +20,12 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | in-review | Build 4 quantitative-fact Bucket-1 seams — **gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment** (clean public APIs, no keys) — in the `aso-tox` seam pattern. **Pilot-gate: ship gnomAD first (PR-A), wait for merge, then one PR per remaining seam.** | `hayes/gnomad-constraint` (PR-A) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **PR-A gnomAD ✅ merged (#6).** Remaining (one PR each): **GTEx (PR-B, next) → InterPro (PR-C) → g:Profiler (PR-D)**. | next: `hayes/gtex-expression` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 
-> **Hayes — start here:** (1) `bash dev/setup-contributor.sh hayes`  (2) read `dev/CONTRIBUTOR_RULES.md` +
-> the [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) in full  (3) build **only**
-> `gnomad-constraint` first, open PR-A to `main`, stop and wait for Rohan's review. Stuck on the harness or a
-> contract? Post in `dev/HELP.md` — don't guess.
+> **Hayes — pilot merged, keep going:** the gnomAD pilot (#6) is in. The pattern is proven and in-repo —
+> **use `sapphire-orchestrator/tools/gnomad_constraint_seam.py` as your template** for the rest. Next:
+> **GTEx (PR-B)** on branch `hayes/gtex-expression`, one seam per PR, full Gates 1–5 each. Re-read the updated
+> brief (it now has template + `syn_z`/`_SOURCE` notes). Blocked? `dev/HELP.md`.
 
 ## gavin  (`@GavinWongYF`) — contributor
 _No work assigned yet._
@@ -43,10 +43,13 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 | `scenario-coverage` | gavin | Broaden captured scenario coverage across the 10-axis variety matrix | [engine](engine.md) |
 | `retire-mocks` | — | Audit + honestly label/retire remaining mock surfaces | [tools](tools.md) |
 | `chronic-tox` | hayes | Scope + integrate the chronic-tox model (roadmap) | [tools](tools.md) |
+| `crossplatform-test-hardening` | rohan/gavin | Fix 3 pre-existing cross-platform test failures Hayes flagged (HELP.md, resolved): moat clone-name test hardcodes `sapphire-capability-map`; `test_scenarios`/`test_trace_view` assume UTF-8 (fail on Windows cp1252). Low-risk: derive the moat suffix from the repo root; add `encoding="utf-8"` + guard the `✓` stdout write. | [dev-harness](dev-harness.md) |
 
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `quant-fact-seams` (PR-A gnomAD) | hayes | 2026-06-23 | PR #6 |
+| `repo-streamline` | rohan | 2026-06-23 | PR #5 |
 | `status-vision-hardening` | rohan | 2026-06-22 | PR #3 |
 | `dev-strict-branch-rules` | rohan | 2026-06-22 | PR #2 |
 | `dev-collab-harness` | rohan | 2026-06-22 | PR #1 |
