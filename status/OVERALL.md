@@ -33,6 +33,8 @@ harnessed path (`run_live`) to the front door.
 3. **Broaden captured scenario coverage** across the 10-axis variety matrix. (engine.md)
 4. **Retire remaining mocks honestly** / mark every track's provenance. (tools.md)
 5. **Chronic-tox model** integration (roadmap). (tools.md)
+6. **Quantitative-fact seams** (assigned `quant-fact-seams`, rohan) — gnomAD/GTEx/DepMap/AlphaMissense ±
+   structural/enrichment as Bucket-1 seams: hard numbers alongside EMET's narrative. (tools.md)
 
 ## Top risks
 - **Enforcement is local-only** (free repo, no branch protection/Actions) — relies on cooperating agents +

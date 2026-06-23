@@ -15,7 +15,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## rohan  (`@rohanaryagondi`) — lead + approver
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `status-vision-hardening` | in-review | Vision doc + status dir + workboard; harden local enforcement (tests-on-push, secret-scan, audit) | `rohan/status-vision-hardening` | [dev-harness](dev-harness.md) |
+| `quant-fact-seams` | assigned | Add 6–10 quantitative-fact Bucket-1 seams (gnomAD constraint, GTEx, DepMap, AlphaMissense, ± Foldseek/InterPro/enrichment) — hard numbers alongside EMET, in the `aso-tox` seam pattern. Ship incrementally (gnomAD pilot first). | — | [tools](tools.md) · [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 _No work assigned yet._
@@ -40,6 +40,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `status-vision-hardening` | rohan | 2026-06-22 | PR #3 |
 | `dev-strict-branch-rules` | rohan | 2026-06-22 | PR #2 |
 | `dev-collab-harness` | rohan | 2026-06-22 | PR #1 |
 | `aso-tox-sequence-wiring` | rohan | 2026-06-22 | see LEDGER |

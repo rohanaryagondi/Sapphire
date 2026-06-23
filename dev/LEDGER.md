@@ -11,6 +11,15 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Task assigned: quant-fact-seams (planning)  (`main`, PR #4)
+- Built-By: `rohan` · merged by `rohan`. Planning/docs only — no code.
+- What: Brief + workboard assignment for 6–10 quantitative-fact Bucket-1 seams (gnomAD constraint, GTEx,
+  DepMap, AlphaMissense, ± Foldseek/InterPro/enrichment) in the `aso-tox` seam pattern — hard numbers that
+  complement EMET's narrative. Reimplement select ToolUniverse Apache-2.0 wrappers as our own stdlib (`urllib`)
+  seams; no ToolUniverse runtime, no Slurm. Brief: `docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md`.
+- Gates: docs tier (suite untouched, 278). Implementation ships incrementally (gnomAD pilot first), each seam
+  its own Standard-tier PR with Gate-5 proof the fact lands in the dossier via `run_live`.
+
 ## 2026-06-22 — Local enforcement hardening + vision + status/workboard  (`main`, PR #3)
 - Built-By: `rohan` · merged by `rohan`.
 - What: Repo stays **free, no GitHub Actions** (Rohan's call) → enforcement is fully local. Added
