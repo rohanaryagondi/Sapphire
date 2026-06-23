@@ -1,34 +1,51 @@
 #!/usr/bin/env bash
-# Sapphire commit-msg guard — enforces attribution on every commit.
+# Sapphire commit-msg guard — enforces accurate attribution on every commit.
 # Installed by `bash dev/setup-contributor.sh <handle>` (sets core.hooksPath=.githooks).
 #
-# Rejects any commit message lacking a valid  `Built-By: <handle>`  trailer
-# (handle ∈ rohan|hayes|gavin). This is what makes `git log --grep=Built-By` a
-# complete attribution record. Merge commits are exempt.
+# Rejects any commit whose TRAILER BLOCK lacks a valid `Built-By: <handle>` trailer
+# (handle ∈ rohan|hayes|gavin), and — when `sapphire.handle` is configured — requires
+# the trailer to match this clone's owner (so hayes can't commit `Built-By: rohan`).
+# Uses `git interpret-trailers` so a `Built-By:` line in the body prose does NOT count.
+# Genuine merge commits are exempt. This is what makes `git log --grep=Built-By` exact.
 set -euo pipefail
 
 msg_file="$1"
 first_line="$(sed -n '1p' "$msg_file" || true)"
 
-# Exempt merge commits (their message starts with "Merge ").
+# Exempt genuine git-generated merge commits only (tight patterns, not any "Merge *").
 case "$first_line" in
-  "Merge "*) exit 0 ;;
+  "Merge branch "*|"Merge pull request #"*|"Merge remote-tracking branch "*|"Merge tag "*)
+    exit 0 ;;
 esac
 
-if ! grep -Eq '^Built-By: (rohan|hayes|gavin)\b' "$msg_file"; then
-  cat >&2 <<'EOF'
+reject() { echo "" >&2; echo "  ✗ COMMIT REJECTED — $1" >&2; cat >&2 <<'EOF'
 
-  ✗ COMMIT REJECTED — missing a valid `Built-By:` trailer.
-
-  Every commit must end with BOTH attribution trailers, e.g.:
+  Every commit must end with a real trailer block, e.g.:
 
       Built-By: hayes
       Co-Authored-By: Claude <model-used> <noreply@anthropic.com>
 
-  (handle ∈ rohan | hayes | gavin). See dev/CONVENTIONS.md §1 and dev/CONTRIBUTOR_RULES.md.
-
+  (handle ∈ rohan | hayes | gavin, and must match your `sapphire.handle`).
+  See dev/CONVENTIONS.md §1 and dev/CONTRIBUTOR_RULES.md.
 EOF
   exit 1
+}
+
+# Extract Built-By only from the parsed trailer block (not body prose).
+builtby="$(git interpret-trailers --parse "$msg_file" 2>/dev/null \
+            | sed -n 's/^Built-By:[[:space:]]*//p' | head -1)"
+
+if [[ -z "$builtby" ]]; then
+  reject "missing a valid 'Built-By:' trailer."
+fi
+if [[ ! "$builtby" =~ ^(rohan|hayes|gavin)$ ]]; then
+  reject "Built-By handle '$builtby' is not one of rohan|hayes|gavin."
+fi
+
+# Cross-validate against this clone's configured owner, if set.
+cfg_handle="$(git config --get sapphire.handle || true)"
+if [[ -n "$cfg_handle" && "$builtby" != "$cfg_handle" ]]; then
+  reject "Built-By is '$builtby' but this clone is configured for '$cfg_handle' — attribute your own work."
 fi
 
 exit 0

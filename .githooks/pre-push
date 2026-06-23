@@ -3,10 +3,12 @@
 # Installed by `bash dev/setup-contributor.sh <handle>` (sets core.hooksPath=.githooks).
 #
 # Blocks, before anything reaches GitHub:
+#   0. Any push when `sapphire.handle` is not configured (run setup first).
 #   1. ANY push to a protected branch (main / master / a main-backup-*).
 #   2. Any branch not named  <handle>/<slug>  with handle in {rohan,hayes,gavin}.
 #   3. A branch whose prefix doesn't match this clone's configured `sapphire.handle`
 #      (so hayes can't push a `gavin/...` branch).
+# Tag pushes pass through (not a branch-rule concern).
 #
 # This is a guardrail for cooperating agents. It is bypassable with `git push --no-verify`
 # — doing so is a hard violation of dev/CONTRIBUTOR_RULES.md, and the GitHub Actions
@@ -21,7 +23,20 @@ handle="$(git config --get sapphire.handle || true)"
 
 block() { echo "" >&2; echo "  ✗ PUSH BLOCKED — $1" >&2; echo "    See dev/CONTRIBUTOR_RULES.md." >&2; echo "" >&2; exit 1; }
 
+# 0. Require a configured, valid handle before any push.
+if [[ -z "$handle" ]]; then
+  block "sapphire.handle is not set. Run: bash dev/setup-contributor.sh <handle>"
+fi
+if [[ ! "$handle" =~ $HANDLE_RE ]]; then
+  block "git config sapphire.handle='$handle' is invalid (must be rohan|hayes|gavin). Re-run dev/setup-contributor.sh."
+fi
+
 while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "$remote_ref" ] && continue
+
+  # Tag pushes are not a branch-rule concern — let them through.
+  [[ "$remote_ref" == refs/tags/* ]] && continue
+
   # remote_ref looks like refs/heads/<branch>
   branch="${remote_ref#refs/heads/}"
   [ -z "$branch" ] && continue
@@ -41,15 +56,8 @@ while read -r local_ref local_sha remote_ref remote_sha; do
 
   # 3. branch prefix must match this clone's configured handle
   prefix="${branch%%/*}"
-  if [[ -n "$handle" ]]; then
-    if [[ ! "$handle" =~ $HANDLE_RE ]]; then
-      block "git config sapphire.handle='$handle' is invalid. Re-run dev/setup-contributor.sh."
-    fi
-    if [[ "$prefix" != "$handle" ]]; then
-      block "you are '$handle' but tried to push a '$prefix/...' branch. Push only your own '$handle/...' branches."
-    fi
-  else
-    echo "  ⚠ sapphire.handle is not set — run: bash dev/setup-contributor.sh <handle>" >&2
+  if [[ "$prefix" != "$handle" ]]; then
+    block "you are '$handle' but tried to push a '$prefix/...' branch. Push only your own '$handle/...' branches."
   fi
 done
 

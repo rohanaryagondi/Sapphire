@@ -5,6 +5,8 @@
 # Usage:  bash dev/setup-contributor.sh <handle>      # handle ∈ rohan | hayes | gavin
 set -euo pipefail
 
+git rev-parse --git-dir >/dev/null 2>&1 || { echo "Error: run this from inside the Sapphire repo."; exit 1; }
+
 handle="${1:-}"
 case "$handle" in
   rohan|hayes|gavin) ;;
