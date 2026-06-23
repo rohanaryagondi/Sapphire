@@ -24,6 +24,12 @@
    DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
    **gnomAD ✅ merged (PR-A, #6)**; GTEx (PR-B, next) → InterPro → g:Profiler follow as separate PRs ·
    [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
+5. **Experiment Design tool** — port Matt's `design-form-agent` (Otter meeting-notes → Quiver
+   experiment-design-sheet JSON, Claude-based, Quiver optogenetics assay vocabulary) into Sapphire as a
+   standalone Quiver tool (`tools/experiment_design/`). Phase 1: meeting-notes → filled design sheet
+   (JSON + MD, ± xlsx). Internal-only (LLM reasoning is allowed; no external evidence source touched).
+   Moat/firm integration = later epic. → `experiment-design` (**hayes**, queued after the seams) ·
+   [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
 
 ## Watch-outs
 - **Data boundary is absolute**: public identifiers only leave Quiver. Tools that call external services

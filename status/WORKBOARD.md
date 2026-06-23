@@ -21,11 +21,13 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **PR-A gnomAD ✅ merged (#6).** Remaining (one PR each): **GTEx (PR-B, next) → InterPro (PR-C) → g:Profiler (PR-D)**. | next: `hayes/gtex-expression` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `experiment-design` | queued (after seams) | **Epic.** Port Matt's `design-form-agent` into Sapphire as a standalone tool: meeting-notes → filled experiment-design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the design sheet). Moat/firm wiring is a later epic. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 
-> **Hayes — pilot merged, keep going:** the gnomAD pilot (#6) is in. The pattern is proven and in-repo —
-> **use `sapphire-orchestrator/tools/gnomad_constraint_seam.py` as your template** for the rest. Next:
-> **GTEx (PR-B)** on branch `hayes/gtex-expression`, one seam per PR, full Gates 1–5 each. Re-read the updated
-> brief (it now has template + `syn_z`/`_SOURCE` notes). Blocked? `dev/HELP.md`.
+> **Hayes — your queue:** (1) finish `quant-fact-seams` — **GTEx (PR-B, next)** on `hayes/gtex-expression`,
+> then InterPro, then g:Profiler; use `sapphire-orchestrator/tools/gnomad_constraint_seam.py` as the template,
+> one seam per PR, full Gates 1–5 each (re-read the seams brief — it has the template + `syn_z`/`_SOURCE`
+> notes). (2) **THEN** the `experiment-design` epic (ED-1 first) — read its [brief]
+> (../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) in full before starting. Blocked? `dev/HELP.md`.
 
 ## gavin  (`@GavinWongYF`) — contributor
 _No work assigned yet._

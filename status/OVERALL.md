@@ -34,7 +34,10 @@ harnessed path (`run_live`) to the front door.
 4. **Retire remaining mocks honestly** / mark every track's provenance. (tools.md)
 5. **Chronic-tox model** integration (roadmap). (tools.md)
 6. **Quantitative-fact seams** (assigned `quant-fact-seams`, **hayes**) — gnomAD constraint, GTEx, InterPro,
-   g:Profiler as Bucket-1 seams: hard numbers alongside EMET's narrative. Pilot-gate (gnomAD first). (tools.md)
+   g:Profiler as Bucket-1 seams: hard numbers alongside EMET's narrative. gnomAD ✅ merged; GTEx next. (tools.md)
+7. **Experiment Design tool** (`experiment-design`, **hayes**, queued after seams) — port Matt's
+   design-form-agent into Sapphire: meeting-notes → filled experiment-design sheet. Phase 1 standalone;
+   moat/firm integration later. Step toward Sapphire as Quiver's all-in-one AI. (tools.md)
 
 ## Top risks
 - **Enforcement is local-only** (free repo, no branch protection/Actions) — relies on cooperating agents +
