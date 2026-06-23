@@ -18,10 +18,19 @@ has_aws_key() { printf '%s' "$1" | grep -oE '\bAKIA[A-Z0-9]{16}\b' | grep -qE '[
 
 block() { echo "" >&2; echo "  ✗ COMMIT BLOCKED — $1" >&2; echo "    No secrets in git, ever (dev/CONVENTIONS.md §5). Remove it and re-stage." >&2; echo "" >&2; exit 1; }
 
-# 1. Never commit a .env or key file.
-if git diff --cached --name-only | grep -qiE '(^|/)(\.env|\.env\..+|id_rsa|id_ed25519|.+\.pem|.+\.p12|.+\.pfx)$'; then
-  block "a secret/key file is staged."
-fi
+# 1. Never commit a real .env or key file. (.env.example/.sample/.template are
+#    secret-free templates by convention — allowed; the content scan in step 2 still
+#    runs on them as a backstop.)
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  bn="$(basename "$f")"
+  case "$bn" in
+    .env.example|.env.sample|.env.template) continue ;;   # safe templates
+  esac
+  if printf '%s' "$bn" | grep -qiE '^(\.env|\.env\..+|id_rsa|id_ed25519|.+\.pem|.+\.p12|.+\.pfx)$'; then
+    block "a secret/key file is staged: $f"
+  fi
+done < <(git diff --cached --name-only)
 
 # 2. Scan staged additions for secret patterns, file by file (skipping the scanners).
 while IFS= read -r f; do

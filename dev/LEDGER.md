@@ -11,6 +11,21 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Vendor Matt's design-form-agent (unblock experiment-design ED-1)  (`main`, PR #14)
+- Built-By: `rohan`. Per Rohan's direction ("consume Matt's full repo into Sapphire").
+- What: imported a verbatim snapshot of `MatthewCarey24/design-form-agent` (private Quiver repo; upstream commit
+  `afcf01b`) to **`vendor/design-form-agent/`** as the preserved-original reference (CONVENTIONS §4), with
+  `VENDORED.md` (provenance + attribution to Matt Carey + how the port uses it). `.git` not included; flat
+  snapshot. Secret-scanned clean (`.env.example` is placeholders only; keys read from env). No large binaries
+  (largest 148 KB).
+- Unblocks **`experiment-design` ED-1**: resolved Hayes's HELP request, flipped the workboard row active, and
+  pointed the ED brief at `vendor/design-form-agent/` (port into `tools/experiment_design/`, domain content
+  verbatim, golden-test vs the vendored `sample_extraction_jan6.json`).
+- Gates: docs/vendor only — no engine code, suite unaffected (342). Audit clean.
+- Hook fix (caught by dogfooding): `.githooks/pre-commit` was blocking `.env.example` (its filename rule
+  `\.env\..+` matched the secret-free template). Relaxed to allow `.env.example`/`.sample`/`.template` while
+  still blocking real `.env`/`.env.local`/keys; the content scan still runs on templates as a backstop.
+
 ## 2026-06-23 — g:Profiler enrichment seam — quant-fact-seams series ✅ COMPLETE  (`main`, PR #12)
 - **g:Profiler seam authored by `hayes`** (`Built-By: hayes`, fresh branch off latest main — staleness fixed);
   merged by `rohan` directly (no integration branch needed — clean). Bookkeeping in PR #13.

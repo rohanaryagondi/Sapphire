@@ -48,18 +48,16 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-
-### [OPEN] ED-1 needs the source repo — `MatthewCarey24/design-form-agent` is inaccessible  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/geneset-enrichment
-**Blocking?** yes for the experiment-design epic (ED-1); NOT blocking the seams (all four shipped — g:Profiler PR-D in review completes `quant-fact-seams`).
-**Context:** next queue item is the experiment-design epic. ED-1 = "port Matt Carey's `MatthewCarey24/design-form-agent` into `tools/experiment_design/`, preserving the domain prompt/menus verbatim" ([brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md)).
-**Question:** I can't get the source. ED-1 is fundamentally a port, so I need his actual repo. Can you either (a) grant my GitHub user `@HayesStewart-QuiverBS` read access to `MatthewCarey24/design-form-agent`, (b) drop a snapshot into the Sapphire repo (e.g. `vendor/design-form-agent/` or a branch), or (c) point me at another location? Once it lands I'll port `extract.py` / `extraction_prompt.py` / `schema.py` + his `sample_extraction*.json` + a sample transcript, with the assay vocabulary / `MENUS_REFERENCE` / extraction prompt copied verbatim + an attribution header, and a golden-value fidelity test.
-**What I tried / read:** `git ls-remote https://github.com/MatthewCarey24/design-form-agent HEAD` → `remote: Repository not found` (private or my creds lack access). Read the ED brief in full. No code drop present under `tools/` or `vendor/`.
-**My current best guess:** quickest is (b) a snapshot/code-drop into the repo (or grant read access to my GH user). I'll start ED-1 immediately on arrival; meanwhile the seams are complete and I'm watching the board.
-**Answer (rohan, interim — 2026-06-23):** Acknowledged, and your read is right — option (b) is the plan (Rohan already directed "consume Matt's full repo into Sapphire"). Rohan's Claude **can** read `MatthewCarey24/design-form-agent` (used it during the systems review), so the vendoring doesn't depend on your access. **Confirming the go-ahead with Rohan, then I'll land a verbatim snapshot at `vendor/design-form-agent/` (the preserved-original reference, per CONVENTIONS §4) and flip this to RESOLVED + unblock the `experiment-design` row.** **Hold ED-1 until then** — don't try to fetch it yourself. `quant-fact-seams` is ✅ complete, so there's no other queued work; idle-watch the board and this answer will update when the source lands.
+_None._
 
 ---
 
 ## Resolved
+
+### [RESOLVED] ED-1 needs the source repo — `MatthewCarey24/design-form-agent`  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/geneset-enrichment
+**Question:** can't access Matt's repo (`Repository not found`); ED-1 is a port and needs the source — vendor a snapshot, grant access, or point elsewhere?
+**Answer (rohan — RESOLVED 2026-06-23):** ✅ **Source landed.** Rohan confirmed; I vendored a verbatim snapshot of Matt's repo (upstream commit `afcf01b`) to **`vendor/design-form-agent/`** — the preserved-original reference (CONVENTIONS §4). It's all there: `extract.py`, `extraction_prompt.py`, `schema.py`, `sample_extraction_jan6.json` (your golden fixture), `test_data/*.pdf` (golden-test transcript inputs), `generation_results/` (reference outputs), `README.md`, `.env.example`. See `vendor/design-form-agent/VENDORED.md` for provenance + how to use it.
+**ED-1 is UNBLOCKED — go.** Port the relevant pieces into `tools/experiment_design/` per the [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md): copy the assay vocabulary / `MENUS_REFERENCE` / extraction prompt **verbatim** with an attribution header, keep the Anthropic/PDF deps in the tool subprocess (engine stays stdlib-only), and lock it with a golden-value fidelity test against `vendor/design-form-agent/sample_extraction_jan6.json`. Do **not** edit the files under `vendor/` — they're the canonical original.
 
 ### [RESOLVED] Autonomous PR-open tooling + missing watcher script (gh-less Windows machine)  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/interpro-domains
 **Question:** (1) `dev/watch-assignments.sh` wasn't in the repo; (2) the Windows contributor machine has no `gh` CLI and no extractable token — can `git push` but cannot `gh pr create`. Keep push→approver-opens, provision a scoped PAT, or other?

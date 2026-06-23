@@ -1,0 +1,1092 @@
+{
+  "meeting_title": "Meeting to discuss the inhibitory neuron synaptic assay for Quake Aim 1 Ruggedization",
+  "meeting_date": "2025-12-15",
+  "attendees": [
+    "James Fink",
+    "Steven Ryan",
+    "Aishwarya Dhandapani",
+    "Kathy (Speaker 1)",
+    "Speaker 2"
+  ],
+  "meeting_type": "brainstorming",
+  "experiments": [
+    {
+      "experiment_name": "IPSP Detection in Human Co-cultures - Chloride Reversal Modulation",
+      "experiment_description": "Test whether modulating chloride reversal potential via KCl concentration changes affects IPSP detection in DLX + NGN2 co-cultures to understand why IPSPs are rare/small.",
+      "metadata": {
+        "project_code": {
+          "value": "Quake Aim 1",
+          "confidence": "high",
+          "source": "meeting title"
+        },
+        "assay_type": {
+          "value": "Synaptic",
+          "confidence": "high",
+          "source": "James discussing synaptic assay design"
+        },
+        "sub_assay_type": {
+          "value": "GABAR",
+          "confidence": "high",
+          "source": "focus on IPSP/GABA transmission"
+        },
+        "round_number": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified, experiment not yet plated"
+        }
+      },
+      "culture": {
+        "genotypes": [
+          {
+            "name": {
+              "value": "DLX",
+              "confidence": "high",
+              "source": "James: 'DLx equals pre'"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          },
+          {
+            "name": {
+              "value": "NGN2 neurons",
+              "confidence": "high",
+              "source": "James: 'two equals post'"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          }
+        ],
+        "num_plates": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "plate_type": {
+          "value": "96-well Ibidi",
+          "confidence": "medium",
+          "source": "standard format implied"
+        },
+        "viruses": [
+          {
+            "name": {
+              "value": "Cre-ON QuasAr",
+              "confidence": "high",
+              "source": "standard synaptic setup discussed"
+            },
+            "dose": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          },
+          {
+            "name": {
+              "value": "Cre-OFF CheRiff",
+              "confidence": "high",
+              "source": "standard synaptic setup discussed"
+            },
+            "dose": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          }
+        ],
+        "glia": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "glia_details": {}
+      },
+      "imaging": {
+        "imaging_date": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "experiment not yet plated"
+        },
+        "imaging_div": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "stim_protocol": {
+          "value": "synaptic protocol",
+          "confidence": "high",
+          "source": "James discussing synaptic assay"
+        },
+        "imaging_buffer": {
+          "value": "Tyrodes with KCl modulation",
+          "confidence": "medium",
+          "source": "standard for synaptic + KCl dose response discussed"
+        },
+        "fovs_per_well": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "temperature": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "synaptic_blockers": {
+          "value": [
+            "GABAzine (for control condition)"
+          ],
+          "confidence": "high",
+          "source": "James: 'gabazine yes no'"
+        }
+      },
+      "treatments": [
+        {
+          "compound_name": {
+            "value": "KCl",
+            "confidence": "high",
+            "source": "James: 'ACL dose response to modulate reversal'"
+          },
+          "concentrations": [
+            {
+              "value": "5-point concentration response curve",
+              "confidence": "high",
+              "source": "James: 'five point, yeah, sort of concentration response curve'"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": "at imaging",
+            "confidence": "medium",
+            "source": "implied for buffer modulation"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Modulate chloride reversal potential - expect large negative IPSPs at one end, shunting in middle, EPSPs at other end"
+        },
+        {
+          "compound_name": {
+            "value": "GABAzine",
+            "confidence": "high",
+            "source": "gabazine control discussed"
+          },
+          "concentrations": [
+            {
+              "value": "standard blocking concentration",
+              "confidence": "medium",
+              "source": "implied standard"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": "at imaging",
+            "confidence": "medium",
+            "source": "standard blocker protocol"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Control to confirm PSPs are GABA-mediated"
+        }
+      ],
+      "plate_layout": {
+        "layout_strategy": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed in detail"
+        },
+        "controls": [
+          {
+            "value": "GABAzine-treated wells",
+            "confidence": "high",
+            "source": "James: 'gabazine yes no'"
+          }
+        ],
+        "notes": [
+          "Sister plate needed for excitability assay as control per Steven"
+        ]
+      },
+      "timeline": {
+        "events": [
+          {
+            "event": "Design form submission",
+            "relative_day": null,
+            "absolute_date": "next week",
+            "notes": "James: 'send the design form next week'"
+          },
+          {
+            "event": "Plating",
+            "relative_day": null,
+            "absolute_date": "after holiday break",
+            "notes": "James: 'played it when we get back'"
+          }
+        ]
+      },
+      "analysis_notes": [
+        "Count IPSPs vs EPSPs at each KCl concentration",
+        "Look for shift in IPSP number and size with chloride modulation"
+      ]
+    },
+    {
+      "experiment_name": "IPSP Detection - Sister Plate Excitability Control",
+      "experiment_description": "Run excitability assay on sister plate with same KCl concentrations to confirm presynaptic cells can still fire at each KCl level.",
+      "metadata": {
+        "project_code": {
+          "value": "Quake Aim 1",
+          "confidence": "high",
+          "source": "same project"
+        },
+        "assay_type": {
+          "value": "Excitability",
+          "confidence": "high",
+          "source": "Steven: 'excitability assay'"
+        },
+        "sub_assay_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "round_number": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "culture": {
+        "genotypes": [
+          {
+            "name": {
+              "value": "DLX + NGN2 co-culture",
+              "confidence": "high",
+              "source": "sister plate to synaptic"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          }
+        ],
+        "num_plates": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "plate_type": {
+          "value": "96-well Ibidi",
+          "confidence": "medium",
+          "source": "standard format implied"
+        },
+        "viruses": [],
+        "glia": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "glia_details": {}
+      },
+      "imaging": {
+        "imaging_date": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "imaging_div": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "stim_protocol": {
+          "value": "excitability protocol",
+          "confidence": "high",
+          "source": "excitability assay"
+        },
+        "imaging_buffer": {
+          "value": "with same KCl concentrations as synaptic plate",
+          "confidence": "high",
+          "source": "Steven: 'same potassium chloride concentrations'"
+        },
+        "fovs_per_well": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "temperature": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "synaptic_blockers": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        }
+      },
+      "treatments": [
+        {
+          "compound_name": {
+            "value": "KCl",
+            "confidence": "high",
+            "source": "Steven proposing control"
+          },
+          "concentrations": [
+            {
+              "value": "same 5-point series as synaptic plate",
+              "confidence": "high",
+              "source": "matched to synaptic experiment"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": "at imaging",
+            "confidence": "medium",
+            "source": "implied"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Control for depolarization block - ensure presynaptic cells can still fire"
+        }
+      ],
+      "plate_layout": {
+        "layout_strategy": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "controls": [
+          {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          }
+        ],
+        "notes": []
+      },
+      "timeline": {
+        "events": []
+      },
+      "analysis_notes": [
+        "Correlate firing ability with KCl concentration",
+        "Check if elevated resting potential causes depolarization block"
+      ]
+    },
+    {
+      "experiment_name": "GABA-A PAM Treatment to Boost Weak IPSPs",
+      "experiment_description": "Test whether GABA-A positive allosteric modulators can amplify weak/undetectable IPSPs to prove GABA is being released.",
+      "metadata": {
+        "project_code": {
+          "value": "Quake Aim 1",
+          "confidence": "high",
+          "source": "same project"
+        },
+        "assay_type": {
+          "value": "Synaptic",
+          "confidence": "high",
+          "source": "synaptic assay context"
+        },
+        "sub_assay_type": {
+          "value": "GABAR",
+          "confidence": "high",
+          "source": "GABA receptor focus"
+        },
+        "round_number": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "culture": {
+        "genotypes": [
+          {
+            "name": {
+              "value": "DLX",
+              "confidence": "high",
+              "source": "co-culture context"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          },
+          {
+            "name": {
+              "value": "NGN2 neurons",
+              "confidence": "high",
+              "source": "co-culture context"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          }
+        ],
+        "num_plates": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "plate_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "viruses": [],
+        "glia": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "glia_details": {}
+      },
+      "imaging": {
+        "imaging_date": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "imaging_div": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "stim_protocol": {
+          "value": "synaptic protocol",
+          "confidence": "high",
+          "source": "implied"
+        },
+        "imaging_buffer": {
+          "value": "Tyrodes",
+          "confidence": "medium",
+          "source": "standard for synaptic"
+        },
+        "fovs_per_well": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "temperature": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "synaptic_blockers": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "treatments": [
+        {
+          "compound_name": {
+            "value": "GABA-A PAM (benzodiazepine or alpha-3 specific modulator suggested)",
+            "confidence": "medium",
+            "source": "James: 'GABA by Pams to see if we can just boost'"
+          },
+          "concentrations": [
+            {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Amplify weak IPSP signals to confirm GABA release is occurring"
+        },
+        {
+          "compound_name": {
+            "value": "Diazepam",
+            "confidence": "medium",
+            "source": "Gemini suggested: 'diazepam, which affects alpha two, three and five'"
+          },
+          "concentrations": [
+            {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "General benzodiazepine to boost GABA-A currents given alpha-3 dominance"
+        },
+        {
+          "compound_name": {
+            "value": "CGP 55845 (GABA-B antagonist)",
+            "confidence": "medium",
+            "source": "Gemini recommendation read by James"
+          },
+          "concentrations": [
+            {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Test if high GABA-B expression is causing tonic inhibition that masks phasic IPSPs"
+        }
+      ],
+      "plate_layout": {
+        "layout_strategy": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "controls": [
+          {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          }
+        ],
+        "notes": []
+      },
+      "timeline": {
+        "events": []
+      },
+      "analysis_notes": [
+        "Look for increase in IPSP number and amplitude with PAM treatment",
+        "If EPSPs also increase, confirms receptors present but signals weak at baseline"
+      ]
+    },
+    {
+      "experiment_name": "Single Cell Stimulation of DLX Neurons",
+      "experiment_description": "Use functional masks to identify and stimulate individual DLX neurons to directly observe if they fire and produce IPSPs, compared to NGN2 neuron responses.",
+      "metadata": {
+        "project_code": {
+          "value": "Quake Aim 1",
+          "confidence": "high",
+          "source": "same project"
+        },
+        "assay_type": {
+          "value": "Synaptic",
+          "confidence": "medium",
+          "source": "hybrid approach discussed"
+        },
+        "sub_assay_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "novel approach"
+        },
+        "round_number": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "culture": {
+        "genotypes": [
+          {
+            "name": {
+              "value": "DLX (labeled with GFP)",
+              "confidence": "high",
+              "source": "James: 'Label DLx with JFP, RFP'"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          },
+          {
+            "name": {
+              "value": "NGN2 neurons",
+              "confidence": "high",
+              "source": "co-culture"
+            },
+            "density": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            },
+            "lot_number": {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not discussed"
+            }
+          }
+        ],
+        "num_plates": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "plate_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "viruses": [],
+        "glia": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "glia_details": {}
+      },
+      "imaging": {
+        "imaging_date": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "imaging_div": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "stim_protocol": {
+          "value": "single cell stim with functional masks + synaptic pulses",
+          "confidence": "high",
+          "source": "James describing approach, Steven suggesting de-risking"
+        },
+        "imaging_buffer": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "fovs_per_well": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "temperature": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "synaptic_blockers": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "treatments": [
+        {
+          "compound_name": {
+            "value": "various KCl concentrations",
+            "confidence": "medium",
+            "source": "James: 'in the context of and ACL dose'"
+          },
+          "concentrations": [
+            {
+              "value": null,
+              "confidence": "unresolved",
+              "source": "not specified"
+            }
+          ],
+          "vehicle": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          },
+          "timing": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "addition_protocol": {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not specified"
+          },
+          "purpose": "Combine single cell stim with chloride modulation"
+        }
+      ],
+      "plate_layout": {
+        "layout_strategy": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "controls": [
+          {
+            "value": null,
+            "confidence": "unresolved",
+            "source": "not discussed"
+          }
+        ],
+        "notes": [
+          "Compare DLX firing to NGN2 firing at same stim power/duration",
+          "May need to adjust stim parameters for DLX"
+        ]
+      },
+      "timeline": {
+        "events": []
+      },
+      "analysis_notes": [
+        "Compare spike counts from DLX vs NGN2 at same stim parameters",
+        "Check if DLX neurons require higher power or longer duration to fire equivalently",
+        "Steven suggested adding synaptic-style pulses (90 W/cm\u00b2) to protocol as de-risking if DMD doesn't work",
+        "Post-hoc analysis: identify if cells that were stimulated actually fired"
+      ]
+    },
+    {
+      "experiment_name": "Homeostatic Plasticity Experiment",
+      "experiment_description": "Separate experiment being planned by Kathy and Luis involving drug timing and treatment.",
+      "metadata": {
+        "project_code": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "assay_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "sub_assay_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        },
+        "round_number": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not specified"
+        }
+      },
+      "culture": {
+        "genotypes": [],
+        "num_plates": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "plate_type": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "viruses": [],
+        "glia": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "glia_details": {}
+      },
+      "imaging": {
+        "imaging_date": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "imaging_div": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "stim_protocol": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "imaging_buffer": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "fovs_per_well": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "temperature": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "synaptic_blockers": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        }
+      },
+      "treatments": [],
+      "plate_layout": {
+        "layout_strategy": {
+          "value": null,
+          "confidence": "unresolved",
+          "source": "not discussed"
+        },
+        "controls": [],
+        "notes": []
+      },
+      "timeline": {
+        "events": [
+          {
+            "event": "Review design document",
+            "relative_day": null,
+            "absolute_date": "this week",
+            "notes": "Kathy sent around document"
+          },
+          {
+            "event": "Meeting with Ben about plastics ordering and design",
+            "relative_day": null,
+            "absolute_date": "in two days",
+            "notes": "James and Steve to attend"
+          },
+          {
+            "event": "Plating",
+            "relative_day": null,
+            "absolute_date": "next week or during break",
+            "notes": "James: 'plate next week or during break'"
+          }
+        ]
+      },
+      "analysis_notes": []
+    }
+  ],
+  "action_items": [
+    {
+      "description": "Find design form for the round Hong Kang has been analyzing",
+      "assignee": "Aishwarya or Kathy",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Find the round where v3 condition was tested for inhibitory synaptic assay",
+      "assignee": "Aishwarya or Kathy",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Check if Hong Kang can analyze all FOVs for v3 condition to see if number of IPSPs increases",
+      "assignee": "Aishwarya",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Check if we have lentivirus with Cre-ON QuasAr AND Cre-OFF CheRiff P2A QuasAr construct (to see presynaptic cells fire)",
+      "assignee": "Steven Ryan",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Look up GABA sniffer sensors as potential assay for GABA release detection",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Order qPCR probes for synaptic machinery genes (vesicular transporters, gephyrin, neuroligin-2)",
+      "assignee": "Aishwarya",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Check OptoXseq viz for GABRA (GABA-A subunits) vs GABBR (GABA-B) expression in NGN2 neurons",
+      "assignee": "Kathy/Aishwarya",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Order probes for GABRA-A1, GABRA-A2, GABRA-A3 and test in v1 vs v2 vs v3 cultures",
+      "assignee": "Aishwarya",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Test GABRA probes in rodent neurons to confirm developmental stage expression",
+      "assignee": null,
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Review homeostatic plasticity experiment document Kathy sent",
+      "assignee": "Team",
+      "deadline": "this week",
+      "priority": "medium"
+    },
+    {
+      "description": "Check pH of imaging buffer (Tyrodes)",
+      "assignee": null,
+      "deadline": null,
+      "priority": "low"
+    },
+    {
+      "description": "Ask Hong Kang to check if traces are bleach-corrected and if correction could flip small IPSPs to appear as EPSPs",
+      "assignee": "James (to discuss with Hong Kang tomorrow)",
+      "deadline": "tomorrow (Wednesday)",
+      "priority": "medium"
+    },
+    {
+      "description": "Review historical DFP/DLX excitability data to understand what makes DLX cells have lower sources (brightness vs SNR vs spike shape)",
+      "assignee": "Team",
+      "deadline": "next Aim 1 Ruggedization check-in",
+      "priority": "medium"
+    },
+    {
+      "description": "Summarize Otter meeting transcript into debrief",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Send response to David's email about Plex report timeline",
+      "assignee": "Steven Ryan",
+      "deadline": null,
+      "priority": "medium"
+    }
+  ],
+  "open_questions": [
+    {
+      "question": "Why are there so few IPSPs detected in human co-cultures compared to rodent?",
+      "context": "Current data shows ~13 IPSPs in 6 FOVs that go to zero with GABAzine, but this is much lower than expected",
+      "proposed_answers": [
+        "Chloride reversal potential issue (shunting inhibition)",
+        "Weak/small signals below detection threshold",
+        "Missing synaptic machinery or structural proteins",
+        "DLX neurons not firing robustly",
+        "GABRA-A3 (fetal subunit) producing slower kinetics filtered out by analysis",
+        "High GABA-B receptor expression causing tonic inhibition",
+        "Analysis pipeline bleach correction artifacts"
+      ],
+      "who_should_decide": "Team based on upcoming experiments"
+    },
+    {
+      "question": "Are the 'stim artifacts' in DLX neurons actually different from NGN2 neurons?",
+      "context": "Hong Kang noted weird artifacts with spiking vs non-spiking pattern",
+      "proposed_answers": [
+        "Single cell stim experiment comparing DLX vs NGN2 will answer this"
+      ],
+      "who_should_decide": "Hong Kang analysis"
+    },
+    {
+      "question": "What specific KCl concentrations should be used for the 5-point dose response?",
+      "context": "Need to span from large negative IPSPs to shunting to depolarizing",
+      "proposed_answers": [
+        "Not specified - needs to be determined based on expected reversal potentials"
+      ],
+      "who_should_decide": "James/Steven"
+    },
+    {
+      "question": "Could the lack of IPSPs be specific to this genetic background?",
+      "context": "James raised possibility that DLX cells from this line may not mature properly",
+      "proposed_answers": [
+        "Consider testing multiple genetic backgrounds",
+        "Compare to v3 condition data first"
+      ],
+      "who_should_decide": "Team"
+    },
+    {
+      "question": "What is the best way to directly measure synaptic structure/co-localization?",
+      "context": "Steven suggested ICC for pre/postsynaptic terminals but James noted optimization would take too long",
+      "proposed_answers": [
+        "Use qPCR for synaptic machinery genes as faster approach",
+        "Maybe do snap-tag experiment later",
+        "ICC too time-intensive for now"
+      ],
+      "who_should_decide": "James (decided qPCR is faster)"
+    }
+  ],
+  "additional_notes": [
+    "Key insight from Gemini analysis: NGN2 neurons express GABRA-A3 (fetal subunit) not GABRA-A1 (adult), which produces slower kinetics that may be filtered out as drift",
+    "GABBR1 (GABA-B receptor) expression is very high (~200 TPM), potentially causing tonic inhibition and clamping membrane potential",
+    "Current Hong Kang analysis approach: 5-sigma thresholding with peak time <150ms criteria - may need to relax for human data",
+    "Rodent neurons show robust IPSPs with same pipeline - confirms analysis can capture inhibitory events when present",
+    "GABAzine control already validates that detected IPSPs are GABA-mediated (go from 13 to 0)",
+    "v3 condition (concept condition) has shown improved excitatory neuron profiles - checking if it also improves IPSP detection would be 'huge win'",
+    "Meeting with Ben about plastics ordering scheduled for 2 days out",
+    "This experiment will NOT be plated before holiday break - too much other work. Goal is to finalize design over break for plating when team returns",
+    "Consider multiple genetic backgrounds for future experiments to rule out line-specific issues"
+  ]
+}
