@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Sapphire pre-commit guard — backup secret scanner.
+# Installed by `bash dev/setup-contributor.sh <handle>` (core.hooksPath=.githooks).
+#
+# Blocks a commit that stages an obvious secret. A backstop, not a guarantee — it exists
+# because a real token was once pasted into a session (CONVENTIONS §5: no secrets in git).
+# Scans the STAGED diff only. The scanner tooling (which legitimately contains these
+# patterns) is excluded from the content scan.
+set -euo pipefail
+
+# Files allowed to contain secret-pattern regexes (the scanners themselves).
+ALLOW_RE='^(\.githooks/pre-commit|dev/audit-history\.sh)$'
+# "Safe" patterns: no biological-sequence false positives (proteins/DNA are pure letters).
+SECRET_RE='gh[pousr]_[A-Za-z0-9]{20,}|BEGIN ([A-Z]+ )?PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}|aws_secret_access_key[[:space:]]*=[[:space:]]*[A-Za-z0-9/+]{40}'
+# AWS access-key IDs: word-bounded AND must contain a digit — a protein like AKIARPKKRAETIRFSQHAV
+# (pure letters, embedded in a longer run) must NOT trip this. Checked separately below.
+has_aws_key() { printf '%s' "$1" | grep -oE '\bAKIA[A-Z0-9]{16}\b' | grep -qE '[0-9]'; }
+
+block() { echo "" >&2; echo "  ✗ COMMIT BLOCKED — $1" >&2; echo "    No secrets in git, ever (dev/CONVENTIONS.md §5). Remove it and re-stage." >&2; echo "" >&2; exit 1; }
+
+# 1. Never commit a .env or key file.
+if git diff --cached --name-only | grep -qiE '(^|/)(\.env|\.env\..+|id_rsa|id_ed25519|.+\.pem|.+\.p12|.+\.pfx)$'; then
+  block "a secret/key file is staged."
+fi
+
+# 2. Scan staged additions for secret patterns, file by file (skipping the scanners).
+while IFS= read -r f; do
+  [ -z "$f" ] && continue
+  printf '%s\n' "$f" | grep -qE "$ALLOW_RE" && continue
+  added="$(git diff --cached -U0 --no-color -- "$f" | grep '^+' | grep -v '^+++' || true)"
+  if printf '%s' "$added" | grep -qE "$SECRET_RE"; then
+    block "a secret pattern is staged in '$f'."
+  fi
+  if has_aws_key "$added"; then
+    block "an AWS access key (AKIA…) is staged in '$f'."
+  fi
+done < <(git diff --cached --name-only --diff-filter=AM)
+
+exit 0

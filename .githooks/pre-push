@@ -59,6 +59,25 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   if [[ "$prefix" != "$handle" ]]; then
     block "you are '$handle' but tried to push a '$prefix/...' branch. Push only your own '$handle/...' branches."
   fi
+
+  # 4. if this push changes any Python, the full suite must be green first (Gate 1, local).
+  base="$remote_sha"
+  if [[ "$base" == "$ZERO" ]]; then
+    # new branch on the remote — diff against origin/main if we have it, else the merge base with HEAD
+    base="$(git rev-parse --verify --quiet origin/main || true)"
+  fi
+  if [[ -n "$base" ]] && git rev-parse --verify --quiet "$base" >/dev/null; then
+    changed="$(git diff --name-only "$base" "$local_sha" 2>/dev/null || true)"
+  else
+    changed="$(git diff --name-only "$local_sha" 2>/dev/null || true)"
+  fi
+  if printf '%s\n' "$changed" | grep -qE '\.py$'; then
+    echo "  • Python changed in this push — running Gate 1 (dev/run-tests.sh) before allowing push…" >&2
+    root="$(git rev-parse --show-toplevel)"
+    if ! bash "$root/dev/run-tests.sh" >&2; then
+      block "the test suite is RED. Fix it before pushing (Gate 1 must be green)."
+    fi
+  fi
 done
 
 exit 0

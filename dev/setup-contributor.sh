@@ -13,9 +13,9 @@ case "$handle" in
   *) echo "Usage: bash dev/setup-contributor.sh <handle>   (handle ∈ rohan | hayes | gavin)"; exit 1 ;;
 esac
 
-# 1. Use the version-controlled hooks (pre-push + commit-msg).
+# 1. Use the version-controlled hooks (pre-commit + commit-msg + pre-push).
 git config core.hooksPath .githooks
-chmod +x .githooks/* 2>/dev/null || true
+chmod +x .githooks/* dev/*.sh 2>/dev/null || true
 
 # 2. Record who this clone belongs to (the pre-push hook enforces the prefix).
 git config sapphire.handle "$handle"
@@ -25,10 +25,11 @@ echo "Configured this clone for contributor: $handle"
 echo "  core.hooksPath = .githooks   (pre-push + commit-msg guards active)"
 echo "  sapphire.handle = $handle"
 echo
-echo "Branch rules now enforced locally:"
-echo "  • No direct pushes to main (or any protected branch) — open a PR."
-echo "  • Branches must be named  $handle/<slug>."
-echo "  • Every commit must carry a 'Built-By: $handle' trailer."
+echo "Guards now active locally:"
+echo "  • pre-commit : blocks staging obvious secrets (tokens, keys, .env)."
+echo "  • commit-msg : requires a 'Built-By: $handle' trailer matching your handle."
+echo "  • pre-push   : no pushes to main / wrong branch names; and if the push"
+echo "                 changes any Python, the full suite must pass first (Gate 1)."
 echo
 echo "Do NOT bypass with --no-verify (hard violation — see dev/CONTRIBUTOR_RULES.md)."
 echo "Read dev/CONTRIBUTOR_RULES.md and dev/CONTRIBUTORS.md before you start."

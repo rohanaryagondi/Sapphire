@@ -6,22 +6,21 @@ Every change to Sapphire follows these. They are not style preferences; they are
 - **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
   `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
   a reviewed PR.
-  > **Enforcement (2026-06-22)** on the canonical repo `rohanaryagondi/Sapphire`, layered defense-in-depth:
-  > 1. **Client-side hooks** (`.githooks/`, installed by `dev/setup-contributor.sh`): `pre-push` hard-blocks
-  >    pushes to `main`/protected branches and non-`<handle>/` branches; `commit-msg` requires the `Built-By`
-  >    trailer. The strongest *preventive* control for cooperating agents.
-  > 2. **CODEOWNERS** routes every PR to the approver.
-  > 3. **`dev/CONTRIBUTOR_RULES.md`** binds the contributor agents (no main pushes, no merges, no `--no-verify`).
+  > **Enforcement model (2026-06-22)** on `rohanaryagondi/Sapphire`. The repo is a **free private** repo and
+  > **stays free** — no server-side branch protection, no GitHub Actions. Enforcement is therefore **local and
+  > layered**, and every clone must run `bash dev/setup-contributor.sh <handle>` to arm it:
+  > 1. **`pre-commit`** — blocks staging obvious secrets (tokens/keys/.env). Backstop for §5.
+  > 2. **`commit-msg`** — requires a real `Built-By` trailer matching the clone's `sapphire.handle`.
+  > 3. **`pre-push`** — blocks pushes to `main`/protected branches and non-`<handle>/<slug>` branches; and if
+  >    the push changes any Python, **runs the full suite (`dev/run-tests.sh`, Gate 1) and blocks on red**.
+  > 4. **CODEOWNERS** routes every PR to the approver; **`dev/CONTRIBUTOR_RULES.md`** binds the agents.
+  > 5. **`dev/audit-history.sh`** — the detective backup (run periodically / before trusting `main`): scans
+  >    history for missing `Built-By` and leaked secrets. Replaces the (unavailable) CI check.
   >
-  > These three are **active on the free tier today** (layer 1 verified blocking). Two server-side layers are
-  > **staged for a GitHub Pro upgrade** on `rohanaryagondi` (both currently unavailable on the free private
-  > repo — branch protection 403s, and Actions can't allocate a runner):
-  > - **branch protection** — `bash dev/enable-branch-protection.sh` (preventive, server-side).
-  > - **`branch-guard` Action** — parked in `dev/ci/` (detective: flags direct main pushes). Move it to
-  >   `.github/workflows/` once Actions runs.
-  >
-  > Until upgraded, the active layers are bypassable by a non-cooperating actor (`--no-verify`); **do not grant
-  > Hayes/Gavin write access until you accept that or upgrade.** Treat the rules as binding regardless.
+  > **Known limitation:** the hooks are per-clone and bypassable with `git push --no-verify` — a hard
+  > violation (`dev/CONTRIBUTOR_RULES.md`). Collaborators have write access, so the model relies on cooperating
+  > agents + the audit backstop catching anything that slips. (`dev/enable-branch-protection.sh` remains in the
+  > repo for the day this ever moves to a paid plan/org, but that is not the plan.)
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,
