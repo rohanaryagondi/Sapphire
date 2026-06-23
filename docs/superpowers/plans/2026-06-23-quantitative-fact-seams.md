@@ -40,7 +40,7 @@ Do **not** open PR-B until PR-A is merged. One seam per PR; small PRs, full gate
 ## Read first (the pattern you are copying)
 - `tools/aso_tox/` + `sapphire-orchestrator/tools/aso_tox_seam.py` — **the seam pattern.** Note: `predict_findings(inputs) -> dict` returns `{"candidate", "facts": [...], "provenance": "...", "invalid_sequences": [...]}`; honest-empty when no input; never raises.
 - `sapphire-orchestrator/harness/agents.json` — the `aso-tox` entry. **Copy its shape.** Note the `output_schema` lists EVERY field the seam can emit with `additionalProperties:false` (see the lesson below).
-- `sapphire-orchestrator/live_engine.py` — `_BUCKET1_AGENTS` list (~line 35) and the block (~line 134) that wires `ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings`. You add your agent id + an identical wiring block.
+- `sapphire-orchestrator/live_engine.py` — the `_BUCKET1_AGENTS` list and, inside `run_live`, the block that wires `ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings` (search for `python_fns` to find it — currently ~line 185-190). You add your agent id to the list + the **same kind of** wiring block. Note: aso-tox's entry point is named `predict_findings`; **your seam's entry point is `findings()`** (see the template), so your wiring call is `<name>_seam.findings`.
 - `sapphire-orchestrator/contracts/provenance.py` — the allowed provenance-label set. You add new labels.
 - `sapphire-orchestrator/tests/test_live_engine.py` — the offline-mock `ctx` pattern + the aso-tox tests (`TestAsoSequenceWiring`). Copy this test approach.
 - `dev/CONVENTIONS.md` (§2 stdlib-only, §3 data-honesty/provenance/data-boundary, §6 tests) and `dev/GATES.md`.
@@ -93,7 +93,8 @@ def findings(inputs: dict) -> dict:
 **2. Provenance — add the label to `contracts/provenance.py`** (`gnomad`, `gtex`, `interpro`, `gprofiler`).
 
 **3. Harness agent — add to `harness/agents.json`** (copy the `aso-tox` block):
-- `id`, `kind: "python"`, `provenance_label`, `guardrails: ["facts_only_cited", "stamp_provenance", "data_boundary"]`,
+- `id`, `kind: "python"`, `provenance_label`, `guardrails: ["facts_only_cited", "stamp_provenance", "data_boundary"]`
+  — **note:** the aso-tox agent you're copying has only `["facts_only_cited", "stamp_provenance"]` (its sequences arrive pre-validated via an internal channel). **Your seams take gene symbols/IDs straight from the query and call public APIs, so they MUST add `data_boundary`** — don't drop it when copying the aso-tox block.
   `timeout_s`, `output_schema` with `properties` = `candidate, facts(items: value/source/tier[/flag/provenance]), provenance, error` and `additionalProperties:false`, `required: ["candidate","facts"]`.
 
 **4. Engine wiring — `live_engine.py`:** add the id to `_BUCKET1_AGENTS`, and add a wiring block mirroring aso-tox:
