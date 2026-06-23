@@ -9,6 +9,7 @@
 | **Q-Models** | ✅ real | `qmodels:*` | 24 tools vendored in `q-models/`; CPU sync (`live-local`, $0); GPU via async launcher (live-proven). Some tracks marked `stub`/`eval` in `qmodels/registry.json` — never silently mocked. |
 | **Internal moat** | ✅ real | `moat-real` | `MoatClient` + `moat_facts` read Loka CNS_DFP EP-distance data; degrades honestly to `[]`/mock if `RohanOnly/moat/moat.sqlite` isn't built. |
 | **ASO-tox** | ✅ real | `aso-tox` | Hongkang's GBR model (`tools/aso_tox/`); stdlib seam `tools/aso_tox_seam.py`; real predictions when sequences present, honest-empty otherwise. Input validated (non-ATGC rejected). sklearn pinned 1.8.0 in the subprocess. |
+| **gnomAD constraint** | ✅ live | `gnomad` | Gene LoF-constraint (pLI, LOEUF, missense Z) via the public GraphQL API; stdlib seam `tools/gnomad_constraint_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise, honest error envelope when the API is down. First of the `quant-fact-seams` pilot (PR-A). |
 
 ## Open items
 1. **ASO Design tool** — does not exist yet. Build it; its output feeds the `aso-tox` `sequences=` channel
@@ -20,8 +21,9 @@
    InterPro domains, g:Profiler enrichment — clean public APIs, no keys) as Bucket-1 seams in the `aso-tox`
    pattern — hard numbers that complement EMET's narrative (EMET is an LLM knowledge source; these give the
    value, not the prose). Reimplemented as our own stdlib seams; the ToolUniverse runtime is NOT adopted.
-   DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → assigned `quant-fact-seams` (**hayes**),
-   pilot-gate gnomAD first · [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
+   DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
+   **gnomAD pilot in review (PR-A)**; GTEx / InterPro / g:Profiler follow as separate PRs after merge ·
+   [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
 
 ## Watch-outs
 - **Data boundary is absolute**: public identifiers only leave Quiver. Tools that call external services

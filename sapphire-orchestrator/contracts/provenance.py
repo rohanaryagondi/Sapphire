@@ -11,6 +11,8 @@ PROVENANCE = frozenset({
     "moat-real",
     # Quiver ASO acute-toxicity delegate (subprocess; sklearn env)
     "aso-tox",
+    # quantitative-fact Bucket-1 seams (public APIs via stdlib urllib seams)
+    "gnomad",
 })
 
 

@@ -16,6 +16,7 @@ import sys
 import tempfile
 import types
 import unittest
+from unittest import mock
 
 # ── ensure package root is on sys.path ──────────────────────────────────────
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -25,6 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
+from tools import gnomad_constraint_seam
 
 
 # ── Fake runner helpers ──────────────────────────────────────────────────────
@@ -83,14 +85,25 @@ def _fake_qmodels_client():
     return ns
 
 
+def _fake_gnomad_fn(inputs):
+    """Offline stand-in for the gnomAD seam: honest-empty, no network. Keeps the
+    shared offline ctx from making a live API call when a gene symbol is present.
+    The TestGnomadConstraintWiring tests pop this to exercise the real seam with
+    _fetch monkeypatched to a recorded fixture."""
+    return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "gnomad"}
+
+
 def _build_ctx():
     """Build a ctx dict that mocks every backend except the real moat."""
     return {
         "runner": _fake_claude_runner,
         "emet_handler": _fake_emet_handler,
         "qmodels_client": _fake_qmodels_client(),
-        # NOTE: do NOT pre-populate python_fns["internal-science-lead"] so that
-        #       run_live wires the REAL moat backend by default.
+        # gnomad-constraint would hit a public network API via the real seam; mock it
+        # (honest-empty) so the offline suite never touches the network.
+        "python_fns": {"gnomad-constraint": _fake_gnomad_fn},
+        # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
+        #       that run_live wires the REAL moat + aso-tox backends by default.
     }
 
 
@@ -667,6 +680,117 @@ class TestAsoSequenceWiring(unittest.TestCase):
             lower_raw.get("invalid_sequences", []), [],
             f"lowercase valid ATGC should not appear in invalid_sequences"
         )
+
+
+# ── gnomAD constraint seam fixture (recorded live TSC2 GraphQL payload) ──────
+_GNOMAD_FIXTURE_TSC2 = {
+    "data": {"gene": {"symbol": "TSC2", "gnomad_constraint": {
+        "pli": 1, "oe_lof": 0.14340755511655665,
+        "oe_lof_upper": 0.1955335916011317, "mis_z": -0.07814465472993333}}}
+}
+
+
+class TestGnomadConstraintWiring(unittest.TestCase):
+    """The gnomad-constraint seam, wired into run_live, lands a real cited fact in
+    the dossier — proving the harness schema-validation + provenance-stamping path
+    end-to-end. Network is monkeypatched at the seam's _fetch boundary ($0, offline)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _ctx_with_real_gnomad(self):
+        """Offline ctx, but pop the gnomad mock so run_live wires the REAL seam
+        (gnomad_constraint_seam.findings)."""
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("gnomad-constraint", None)
+        return ctx
+
+    def test_gnomad_fact_lands_in_dossier(self):
+        """run_live on a gene query lands ≥1 fact with provenance 'gnomad' in the
+        dossier, and the gnomad-constraint agent reports status 'ok'."""
+        with mock.patch.object(gnomad_constraint_seam, "_fetch",
+                               lambda symbol: _GNOMAD_FIXTURE_TSC2):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_gnomad(),
+            )
+        dossier = result["discover"]["dossier"]
+        gnomad_facts = [f for f in dossier if f.get("provenance") == "gnomad"]
+        self.assertTrue(
+            len(gnomad_facts) >= 1,
+            f"expected ≥1 gnomad fact; dossier provenances: "
+            f"{[f.get('provenance') for f in dossier]}"
+        )
+        # Non-vacuous: the measured numbers must appear in the landed fact value.
+        val = gnomad_facts[0]["value"]
+        self.assertIn("pLI 1.00", val, val)
+        self.assertIn("LOEUF 0.20", val, val)
+        self.assertEqual(gnomad_facts[0]["tier"], "T1")
+        # The fact must be provenance-stamped by the harness, and the agent 'ok'.
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gnomad-constraint"), None)
+        self.assertIsNotNone(agent, "gnomad-constraint not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
+
+    def test_no_gene_query_honest_empty_no_network(self):
+        """A query with no extractable gene → the seam must NOT call the network,
+        gnomad-constraint dispatches honest-empty (status 'ok'), 0 gnomad facts."""
+        with mock.patch.object(gnomad_constraint_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Outline a general CNS target-validation strategy.",
+                ctx=self._ctx_with_real_gnomad(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gnomad-constraint"), None)
+        self.assertIsNotNone(agent, "gnomad-constraint not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        gnomad_facts = [f for f in result["discover"]["dossier"]
+                        if f.get("provenance") == "gnomad"]
+        self.assertEqual(len(gnomad_facts), 0, f"expected 0 gnomad facts; got {gnomad_facts}")
+
+    def test_api_down_degrades_no_crash(self):
+        """If gnomAD is unreachable the engine must not crash: gnomad contributes 0
+        facts and the agent degrades honestly (status 'ok', empty facts)."""
+        import urllib.error
+
+        def _boom(symbol):
+            raise urllib.error.URLError("connection refused")
+
+        with mock.patch.object(gnomad_constraint_seam, "_fetch", _boom):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_gnomad(),
+            )
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gnomad-constraint"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected honest 'ok' empty; got {agent}")
+        gnomad_facts = [f for f in result["discover"]["dossier"]
+                        if f.get("provenance") == "gnomad"]
+        self.assertEqual(len(gnomad_facts), 0)
+
+    def test_internal_id_in_query_blocks_gnomad(self):
+        """data_boundary must block the gnomad seam when an internal id (QS\\d+) is in
+        the query — the seam never fires (no network), the agent abstains."""
+        with mock.patch.object(gnomad_constraint_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Assess QS00123 against TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_gnomad(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "gnomad-constraint"), None)
+        self.assertIsNotNone(agent)
+        self.assertIn(agent["status"], ("abstained", "escalated"),
+                      f"expected data_boundary to block gnomad; got {agent}")
 
 
 if __name__ == "__main__":

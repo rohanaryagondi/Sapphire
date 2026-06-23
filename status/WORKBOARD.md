@@ -20,7 +20,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | assigned | Build 4 quantitative-fact Bucket-1 seams — **gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment** (clean public APIs, no keys) — in the `aso-tox` seam pattern. **Pilot-gate: ship gnomAD first (PR-A), wait for merge, then one PR per remaining seam.** | `hayes/gnomad-constraint` (PR-A) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `quant-fact-seams` | in-review | Build 4 quantitative-fact Bucket-1 seams — **gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment** (clean public APIs, no keys) — in the `aso-tox` seam pattern. **Pilot-gate: ship gnomAD first (PR-A), wait for merge, then one PR per remaining seam.** | `hayes/gnomad-constraint` (PR-A) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 
 > **Hayes — start here:** (1) `bash dev/setup-contributor.sh hayes`  (2) read `dev/CONTRIBUTOR_RULES.md` +
 > the [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) in full  (3) build **only**
