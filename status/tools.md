@@ -16,6 +16,12 @@
 2. **Chronic-tox model** — roadmap; scope the integration. → backlog `chronic-tox` (suggested: hayes).
 3. **Retire/label remaining mocks** — audit every track; mark `proven` vs `paper-claim`; nothing silently
    mocked. → backlog `retire-mocks`.
+4. **Quantitative-fact seams** — add 6–10 structured numeric fact sources (gnomAD constraint, GTEx, DepMap,
+   AlphaMissense, ± Foldseek/InterPro/enrichment) as Bucket-1 seams in the `aso-tox` pattern — hard numbers
+   that complement EMET's narrative (EMET is an LLM knowledge source; these give the value, not the prose).
+   Reimplement ~a handful of ToolUniverse's Apache-2.0 wrappers as our own stdlib seams; don't adopt the
+   ToolUniverse runtime. → assigned `quant-fact-seams` (rohan) ·
+   [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
 
 ## Watch-outs
 - **Data boundary is absolute**: public identifiers only leave Quiver. Tools that call external services
