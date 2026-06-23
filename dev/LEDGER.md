@@ -17,9 +17,10 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
   the free tier allows: client-side `.githooks/pre-push` (blocks main/protected pushes, enforces `<handle>/`
   naming + prefix==`sapphire.handle`, blocks when unset, lets tags through) and `.githooks/commit-msg`
   (requires a real `Built-By` trailer parsed via `git interpret-trailers`, cross-validated against the clone's
-  handle; tight merge exemption); `dev/setup-contributor.sh` wires both; `.github/workflows/branch-guard.yml`
-  (detective backstop — fails bad PR branch names, files an issue on direct main pushes; injection-safe);
-  `dev/CONTRIBUTOR_RULES.md` binds hayes/gavin agents. CODEOWNERS → `@rohanaryagondi`.
+  handle; tight merge exemption); `dev/setup-contributor.sh` wires both; `dev/CONTRIBUTOR_RULES.md` binds
+  hayes/gavin agents. CODEOWNERS → `@rohanaryagondi`. A detective `branch-guard` Action was authored but
+  **parked in `dev/ci/`** (injection-safe) — GitHub Actions can't allocate a runner on this free private repo
+  (jobs fail in ~4s with no steps), so an active workflow would red-X every PR; it activates with Pro.
 - Gates: hooks functionally verified twice (push-to-main/wrong-name/wrong-prefix/unset-handle BLOCKED,
   own-branch + tags ALLOWED; commit without real `Built-By`, body-prose evasion, fake-"Merge", cross-handle
   all REJECTED; real trailer + real merge ACCEPTED; real `git push --dry-run` to main blocked end-to-end) ·

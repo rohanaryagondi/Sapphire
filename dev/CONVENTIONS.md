@@ -10,15 +10,18 @@ Every change to Sapphire follows these. They are not style preferences; they are
   > 1. **Client-side hooks** (`.githooks/`, installed by `dev/setup-contributor.sh`): `pre-push` hard-blocks
   >    pushes to `main`/protected branches and non-`<handle>/` branches; `commit-msg` requires the `Built-By`
   >    trailer. The strongest *preventive* control for cooperating agents.
-  > 2. **`branch-guard` Action** (`.github/workflows/`): *detective* backstop — fails the check on bad PR
-  >    branch names and files an issue on any direct push to `main`.
-  > 3. **CODEOWNERS** routes every PR to the approver.
-  > 4. **`dev/CONTRIBUTOR_RULES.md`** binds the contributor agents (no main pushes, no merges, no `--no-verify`).
+  > 2. **CODEOWNERS** routes every PR to the approver.
+  > 3. **`dev/CONTRIBUTOR_RULES.md`** binds the contributor agents (no main pushes, no merges, no `--no-verify`).
   >
-  > The account is GitHub **free**, so true server-side branch protection still 403s — it's **one step away**:
-  > enable **GitHub Pro** (~$4/mo), then `bash dev/enable-branch-protection.sh`. Until then layers 1–4 hold the
-  > line but are bypassable by a non-cooperating actor; **do not grant Hayes/Gavin access until you accept that
-  > or upgrade.** Treat the rules as binding regardless.
+  > These three are **active on the free tier today** (layer 1 verified blocking). Two server-side layers are
+  > **staged for a GitHub Pro upgrade** on `rohanaryagondi` (both currently unavailable on the free private
+  > repo — branch protection 403s, and Actions can't allocate a runner):
+  > - **branch protection** — `bash dev/enable-branch-protection.sh` (preventive, server-side).
+  > - **`branch-guard` Action** — parked in `dev/ci/` (detective: flags direct main pushes). Move it to
+  >   `.github/workflows/` once Actions runs.
+  >
+  > Until upgraded, the active layers are bypassable by a non-cooperating actor (`--no-verify`); **do not grant
+  > Hayes/Gavin write access until you accept that or upgrade.** Treat the rules as binding regardless.
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,

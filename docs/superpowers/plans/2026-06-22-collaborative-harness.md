@@ -13,10 +13,11 @@ protection, not just convention.
 1. **Attribution:** git-native — branch prefix `<handle>/<slug>` + mandatory `Built-By: <handle>` commit
    trailer + `dev/CONTRIBUTORS.md` registry + `Built-By` in the ledger. No in-file headers (avoid churn).
 2. **Enforcement:** canonical repo is **`rohanaryagondi/Sapphire`** (renamed from `sapphire-capability-map`,
-   Rohan's decision 2026-06-22). Layered: client-side hooks (`.githooks/`) hard-block main pushes + wrong
-   branch names + missing `Built-By`; a `branch-guard` Action flags direct main pushes; CODEOWNERS routes
-   review; `dev/CONTRIBUTOR_RULES.md` binds contributor agents. True server-side branch protection still
-   needs GitHub Pro (free-tier 403) — `dev/enable-branch-protection.sh` applies it once upgraded.
+   Rohan's decision 2026-06-22). Active free-tier layers: client-side hooks (`.githooks/`) hard-block main
+   pushes + wrong branch names + missing `Built-By`; CODEOWNERS routes review; `dev/CONTRIBUTOR_RULES.md` binds
+   contributor agents. Staged for a GitHub Pro upgrade (both unavailable on free private): server-side branch
+   protection (`dev/enable-branch-protection.sh`) and the `branch-guard` Action (parked in `dev/ci/`; Actions
+   can't allocate a runner on free tier).
 3. **Reporting:** tracked `dev/reports/<handle>/`; `dev/LEDGER.md` stays the canonical merge log.
 4. **Branch surgery (DONE before this plan):** old `main` → `main-backup-2026-06-22`; `main` fast-forwarded
    to the former `Rohan` bedrock; `Rohan` branch retired. Everyone now branches off `main`.

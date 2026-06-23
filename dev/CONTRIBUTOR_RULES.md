@@ -13,7 +13,8 @@ are unguarded and you will violate the rules below — so don't skip it.
 
 ## The rules (non-negotiable)
 1. **Never push to `main`.** Not directly, not force, not ever. `main` changes only through a PR that **rohan**
-   merges. The pre-push hook blocks it; the Actions backstop files an issue if it somehow lands.
+   merges. The pre-push hook blocks it locally (and the staged `branch-guard` Action will file an issue if it
+   somehow lands, once Actions is enabled — see `dev/ci/`).
 2. **Never merge a PR** — not yours, not anyone's. Only rohan's Claude approves and merges. You open the PR
    and stop.
 3. **One branch shape only: `<handle>/<slug>`** cut from the latest `main` (e.g. `hayes/aso-design-tool`).
