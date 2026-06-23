@@ -36,7 +36,7 @@ done < <(git rev-list --no-merges --since="$SINCE" "$RANGE")
 #    AND must contain a digit (AKIARPKKRAETIRFSQHAV and friends must not false-positive).
 echo "── Secret scan ──"
 added="$(git log -p --since="$SINCE" "$RANGE" 2>/dev/null | grep -E '^\+' || true)"
-safe="$(printf '%s' "$added" | grep -EI 'gh[pousr]_[A-Za-z0-9]{20,}|BEGIN ([A-Z]+ )?PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}' || true)"
+safe="$(printf '%s' "$added" | grep -EI 'gh[pousr]_[A-Za-z0-9]{20,}|BEGIN ([A-Z]+ )?PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}|aws_secret_access_key[[:space:]]*=[[:space:]]*[A-Za-z0-9/+]{40}' || true)"
 aws="$(printf '%s' "$added" | grep -oE '\bAKIA[A-Z0-9]{16}\b' | grep -E '[0-9]' || true)"
 if [ -n "$safe$aws" ]; then
   echo "  ✗ possible secret(s) found in history:"; printf '%s\n%s\n' "$safe" "$aws" | grep -v '^$' | head -5; problems=$((problems + 1))

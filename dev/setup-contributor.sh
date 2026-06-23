@@ -22,7 +22,7 @@ git config sapphire.handle "$handle"
 
 # 3. Encourage a matching git identity for the Built-By attribution.
 echo "Configured this clone for contributor: $handle"
-echo "  core.hooksPath = .githooks   (pre-push + commit-msg guards active)"
+echo "  core.hooksPath = .githooks   (pre-commit + commit-msg + pre-push guards active)"
 echo "  sapphire.handle = $handle"
 echo
 echo "Guards now active locally:"

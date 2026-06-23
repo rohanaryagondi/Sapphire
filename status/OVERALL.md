@@ -4,7 +4,7 @@
 [`WORKBOARD.md`](WORKBOARD.md).*
 
 ## Headline
-The two-bucket firm runs end-to-end. Phases 1–6 are done. **268→278 tests green.** Fact sources are largely
+The two-bucket firm runs end-to-end. Phases 1–6 are done. **278 tests green.** Fact sources are largely
 **live/real** (EMET, personas, Q-Models, internal moat, ASO-tox); the keystone remaining is wiring the live
 harnessed path (`run_live`) to the front door.
 
