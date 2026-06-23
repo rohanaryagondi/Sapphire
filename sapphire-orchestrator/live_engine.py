@@ -27,7 +27,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam
+from tools import aso_tox_seam, gnomad_constraint_seam
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -47,6 +47,9 @@ _BUCKET1_AGENTS = [
     # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
     # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
     "aso-tox",
+    # gnomAD gene constraint (pLI / LOEUF / missense Z) — quantitative fact source.
+    # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
+    "gnomad-constraint",
 ]
 
 
@@ -188,6 +191,10 @@ def run_live(
     # Passes sequences through inputs — fires only when ASO sequences are present.
     if "aso-tox" not in ctx["python_fns"]:
         ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings
+    # Wire the gnomAD constraint seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
+    if "gnomad-constraint" not in ctx["python_fns"]:
+        ctx["python_fns"]["gnomad-constraint"] = gnomad_constraint_seam.findings
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents

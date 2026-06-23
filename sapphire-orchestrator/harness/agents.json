@@ -337,6 +337,39 @@
       "provenance_label": "aso-tox",
       "timeout_s": 120,
       "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "gnomad-constraint",
+      "role": "Bucket-1 quantitative fact source — gnomAD gene loss-of-function constraint (pLI, LOEUF, missense Z) via the public GraphQL API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
+      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance", "data_boundary"],
+      "provenance_label": "gnomad",
+      "timeout_s": 30,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
     }
   ]
 }
