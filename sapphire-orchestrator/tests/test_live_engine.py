@@ -26,7 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
-from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam
+from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
 
 
 # ── Fake runner helpers ──────────────────────────────────────────────────────
@@ -107,6 +107,13 @@ def _fake_interpro_fn(inputs):
     return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "interpro"}
 
 
+def _fake_geneset_fn(inputs):
+    """Offline stand-in for the g:Profiler enrichment seam: honest-empty, no network.
+    The TestGenesetEnrichmentWiring tests pop this to exercise the real seam with
+    _fetch monkeypatched to a recorded fixture."""
+    return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "gprofiler"}
+
+
 def _build_ctx():
     """Build a ctx dict that mocks every backend except the real moat."""
     return {
@@ -115,7 +122,7 @@ def _build_ctx():
         "qmodels_client": _fake_qmodels_client(),
         # gnomad-constraint would hit a public network API via the real seam; mock it
         # (honest-empty) so the offline suite never touches the network.
-        "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn, "interpro-domains": _fake_interpro_fn},
+        "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn, "interpro-domains": _fake_interpro_fn, "geneset-enrichment": _fake_geneset_fn},
         # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
         #       that run_live wires the REAL moat + aso-tox backends by default.
     }
@@ -1019,6 +1026,123 @@ class TestInterproDomainsWiring(unittest.TestCase):
         self.assertIsNotNone(agent)
         self.assertIn(agent["status"], ("abstained", "escalated"),
                       f"expected data_boundary to block interpro; got {agent}")
+
+
+# ── g:Profiler seam fixture (recorded enrichment terms for {TSC1,TSC2,MTOR}) ─
+_GENESET_FIXTURE = {"result": [
+    {"native": "HP:0032051", "name": "Focal cortical dysplasia type II", "source": "HP", "p_value": 3.0497e-07, "significant": True},
+    {"native": "WP:WP4141", "name": "PI3K AKT mTOR vitamin D3 signaling", "source": "WP", "p_value": 9.52e-07, "significant": True},
+    {"native": "REAC:R-HSA-380972", "name": "Energy dependent regulation of mTOR by LKB1-AMPK", "source": "REAC", "p_value": 2.98e-06, "significant": True},
+]}
+
+
+def _geneset_dispatch(genes):
+    """Fake geneset _fetch returning the recorded enrichment fixture."""
+    return _GENESET_FIXTURE
+
+
+class TestGenesetEnrichmentWiring(unittest.TestCase):
+    """The geneset-enrichment seam, wired into run_live, lands a real cited fact in the
+    dossier from the query's gene SET. Network monkeypatched at the seam's _fetch
+    boundary ($0, offline)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _ctx_with_real_geneset(self):
+        """Offline ctx, but pop the geneset mock so run_live wires the REAL seam."""
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("geneset-enrichment", None)
+        return ctx
+
+    def test_geneset_fact_lands_in_dossier(self):
+        with mock.patch.object(geneset_enrichment_seam, "_fetch", _geneset_dispatch):
+            result = run_live(
+                "Compare TSC1 and TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_geneset(),
+            )
+        dossier = result["discover"]["dossier"]
+        gp_facts = [f for f in dossier if f.get("provenance") == "gprofiler"]
+        self.assertTrue(
+            len(gp_facts) >= 1,
+            f"expected ≥1 gprofiler fact; dossier provenances: "
+            f"{[f.get('provenance') for f in dossier]}"
+        )
+        val = gp_facts[0]["value"]
+        self.assertIn("significant terms", val, val)
+        self.assertIn("HP:0032051", val, val)
+        self.assertEqual(gp_facts[0]["tier"], "T2")
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "geneset-enrichment"), None)
+        self.assertIsNotNone(agent, "geneset-enrichment not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
+
+    def test_gene_set_threaded_from_query(self):
+        """run_live threads the WHOLE extracted gene set into the seam — both TSC1 and
+        TSC2 reach g:Profiler, not just candidate (genes[0])."""
+        captured = {}
+
+        def _spy(genes):
+            captured["genes"] = list(genes)
+            return _GENESET_FIXTURE
+
+        with mock.patch.object(geneset_enrichment_seam, "_fetch", _spy):
+            run_live("Compare TSC1 and TSC2 in tuberous sclerosis.",
+                     ctx=self._ctx_with_real_geneset())
+        self.assertIn("TSC1", captured.get("genes", []))
+        self.assertIn("TSC2", captured.get("genes", []))
+
+    def test_no_gene_query_honest_empty_no_network(self):
+        with mock.patch.object(geneset_enrichment_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Outline a general CNS target-validation strategy.",
+                ctx=self._ctx_with_real_geneset(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "geneset-enrichment"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "gprofiler"], [])
+
+    def test_api_down_degrades_no_crash(self):
+        import urllib.error
+
+        def _boom(genes):
+            raise urllib.error.URLError("connection refused")
+
+        with mock.patch.object(geneset_enrichment_seam, "_fetch", _boom):
+            result = run_live(
+                "Compare TSC1 and TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_geneset(),
+            )
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "geneset-enrichment"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected honest 'ok' empty; got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "gprofiler"], [])
+
+    def test_internal_id_in_query_blocks_geneset(self):
+        with mock.patch.object(geneset_enrichment_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Assess QS00123 against TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_geneset(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "geneset-enrichment"), None)
+        self.assertIsNotNone(agent)
+        self.assertIn(agent["status"], ("abstained", "escalated"),
+                      f"expected data_boundary to block geneset; got {agent}")
 
 
 if __name__ == "__main__":

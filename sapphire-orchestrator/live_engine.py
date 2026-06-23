@@ -27,7 +27,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -56,6 +56,9 @@ _BUCKET1_AGENTS = [
     # InterPro protein domain/family annotations (IPR accessions) — structured fact source.
     # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
     "interpro-domains",
+    # g:Profiler functional enrichment (top GO / pathway terms) over the gene set —
+    # quantitative fact source. Fires when a gene set / target is present; honest-empty otherwise.
+    "geneset-enrichment",
 ]
 
 
@@ -209,6 +212,10 @@ def run_live(
     # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
     if "interpro-domains" not in ctx["python_fns"]:
         ctx["python_fns"]["interpro-domains"] = interpro_domains_seam.findings
+    # Wire the g:Profiler enrichment seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
+    if "geneset-enrichment" not in ctx["python_fns"]:
+        ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents
@@ -223,6 +230,10 @@ def run_live(
         "candidate": target,
         "disease": tri.get("disease_label", ""),
         "query": query,
+        # genes: the full set of gene symbols extracted from the query (candidate is
+        # genes[0]). Threaded for the geneset-enrichment agent, which operates on a SET;
+        # a single-gene query yields a one-element set. Other agents ignore this key.
+        "genes": ents["genes"],
         # sequences: ASO candidates threaded through to the aso-tox agent.
         # Populated from the explicit sequences= param (preferred) or the
         # query-text extractor.  Empty list when no sequences are present —

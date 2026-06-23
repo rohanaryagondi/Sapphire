@@ -15,6 +15,7 @@ PROVENANCE = frozenset({
     "gnomad",
     "gtex",
     "interpro",
+    "gprofiler",
 })
 
 
