@@ -11,6 +11,28 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Bucket-1 knowledge-corpus PILOT: FDA Institutional Memory + the method  (`main`, PR #15)
+- Built-By: `rohan` (driven via subagents). The pilot of a new initiative: give each Bucket-1 semantic agent a
+  pre-ingested, queryable knowledge corpus so a run hits local for the stable ~70% and only searches the
+  novel ~30% — cheaper, faster, grounded.
+- What: `sapphire-orchestrator/corpus/fda-institutional-memory/` — 35 cited+dated claim-cards (`index.jsonl`),
+  themed `notes/`, `manifest.md` (coverage map + honest gaps), `QUERIES.md` (worked checks), and `METHOD.md`
+  (the repeatable recipe to replicate for the other 12). Upgraded the agent skill doc skeleton → real
+  corpus-first→search-the-gap operating spec (with "AdComm is advisory; a dispositive veto needs a T1 primary
+  citation; confirm a T2 card before veto"). Added **`dev/validate-corpus.sh`** — a mechanical citation-integrity
+  gate (valid JSON + fields + quote≤60w; tier T1 only on a primary domain; every URL resolves or is tagged
+  `unverifiable_by_fetch`; 404=hard fail, 403/timeout rescuable-by-flag).
+- Quality (this is the value): an adversarial fact-check of 14 cards incl. all 5 high-stakes (aducanumab 0-10-1,
+  tofersen 9-0, eteplirsen, pergolide, AXS-07) found **zero fabricated actions, zero wrong facts** — the
+  regulatory memory is real. It also found a citation-hygiene defect class (a 404 URL, paraphrase-as-quote,
+  press-wire-as-T1); all fixed against the new gate (which then surfaced + fixed 5 more dead/blocked URLs);
+  2 repointed PMC quotes spot-verified verbatim by the controller. Corpus gate CLEAN (35/35).
+- Honest limit: fda.gov/federalregister block automated fetch, so corpora lean T2; primary-but-unfetchable
+  cards are tagged `unverifiable_by_fetch` and the skill doc requires confirming primary before a veto. A
+  browser-capable pass to upgrade key T2→T1 is a deferred option (Rohan's call).
+- Next (gated on Rohan's sign-off): delegate the other 12 — Hayes 6 / Gavin 6 — each replicating `METHOD.md`
+  and passing `dev/validate-corpus.sh`. Separately, wire the runtime corpus-first→search-the-gap retrieval.
+
 ## 2026-06-23 — Vendor Matt's design-form-agent (unblock experiment-design ED-1)  (`main`, PR #14)
 - Built-By: `rohan`. Per Rohan's direction ("consume Matt's full repo into Sapphire").
 - What: imported a verbatim snapshot of `MatthewCarey24/design-form-agent` (private Quiver repo; upstream commit
