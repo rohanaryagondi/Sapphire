@@ -48,7 +48,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+### [OPEN] ED-1 needs the source repo — `MatthewCarey24/design-form-agent` is inaccessible  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/geneset-enrichment
+**Blocking?** yes for the experiment-design epic (ED-1); NOT blocking the seams (all four shipped — g:Profiler PR-D in review completes `quant-fact-seams`).
+**Context:** next queue item is the experiment-design epic. ED-1 = "port Matt Carey's `MatthewCarey24/design-form-agent` into `tools/experiment_design/`, preserving the domain prompt/menus verbatim" ([brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md)).
+**Question:** I can't get the source. ED-1 is fundamentally a port, so I need his actual repo. Can you either (a) grant my GitHub user `@HayesStewart-QuiverBS` read access to `MatthewCarey24/design-form-agent`, (b) drop a snapshot into the Sapphire repo (e.g. `vendor/design-form-agent/` or a branch), or (c) point me at another location? Once it lands I'll port `extract.py` / `extraction_prompt.py` / `schema.py` + his `sample_extraction*.json` + a sample transcript, with the assay vocabulary / `MENUS_REFERENCE` / extraction prompt copied verbatim + an attribution header, and a golden-value fidelity test.
+**What I tried / read:** `git ls-remote https://github.com/MatthewCarey24/design-form-agent HEAD` → `remote: Repository not found` (private or my creds lack access). Read the ED brief in full. No code drop present under `tools/` or `vendor/`.
+**My current best guess:** quickest is (b) a snapshot/code-drop into the repo (or grant read access to my GH user). I'll start ED-1 immediately on arrival; meanwhile the seams are complete and I'm watching the board.
+**Answer (lead fills):** —
 
 ---
 

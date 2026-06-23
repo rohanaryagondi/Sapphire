@@ -12,6 +12,7 @@
 | **gnomAD constraint** | ✅ live | `gnomad` | Gene LoF-constraint (pLI, LOEUF, missense Z) via the public GraphQL API; stdlib seam `tools/gnomad_constraint_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise, honest error envelope when the API is down. First of the `quant-fact-seams` pilot (PR-A). |
 | **GTEx expression** | ✅ live | `gtex` | Tissue expression (median TPM) + CNS selectivity via the public REST API (dataset `gtex_v8`, pinned); stdlib seam `tools/gtex_expression_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise, honest error envelope when the API is down. `quant-fact-seams` PR-B. |
 | **InterPro domains** | ✅ live | `interpro` | Protein domain/family annotations (IPR accessions) via UniProt (symbol→accession) + the public InterPro REST API; stdlib seam `tools/interpro_domains_seam.py`; cited **T1** facts; fires on a target gene symbol, honest-empty otherwise (incl. 404), honest error envelope when an API is down. `quant-fact-seams` PR-C. |
+| **g:Profiler enrichment** | ✅ live | `gprofiler` | Functional enrichment (top over-represented GO / pathway terms + p-values) over the query's gene **set** via the public g:GOSt REST API; stdlib seam `tools/geneset_enrichment_seam.py`; cited **T2** facts (computed enrichment); fires on a gene set / target, honest-empty otherwise, honest error envelope when the API is down. `quant-fact-seams` PR-D (completes the four). |
 
 ## Open items
 1. **ASO Design tool** — does not exist yet. Build it; its output feeds the `aso-tox` `sequences=` channel
@@ -24,7 +25,7 @@
    pattern — hard numbers that complement EMET's narrative (EMET is an LLM knowledge source; these give the
    value, not the prose). Reimplemented as our own stdlib seams; the ToolUniverse runtime is NOT adopted.
    DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
-   **gnomAD ✅ (#6) + GTEx ✅ (#9) merged**; **InterPro in review (PR-C)**; g:Profiler (PR-D) follows ·
+   **gnomAD ✅ (#6) + GTEx ✅ (#9) + InterPro ✅ (#11) merged**; **g:Profiler in review (PR-D)** — completes the four ·
    [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
 5. **Experiment Design tool** — port Matt's `design-form-agent` (Otter meeting-notes → Quiver
    experiment-design-sheet JSON, Claude-based, Quiver optogenetics assay vocabulary) into Sapphire as a

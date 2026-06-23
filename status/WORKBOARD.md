@@ -20,7 +20,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **gnomAD ✅ (#6) · GTEx ✅ (#9) · InterPro ✅ (PR-C) merged.** Remaining: **g:Profiler (PR-D, last)**. | next: `hayes/gprofiler-enrichment` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `quant-fact-seams` | in-review | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **gnomAD ✅ (#6) · GTEx ✅ (#9) · InterPro ✅ (#11) merged; g:Profiler (PR-D) in review** — completes the four. | `hayes/geneset-enrichment` (PR-D) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 | `experiment-design` | queued (after seams) | **Epic.** Port Matt's `design-form-agent` into Sapphire as a standalone tool: meeting-notes → filled experiment-design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the design sheet). Moat/firm wiring is a later epic. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): `git pull origin main`
