@@ -11,6 +11,23 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-22 — Local enforcement hardening + vision + status/workboard  (`main`, PR #3)
+- Built-By: `rohan` · merged by `rohan`.
+- What: Repo stays **free, no GitHub Actions** (Rohan's call) → enforcement is fully local. Added
+  `.githooks/pre-commit` (bio-safe secret scanner — AWS pattern word-bounded + digit-required so protein/DNA
+  sequences don't false-positive); `pre-push` now runs the full suite (`dev/run-tests.sh`) on any Python
+  change; `dev/audit-history.sh` is the detective backup (Built-By coverage since the convention + secret
+  leaks), replacing the dropped CI; removed `dev/ci/`. Recorded Hayes (`@HayesStewart-QuiverBS`) + Gavin
+  (`@GavinWongYF`) as write collaborators. Added **`docs/VISION.md`** and the **`status/`** directory
+  (OVERALL + per-area + `WORKBOARD.md` per-agent assignments, Hayes/Gavin empty for now); `dev/DELEGATION.md`
+  slimmed to the protocol pointing at the workboard.
+- Gates: Gate 1 278 green (`dev/run-tests.sh`; no runtime code touched) · independent review
+  **Approved-with-nits** (all fixed) · Gate 5 guards RUN & verified (fake gh-token / real AWS-key / aws_secret
+  form BLOCKED; clean file + protein sequence ALLOWED; scanner self-exclusion; audit CLEAN; run-tests green) ·
+  no secrets/binaries.
+- Gaps/Follow-ups: enforcement is per-clone + `--no-verify`-bypassable (documented hard violation; audit
+  catches it) — accepted residual risk of a free repo. No work assigned to Hayes/Gavin yet.
+
 ## 2026-06-22 — Strict branch enforcement + repo renamed to Sapphire  (`main`, PR #2)
 - Built-By: `rohan` · merged by `rohan`.
 - What: Canonical repo renamed to **`rohanaryagondi/Sapphire`**. Layered branch-rule enforcement, as strict as
