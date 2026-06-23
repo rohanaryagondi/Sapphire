@@ -35,10 +35,11 @@ Never conflate them. A "reviewer" in the runtime harness is a *persona judging a
 
 GitHub plumbing: [`.github/CODEOWNERS`](../.github/CODEOWNERS) (every PR needs Rohan's review) and
 [`.github/pull_request_template.md`](../.github/pull_request_template.md) (gate-evidence checklist).
-Branch-rule enforcement: [`.githooks/`](../.githooks/) + [`dev/setup-contributor.sh`](setup-contributor.sh)
-(client-side guards — the active free-tier layer) and [`CONTRIBUTOR_RULES.md`](CONTRIBUTOR_RULES.md) (the hard
-rules for contributor agents). A server-side `branch-guard` Action is staged in
-[`dev/ci/`](ci/) (inactive — GitHub Actions can't run on this free private repo yet; activates with Pro).
+Local enforcement (the repo stays free — no branch protection, no Actions):
+[`.githooks/`](../.githooks/) (pre-commit secret scan · commit-msg `Built-By` · pre-push branch rules +
+auto-runs the suite on Python changes) installed by [`dev/setup-contributor.sh`](setup-contributor.sh);
+[`dev/run-tests.sh`](run-tests.sh) (Gate 1 runner); [`dev/audit-history.sh`](audit-history.sh) (detective
+backup); and [`CONTRIBUTOR_RULES.md`](CONTRIBUTOR_RULES.md) (the hard rules for contributor agents).
 
 ## Collaboration model (rohan · hayes · gavin)
 
@@ -52,11 +53,10 @@ Sapphire is built by three contributors, each driving their own Claude. The mode
   First thing in any clone: `bash dev/setup-contributor.sh <handle>` to install the branch guards. Contributor
   agents (hayes/gavin) are bound by `CONTRIBUTOR_RULES.md`.
 - **Only Rohan's Claude reviews, approves, and merges to `main`** — re-establishing the gates independently on
-  the PR (`PR_REVIEW.md`). Enforcement is layered (`CONVENTIONS.md` §1): **active now** — client-side hooks
-  hard-block main pushes / wrong branch names / missing `Built-By`, plus CODEOWNERS review-routing and the
-  contributor rules. **Staged for Pro** — server-side branch protection (`dev/enable-branch-protection.sh`)
-  and the `branch-guard` Action (`dev/ci/`); both need a GitHub plan upgrade. The active layers are treated
-  as binding.
+  the PR (`PR_REVIEW.md`). Enforcement is **local and layered** (`CONVENTIONS.md` §1), since the repo stays
+  free: client-side hooks hard-block main pushes / wrong branch names / missing `Built-By` and run the suite
+  on Python changes; CODEOWNERS routes review; `dev/audit-history.sh` is the detective backup. The only
+  bypass is `--no-verify` — a documented hard violation the audit catches.
 
 Runnable assets (so the process is enforced, not just described):
 - `.claude/agents/sapphire-dev-{planner,implementer,reviewer,verifier,integrator}.md` — the builder roles.

@@ -13,8 +13,7 @@ are unguarded and you will violate the rules below — so don't skip it.
 
 ## The rules (non-negotiable)
 1. **Never push to `main`.** Not directly, not force, not ever. `main` changes only through a PR that **rohan**
-   merges. The pre-push hook blocks it locally (and the staged `branch-guard` Action will file an issue if it
-   somehow lands, once Actions is enabled — see `dev/ci/`).
+   merges. The pre-push hook blocks it locally, and `dev/audit-history.sh` catches it after the fact.
 2. **Never merge a PR** — not yours, not anyone's. Only rohan's Claude approves and merges. You open the PR
    and stop.
 3. **One branch shape only: `<handle>/<slug>`** cut from the latest `main` (e.g. `hayes/aso-design-tool`).
@@ -24,12 +23,13 @@ are unguarded and you will violate the rules below — so don't skip it.
 5. **Never use `--no-verify`** (or otherwise disable/edit the hooks). Bypassing a guardrail is the most
    serious violation here — it defeats the whole model. If a hook blocks something you believe is legitimate,
    stop and ask rohan; do not route around it.
-6. **Never touch the approver's machinery**: `.github/CODEOWNERS`, `.github/workflows/`, `.githooks/`,
-   `dev/PR_REVIEW.md`, branch-protection config. If a change there is needed, propose it in a PR and let rohan
-   decide.
-7. **Stay in your lane / the brief.** Claim your task on `dev/DELEGATION.md`, write a brief, and build only
-   that. Run the full local lifecycle (Gates 1–5, `dev/GATES.md`) before opening the PR; paste the evidence
-   into the PR template.
+6. **Never touch the approver's machinery**: `.github/CODEOWNERS`, `.githooks/`, `dev/PR_REVIEW.md`,
+   `dev/run-tests.sh`, `dev/audit-history.sh`, `dev/setup-contributor.sh`. If a change there is needed,
+   propose it in a PR and let rohan decide.
+7. **Stay in your lane / the brief.** Find your assigned work on the **workboard** (`status/WORKBOARD.md`),
+   write a brief, and build only that. Run the full local lifecycle (Gates 1–5, `dev/GATES.md`) before opening
+   the PR; paste the evidence into the PR template. (The pre-push hook also runs the suite when you change
+   Python — but don't rely on it; run the gates yourself.)
 8. **Honor every other convention** in `dev/CONVENTIONS.md` (stdlib-only runtime, provenance labels, public
    identifiers only, no secrets/binaries, real non-vacuous tests). The data boundary is absolute.
 

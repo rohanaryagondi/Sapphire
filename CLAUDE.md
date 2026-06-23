@@ -138,10 +138,10 @@ two-bucket "firm":
   `DELEGATION.md`, `PR_REVIEW.md`).
 - **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** **Only Rohan's Claude
   reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). Canonical repo: **`rohanaryagondi/Sapphire`**.
-  Branch rules — **active on free tier:** client-side git hooks (`.githooks/`, installed via
-  `dev/setup-contributor.sh` — block pushes to `main`, enforce `<handle>/` naming + the `Built-By` trailer)
-  + `.github/CODEOWNERS` + `dev/CONTRIBUTOR_RULES.md` (binds hayes/gavin agents). **Staged for GitHub Pro:**
-  server-side branch protection (`dev/enable-branch-protection.sh`) and the `branch-guard` Action (`dev/ci/`) —
-  both unavailable on the free private repo (protection 403s; Actions can't run). Every commit carries
-  `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
+  Enforcement is **local** (the repo stays free — no branch protection, no Actions): git hooks (`.githooks/`,
+  installed via `dev/setup-contributor.sh`) — `pre-commit` secret scan, `commit-msg` `Built-By` trailer,
+  `pre-push` blocks main/wrong-branch pushes and runs the full suite on Python changes — plus
+  `.github/CODEOWNERS`, `dev/CONTRIBUTOR_RULES.md` (binds hayes/gavin agents), and `dev/audit-history.sh`
+  (detective backup). Every commit carries `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
+  See `status/` for build status + the per-agent `status/WORKBOARD.md`, and `docs/VISION.md` for the vision.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

@@ -11,8 +11,8 @@
 # Tag pushes pass through (not a branch-rule concern).
 #
 # This is a guardrail for cooperating agents. It is bypassable with `git push --no-verify`
-# — doing so is a hard violation of dev/CONTRIBUTOR_RULES.md, and the GitHub Actions
-# backstop (.github/workflows/branch-guard.yml) still flags a direct push to main.
+# — doing so is a hard violation of dev/CONTRIBUTOR_RULES.md; the detective backstop
+# `dev/audit-history.sh` catches a direct push to main after the fact.
 set -euo pipefail
 
 PROTECTED_RE='^(main|master|main-backup-.*)$'
@@ -58,6 +58,27 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   prefix="${branch%%/*}"
   if [[ "$prefix" != "$handle" ]]; then
     block "you are '$handle' but tried to push a '$prefix/...' branch. Push only your own '$handle/...' branches."
+  fi
+
+  # 4. if this push changes any Python, the full suite must be green first (Gate 1, local).
+  base="$remote_sha"
+  if [[ "$base" == "$ZERO" ]]; then
+    # new branch on the remote — diff against origin/main if we have it, else the merge base with HEAD
+    base="$(git rev-parse --verify --quiet origin/main || true)"
+  fi
+  if [[ -n "$base" ]] && git rev-parse --verify --quiet "$base" >/dev/null; then
+    changed="$(git diff --name-only "$base" "$local_sha" 2>/dev/null || true)"
+  else
+    # No base to diff against (disconnected repo, no origin/main): list files in the
+    # tip commit itself rather than a (wrong) working-tree diff.
+    changed="$(git show --name-only --format='' "$local_sha" 2>/dev/null || true)"
+  fi
+  if printf '%s\n' "$changed" | grep -qE '\.py$'; then
+    echo "  • Python changed in this push — running Gate 1 (dev/run-tests.sh) before allowing push…" >&2
+    root="$(git rev-parse --show-toplevel)"
+    if ! bash "$root/dev/run-tests.sh" >&2; then
+      block "the test suite is RED. Fix it before pushing (Gate 1 must be green)."
+    fi
   fi
 done
 
