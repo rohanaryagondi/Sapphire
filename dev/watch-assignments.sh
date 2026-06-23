@@ -6,9 +6,12 @@
 # so it can run continuously with no human prompting. It watches TWO channels:
 #
 #   [board]      origin/main : status/WORKBOARD.md + dev/HELP.md
-#                 → a new/updated assignment under your handle, OR an answer to one of your
-#                   HELP requests, OR (when the approver merges your PR) the cue to start the
-#                   next task. These files change on main only when the approver merges.
+#                 → these coordination docs changed on main (only the approver can change them).
+#                   Could be a new/updated assignment for you, an answer to one of your HELP
+#                   requests, or (when the approver merges your PR + bumps the board) the cue to
+#                   start your next task. It hashes the WHOLE files, so a change to another
+#                   contributor's row also wakes you — re-check YOUR section; if nothing's new,
+#                   re-idle (one harmless cycle).
 #   [pr-review]  your open PRs : a new review or comment from the approver
 #                 → address requested changes on the same branch + push, or proceed if approved.
 #
@@ -45,6 +48,13 @@ pr_sig() {
       2>/dev/null || true
   done | sort | tail -1
 }
+
+# Preflight: the [board] channel is git-only and always works; the [pr-review] channel needs gh auth.
+# Warn loudly (don't die — board signals still flow) so the dead channel is never a SILENT failure.
+if ! gh auth status >/dev/null 2>&1; then
+  echo "WARN: gh is NOT authenticated — the [pr-review] channel is DISABLED (you won't be woken on PR reviews)."
+  echo "WARN: run 'gh auth login', then restart this watcher. The [board] channel (assignments/HELP) still works."
+fi
 
 pm="$(board_sig)"
 pp="$(pr_sig)"

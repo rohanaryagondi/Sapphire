@@ -45,6 +45,12 @@ Apply `dev/GATES.md` to the PR:
   ```
   Confirm the merge commit carries the `Built-By: <handle>` attribution (`git log -1 --format=%b main`), and
   append a `dev/LEDGER.md` entry (with `Built-By` + "merged by rohan").
+- **Bump the workboard — this is mandatory, not bookkeeping.** In the same merge cycle, update the
+  contributor's row on `status/WORKBOARD.md` (mark the task/sub-task `merged`, flip to the next one) and merge
+  that to `main`. The contributor's autonomous watcher (`dev/watch-assignments.sh`) keys its **"start the next
+  task"** signal on this `main`-side board change — **if you merge a PR but don't update the board, the
+  contributor agent idles indefinitely.** Likewise, when you answer a `dev/HELP.md` request, land the answer on
+  `main`/the PR so their watcher wakes them.
 
 ## Hard rules
 - **Never merge your own unreviewed work blind.** Even for `rohan`'s PRs, run the gates and have an independent
