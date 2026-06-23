@@ -26,7 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
-from tools import gnomad_constraint_seam, gtex_expression_seam
+from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam
 
 
 # ── Fake runner helpers ──────────────────────────────────────────────────────
@@ -100,6 +100,13 @@ def _fake_gtex_fn(inputs):
     return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "gtex"}
 
 
+def _fake_interpro_fn(inputs):
+    """Offline stand-in for the InterPro seam: honest-empty, no network. The
+    TestInterproDomainsWiring tests pop this to exercise the real seam with _fetch
+    monkeypatched to recorded fixtures."""
+    return {"candidate": inputs.get("candidate", ""), "facts": [], "provenance": "interpro"}
+
+
 def _build_ctx():
     """Build a ctx dict that mocks every backend except the real moat."""
     return {
@@ -108,7 +115,7 @@ def _build_ctx():
         "qmodels_client": _fake_qmodels_client(),
         # gnomad-constraint would hit a public network API via the real seam; mock it
         # (honest-empty) so the offline suite never touches the network.
-        "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn},
+        "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn, "interpro-domains": _fake_interpro_fn},
         # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
         #       that run_live wires the REAL moat + aso-tox backends by default.
     }
@@ -905,6 +912,113 @@ class TestGtexExpressionWiring(unittest.TestCase):
         self.assertIsNotNone(agent)
         self.assertIn(agent["status"], ("abstained", "escalated"),
                       f"expected data_boundary to block gtex; got {agent}")
+
+
+# ── InterPro seam fixtures (recorded TSC2 → UniProt P49815 → InterPro) ───────
+_INTERPRO_UNIPROT_TSC2 = {"results": [{"primaryAccession": "P49815"}]}
+_INTERPRO_ENTRIES_TSC2 = {"count": 8, "results": [
+    {"metadata": {"accession": "IPR000331", "name": "Rap/Ran-GAP domain", "type": "domain"}},
+    {"metadata": {"accession": "IPR003913", "name": "Tuberin", "type": "family"}},
+    {"metadata": {"accession": "IPR018515", "name": "Tuberin-type domain", "type": "domain"}},
+    {"metadata": {"accession": "IPR027107", "name": "Tuberin/Ral GTPase-activating protein subunit alpha", "type": "family"}},
+]}
+
+
+def _interpro_dispatch(url):
+    """Fake interpro _fetch routing the two-call flow (UniProt → InterPro) to fixtures."""
+    if "rest.uniprot.org" in url:
+        return _INTERPRO_UNIPROT_TSC2
+    if "interpro" in url:
+        return _INTERPRO_ENTRIES_TSC2
+    raise AssertionError(f"unexpected interpro url {url}")
+
+
+class TestInterproDomainsWiring(unittest.TestCase):
+    """The interpro-domains seam, wired into run_live, lands a real cited fact in the
+    dossier. Network is monkeypatched at the seam's _fetch boundary ($0, offline)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _ctx_with_real_interpro(self):
+        """Offline ctx, but pop the interpro mock so run_live wires the REAL seam."""
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("interpro-domains", None)
+        return ctx
+
+    def test_interpro_fact_lands_in_dossier(self):
+        with mock.patch.object(interpro_domains_seam, "_fetch", _interpro_dispatch):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_interpro(),
+            )
+        dossier = result["discover"]["dossier"]
+        interpro_facts = [f for f in dossier if f.get("provenance") == "interpro"]
+        self.assertTrue(
+            len(interpro_facts) >= 1,
+            f"expected ≥1 interpro fact; dossier provenances: "
+            f"{[f.get('provenance') for f in dossier]}"
+        )
+        val = interpro_facts[0]["value"]
+        self.assertIn("UniProt P49815", val, val)
+        self.assertIn("IPR000331", val, val)
+        self.assertEqual(interpro_facts[0]["tier"], "T1")
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "interpro-domains"), None)
+        self.assertIsNotNone(agent, "interpro-domains not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
+
+    def test_no_gene_query_honest_empty_no_network(self):
+        with mock.patch.object(interpro_domains_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Outline a general CNS target-validation strategy.",
+                ctx=self._ctx_with_real_interpro(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "interpro-domains"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "interpro"], [])
+
+    def test_api_down_degrades_no_crash(self):
+        import urllib.error
+
+        def _boom(url):
+            raise urllib.error.URLError("connection refused")
+
+        with mock.patch.object(interpro_domains_seam, "_fetch", _boom):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx_with_real_interpro(),
+            )
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "interpro-domains"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected honest 'ok' empty; got {agent}")
+        self.assertEqual(
+            [f for f in result["discover"]["dossier"] if f.get("provenance") == "interpro"], [])
+
+    def test_internal_id_in_query_blocks_interpro(self):
+        with mock.patch.object(interpro_domains_seam, "_fetch") as fetch_mock:
+            result = run_live(
+                "Assess QS00123 against TSC2 in tuberous sclerosis.",
+                ctx=self._ctx_with_real_interpro(),
+            )
+            fetch_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"]
+                      if a["id"] == "interpro-domains"), None)
+        self.assertIsNotNone(agent)
+        self.assertIn(agent["status"], ("abstained", "escalated"),
+                      f"expected data_boundary to block interpro; got {agent}")
 
 
 if __name__ == "__main__":

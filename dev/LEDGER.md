@@ -11,6 +11,26 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — InterPro protein-domains seam (quant-fact-seams PR-C)  (`main`, PR #11)
+- **InterPro seam authored by `hayes`** (commit c4fcfcb, `Built-By: hayes`); **integrated + merged by `rohan`**
+  (clean auto-merge this time; this commit also does approver bookkeeping — workboard bump, HELP answer, a
+  CONTRIBUTOR_RULES clarification). Hayes credited via `Co-Authored-By`.
+- What: stdlib-only Bucket-1 seam wrapping EBI's InterPro API (`tools/interpro_domains_seam.py`) — two-call
+  flow (gene symbol → reviewed human UniProt accession → InterPro entries) behind one `_fetch`; emits a cited
+  **T1** fact listing real domain/family IPR accessions with provenance `interpro`; complete `output_schema`
+  (incl. `error`); `data_boundary` guardrail; wired into `_BUCKET1_AGENTS`+`python_fns`. Faithful to the
+  gnomAD/gtex template.
+- Gates (approver, independent subagents): Gate 1 **327 green** (+17) · Gate 2 reviewer **Approved** (3 Minor
+  nits) · Gate 5 verifier **PASS** (interpro fact lands via `run_live`, status `ok`, real IPR accessions;
+  schema-complete error path; honest degradation; facts proven mock-derived; data boundary enforced; no
+  vacuous tests).
+- Also in this commit: answered Hayes's HELP request (his gh-less Windows box can't `gh pr create` — sanctioned
+  the push→approver-opens token-less flow; watcher runs board-only there; PAT provisioning escalated to Rohan);
+  softened the CONTRIBUTOR_RULES "open your own PR" rule accordingly.
+- Follow-ups: **g:Profiler (PR-D)** is the last seam. 3 Minor InterPro nits to fold into PR-D or a cleanup:
+  `"1 entries"` grammar (count==1); UniProt-404-as-honest-empty comment accuracy; InterPro `page_size` for
+  proteins with >25 entries (all non-blocking, self-noted).
+
 ## 2026-06-23 — Autonomous contributor operation (watcher + operating loop)  (`main`, PR #10)
 - Built-By: `rohan` · merged by `rohan`. Docs + one bash script; no engine code.
 - What: contributor agents now run continuously without prompting and unblock themselves.
