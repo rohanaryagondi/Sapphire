@@ -11,6 +11,28 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — GTEx tissue-expression seam (quant-fact-seams PR-B)  (`main`, PR #9)
+- **GTEx seam authored by `hayes`** (`Built-By: hayes` on his commit b13f86f); **integrated + merged by `rohan`**
+  (this squash resolves a `status/WORKBOARD.md` conflict from his stale branch — see process note). Hayes credited
+  via `Co-Authored-By`.
+- What: stdlib-only Bucket-1 fact seam wrapping GTEx's public REST API (`tools/gtex_expression_seam.py`) —
+  two-call flow (gene symbol → Ensembl gencodeId → medianGeneExpression, dataset `gtex_v8` pinned) behind one
+  `_fetch`; emits a cited **T1** fact (top CNS-region median TPM + a CNS-selectivity rank computed over the
+  returned tissue medians — a verifiable rank, not an invented score) with provenance `gtex`; harness agent +
+  complete `output_schema` (incl. `error`); `data_boundary` guardrail; wired into `_BUCKET1_AGENTS`+`python_fns`.
+  Reused the gnomAD pilot template; applied both pilot-review refinements (versioned source label; selectivity
+  from real data).
+- Gates (approver, independent subagents): Gate 1 **310 green** (+16) · Gate 2 reviewer **Approved** (2 Minor
+  nits, non-blocking → follow-up) · Gate 5 verifier **PASS** (gtex fact lands via `run_live`, status `ok`, real
+  TPM; schema-completeness/error-path ok; honest degradation on all 4 paths; selectivity proven data-derived;
+  data boundary enforced; non-vacuous tests confirmed by wiring-deletion test) · no secrets.
+- Process note (recurring, now addressed on the workboard): Hayes's branch was cut from a stale `main` (pre-#8)
+  and he didn't open the PR — same as gnomAD. I resolved the resulting WORKBOARD conflict and opened/merged the
+  PR. The workboard "start here" note now requires contributors to branch from the latest `main` (rebase if it
+  moves) and to open their own PR.
+- Gaps/Follow-ups: next seam = **InterPro (PR-C)**, then g:Profiler. The 2 review nits (rank 2–5 fixture;
+  schema-subset assertion) are minor, fold into PR-C or a cleanup.
+
 ## 2026-06-23 — gnomAD constraint seam (quant-fact-seams PR-A pilot)  (`main`, PR #6)
 - **Built-By: `hayes`** · merged by `rohan`. **First contributor PR — the harness's first external contribution.**
 - What: stdlib-only Bucket-1 fact seam wrapping gnomAD's public GraphQL constraint API (`tools/gnomad_constraint_seam.py`)

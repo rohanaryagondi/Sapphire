@@ -20,14 +20,18 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **PR-A gnomAD ✅ merged (#6).** Remaining (one PR each): **GTEx (PR-B, next) → InterPro (PR-C) → g:Profiler (PR-D)**. | next: `hayes/gtex-expression` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| `quant-fact-seams` | in-progress | Build 4 quantitative-fact Bucket-1 seams in the `aso-tox` pattern. **gnomAD ✅ (#6) · GTEx ✅ (PR-B) merged.** Remaining (one PR each): **InterPro (PR-C, next) → g:Profiler (PR-D)**. | next: `hayes/interpro-domains` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
 | `experiment-design` | queued (after seams) | **Epic.** Port Matt's `design-form-agent` into Sapphire as a standalone tool: meeting-notes → filled experiment-design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the design sheet). Moat/firm wiring is a later epic. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 
-> **Hayes — your queue:** (1) finish `quant-fact-seams` — **GTEx (PR-B, next)** on `hayes/gtex-expression`,
-> then InterPro, then g:Profiler; use `sapphire-orchestrator/tools/gnomad_constraint_seam.py` as the template,
-> one seam per PR, full Gates 1–5 each (re-read the seams brief — it has the template + `syn_z`/`_SOURCE`
-> notes). (2) **THEN** the `experiment-design` epic (ED-1 first) — read its [brief]
-> (../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) in full before starting. Blocked? `dev/HELP.md`.
+> **Hayes — your queue:** (1) finish `quant-fact-seams` — gnomAD ✅ + GTEx ✅ merged; **InterPro (PR-C, next)**
+> on `hayes/interpro-domains`, then g:Profiler; use `sapphire-orchestrator/tools/gnomad_constraint_seam.py`
+> (or your gtex seam) as the template, one seam per PR, full Gates 1–5 each. (2) **THEN** the
+> `experiment-design` epic (ED-1 first) — read its [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md)
+> in full before starting.
+> **Two process musts (both slipped on gnomAD+GTEx — fix going forward):** **(a) cut your branch from the
+> LATEST `main`** (`git checkout main && git pull` first); if `main` moves while you work, `git merge origin/main`
+> + resolve before pushing — this avoids the merge conflicts I had to resolve for you. **(b) Open the PR
+> yourself** (`gh pr create --base main`) — don't just push the branch and stop. Blocked? `dev/HELP.md`.
 
 ## gavin  (`@GavinWongYF`) — contributor
 _No work assigned yet._
@@ -50,6 +54,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `quant-fact-seams` (PR-B GTEx) | hayes | 2026-06-23 | PR #9 |
 | `quant-fact-seams` (PR-A gnomAD) | hayes | 2026-06-23 | PR #6 |
 | `repo-streamline` | rohan | 2026-06-23 | PR #5 |
 | `status-vision-hardening` | rohan | 2026-06-22 | PR #3 |

@@ -27,7 +27,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -50,6 +50,9 @@ _BUCKET1_AGENTS = [
     # gnomAD gene constraint (pLI / LOEUF / missense Z) — quantitative fact source.
     # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
     "gnomad-constraint",
+    # GTEx tissue expression (median TPM + CNS selectivity) — quantitative fact source.
+    # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
+    "gtex-expression",
 ]
 
 
@@ -195,6 +198,10 @@ def run_live(
     # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
     if "gnomad-constraint" not in ctx["python_fns"]:
         ctx["python_fns"]["gnomad-constraint"] = gnomad_constraint_seam.findings
+    # Wire the GTEx expression seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
+    if "gtex-expression" not in ctx["python_fns"]:
+        ctx["python_fns"]["gtex-expression"] = gtex_expression_seam.findings
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents
