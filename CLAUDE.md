@@ -137,9 +137,11 @@ two-bucket "firm":
   driving their own Claude — see the **collaborative dev harness** in `dev/` (`CONTRIBUTORS.md`,
   `DELEGATION.md`, `PR_REVIEW.md`).
 - **Work on a feature branch `<handle>/<slug>` cut from `main`; ship via a PR.** **Only Rohan's Claude
-  reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). Canonical repo: **`rohanaryagondi-quiver/Sapphire`**
-  (Quiver-owned). GitHub *hard* enforcement (branch protection) is one step away — enable GitHub Pro on that
-  account, then run `dev/enable-branch-protection.sh`; until then the rule holds by **convention + CODEOWNERS
-  review-routing** (see `dev/CONVENTIONS.md` §1). Every commit carries `Built-By: <handle>` + the Claude
-  `Co-Authored-By` trailer.
+  reviews, approves, and merges PRs** (`dev/PR_REVIEW.md`). Canonical repo: **`rohanaryagondi/Sapphire`**.
+  Branch rules — **active on free tier:** client-side git hooks (`.githooks/`, installed via
+  `dev/setup-contributor.sh` — block pushes to `main`, enforce `<handle>/` naming + the `Built-By` trailer)
+  + `.github/CODEOWNERS` + `dev/CONTRIBUTOR_RULES.md` (binds hayes/gavin agents). **Staged for GitHub Pro:**
+  server-side branch protection (`dev/enable-branch-protection.sh`) and the `branch-guard` Action (`dev/ci/`) —
+  both unavailable on the free private repo (protection 403s; Actions can't run). Every commit carries
+  `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

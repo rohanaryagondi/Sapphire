@@ -11,6 +11,24 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-22 — Strict branch enforcement + repo renamed to Sapphire  (`main`, PR #2)
+- Built-By: `rohan` · merged by `rohan`.
+- What: Canonical repo renamed to **`rohanaryagondi/Sapphire`**. Layered branch-rule enforcement, as strict as
+  the free tier allows: client-side `.githooks/pre-push` (blocks main/protected pushes, enforces `<handle>/`
+  naming + prefix==`sapphire.handle`, blocks when unset, lets tags through) and `.githooks/commit-msg`
+  (requires a real `Built-By` trailer parsed via `git interpret-trailers`, cross-validated against the clone's
+  handle; tight merge exemption); `dev/setup-contributor.sh` wires both; `dev/CONTRIBUTOR_RULES.md` binds
+  hayes/gavin agents. CODEOWNERS → `@rohanaryagondi`. A detective `branch-guard` Action was authored but
+  **parked in `dev/ci/`** (injection-safe) — GitHub Actions can't allocate a runner on this free private repo
+  (jobs fail in ~4s with no steps), so an active workflow would red-X every PR; it activates with Pro.
+- Gates: hooks functionally verified twice (push-to-main/wrong-name/wrong-prefix/unset-handle BLOCKED,
+  own-branch + tags ALLOWED; commit without real `Built-By`, body-prose evasion, fake-"Merge", cross-handle
+  all REJECTED; real trailer + real merge ACCEPTED; real `git push --dry-run` to main blocked end-to-end) ·
+  independent review **Approved-with-nits** (all fixed) · independent verify **PASS** · injection-safe workflow.
+- Gaps/Follow-ups: true server-side branch protection still needs **GitHub Pro** (free-tier 403) —
+  `dev/enable-branch-protection.sh` applies it once upgraded; `--no-verify` is a known bypass (documented hard
+  violation, caught by the Action). Need Hayes/Gavin GitHub usernames before granting collaborator access.
+
 ## 2026-06-22 — Collaborative dev harness (multi-contributor, PR-gated)  (`main`, PR #1)
 - Built-By: `rohan` · merged by `rohan`.
 - What: Turned the solo `dev/` harness into a 3-contributor harness (rohan · hayes · gavin), each driving

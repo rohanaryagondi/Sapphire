@@ -6,12 +6,22 @@ Every change to Sapphire follows these. They are not style preferences; they are
 - **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
   `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
   a reviewed PR.
-  > **Enforcement status (2026-06-22):** the canonical repo is `rohanaryagondi-quiver/Sapphire` (Quiver-owned).
-  > That account is currently **GitHub free**, where branch protection + rulesets return 403. So hard
-  > enforcement is **one step away**: enable **GitHub Pro** on `rohanaryagondi-quiver` (~$4/mo), then run
-  > `bash dev/enable-branch-protection.sh` (token-free; reads `GH_TOKEN`). Until then the no-direct-push rule
-  > is **convention + CODEOWNERS review-routing**, not machine-enforced — anyone with write access *could*
-  > bypass it. Treat it as binding regardless, and do **not** grant Hayes/Gavin access until protection is live.
+  > **Enforcement (2026-06-22)** on the canonical repo `rohanaryagondi/Sapphire`, layered defense-in-depth:
+  > 1. **Client-side hooks** (`.githooks/`, installed by `dev/setup-contributor.sh`): `pre-push` hard-blocks
+  >    pushes to `main`/protected branches and non-`<handle>/` branches; `commit-msg` requires the `Built-By`
+  >    trailer. The strongest *preventive* control for cooperating agents.
+  > 2. **CODEOWNERS** routes every PR to the approver.
+  > 3. **`dev/CONTRIBUTOR_RULES.md`** binds the contributor agents (no main pushes, no merges, no `--no-verify`).
+  >
+  > These three are **active on the free tier today** (layer 1 verified blocking). Two server-side layers are
+  > **staged for a GitHub Pro upgrade** on `rohanaryagondi` (both currently unavailable on the free private
+  > repo — branch protection 403s, and Actions can't allocate a runner):
+  > - **branch protection** — `bash dev/enable-branch-protection.sh` (preventive, server-side).
+  > - **`branch-guard` Action** — parked in `dev/ci/` (detective: flags direct main pushes). Move it to
+  >   `.github/workflows/` once Actions runs.
+  >
+  > Until upgraded, the active layers are bypassable by a non-cooperating actor (`--no-verify`); **do not grant
+  > Hayes/Gavin write access until you accept that or upgrade.** Treat the rules as binding regardless.
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,
