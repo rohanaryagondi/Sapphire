@@ -42,10 +42,13 @@ module docstring so it's unambiguous.
 ## Phase 1 — the work (each is its own Standard-tier PR off `main`)
 
 ### ED-1 — Port + fidelity-lock  (PR-E1; build first)
-Bring Matt's code into `tools/experiment_design/`, adapted to our conventions:
-- `extract.py` (core: `extract(path) -> dict`, `render_md(data) -> str`, CLI), `extraction_prompt.py` (the
-  system prompt + Quiver vocabulary + `MENUS_REFERENCE`), `schema.py` (the form schema), and his
-  `sample_extraction*.json` + a sample transcript as the **golden fixture**.
+**Source is vendored** at `vendor/design-form-agent/` (verbatim snapshot, upstream `afcf01b`; see its
+`VENDORED.md`). Port FROM there INTO `tools/experiment_design/`, adapted to our conventions. **Do not edit
+anything under `vendor/`** — it's the preserved-original reference.
+- Port `extract.py` (core: `extract(path) -> dict`, `render_md(data) -> str`, CLI), `extraction_prompt.py` (the
+  system prompt + Quiver vocabulary + `MENUS_REFERENCE`), `schema.py` (the form schema); use
+  `vendor/design-form-agent/sample_extraction_jan6.json` + a `vendor/design-form-agent/test_data/*.pdf`
+  transcript as the **golden fixture**. (Skip `app.py` — the Slack bot is out of scope.)
 - **Preserve the scientific content verbatim** — the assay vocabulary, `MENUS_REFERENCE`, and the extraction
   prompt are the proprietary value (CONVENTIONS §4 vendor-verbatim analog). Wrap/adapt the plumbing; do **not**
   edit the domain prompt or menu values. Keep his original files as the canonical reference + an attribution

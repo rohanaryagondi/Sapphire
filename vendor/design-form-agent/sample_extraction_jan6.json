@@ -1,0 +1,315 @@
+{
+  "meeting_title": "Follow-up: Aim 1 Inhibitory Neuron Experiments",
+  "meeting_date": "2026-01-06",
+  "attendees": ["James Fink", "Steven Ryan", "Kathy (Speaker 2/3)", "Speaker 4 (unidentified)"],
+  "meeting_type": "follow_up",
+
+  "experiments": [
+    {
+      "experiment_name": "Potassium titration for GABA reversal potential",
+      "experiment_description": "Dose-response of external potassium (using KMeSO4 instead of KCl to avoid confounding chloride reversal) in the imaging buffer to modulate membrane potential and observe transition of GABA-mediated responses from inhibitory to excitatory (IPSP reversal).",
+
+      "metadata": {
+        "project_code": {"value": null, "confidence": "unresolved", "source": "Not explicitly discussed; likely falls under Aim 1 / Quake ruggedization"},
+        "assay_type": {"value": "Synaptic", "confidence": "high", "source": "Discussed as synaptic assay context throughout; imaging buffer is Tyrodes"},
+        "sub_assay_type": {"value": null, "confidence": "unresolved", "source": "Not specified; likely GABAR or custom"},
+        "round_number": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+      },
+
+      "culture": {
+        "genotypes": [
+          {
+            "name": {"value": "NGN2D.S. + DLX2 co-culture", "confidence": "high", "source": "Implied from Aim 1 context — inhibitory neuron co-culture experiments"},
+            "density": {"value": null, "confidence": "unresolved", "source": "Not discussed in this meeting"},
+            "lot_number": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+          }
+        ],
+        "num_plates": {"value": null, "confidence": "unresolved", "source": "Not finalized; plate layout started but not completed"},
+        "plate_type": {"value": "96-well Ibidi", "confidence": "medium", "source": "Standard for their experiments; not explicitly stated"},
+        "viruses": [],
+        "glia": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "glia_details": {}
+      },
+
+      "imaging": {
+        "imaging_date": {"value": null, "confidence": "unresolved", "source": "Not set; experiment planning still in progress"},
+        "imaging_div": {"value": null, "confidence": "unresolved", "source": "Not specified"},
+        "stim_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "imaging_buffer": {"value": "Tyrodes (modified with KMeSO4)", "confidence": "high", "source": "James at ~19:33 confirms Tyrodes for synaptic; KMeSO4 replaces KCl"},
+        "fovs_per_well": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "temperature": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "synaptic_blockers": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+      },
+
+      "treatments": [
+        {
+          "compound_name": {"value": "Potassium methyl sulfate (KMeSO4)", "confidence": "high", "source": "James at ~16:03 confirms KMeSO4 based on Gemini analysis; chosen over KCl, K-gluconate, K-acetate"},
+          "concentrations": [
+            {"value": "3 concentrations: low (~2 mM), standard (baseline ~5.4 mM), high (~8-10 mM)", "confidence": "medium", "source": "Steven at 20:34 suggests 'down to 2 and up to 8 or 10'; James agrees on 3 concentrations at 17:13; baseline KCl in Tyrodes is 5.4 mM equivalent"}
+          ],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "NaCl must be reduced proportionally to maintain osmolarity — discussed but exact recipe needs Gemini calculation"},
+          "timing": {"value": "Applied in imaging buffer (acute, at time of imaging)", "confidence": "high", "source": "Steven at 11:22 confirms this is in the imaging buffer, not in culture"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "Modulate membrane potential to shift GABA reversal potential; observe dose-response of IPSPs transitioning from inhibitory to excitatory"
+        }
+      ],
+
+      "plate_layout": {
+        "layout_strategy": {"value": "Three buckets of wells per plate: standard/low/high, repeating pattern (same as spontaneity/bursting experiment)", "confidence": "high", "source": "James at 20:58: 'just do three, three buckets of wells... one row standard, low, high, standard, low, high'"},
+        "controls": [
+          {"value": "Standard Tyrodes (baseline KCl concentration)", "confidence": "high", "source": "Steven at 17:18-21 confirms normal concentration as center point"}
+        ],
+        "notes": [
+          "6-point CRC discussed but James suggests 3 concentrations is sufficient given expected small dynamic range",
+          "Steven suggests sister plate with same K+ concentrations run in excitability assay as a control for depolarization block"
+        ]
+      },
+
+      "timeline": {
+        "events": []
+      },
+
+      "analysis_notes": [
+        "Goal is to show titration of reversal potential — EPSPs at low K+, flat/shunting at middle, IPSPs at high K+",
+        "Compare with sister plate excitability data to rule out depolarization block"
+      ]
+    },
+
+    {
+      "experiment_name": "GABA-A PAM panel for boosting IPSP/EPSP detection",
+      "experiment_description": "Test positive allosteric modulators (PAMs) of GABA-A receptors, including subtype-selective PAMs, to increase the amplitude and frequency of detectable IPSPs and EPSPs in co-cultures.",
+
+      "metadata": {
+        "project_code": {"value": null, "confidence": "unresolved", "source": "Not specified"},
+        "assay_type": {"value": "Synaptic", "confidence": "high", "source": "Context of IPSP/EPSP detection"},
+        "sub_assay_type": {"value": null, "confidence": "unresolved", "source": "Not specified"},
+        "round_number": {"value": null, "confidence": "unresolved", "source": "Not specified"}
+      },
+
+      "culture": {
+        "genotypes": [
+          {
+            "name": {"value": "NGN2D.S. + DLX2 co-culture", "confidence": "high", "source": "Same co-culture context as Aim 1"},
+            "density": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+            "lot_number": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+          }
+        ],
+        "num_plates": {"value": null, "confidence": "unresolved", "source": "Not determined"},
+        "plate_type": {"value": "96-well Ibidi", "confidence": "medium", "source": "Standard"},
+        "viruses": [],
+        "glia": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "glia_details": {}
+      },
+
+      "imaging": {
+        "imaging_date": {"value": null, "confidence": "unresolved", "source": "Designated as 'second experiment' — to be planned after drug ordering"},
+        "imaging_div": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "stim_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "imaging_buffer": {"value": "Tyrodes", "confidence": "medium", "source": "Synaptic assay context"},
+        "fovs_per_well": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "temperature": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "synaptic_blockers": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+      },
+
+      "treatments": [
+        {
+          "compound_name": {"value": "Diazepam", "confidence": "high", "source": "James at 21:33: 'one's going to be diazepam'"},
+          "concentrations": [],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "timing": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "General benzodiazepine PAM — affects alpha 2, 3, and 5 subunits; should boost wimpy GABA signals"
+        },
+        {
+          "compound_name": {"value": "Zolpidem", "confidence": "high", "source": "James at ~22:37-41 discusses zolpidem: 'highly specific for alpha one, which we think doesn't exist — so we should try that as well'"},
+          "concentrations": [],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "timing": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "Alpha-1 selective — expected negative control since their NGN2 neurons lack GABRA-A1 expression"
+        },
+        {
+          "compound_name": {"value": "KRM-II-81 (or similar alpha-2/3 selective PAM)", "confidence": "medium", "source": "Discussed at ~23:08-11 as 'research grade, avoids sedation associated alpha-1'; Steven hadn't heard of it"},
+          "concentrations": [],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "timing": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "Alpha-2/3 selective — avoids alpha-1; for circuit-level studies"
+        },
+        {
+          "compound_name": {"value": "MP-III-022 (alpha-5 selective PAM)", "confidence": "medium", "source": "Discussed at ~23:35-40: 'potent, selective PAM of GABA-A containing alpha-5 subunit, Ki 55 nM'"},
+          "concentrations": [],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "timing": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "Alpha-5 selective PAM — tests alpha-5 contribution since their cells express it"
+        },
+        {
+          "compound_name": {"value": "Barbiturates (unspecified)", "confidence": "low", "source": "James at 22:15 mentions barbiturates as 'something we can order'"},
+          "concentrations": [],
+          "vehicle": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "timing": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "addition_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+          "purpose": "Additional GABA-A modulators for the panel"
+        }
+      ],
+
+      "plate_layout": {
+        "layout_strategy": {"value": null, "confidence": "unresolved", "source": "James notes this should be a separate experiment from K+ titration since drugs need to be ordered/prepped first"},
+        "controls": [],
+        "notes": [
+          "James at 22:41: 'maybe this is the second experiment, instead of at the same time' — drugs need to be ordered and prepped",
+          "Check with Ben on what compounds are available in-house vs need ordering"
+        ]
+      },
+
+      "timeline": {
+        "events": []
+      },
+
+      "analysis_notes": [
+        "Key comparison: if alpha-1 PAM (zolpidem) does nothing but alpha-2/3 PAM works, that confirms GABRA subunit composition matches functional output",
+        "James at 24:00: 'if alpha-3 is high, alpha-1 is low, and the alpha-1 PAM doesn't work as well as the alpha-2/3 PAM, that's telling — that checks out'"
+      ]
+    },
+
+    {
+      "experiment_name": "Inhibitory neuron ratio experiment",
+      "experiment_description": "Vary the ratio of DLX2 (inhibitory) to NGN2 (excitatory) neurons to test whether changing inhibitory neuron density affects IPSP detection, combined with PAMs or K+ titration.",
+
+      "metadata": {
+        "project_code": {"value": null, "confidence": "unresolved", "source": "Not specified"},
+        "assay_type": {"value": "Synaptic", "confidence": "high", "source": "IPSP detection context"},
+        "sub_assay_type": {"value": null, "confidence": "unresolved", "source": "Not specified"},
+        "round_number": {"value": null, "confidence": "unresolved", "source": "Not specified"}
+      },
+
+      "culture": {
+        "genotypes": [
+          {
+            "name": {"value": "NGN2D.S. + DLX2 co-culture at varying ratios", "confidence": "high", "source": "James at 24:35 and 25:04"},
+            "density": {"value": "3 ratios to be determined", "confidence": "medium", "source": "James at 25:04: 'maybe three ratios... anything more granular is kind of useless'"},
+            "lot_number": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+          }
+        ],
+        "num_plates": {"value": null, "confidence": "unresolved", "source": "Not determined"},
+        "plate_type": {"value": "96-well Ibidi", "confidence": "medium", "source": "Standard"},
+        "viruses": [],
+        "glia": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "glia_details": {}
+      },
+
+      "imaging": {
+        "imaging_date": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "imaging_div": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "stim_protocol": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "imaging_buffer": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "fovs_per_well": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "temperature": {"value": null, "confidence": "unresolved", "source": "Not discussed"},
+        "synaptic_blockers": {"value": null, "confidence": "unresolved", "source": "Not discussed"}
+      },
+
+      "treatments": [],
+
+      "plate_layout": {
+        "layout_strategy": {"value": "3 ratios of DLX2:NGN2", "confidence": "medium", "source": "James at 25:04"},
+        "controls": [
+          {"value": "NGN2-only wells (no inhibitory neurons) with GABA assay and blockers — artifact control", "confidence": "high", "source": "James at 26:16: 'include a no GABA, no inhibitory neurons, NGN2 only, and we'd still run GABA assay... just to show it's not a CheRiff artifact'"}
+        ],
+        "notes": [
+          "James considering combining ratio experiment with PAM or K+ titration",
+          "Kathy assigned to draft plate layout for ratio experiment"
+        ]
+      },
+
+      "timeline": {
+        "events": []
+      },
+
+      "analysis_notes": [
+        "Compare IPSP counts across ratios",
+        "Include Hong Kang's detection approach for consistency"
+      ]
+    }
+  ],
+
+  "action_items": [
+    {
+      "description": "Get the Tyrodes imaging buffer recipe from Jen",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Feed the buffer recipe to Gemini to propose KMeSO4 dose-response concentrations and NaCl compensation plan",
+      "assignee": "James Fink / Kathy",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Check with Ben on availability of diazepam, zolpidem, KRM-II-81, MP-III-022, and barbiturates; order what's needed",
+      "assignee": "Kathy / Ben",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Draft plate layout for K+ titration experiment (3 conditions: standard/low/high, repeating rows)",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "high"
+    },
+    {
+      "description": "Draft plate layout for inhibitory neuron ratio experiment (3 ratios + NGN2-only control)",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "medium"
+    },
+    {
+      "description": "Schedule small group meeting Friday to finalize experiment designs",
+      "assignee": "James Fink",
+      "deadline": "Friday (2026-01-09 approx)",
+      "priority": "high"
+    },
+    {
+      "description": "GABA sniffers — look into feasibility (back-burnered due to illuminator/filter concerns)",
+      "assignee": "Kathy",
+      "deadline": null,
+      "priority": "low"
+    }
+  ],
+
+  "open_questions": [
+    {
+      "question": "What exact KMeSO4 concentrations should be used, and how much NaCl reduction is needed to maintain osmolarity?",
+      "context": "Need the Tyrodes recipe first, then calculate via Nernst equation. Baseline K+ in Tyrodes appears to be ~5.4 mM.",
+      "proposed_answers": ["~2 mM (low), ~5.4 mM (standard), ~8-10 mM (high) — Steven's suggestion"],
+      "who_should_decide": "Steven Ryan (electrophysiology expertise) + Gemini calculation"
+    },
+    {
+      "question": "Should the K+ titration and PAM experiments be run simultaneously on the same plates, or as separate experiments?",
+      "context": "PAM drugs need to be ordered and prepped, which takes time. K+ titration can proceed sooner.",
+      "proposed_answers": ["Separate experiments (James's preference)", "Combined on same plates"],
+      "who_should_decide": "James Fink"
+    },
+    {
+      "question": "What 3 ratios of DLX2:NGN2 should be tested?",
+      "context": "James notes anything more granular than 3 is useless. Current standard ratio not explicitly stated in this meeting.",
+      "proposed_answers": [],
+      "who_should_decide": "James Fink / Kathy"
+    },
+    {
+      "question": "Are GABA sniffers feasible with current illuminators and filters?",
+      "context": "Steven unsure if they're genetically encoded or aqueous dyes; may lack proper optics",
+      "proposed_answers": ["Back-burnered for now"],
+      "who_should_decide": "Steven Ryan / Jim"
+    }
+  ],
+
+  "additional_notes": [
+    "This meeting is a follow-up to the Dec 15 brainstorming session. The Dec 15 meeting generated a broad list of hypotheses for why IPSPs are scarce in human co-cultures (shunting, weak signals, missing synaptic machinery, inhibitory neurons not firing, etc). This Jan 6 meeting narrows to concrete experiments.",
+    "Background context from Dec 15: Hong Kang detected ~13 IPSPs from 6 FOVs in baseline conditions, dropping to 0 with gabazine. This is the starting signal they're trying to amplify.",
+    "Key scientific insight driving these experiments: NGN2 neurons express GABRA-A3 (fetal/slow) not GABRA-A1 (adult/fast), so IPSPs are expected to be broader and slower than rodent IPSPs — the analysis pipeline may need adjustment.",
+    "Separate experiments being run by Kathy/Luis on culture side: Thermo proprietary media, forskolin + rolipram (cAMP boost), chronic GABA agonist (muscimol for 2-4 weeks)",
+    "James explicitly chose KMeSO4 over KCl (confounds chloride reversal), K-gluconate (chelates calcium), K-acetate (too permeable), and K-methanesulfonate (similar but less preferred)"
+  ]
+}

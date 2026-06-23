@@ -21,13 +21,16 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
-| `experiment-design` | **blocked** (ED-1 source) | **Epic.** Port Matt's `design-form-agent` into Sapphire: meeting-notes → filled design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the sheet). **ED-1 blocked:** Hayes can't access `MatthewCarey24/design-form-agent` — escalated to Rohan (vendor a snapshot vs grant access); see the open HELP request. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
+| `experiment-design` | **active — ED-1 unblocked** | **Epic.** Port Matt's `design-form-agent` into Sapphire: meeting-notes → filled design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the sheet). **Source vendored at `vendor/design-form-agent/`** (see its `VENDORED.md`) — start **ED-1** now: port into `tools/experiment_design/`, domain prompt/`MENUS_REFERENCE`/schema verbatim, golden-test vs `vendor/design-form-agent/sample_extraction_jan6.json`. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
 > `bash dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running (board + HELP + PR-review channels).
-> **Status:** `quant-fact-seams` ✅ complete (all 4 seams merged). Next is the **`experiment-design` epic**,
-> but **ED-1 is blocked** pending the source repo (your HELP request is escalated to Rohan) — hold until the
-> source lands, then start ED-1 per its [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
+> **Status:** `quant-fact-seams` ✅ complete (all 4 seams merged). **Now active: the `experiment-design` epic —
+> ED-1 is UNBLOCKED.** Matt's source is vendored at **`vendor/design-form-agent/`** (read its `VENDORED.md`).
+> Start ED-1: port into `tools/experiment_design/` per the
+> [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) — domain prompt/`MENUS_REFERENCE`/schema
+> **verbatim**, deps in the tool subprocess (engine stays stdlib-only), golden-test vs
+> `vendor/design-form-agent/sample_extraction_jan6.json`. Don't edit anything under `vendor/`.
 > **PR flow:** you now have a PAT → **open your own PRs** (`gh pr create --base main`) and the watcher's
 > pr-review channel works. (If `gh` ever fails, the token-less push→approver-opens fallback remains sanctioned.)
 > Always branch from the **latest `main`** (`git pull` first; merge `origin/main` if it moves). Blocked? `dev/HELP.md`.
