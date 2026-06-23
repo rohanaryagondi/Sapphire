@@ -167,7 +167,7 @@ Empirically-tested-here rows (from the Q-Mammal eval) are marked **[Q-Mammal]**.
 
 ## CAP-15 Expert judgment / strategic reasoning
 
-***No off-the-shelf model.*** Intended build = the **expert agent** (see [`expert-agent/`](expert-agent/) — proposal + runnable scaffold). Patterns, with the honest caveat that persona-conditioning improves tone/framing but has shown near-zero/negative effect on specialized-task accuracy — so claims must be grounded in retrieved, cited public sources, not "pretend you are Dr. X."
+***No off-the-shelf model.*** Intended build = the **expert agent** (see [`expert-agent/`](../../expert-agent/) — proposal + runnable scaffold). Patterns, with the honest caveat that persona-conditioning improves tone/framing but has shown near-zero/negative effect on specialized-task accuracy — so claims must be grounded in retrieved, cited public sources, not "pretend you are Dr. X."
 
 - **RAG / GraphRAG over an expert corpus (2024-25)** — open (LangChain, LlamaIndex, Microsoft GraphRAG). Ground + cite claims from one expert's public output; GraphRAG adds multi-hop structure. `production` (framework)/`paper-claim` (fidelity).
 - **Persona-conditioned LLMs / role agents (2024-26)** — build pattern (system-prompt persona ± LoRA on corpus). Tone/framing gains; accuracy degradation risk on reasoning tasks. `research`/`paper-claim`.
