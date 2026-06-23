@@ -145,8 +145,11 @@ two-bucket "firm":
   `pre-push` blocks main/wrong-branch pushes and runs the full suite on Python changes — plus
   `.github/CODEOWNERS`, `dev/CONTRIBUTOR_RULES.md` (binds hayes/gavin agents), and `dev/audit-history.sh`
   (detective backup). Every commit carries `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
-  When a contributor's Claude is blocked it asks via **`dev/HELP.md`** (async Claude-to-Claude help desk).
-  Repo hygiene is audited by the **`sapphire-audit`** admin skill (`dev/audit-repo.sh` — stray files, broken
-  doc links, workboard drift). See `status/` for build status + the per-agent `status/WORKBOARD.md`, and
+  Contributor agents **run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): they keep
+  `dev/watch-assignments.sh <handle> <gh-user>` running as a background watcher (assignments on the workboard +
+  `dev/HELP.md` answers + PR reviews) and work their queue without prompting; when blocked they ask via
+  **`dev/HELP.md`** and the answer (merged to `main`) wakes them. Repo hygiene is audited by the
+  **`sapphire-audit`** admin skill (`dev/audit-repo.sh` — stray files, broken doc links, workboard drift).
+  See `status/` for build status + the per-agent `status/WORKBOARD.md`, and
   `docs/VISION.md` for the vision.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

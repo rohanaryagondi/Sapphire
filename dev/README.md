@@ -36,6 +36,8 @@ Never conflate them. A "reviewer" in the runtime harness is a *persona judging a
 | [`templates/`](templates/) | Reusable prompts: task brief, code review, functional verify |
 
 Scripts + skills: [`setup-contributor.sh`](setup-contributor.sh) (arm the hooks — run once per clone),
+[`watch-assignments.sh`](watch-assignments.sh) (the autonomous-contributor watcher — assignments + HELP
+answers + PR reviews; see `CONTRIBUTOR_RULES.md` §Autonomous operation),
 [`run-tests.sh`](run-tests.sh) (Gate 1), [`audit-history.sh`](audit-history.sh) (Built-By + secret history),
 [`audit-repo.sh`](audit-repo.sh) (repo-mess checks) — the last two are driven by the
 [`sapphire-audit`](../.claude/skills/sapphire-audit/SKILL.md) admin skill. Build skill: [`sapphire-build`](../.claude/skills/sapphire-build/SKILL.md).
