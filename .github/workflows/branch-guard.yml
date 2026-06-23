@@ -24,12 +24,13 @@ jobs:
         env:
           BR: ${{ github.head_ref }}
         run: |
-          echo "PR head branch: $BR"
-          if [[ ! "$BR" =~ ^(rohan|hayes|gavin)/.+ ]]; then
-            echo "::error::Branch name violates the naming rule. Use <handle>/<slug> (handle in rohan|hayes|gavin)."
+          echo "head_ref=[$BR]"
+          if printf '%s' "$BR" | grep -Eq '^(rohan|hayes|gavin)/.+'; then
+            echo "OK: branch naming valid."
+          else
+            echo "::error::Branch '$BR' violates <handle>/<slug> naming (handle in rohan|hayes|gavin)."
             exit 1
           fi
-          echo "OK: branch naming valid."
 
   # 2) Any push to main that is NOT by the approver is flagged loudly.
   direct-push-guard:
