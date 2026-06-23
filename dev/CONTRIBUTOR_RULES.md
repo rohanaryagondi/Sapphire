@@ -41,14 +41,49 @@ are unguarded and you will violate the rules below — so don't skip it.
 ## How you ship (the only path)
 ```
 bash dev/setup-contributor.sh hayes         # once
-git checkout main && git pull
+git checkout main && git pull               # ALWAYS branch from the LATEST main
 git checkout -b hayes/<slug>
 # ...build test-first, run Gates 1–5 locally...
 git commit            # message must include  Built-By: hayes
+# if main moved while you worked:  git fetch origin && git merge origin/main  (resolve, re-test)
 git push -u origin hayes/<slug>             # hook allows this; blocks main + wrong prefixes
-gh pr create --base main                    # fill the PR template with gate evidence
-# then STOP. rohan's Claude reviews, approves, and merges. You do not merge.
+gh pr create --base main                    # YOU open the PR — don't just push and stop
+# then wait for rohan's Claude to review. Address change-requests on the same branch + push.
+# rohan's Claude approves and merges. You never merge.
 ```
+Two musts that have slipped before: **(1) branch from the latest `main`** (and merge `origin/main` in if it
+moves) — stale branches cause merge conflicts the approver has to clean up; **(2) open your own PR** — a pushed
+branch with no PR is invisible to the flow.
+
+## Autonomous operation — run without being prompted
+Contributor agents are expected to **run continuously**, not one task at a time. After setup, start the
+watcher and enter the loop:
+
+```
+bash dev/setup-contributor.sh <handle>                       # once per clone
+# launch as a background Monitor (it emits an event when there's something to act on):
+bash dev/watch-assignments.sh <handle> <github-username>
+```
+
+The watcher (`dev/watch-assignments.sh`) watches **two channels on `origin/main`** + **your open PRs**:
+- **`status/WORKBOARD.md`** — a new/updated task under your handle, or (when the approver merges your PR) the
+  cue to start the next one.
+- **`dev/HELP.md`** — an **answer** to one of your HELP requests (the approver fills the request's *Answer*
+  field and merges it to `main`). This is how you get unblocked automatically.
+- **your open PRs** — a new review/comment from the approver (address change-requests, or proceed if approved).
+
+**The loop (repeat forever, no human input):**
+1. `git pull origin main`; read `status/WORKBOARD.md` (your section) + `dev/HELP.md` (answers to your requests).
+2. If a HELP request of yours was answered → act on the answer (unblock).
+3. If there's a pending task and nothing blocking → build it through the full lifecycle above (branch → gates →
+   open PR), then keep watching.
+4. If the approver reviewed your PR → address change-requests on the same branch + push; if approved, the
+   approver merges and the workboard signal will cue your next task.
+5. If you're blocked → post a HELP request (commit it), keep working on anything not blocked, and **wait for
+   the watcher to signal the answer** — don't stop the session.
+6. If there's no pending work → idle; the watcher will wake you when the approver assigns something.
+
+You only ever truly stop if explicitly told to. Blocked ≠ stopped — you ask via HELP and keep watching.
 
 ## Why hard rules and not just "please"
 Three agents editing one long-term codebase diverge fast without a single chokepoint. The chokepoint is: all
