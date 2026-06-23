@@ -32,6 +32,11 @@ are unguarded and you will violate the rules below — so don't skip it.
    Python — but don't rely on it; run the gates yourself.)
 8. **Honor every other convention** in `dev/CONVENTIONS.md` (stdlib-only runtime, provenance labels, public
    identifiers only, no secrets/binaries, real non-vacuous tests). The data boundary is absolute.
+9. **When blocked, ask — don't guess.** If the brief, `dev/CONVENTIONS.md`, `dev/GATES.md`, and the code don't
+   answer it — especially anything touching a contract/schema, the harness, the data boundary, or a gate you
+   can't explain — post a request in **`dev/HELP.md`** and signal it (PR comment, or have your operator relay
+   to Rohan). Guessing on the harness/contracts is how silent regressions happen (see the aso-tox schema
+   lesson). Keep working on anything not blocked while you wait.
 
 ## How you ship (the only path)
 ```

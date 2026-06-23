@@ -23,7 +23,8 @@ two-bucket "firm":
    subsystem) + **[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)** — the consolidated end-to-end walkthrough.
 1. `sapphire-orchestrator/AGENTS.md` — the operating model + full roster + the 7 operating rules.
 2. `sapphire-orchestrator/dossier_schema.md` — the "done" definition for the fact bucket.
-3. `HANDOFF.md` — full narrative: vision, decisions + rationale, status, next steps.
+3. `docs/reports/HANDOFF.md` — full narrative: vision, decisions + rationale, status, next steps. (For current
+   state prefer `status/OVERALL.md`; for the north star, `docs/VISION.md`.)
 
 ## Status
 - **Phase 1 DONE** (this branch): 3 control agents (Engagement Lead, Research Manager, Roundtable
@@ -120,7 +121,8 @@ two-bucket "firm":
 | `RohanOnly/qmodels_run/` | Q-Models overnight run artifacts: AWS pre-existing snapshot, append-only ledger, smoke result, and `REPORT.md` (the integration report). |
 | `sapphire-cascade/` | Runnable internal→gate→boost→abstain evidence pipeline; EMET live via Playwright. Skill: `sapphire-cascade`. |
 | `personas/` | James' 59 company personas (md, by archetype). Wrapped by `company-partner-template.md`. |
-| `capability_map.xlsx`, `model_landscape.md`, `integration_map.md`, `orchestration_brief_hayes.md`, `expert-agent/` | **Research foundation** — what to build, which models per capability, the 3-layer data vision, the CAP-15 expert-agent design (regulator partner reuses it). |
+| `docs/foundation/` (`capability_map.xlsx`, `model_landscape.md`, `integration_map.md`, `orchestration_brief_hayes.md`) + `expert-agent/` | **Research foundation** — what to build, which models per capability, the 3-layer data vision, the CAP-15 expert-agent design (regulator partner reuses it). |
+| `docs/reports/` (`HANDOFF.md`, `REPORT.md`, `MORNING-REPORT.md`) | Point-in-time narrative reports (historical record; for live state see `status/`). |
 | `site/` | Interactive walkthrough + the orchestrator **Console** (demo surface). |
 | `source/`, `meetings/`, `specs/` | James' raw Feb-2026 corpus (the ~300 prompts, 399 pipelines), the strategy-meeting transcript, design specs. |
 | `_build/` | Re-runnable generators (personas→md, xlsx, site data). |
@@ -143,5 +145,8 @@ two-bucket "firm":
   `pre-push` blocks main/wrong-branch pushes and runs the full suite on Python changes — plus
   `.github/CODEOWNERS`, `dev/CONTRIBUTOR_RULES.md` (binds hayes/gavin agents), and `dev/audit-history.sh`
   (detective backup). Every commit carries `Built-By: <handle>` + the Claude `Co-Authored-By` trailer.
-  See `status/` for build status + the per-agent `status/WORKBOARD.md`, and `docs/VISION.md` for the vision.
+  When a contributor's Claude is blocked it asks via **`dev/HELP.md`** (async Claude-to-Claude help desk).
+  Repo hygiene is audited by the **`sapphire-audit`** admin skill (`dev/audit-repo.sh` — stray files, broken
+  doc links, workboard drift). See `status/` for build status + the per-agent `status/WORKBOARD.md`, and
+  `docs/VISION.md` for the vision.
 - Push with the user's PAT when asked; scrub the token from the git remote afterward.

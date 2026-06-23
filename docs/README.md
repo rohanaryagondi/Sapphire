@@ -17,7 +17,7 @@ top-level [`CLAUDE.md`](../CLAUDE.md); for the deepest system walkthrough read
 2. [`sapphire-orchestrator/AGENTS.md`](../sapphire-orchestrator/AGENTS.md) — the operating model + roster + 7 rules.
 3. [`sapphire-orchestrator/dossier_schema.md`](../sapphire-orchestrator/dossier_schema.md) — the "done" definition for the fact bucket.
 4. [`ARCHITECTURE.md`](ARCHITECTURE.md) — **consolidated end-to-end architecture** (contracts → harness → agents → engagement loop → memory/self-improvement → console).
-5. [`HANDOFF.md`](../HANDOFF.md) — vision, decisions + rationale, status.
+5. [`reports/HANDOFF.md`](reports/HANDOFF.md) — vision, decisions + rationale, status. (Live state: [`status/OVERALL.md`](../status/OVERALL.md); north star: [`VISION.md`](VISION.md).)
 
 ## 2. Build phases (what's done)
 | Phase | What | Status |

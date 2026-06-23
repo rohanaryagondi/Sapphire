@@ -15,10 +15,17 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## rohan  (`@rohanaryagondi`) — lead + approver
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `quant-fact-seams` | assigned | Add 6–10 quantitative-fact Bucket-1 seams (gnomAD constraint, GTEx, DepMap, AlphaMissense, ± Foldseek/InterPro/enrichment) — hard numbers alongside EMET, in the `aso-tox` seam pattern. Ship incrementally (gnomAD pilot first). | — | [tools](tools.md) · [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+| _none in progress_ | — | (approver: review Hayes's quant-fact-seams PRs) | — | — |
 
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
-_No work assigned yet._
+| Task id | Status | Goal | Branch / PR | Area |
+|---|---|---|---|---|
+| `quant-fact-seams` | assigned | Build 4 quantitative-fact Bucket-1 seams — **gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment** (clean public APIs, no keys) — in the `aso-tox` seam pattern. **Pilot-gate: ship gnomAD first (PR-A), wait for merge, then one PR per remaining seam.** | `hayes/gnomad-constraint` (PR-A) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) |
+
+> **Hayes — start here:** (1) `bash dev/setup-contributor.sh hayes`  (2) read `dev/CONTRIBUTOR_RULES.md` +
+> the [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md) in full  (3) build **only**
+> `gnomad-constraint` first, open PR-A to `main`, stop and wait for Rohan's review. Stuck on the harness or a
+> contract? Post in `dev/HELP.md` — don't guess.
 
 ## gavin  (`@GavinWongYF`) — contributor
 _No work assigned yet._
