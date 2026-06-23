@@ -22,7 +22,7 @@
    pattern — hard numbers that complement EMET's narrative (EMET is an LLM knowledge source; these give the
    value, not the prose). Reimplemented as our own stdlib seams; the ToolUniverse runtime is NOT adopted.
    DepMap/AlphaMissense/Foldseek deferred (bulk-data/job-based). → `quant-fact-seams` (**hayes**):
-   **gnomAD pilot in review (PR-A)**; GTEx / InterPro / g:Profiler follow as separate PRs after merge ·
+   **gnomAD ✅ merged (PR-A, #6)**; GTEx (PR-B, next) → InterPro → g:Profiler follow as separate PRs ·
    [brief](../docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md).
 
 ## Watch-outs

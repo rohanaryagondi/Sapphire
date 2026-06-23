@@ -11,6 +11,21 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — gnomAD constraint seam (quant-fact-seams PR-A pilot)  (`main`, PR #6)
+- **Built-By: `hayes`** · merged by `rohan`. **First contributor PR — the harness's first external contribution.**
+- What: stdlib-only Bucket-1 fact seam wrapping gnomAD's public GraphQL constraint API (`tools/gnomad_constraint_seam.py`)
+  — emits cited **T1** facts (pLI, LOEUF, missense Z) with provenance `gnomad`, fires on a target gene symbol,
+  degrades honestly (gene-not-found vs backend-error distinguished; never raises; never fabricates). Harness
+  agent + complete `output_schema` (incl. `error`; `additionalProperties:false`), `data_boundary` guardrail,
+  wired into `_BUCKET1_AGENTS` + `python_fns`. The pilot that locks the pattern for GTEx/InterPro/g:Profiler.
+- Gates (approver, independent subagents): Gate 1 **294 green** (+16) · Gate 2 reviewer **Approved** (2 Minor
+  nits → folded into the brief for the next seams) · Gate 5 verifier **PASS** (gnomAD fact lands via `run_live`,
+  status `ok`, real numbers; **schema-completeness adversarial check passes — aso-tox trap NOT replicated**;
+  data boundary structurally enforced; live API matches fixture) · provenance `gnomad` allowed; no secrets.
+- Process: Hayes's Claude used `dev/HELP.md` correctly to flag 3 pre-existing cross-platform test conditions
+  (verified pre-existing on clean main, scoped out) — answered + logged as `crossplatform-test-hardening` backlog.
+- Gaps/Follow-ups: next seam = **GTEx (PR-B)**, then InterPro, g:Profiler — each its own PR off the pilot template.
+
 ## 2026-06-23 — Repo streamline + Hayes seam task + help desk + audit skill  (`main`, PR #5)
 - Built-By: `rohan` · merged by `rohan`. Feature tier (docs/process/tooling; no engine code).
 - What: (1) **Top-level cleanup** — top level now only `CLAUDE.md`+`README.md`; research-foundation docs →

@@ -45,20 +45,12 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-
-### [OPEN] Pre-existing cross-platform test failures on Windows (UTF-8 + hardcoded clone name)  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/gnomad-constraint
-**Blocking?** no — worked around locally; flagging for awareness + a decision on whether to harden in-repo.
-**Context:** `quant-fact-seams` pilot (PR-A). Ran the full Gate-1 suite (`dev/run-tests.sh`) on a Windows contributor machine.
-**Question:** Do you want these hardened in-repo (out of my brief's scope, so I didn't touch them), or is "run on macOS / set the env" the expected contributor setup? Three failures, all environmental, **none caused by my change** — verified by `git stash -u` + re-running on clean `main` (identical failures):
-  1. `moat/tests/test_client.py:153` `test_default_db_path_ends_with_repo_relative_path` hardcodes the clone dir name `sapphire-capability-map`; a clone named `Sapphire` (the GitHub repo's default) fails it. Worked around by cloning into the canonical `sapphire-capability-map` (CONVENTIONS §1).
-  2. `tests/test_scenarios.py::test_captured_scenarios_exist_and_validate` → `UnicodeDecodeError` (a file read uses the platform default codec; cp1252 on Windows).
-  3. `tests/test_trace_view.py::test_main_returns_0_for_valid_eid` → `UnicodeEncodeError` writing `✓` to a cp1252 stdout.
-  (2) and (3) pass under `PYTHONUTF8=1` (the macOS/Linux default this UTF-8 codebase assumes).
-**What I tried / read:** Confirmed pre-existing via `git stash -u` + re-run on clean main. With clone named `sapphire-capability-map` + `PYTHONUTF8=1`, `dev/run-tests.sh` → `Gate 1 GREEN — 294 tests`.
-**My current best guess:** Low-risk hardening: derive the moat test's expected suffix from the repo root instead of a literal name; add `encoding="utf-8"` to the offending file read and guard the `✓` stdout write (or just document `PYTHONUTF8=1` for Windows contributors). Happy to do a separate tiny PR if you want it — out of scope for this one.
-**Answer (lead fills):** —
+_None._
 
 ---
 
 ## Resolved
-_None yet._
+
+### [RESOLVED] Pre-existing cross-platform test failures (UTF-8 + hardcoded clone name)  ·  from: hayes  ·  date: 2026-06-23  ·  branch: hayes/gnomad-constraint
+**Question:** harden the 3 pre-existing cross-platform Gate-1 failures in-repo, or treat "run on macOS / set the env" as the expected setup? (moat clone-name test; `test_scenarios`/`test_trace_view` UTF-8 assumptions.)
+**Answer (rohan):** Good catch and exactly the right process — you verified pre-existing on clean `main`, scoped them out, and proposed a low-risk fix. Decision: **yes, harden in-repo** — a UTF-8 codebase should not silently fail on a Windows contributor, and the moat test shouldn't depend on the clone directory's name. But **not your job and not in your PR**: I've logged it as the **`crossplatform-test-hardening`** backlog task (status/WORKBOARD.md, suggested rohan/gavin) with your proposed fix (derive the moat suffix from the repo root; add `encoding="utf-8"` to the file read; guard the `✓` stdout write). **Don't let it block you** — keep building on the canonical `sapphire-capability-map` clone with `PYTHONUTF8=1` and proceed to GTEx (PR-B). Thanks for flagging it cleanly rather than papering over it.
