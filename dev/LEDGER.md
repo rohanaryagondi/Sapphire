@@ -11,6 +11,21 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Autonomous contributor operation (watcher + operating loop)  (`main`, PR #10)
+- Built-By: `rohan` · merged by `rohan`. Docs + one bash script; no engine code.
+- What: contributor agents now run continuously without prompting and unblock themselves.
+  `dev/watch-assignments.sh <handle> <gh-user>` (run as a background Monitor) emits an event on:
+  origin/main `WORKBOARD.md`/`HELP.md` change (new assignment / HELP answer / your PR merged → next task)
+  and a new approver review/comment on your open PR. `CONTRIBUTOR_RULES.md` gains a §Autonomous operation
+  loop; `HELP.md` answers land on `main`/the PR (the unblock trigger; pre-PR asks open a tiny `help-` PR);
+  `PR_REVIEW.md` now mandates bumping the workboard on merge (the contributor's next-task signal).
+- Gates: Gate 1 unaffected (no engine code; 310). Gate 2 reviewer **Approved-with-nits** — all 3 fixed:
+  gh-auth preflight WARN (no silent dead channel), honest board_sig comment, mandatory workboard-bump on
+  merge. Watcher functionally verified (clean start authed; WARN + board channel up when gh unauthed;
+  bash-3.2/macOS-safe). Audit clean.
+- Limits (honest): "runs forever" holds while the agent's session stays alive + gh stays authed; the watcher
+  emits into a live session, it can't restart a dead one. Enforcement remains convention+hooks (free repo).
+
 ## 2026-06-23 — GTEx tissue-expression seam (quant-fact-seams PR-B)  (`main`, PR #9)
 - **GTEx seam authored by `hayes`** (`Built-By: hayes` on his commit b13f86f); **integrated + merged by `rohan`**
   (this squash resolves a `status/WORKBOARD.md` conflict from his stale branch — see process note). Hayes credited
