@@ -1,7 +1,7 @@
 # Sapphire Cascade
 
 A runnable, multi-agent realization of the **three-layer re-ranking cascade** from
-[`../orchestration_brief_hayes.md`](../orchestration_brief_hayes.md): **internal moat → context
+[`orchestration_brief_hayes.md`](../docs/foundation/orchestration_brief_hayes.md): **internal moat → context
 *gate* → predictivity *boost* → uncertainty/abstention**. It makes James' **#7 → #1** demo concrete
 and shows, structurally, why Sapphire is *not* "Emit 2.0."
 

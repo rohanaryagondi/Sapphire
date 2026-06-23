@@ -16,7 +16,7 @@ Read the full commit range as a single coherent change (not task-by-task — tha
 Verdict: **Ready to merge** or **Needs fixes** (with file:line).
 
 ## The gated ship (only if Ready)
-Run the [`dev/GATES.md`](dev/GATES.md) merge checklist and confirm each:
+Run the [`dev/GATES.md`](../../dev/GATES.md) merge checklist and confirm each:
 ```
 [ ] Gate 1 full suite green (cite N)   [ ] Gate 2 review Approved
 [ ] Gate 3 provenance + no secrets/binaries   [ ] Gate 4 stdlib runtime + verbatim vendor

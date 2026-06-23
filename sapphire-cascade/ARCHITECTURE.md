@@ -1,7 +1,7 @@
 # Sapphire Cascade — Architecture
 
 A runnable, multi-agent realization of the **three-layer re-ranking cascade** recommended in
-[`../orchestration_brief_hayes.md`](../orchestration_brief_hayes.md). It operationalizes James'
+[`orchestration_brief_hayes.md`](../docs/foundation/orchestration_brief_hayes.md). It operationalizes James'
 three-layer data vision — **internal moat → context *gate* → predictivity *boost*** — as a panel
 of cooperating agents, with a calibrated **uncertainty/abstention** gate at the exit.
 

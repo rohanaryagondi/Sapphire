@@ -7,8 +7,9 @@ orchestrator reports the facts **and** how each player reacted. Goal: handle the
 in James' corpus — and harder.
 
 > **New here?** Read **[`CLAUDE.md`](CLAUDE.md)** (quick orientation) → **[`sapphire-orchestrator/AGENTS.md`](sapphire-orchestrator/AGENTS.md)**
-> (operating model + roster) → **[`REPORT.md`](REPORT.md)** (living architecture + status) → **[`HANDOFF.md`](HANDOFF.md)** (full narrative, next steps).
-> Work happens on the **`Rohan`** branch (local at `~/Desktop/Projects/Quiver/sapphire-capability-map`).
+> (operating model + roster) → **[`docs/reports/REPORT.md`](docs/reports/REPORT.md)** (living architecture + status) → **[`docs/reports/HANDOFF.md`](docs/reports/HANDOFF.md)** (full narrative, next steps).
+> For current build state see **[`status/OVERALL.md`](status/OVERALL.md)**; the north star is **[`docs/VISION.md`](docs/VISION.md)**.
+> **`main` is the bedrock**; work on a feature branch `<handle>/<slug>` and ship via PR (see `dev/`). Repo: `rohanaryagondi/Sapphire`.
 
 > **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from the product runtime harness in `sapphire-orchestrator/harness/`.
 
@@ -51,10 +52,10 @@ Sapphire's orchestrator + harness + 22-agent registry is the agentic layer that 
 - **`sapphire-cascade/`** — the original re-ranking evidence pipeline (live EMET). **`personas/`** — James' 59 company personas.
 - **`site/`** — interactive walkthrough + the orchestrator Console (demo surface).
 - **`dev/`** — Dev Harness: methodology, conventions, and gates for agents building Sapphire (distinct from the runtime harness).
-- **Research foundation** — `capability_map.xlsx`, `model_landscape.md`, `integration_map.md`,
-  `orchestration_brief_hayes.md`, `expert-agent/`: what to build, which models, the 3-layer data vision.
+- **Research foundation** — `docs/foundation/` (`capability_map.xlsx`, `model_landscape.md`,
+  `integration_map.md`, `orchestration_brief_hayes.md`) + `expert-agent/`: what to build, which models, the 3-layer data vision.
 - **`source/` · `meetings/` · `specs/` · `_build/`** — raw corpus, transcripts, design specs, generators.
-- **`docs/`** — ARCHITECTURE.md · LOKA.md · plans/ · sample-trace.txt
+- **`docs/`** — VISION.md · ARCHITECTURE.md · LOKA.md · foundation/ · reports/ · superpowers/ · **`status/`** (live build state).
 
 ---
 
@@ -77,14 +78,14 @@ into a living map of what Sapphire must do, what can do it today, and where Quiv
 
 | File | What it is |
 |---|---|
-| [`capability_map.xlsx`](capability_map.xlsx) | 16 capability areas × 299 prompts mapped to capability + disease area. |
-| [`model_landscape.md`](model_landscape.md) | Supply side: 3–6 candidate models/tools per capability, maturity + `proven`/`paper-claim` flag. |
-| [`integration_map.md`](integration_map.md) | Tool/data-source frequency re-cut into Internal/Context/Predictivity layers. |
+| [`docs/foundation/capability_map.xlsx`](docs/foundation/capability_map.xlsx) | 16 capability areas × 299 prompts mapped to capability + disease area. |
+| [`docs/foundation/model_landscape.md`](docs/foundation/model_landscape.md) | Supply side: 3–6 candidate models/tools per capability, maturity + `proven`/`paper-claim` flag. |
+| [`docs/foundation/integration_map.md`](docs/foundation/integration_map.md) | Tool/data-source frequency re-cut into Internal/Context/Predictivity layers. |
 | [`personas/`](personas/) | All 59 personas as markdown + `INDEX.md`. |
 | [`expert-agent/`](expert-agent/) | CAP-15 build: the "$50k expert from public posts" design + runnable scaffold. |
-| [`orchestration_brief_hayes.md`](orchestration_brief_hayes.md) | Strategic brief: 4 agentic-orchestration archetypes for Sapphire. |
+| [`docs/foundation/orchestration_brief_hayes.md`](docs/foundation/orchestration_brief_hayes.md) | Strategic brief: 4 agentic-orchestration archetypes for Sapphire. |
 | [`sapphire-cascade/`](sapphire-cascade/) | Runnable 3-layer re-ranking cascade (internal moat → gate → boost); live EMET. |
-| [`HANDOFF.md`](HANDOFF.md) | Full narrative: vision, decisions + rationale, current status, next steps. |
-| [`REPORT.md`](REPORT.md) | Living architecture + status document. |
+| [`docs/reports/HANDOFF.md`](docs/reports/HANDOFF.md) | Full narrative: vision, decisions + rationale, current status, next steps. |
+| [`docs/reports/REPORT.md`](docs/reports/REPORT.md) | Living architecture + status document. |
 | [`meetings/`](meetings/) | 2026-06-11 strategy meeting transcript + structured notes. |
 | [`source/`](source/) | James' raw Feb-2026 corpus (59 personas, 299 + 100 prompts, 399 pipelines). |

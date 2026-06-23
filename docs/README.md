@@ -17,7 +17,7 @@ top-level [`CLAUDE.md`](../CLAUDE.md); for the deepest system walkthrough read
 2. [`sapphire-orchestrator/AGENTS.md`](../sapphire-orchestrator/AGENTS.md) — the operating model + roster + 7 rules.
 3. [`sapphire-orchestrator/dossier_schema.md`](../sapphire-orchestrator/dossier_schema.md) — the "done" definition for the fact bucket.
 4. [`ARCHITECTURE.md`](ARCHITECTURE.md) — **consolidated end-to-end architecture** (contracts → harness → agents → engagement loop → memory/self-improvement → console).
-5. [`HANDOFF.md`](../HANDOFF.md) — vision, decisions + rationale, status.
+5. [`reports/HANDOFF.md`](reports/HANDOFF.md) — vision, decisions + rationale, status. (Live state: [`status/OVERALL.md`](../status/OVERALL.md); north star: [`VISION.md`](VISION.md).)
 
 ## 2. Build phases (what's done)
 | Phase | What | Status |
@@ -27,11 +27,11 @@ top-level [`CLAUDE.md`](../CLAUDE.md); for the deepest system walkthrough read
 | 3 | Orchestrator runs end-to-end (`orchestrator.py` · `run.py` · `serve.py` · Console) | DONE |
 | 4 | **Q-Models integration** — 24 tools callable; two-speed routing; live AWS plumbing proven | DONE — [report](../RohanOnly/qmodels_run/REPORT.md) |
 | 5 | **Harness · live EMET · self-improvement loop · scenario suite · integration** | DONE — [report](superpowers/PHASE5-REPORT.md) |
-| 6 | per-seam harness rewiring · capture stub scenarios live · real moat · Console upgrades | TODO (see CLAUDE.md) |
+| 6 | **ASO-tox tool integrated** — 22-agent harness, GBR model, stdlib seam; `run_live(..., sequences=...)` | DONE — see [`../CLAUDE.md`](../CLAUDE.md) §Phase 6 |
 
 ## 3. Phase 5 — specs, plans, reports (the subagent-driven build)
 Every workstream: brainstorm → **spec** → **plan** → subagent-driven execution (implement → spec+quality
-review → fix-loop → whole-branch review). ~137 stdlib-only tests; on branch `Rohan`; not pushed to main.
+review → fix-loop → whole-branch review). 278 stdlib-only tests; shipped to `main` (the bedrock).
 
 **Design specs** (`docs/superpowers/specs/`)
 - [Phase 5 design spec](superpowers/specs/2026-06-21-sapphire-phase5-design.md) — the whole-phase design (incl. Appendix A: the harness).
@@ -106,5 +106,6 @@ Data boundary (public identifiers only leave Quiver) · facts vs judgment · int
 culture ("SOTA on shit is still shit"). The harness enforces the first four **mechanically**.
 
 ## 9. Conventions
-Work on branch **`Rohan`**. Per-phase commits; push only when asked. Agent `.md` files follow one template
-(see end of `AGENTS.md`). Generated run artifacts live under `RohanOnly/`.
+**`main` is the bedrock**; work on a feature branch `<handle>/<slug>` cut from `main` and ship via a PR that
+Rohan's Claude reviews/merges (see [`../dev/CONTRIBUTOR_RULES.md`](../dev/CONTRIBUTOR_RULES.md)). Agent `.md`
+files follow one template (see end of `AGENTS.md`). Generated run artifacts live under `RohanOnly/`.

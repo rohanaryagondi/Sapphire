@@ -1,7 +1,7 @@
 # Sapphire — Architecture & Status Report
 
 *Last updated: 2026-06-22 · branch `Rohan` · repo `~/Desktop/Projects/Quiver/sapphire-capability-map` (local). **Building Sapphire?** See `dev/README.md` (the dev harness) — distinct from the product runtime harness in `sapphire-orchestrator/harness/`.*
-*This is the orientation document: what Sapphire is, how it's built, what works, and what's missing. For the overnight change log see [`MORNING-REPORT.md`](MORNING-REPORT.md); for agent specs see [`architecture/`](architecture/); for the engine see [`sapphire-orchestrator/`](sapphire-orchestrator/).*
+*This is the orientation document: what Sapphire is, how it's built, what works, and what's missing. For the overnight change log see [`MORNING-REPORT.md`](MORNING-REPORT.md); for agent specs see [`architecture/`](../../architecture/); for the engine see [`sapphire-orchestrator/`](../../sapphire-orchestrator/).*
 
 ---
 
@@ -15,7 +15,7 @@ The strategic moat is Quiver's proprietary **CNS perturbation data** (the Loka `
 
 ## 2. The "firm" pipeline
 
-Every question flows through the same four stages. The agent *specs* (org chart) live in [`architecture/`](architecture/); the *engine* that runs them lives in [`sapphire-orchestrator/`](sapphire-orchestrator/).
+Every question flows through the same four stages. The agent *specs* (org chart) live in [`architecture/`](../../architecture/); the *engine* that runs them lives in [`sapphire-orchestrator/`](../../sapphire-orchestrator/).
 
 ```
           ┌─────────────────────────────────────────────────────────────┐

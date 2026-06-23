@@ -5,7 +5,8 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 
 CHECKLIST = r"C:\Users\rohan.gondi\Desktop\Sapphire\extracted\Sapphire Prompt Work_Feb 2026\Sapphire_Pipeline_Master_Checklist.md"
-OUT = r"C:\Users\rohan.gondi\Desktop\Sapphire\sapphire-capability-map\capability_map.xlsx"
+# Output the generated workbook into docs/foundation/ (repo-relative; was a Windows abs path).
+OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "docs", "foundation", "capability_map.xlsx")
 
 # ---------- parse the 299 prompts ----------
 prompts = []          # (id, text, category)
@@ -215,7 +216,7 @@ notes = [
  ("", 10, False),
  ("HONESTY RULE: Status/verdict reflect only what Q-Mammal established. Everything else is 'Untested' or 'Gap' - no invented model performance.", 10, False),
  ("", 10, False),
- ("FULL MODEL DETAIL: the 'Candidate model(s)' column is a summary. See model_landscape.md for the full per-capability landscape (3-6 named models each, with maturity + proven/paper-claim flags).", 10, False),
+ ("FULL MODEL DETAIL: the 'Candidate model(s)' column is a summary. See docs/foundation/model_landscape.md for the full per-capability landscape (3-6 named models each, with maturity + proven/paper-claim flags).", 10, False),
 ]
 for i,(txt,sz,bold) in enumerate(notes, start=1):
     c = ws3.cell(i,1, txt); c.font=Font(name=ARIAL, size=sz, bold=bold, color=("1F3864" if bold and sz>=11 else "000000")); c.alignment=Alignment(wrap_text=True, vertical="top")

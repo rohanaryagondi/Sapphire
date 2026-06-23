@@ -11,6 +11,22 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Repo streamline + Hayes seam task + help desk + audit skill  (`main`, PR #5)
+- Built-By: `rohan` · merged by `rohan`. Feature tier (docs/process/tooling; no engine code).
+- What: (1) **Top-level cleanup** — top level now only `CLAUDE.md`+`README.md`; research-foundation docs →
+  `docs/foundation/`, point-in-time reports → `docs/reports/`; every reference fixed (build scripts, CLAUDE.md
+  Map, README, docs/README, sapphire-cascade links, REPORT.md's own links). (2) **quant-fact-seams reassigned
+  to hayes**, rescoped to the clean-API set (gnomAD, GTEx, InterPro, g:Profiler), pilot-gate sequencing; brief
+  rewritten as a self-contained, build-ready plan (seam template + worked gnomAD example + schema lesson +
+  Gate-5). (3) **`dev/HELP.md`** — async Claude-to-Claude help desk, wired into the harness + a new
+  CONTRIBUTOR_RULES rule 9. (4) **`sapphire-audit` admin skill** + `dev/audit-repo.sh` (macOS/bash-3.2-safe,
+  python3 link parser) — found + fixed 2 broken doc links (1 a regression from the move).
+- Gates: Gate 1 278 green · independent review **Approved-with-nits** (all 6 fixed) · whole-branch **Ready to
+  merge** · Gate 5 verifier **PASS** (audit clean, 0 broken links, adversarial link-check discriminates, exit
+  codes both directions, build-script paths resolve) · no secrets/binaries.
+- Gaps/Follow-ups: `_build/build_xlsx.py` `CHECKLIST` is still a Windows abs path (pre-existing; only matters
+  if regenerating the xlsx from raw input — not exercised). Hayes builds the seams next (gnomAD PR-A first).
+
 ## 2026-06-23 — Task assigned: quant-fact-seams (planning)  (`main`, PR #4)
 - Built-By: `rohan` · merged by `rohan`. Planning/docs only — no code.
 - What: Brief + workboard assignment for 6–10 quantitative-fact Bucket-1 seams (gnomAD constraint, GTEx,

@@ -5,7 +5,7 @@ from collections import Counter, defaultdict
 import openpyxl
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-XLSX = os.path.join(ROOT, "capability_map.xlsx")
+XLSX = os.path.join(ROOT, "docs", "foundation", "capability_map.xlsx")
 OUT  = os.path.join(ROOT, "site", "data.js")
 
 wb = openpyxl.load_workbook(XLSX)
@@ -43,7 +43,7 @@ for c in caps:
     c["promptCount"] = per_cap.get(c["id"], 0)
     c["topDiseases"] = dis_per_cap[c["id"]].most_common(4)
 
-# ---- hardcoded from integration_map.md (not in xlsx) ----
+# ---- hardcoded from docs/foundation/integration_map.md (not in xlsx) ----
 layers = {
   "Internal": {
     "blurb": "Quiver's unique functional data — the moat. Novel target signals nobody else has.",

@@ -27,11 +27,18 @@ Never conflate them. A "reviewer" in the runtime harness is a *persona judging a
 | [`CONVENTIONS.md`](CONVENTIONS.md) | The binding engineering rules every change must follow |
 | [`GATES.md`](GATES.md) | Definition of Done — the mandatory gates before anything lands on `main` |
 | [`CONTRIBUTORS.md`](CONTRIBUTORS.md) | Who builds Sapphire, the Claude each drives, attribution, ownership |
-| [`DELEGATION.md`](DELEGATION.md) | The live task-assignment board + the claim protocol |
+| [`DELEGATION.md`](DELEGATION.md) | The assignment protocol (live state is `status/WORKBOARD.md`) |
+| [`CONTRIBUTOR_RULES.md`](CONTRIBUTOR_RULES.md) | The hard rules binding contributor agents (hayes/gavin) |
 | [`PR_REVIEW.md`](PR_REVIEW.md) | The approver playbook — how Rohan's Claude gates a PR before merge |
+| [`HELP.md`](HELP.md) | The async help desk — a Claude asks another Claude when blocked (don't guess) |
 | [`LEDGER.md`](LEDGER.md) | Append-only build log (what shipped, when, which commit, `Built-By`) |
 | [`reports/`](reports/) | Per-contributor build reports (`reports/<handle>/`) |
 | [`templates/`](templates/) | Reusable prompts: task brief, code review, functional verify |
+
+Scripts + skills: [`setup-contributor.sh`](setup-contributor.sh) (arm the hooks — run once per clone),
+[`run-tests.sh`](run-tests.sh) (Gate 1), [`audit-history.sh`](audit-history.sh) (Built-By + secret history),
+[`audit-repo.sh`](audit-repo.sh) (repo-mess checks) — the last two are driven by the
+[`sapphire-audit`](../.claude/skills/sapphire-audit/SKILL.md) admin skill. Build skill: [`sapphire-build`](../.claude/skills/sapphire-build/SKILL.md).
 
 GitHub plumbing: [`.github/CODEOWNERS`](../.github/CODEOWNERS) (every PR needs Rohan's review) and
 [`.github/pull_request_template.md`](../.github/pull_request_template.md) (gate-evidence checklist).
