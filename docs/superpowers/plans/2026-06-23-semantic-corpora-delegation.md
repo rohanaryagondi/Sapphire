@@ -19,6 +19,29 @@ faster — and every claim cited, dated, tiered.
   `✓ corpus validation CLEAN`.
 - The agent's current spec: `architecture/bucket1/semantic/<agent>.md` (derive its lens + check types from it).
 
+## Step 0 — ONE-TIME setup: browser + EMET sign-in (do this before your first corpus)
+Both ingestion passes need a working browser, and Pass B needs an **authenticated** EMET session. Do this once
+per machine, at the very start:
+1. **Install the Playwright browser MCP** so you have `browser_navigate` / `browser_evaluate` etc.:
+   ```
+   claude mcp add playwright npx '@playwright/mcp@latest'      # registers the Playwright MCP server
+   npx playwright install chromium                              # installs the actual browser binary
+   ```
+   (If `browser_navigate` is already available in your session, the MCP is installed — skip to step 2.)
+   Verify by navigating to any page; if the browser tools aren't present after this, post in `dev/HELP.md`.
+2. **Open EMET in the browser:** `browser_navigate` to **`https://emet.benchsci.com/`**.
+3. **Ask your human operator to sign in.** You will land on the BenchSci login (`id.summit.benchsci.com`).
+   **Do NOT attempt to log in yourself** (no credential handling by the agent). Tell your operator, verbatim:
+   > "I've opened the BenchSci/EMET login in the Playwright browser. Please **sign in** — or **sign up with
+   >  your `.edu` email** if you don't have an account — then tell me when you're done."
+   Then **wait**. When they confirm, `browser_navigate` to `https://emet.benchsci.com/` again and verify the
+   page title is **"Chat · EMET"** (not the sign-in page). If it still shows the login wall, the session didn't
+   take — ask them to retry; do not proceed to Pass B until it lands on the app.
+4. The session persists for the browser's lifetime — you only re-do this if EMET later bounces you to the login
+   wall mid-build (if so, stop that EMET query, ask your operator to re-sign-in, and continue).
+
+Pass A (browser primary + web) works without any login; only Pass B (EMET) needs the sign-in above.
+
 ## Per-agent procedure (one branch `<handle>/corpus-<agent>`, one PR)
 1. **Derive the lens** from the agent's spec (METHOD Step 1) — each agent's claim-card fields differ:
    - `patent-ip`: patent_no · assignee · claims_scope · priority/expiry · target/molecule · status (granted/litigated/IPR)
@@ -38,10 +61,10 @@ faster — and every claim cited, dated, tiered.
    clinicaltrials.gov; safety → FDA FAERS/safety pages; payer → CMS/ICER; global → EMA/PMDA) and set `tier:"T1"`
    ONLY when you loaded the primary and quote a **verbatim substring**. Secondary/press = T2. A 404 = repoint;
    a blocked-but-correct primary = `"unverifiable_by_fetch": true`.
-3. **Pass B — EMET (→ T2, `emet-live`).** Per METHOD Step 3 Pass B. **First authenticate:** open
-   `emet.benchsci.com` in your browser and log in (if you hit `id.summit.benchsci.com`, you're not authed —
-   log in; if you can't, post in `dev/HELP.md`). Run a focused set of Thorough queries on your agent's key
-   biomedical/class mechanisms; add `emet-live` T2 cards citing **real PMIDs** (`pubmed.ncbi.nlm.nih.gov/<pmid>/`).
+3. **Pass B — EMET (→ T2, `emet-live`).** Per METHOD Step 3 Pass B. Requires the **Step 0** authenticated EMET
+   session (page title "Chat · EMET", not the login wall — if it bounces to the login, get your operator to
+   re-sign-in). Run a focused set of Thorough queries on your agent's key biomedical/class mechanisms; add
+   `emet-live` T2 cards citing **real PMIDs** (`pubmed.ncbi.nlm.nih.gov/<pmid>/`).
    EMET yield varies by agent: **central for post-market-safety / clinical-trial-registry**; thinner for the
    pure regulatory/financial/policy ones — run it regardless, let the yield be honest, record gaps.
 4. **Organize** (METHOD Step 5): `sapphire-orchestrator/corpus/<agent>/` → themed `notes/*.md` (cited+dated) +
