@@ -28,19 +28,21 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `robyn-scs-endpoint-wiring` | **in review (PR open)** | **Standard.** Built `tools/robyn_scs/` — 10 callable endpoints wrapping the vendored `robyn_scs` SCS/STA pipeline (`vendor/robyn_scs/utils/`): `detect_events`, `run_scs`, `run_sta`, `load_stim_metadata`, `stim_mask_from_sidecar`, `merge_and_classify`, `visualize`, `discover_fov_quartets`, `run_fov`, `run_batch`. Thin wrappers, **`vendor/` untouched**, full pipeline NOT run (verified by import + `inspect.signature` alignment + a synthetic `detect_events`). Engine stays stdlib-only (numpy/scipy/pandas/matplotlib lazy in the tool). Suite 476. | `hayes/robyn-scs-endpoints` (PR open) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md) |
+| `robyn-scs-endpoint-wiring` | ✅ **merged (#44)** | **Standard DONE.** `tools/robyn_scs/` — 10 callable endpoints wrapping the vendored SCS/STA pipeline; thin wrappers, `vendor/` untouched, pipeline not run (verified by signature alignment + synthetic `detect_events`); engine stays stdlib (heavy deps lazy/isolated). Gate 2 Approved + Gate 5 PASS, suite 478. Fast-follows (optional): `neuron_types_from_merged` signature probe; `run_fov` trace-roster comment. Next (separate task): live_engine seam to call these as a Bucket-1 tool. | — | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md) |
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
 | `experiment-design` | ✅ **ED-1 (#28) + ED-2 (#36) merged** | **Epic done.** Port Matt's `design-form-agent` → filled design sheet. `tools/experiment_design/` (extract.py + fill.py), vendor-verbatim, golden-locked, stdlib-only. Follow-up nit (next ED push): add `scan_direction`/`addition_protocol` to `_MENU_FIELDS` validation. | — | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
-| `semantic-corpora` (6) | assigned (after robyn-scs) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
+| `semantic-corpora` (6) | **🔨 NOW (robyn-scs ✅ done)** | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
 > `bash dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running (board + HELP + PR-review channels).
-> **Status:** `quant-fact-seams` ✅ + `experiment-design` (ED-1 #28, ED-2 #36) ✅ — both complete.
-> **🔨 NOW: `robyn-scs-endpoint-wiring`** (read the [brief](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md)).
-> The pipeline is **already vendored** for you at **`vendor/robyn_scs/`** (read its `VENDORED.md` + the
-> 8-endpoint map). Build `tools/robyn_scs/` that wires callable endpoints around the vendored `utils/` —
-> **don't modify `vendor/`, don't run the full pipeline** (verify by import + `inspect.signature`). Engine stays
-> stdlib-only (heavy deps live in the tool). Branch from latest `main` (`git pull` first). Then your 6 corpora.
+> **Status:** `quant-fact-seams` ✅ · `experiment-design` (#28/#36) ✅ · `robyn-scs-endpoint-wiring` (#44) ✅ — all complete.
+> **🔨 NOW: your 6 `semantic-corpora`** (patent-ip · post-market-safety · clinical-trial-registry ·
+> payer-market-access · manufacturing-cmc · dea-scheduling). Read the
+> [corpora brief](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) + the **locked** METHOD
+> (`sapphire-orchestrator/corpus/fda-institutional-memory/METHOD.md`) + study the worked example. Build dual-source
+> (browser + EMET), run `bash dev/validate-corpus.sh sapphire-orchestrator/corpus/<agent>` + `bash dev/run-tests.sh`
+> until both green. **Ship your FIRST, wait for my review, then batch the rest in parallel** (one PR each). Branch
+> from latest `main` (`git pull` first). Self-auth `emet.benchsci.com` for the EMET pass.
 > **PR flow:** you have a PAT → **open your own PRs** (`gh pr create --base main`); the watcher's pr-review channel
 > works. (If `gh` ever fails, the token-less push→approver-opens fallback remains sanctioned.) Blocked? `dev/HELP.md`.
 > Always branch from the **latest `main`** (`git pull` first; merge `origin/main` if it moves). Blocked? `dev/HELP.md`.
@@ -78,6 +80,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `robyn-scs-endpoint-wiring` (tools/robyn_scs) | hayes | 2026-06-24 | PR #44 |
 | `frontend-and-data-planes` (A data planes #37 + B transparent front end #41) | rohan | 2026-06-24 | PRs #37/#41 |
 | `experiment-design` (ED-2 fill.py) · vendor robyn_scs (#39) | hayes/rohan | 2026-06-24 | PRs #36/#39 |
 | `semantic-corpora` (global-regulatory-divergence — Gavin's 1st corpus) | gavin | 2026-06-24 | PR #30 |
