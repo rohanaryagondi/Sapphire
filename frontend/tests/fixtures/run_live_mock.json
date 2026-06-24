@@ -1,0 +1,826 @@
+{
+  "query": "Is TSC2 a viable target in tuberous sclerosis?",
+  "plan": {
+    "deliverable": "a ranked, de-risked target list",
+    "type": "prioritization",
+    "disease": "tuberous sclerosis / mTORopathy CNS",
+    "modality": "small molecule (default)",
+    "required_fields": [
+      "A Target & mechanism",
+      "B Scientific validation",
+      "C Safety"
+    ],
+    "skip_fields": [
+      "D Clinical & regulatory",
+      "E Competitive, IP & commercial",
+      "F Ecosystem / perception"
+    ],
+    "agents": [
+      {
+        "name": "Internal Science Lead",
+        "why": "owns the moat hypothesis (the #N starting ranks)"
+      },
+      {
+        "name": "EMET Analyst",
+        "why": "biomedical evidence \u2014 genetics, pathway, drug-safety (live)"
+      },
+      {
+        "name": "Q-Models Runner",
+        "why": "quantify binding / selectivity / ADMET on the surfaced candidate"
+      },
+      {
+        "name": "FDA Institutional Memory \u26d4",
+        "why": "dispositive-veto check on the class (prior CRL/withdrawal)"
+      },
+      {
+        "name": "Post-Market Safety",
+        "why": "class FAERS / label liabilities"
+      }
+    ],
+    "panel": [
+      {
+        "lens": "scientific",
+        "persona": "Biotech CSO \u2014 CNS translational (Denali)",
+        "why": "Biotech CSO \u2014 CNS translational (Denali)"
+      },
+      {
+        "lens": "commercial",
+        "persona": "Pharma BD \u2014 rare disease (BioMarin)",
+        "why": "Pharma BD \u2014 rare disease (BioMarin)"
+      },
+      {
+        "lens": "investability",
+        "persona": "Venture GP \u2014 neuro (Third Rock)",
+        "why": "Venture GP \u2014 neuro (Third Rock)"
+      },
+      {
+        "lens": "regulatory",
+        "persona": "Pharma Neuro SVP / ex-FDA (Takeda Neuro)",
+        "why": "Pharma Neuro SVP / ex-FDA (Takeda Neuro)"
+      },
+      {
+        "lens": "adversarial",
+        "persona": "Adversarial Red-Team (always seated)",
+        "why": "institutional \u2014 must stay adversarial; stress every claim"
+      }
+    ]
+  },
+  "priors": [],
+  "discover": {
+    "dossier": [
+      {
+        "value": "EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "emet mock",
+        "source": "PMID:9",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "Q-Models",
+        "tier": "T2",
+        "provenance": "qmodels",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "fda-primary",
+        "plane": "external"
+      },
+      {
+        "value": "FDA issued a Refusal to File letter for NurOwn (autologous MSC-NTF cells) in ALS; the BLA did not meet the threshold of substantial evidence and the pivotal Phase 3 missed its primary endpoint.",
+        "source": "BrainStorm Cell Therapeutics press release (PRNewswire)",
+        "tier": "T2",
+        "url": "https://www.prnewswire.com/news-releases/brainstorm-cell-therapeutics-receives-refusal-to-file-letter-from-fda-for-its-new-biologics-license-application-for-nurown-for-the-treatment-of-als-301673753.html",
+        "provenance": "corpus",
+        "plane": "external",
+        "from_corpus": true,
+        "field": "fda-institutional-memory"
+      },
+      {
+        "value": "FDA's final ALS drug-development guidance (Sept 2019) advises trial designs that minimize placebo-only exposure and addresses muscle weakness and survival as the disease's core motor aspects.",
+        "source": "FDA / Federal Register 2019-20629",
+        "tier": "T1",
+        "url": "https://www.federalregister.gov/documents/2019/09/24/2019-20629/amyotrophic-lateral-sclerosis-developing-drugs-for-treatment-guidance-for-industry-availability",
+        "provenance": "corpus",
+        "plane": "external",
+        "from_corpus": true,
+        "field": "fda-institutional-memory"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "mock",
+        "source": "PMID:1",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      }
+    ],
+    "flags": {
+      "VETO": [],
+      "DIVERGENCE": [],
+      "KNOWN_UNKNOWNS": []
+    },
+    "status": "complete",
+    "agents": [
+      {
+        "id": "internal-science-lead",
+        "status": "ok",
+        "provenance": "moat-real"
+      },
+      {
+        "id": "emet-runner",
+        "status": "ok",
+        "provenance": "emet-live"
+      },
+      {
+        "id": "q-models-runner",
+        "status": "ok",
+        "provenance": "qmodels"
+      },
+      {
+        "id": "fda-institutional-memory",
+        "status": "ok",
+        "provenance": "fda-primary"
+      },
+      {
+        "id": "patent-ip",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "global-regulatory-divergence",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "clinical-trial-registry",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "post-market-safety",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "payer",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "financial",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "aso-tox",
+        "status": "ok",
+        "provenance": "aso-tox"
+      },
+      {
+        "id": "gnomad-constraint",
+        "status": "ok",
+        "provenance": "gnomad"
+      },
+      {
+        "id": "gtex-expression",
+        "status": "ok",
+        "provenance": "gtex"
+      },
+      {
+        "id": "interpro-domains",
+        "status": "ok",
+        "provenance": "interpro"
+      },
+      {
+        "id": "geneset-enrichment",
+        "status": "ok",
+        "provenance": "gprofiler"
+      }
+    ]
+  },
+  "consult": {
+    "round1": [
+      {
+        "persona": "Mock Persona",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "Mock rationale for testing.",
+        "fact_claims": [
+          {
+            "claim": "TSC2 loss activates mTOR",
+            "cite": "mock"
+          }
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Mock Persona",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "Mock rationale for testing.",
+        "fact_claims": [
+          {
+            "claim": "TSC2 loss activates mTOR",
+            "cite": "mock"
+          }
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Mock Persona",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "Mock rationale for testing.",
+        "fact_claims": [
+          {
+            "claim": "TSC2 loss activates mTOR",
+            "cite": "mock"
+          }
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Mock Persona",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "Mock rationale for testing.",
+        "fact_claims": [
+          {
+            "claim": "TSC2 loss activates mTOR",
+            "cite": "mock"
+          }
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Mock Persona",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "Mock rationale for testing.",
+        "fact_claims": [
+          {
+            "claim": "TSC2 loss activates mTOR",
+            "cite": "mock"
+          }
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      }
+    ]
+  },
+  "synthesize": {
+    "recommendation": "Conditional advance \u2014 5 conditional verdict(s). Address open items before IND filing.",
+    "confidence": "medium",
+    "proposed_experiment": "Run orthogonal in vivo validation for TSC2 in disease-relevant model.",
+    "entities": {
+      "genes": [
+        "TSC2"
+      ],
+      "smiles": [],
+      "diseases": [],
+      "drugs": []
+    }
+  },
+  "engagement_id": "eng_6444d0e8",
+  "reflection": {
+    "engagement_id": "eng_6444d0e8",
+    "written": 19,
+    "records": [
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.691432+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ba6a26fe"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.691641+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_8420b013"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.691772+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0da5d162"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.691888+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_eebe5867"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.691995+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_aec302ce"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.692106+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_8a72a592"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.692217+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_d90d6b30"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-24T21:26:24.692325+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_59aebfe3"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "emet mock",
+          "source": "PMID:9"
+        },
+        "ts": "2026-06-24T21:26:24.692435+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_2bd116ed"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "qmodels",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "Q-Models"
+        },
+        "ts": "2026-06-24T21:26:24.692536+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ba44732f"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "fda-primary",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.692634+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_39fd5037"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.692751+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_2906eba1"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.692852+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_575a324f"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.692957+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_3d474305"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.693062+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_41643e5e"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.693172+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_dd9fb4e8"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "X"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "mock",
+          "source": "PMID:1"
+        },
+        "ts": "2026-06-24T21:26:24.693273+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_099ef0cd"
+      },
+      {
+        "type": "conclusion",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "synthesis",
+        "payload": {
+          "recommendation": "Conditional advance \u2014 5 conditional verdict(s). Address open items before IND filing.",
+          "confidence": "medium"
+        },
+        "ts": "2026-06-24T21:26:24.693384+00:00",
+        "tier": "T3",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_8e11c29a"
+      },
+      {
+        "type": "experiment_proposal",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "synthesis",
+        "payload": {
+          "experiment": "Run orthogonal in vivo validation for TSC2 in disease-relevant model."
+        },
+        "ts": "2026-06-24T21:26:24.693518+00:00",
+        "tier": "T3",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_5bcaf1e6"
+      }
+    ]
+  },
+  "_via": "harness-live"
+}

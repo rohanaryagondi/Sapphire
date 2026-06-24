@@ -27,6 +27,20 @@ else
   echo "  ✗ tests FAILED"; printf '%s\n' "$out" | tail -8; fail=1
 fi
 
+# Frontend suite (LOKA-fork control surface). Lives at repo root, not under
+# sapphire-orchestrator/; render+bridge tests are stdlib-only (NO chainlit needed) so they
+# run in Gate-1. The chainlit launch itself is Gate-5 (verifier), not here.
+cd "$ROOT" || { echo "run-tests: cannot cd repo root"; exit 1; }
+if [ -d frontend/tests ]; then
+  out="$(python -m unittest discover -s frontend/tests -t frontend 2>&1)"
+  n="$(printf '%s' "$out" | grep -oE 'Ran [0-9]+' | grep -oE '[0-9]+' | head -1)"
+  if printf '%s' "$out" | grep -qE '^OK'; then
+    echo "  ✓ frontend (${n:-0})"; total=$((total + ${n:-0}))
+  else
+    echo "  ✗ frontend FAILED"; printf '%s\n' "$out" | tail -8; fail=1
+  fi
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "Gate 1 GREEN — $total tests."
 else

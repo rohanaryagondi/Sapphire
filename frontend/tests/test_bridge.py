@@ -1,0 +1,58 @@
+"""Offline tests for frontend/bridge.py — the in-process run_live seam.
+
+Uses mock=True (the offline mock ctx), so $0, no network, deterministic. Isolates
+engagement/memory writes to temp dirs.
+"""
+from __future__ import annotations
+
+import os
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+_FRONTEND = Path(__file__).resolve().parents[1]
+_ENGINE = _FRONTEND.parent / "sapphire-orchestrator"
+for p in (str(_FRONTEND), str(_ENGINE)):
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
+import bridge  # noqa: E402
+from contracts.run_live_schema import validate_run_live  # noqa: E402
+
+
+class TestBridge(unittest.TestCase):
+    def setUp(self):
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_run_mock_conforms_to_contract(self):
+        r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True)
+        # validate_run_live ignores additive keys (_elapsed_s, _mock) — additive contract.
+        self.assertEqual(validate_run_live(r), [])
+        self.assertIn("_elapsed_s", r)
+        self.assertTrue(r["_mock"])
+        self.assertEqual(r["_via"], "harness-live")
+
+    def test_empty_query_degrades_not_crashes(self):
+        r = bridge.run("", mock=True)
+        self.assertIsInstance(r, dict)
+        self.assertIn("discover", r)  # well-formed, possibly degraded — no traceback
+
+    def test_build_ctx_live_is_none(self):
+        self.assertIsNone(bridge.build_ctx(False))
+        self.assertIsInstance(bridge.build_ctx(True), dict)
+
+    def test_bridge_error_envelope_is_wellformed(self):
+        env = bridge._error_envelope("q", RuntimeError("boom"))
+        self.assertEqual(validate_run_live(env), [])
+        self.assertEqual(env["_via"], "bridge-error")
+        self.assertIn("boom", env["discover"]["flags"]["KNOWN_UNKNOWNS"][0])
+
+
+if __name__ == "__main__":
+    unittest.main()
