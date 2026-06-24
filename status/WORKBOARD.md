@@ -13,15 +13,15 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ---
 
 ## rohan  (`@rohanaryagondi`) — lead + approver
-> **Overnight shift (2026-06-23→24):** a dedicated **rohan worker session** (separate clone) builds the 3 tasks
-> below serially per `docs/superpowers/plans/2026-06-24-overnight-shift.md`; the **auditor session** reviews +
-> Gate-5 verifies + auto-merges each. The auditor stays purely reactive (no own build PRs).
+> **Overnight shift (2026-06-23→24): ✅ COMPLETE** — all 3 worker tasks merged: H (#22), K1 (#24), K2 (#26).
+> Backend is now end-to-end-capable: front door serves the live firm (K1) + agents read their corpora at run
+> time (K2). Suite 368 green. (Auditor: auto-merged all-green; none held.)
 
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `crossplatform-test-hardening` | ✅ merged (#22) | Fixed 3 cross-platform test fails (moat dir-name, cp1252). Suite 343 green. | — | [dev-harness](dev-harness.md) |
 | `k1-run-live-service` | ✅ merged (#24) | **Keystone DONE.** `/api/run` now serves the harnessed `run_live` (`via=engine-live`); contract frozen + validated; canned = labeled fallback. Suite 356. | — | [frontend-loka](frontend-loka.md) |
-| `k2-corpus-retrieval` | assigned (worker, 3rd) | **Keystone.** Corpus-first→search-the-gap: Bucket-1 agents read `corpus/<id>/` at run time; corpus facts land in the dossier (traced, provenance), live path only for the gap. | `rohan/k2-corpus-retrieval` | [runtime-harness](runtime-harness.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
+| `k2-corpus-retrieval` | ✅ merged (#26) | **Keystone DONE.** Bucket-1 agents read `corpus/<id>/` at run time; corpus facts land in the dossier (traced, `provenance=corpus`), live path runs the gap. Veto rule intact. Suite 368. | — | [runtime-harness](runtime-harness.md) |
 
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |

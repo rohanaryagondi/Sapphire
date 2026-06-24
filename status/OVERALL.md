@@ -34,20 +34,18 @@ Bucket-1 facts (EMET + moat + seams + corpora, corpus-first→search-the-gap) �
 LOKA integration tracked in [frontend-loka.md](frontend-loka.md).
 
 ## Top open items (→ flow to the workboard when assigned)
-1. **Front-door = the live firm (the keystone).** `serve.py`'s `_run_live` is the headless-Claude/canned path,
-   **not** `live_engine.run_live` — so the live harnessed firm is still NOT the brain behind the front door.
-   Define `run_live` as a clean callable service boundary (the contract LOKA plugs into) + make it the real
-   entry. LOKA-independent prep; the keystone. (engine.md, frontend-loka.md)
-2. **Corpus runtime retrieval** — implement corpus-first→search-the-gap so Bucket-1 agents actually READ their
-   knowledge corpora at run time. The corpora (FDA-memory live; 12 delegated) are **inert until this exists.**
-   LOKA-independent; critical path. (runtime-harness.md, tools.md)
-3. **Bucket-1 semantic corpora** (`semantic-corpora`) — Hayes 6 / Gavin 6, dual-source, method locked. In motion. (tools.md)
-4. **Experiment Design tool** (`experiment-design`, **hayes**) — ED-1 unblocked (source vendored), then ED-2. (tools.md)
-5. **ASO Design tool** → feed sequences into the `aso-tox` channel. (tools.md)
-6. **Broaden scenario coverage**; **retire/label mocks**; **chronic-tox** (roadmap). (engine.md, tools.md)
-7. **Quant-fact seams round 2** (deferred): DepMap, AlphaMissense, Foldseek (bulk-data). (tools.md)
+1. **LOKA adapter** — when the LOKA code lands, wire LOKA ↔ the frozen `run_live` contract (K1). The front
+   door + contract are ready; this is the remaining front-end piece. (frontend-loka.md)
+2. **Bucket-1 semantic corpora** (`semantic-corpora`) — Hayes 6 / Gavin 6, dual-source, method locked. In
+   motion; each lights up at run time automatically now that K2 has landed. (tools.md)
+3. **Experiment Design tool** (`experiment-design`, **hayes**) — ED-1 unblocked (source vendored), then ED-2. (tools.md)
+4. **ASO Design tool** → feed sequences into the `aso-tox` channel. (tools.md)
+5. **Broaden scenario coverage**; **retire/label mocks**; **chronic-tox** (roadmap). (engine.md, tools.md)
+6. **Quant-fact seams round 2** (deferred): DepMap, AlphaMissense, Foldseek (bulk-data). (tools.md)
 
-*(✅ done: quant-fact-seams — gnomAD/GTEx/InterPro/g:Profiler all merged; FDA-memory dual-source corpus + the corpus method/gate.)*
+*(✅ done: quant-fact-seams (4 seams); FDA-memory dual-source corpus + method/gate; **K1 — front door now serves
+the live firm**; **K2 — Bucket-1 agents read their corpora at run time**; cross-platform test hardening. The
+backend is now end-to-end-capable on its own.)*
 
 ## Top risks
 - **Enforcement is local-only** (free repo, no branch protection/Actions) — relies on cooperating agents +

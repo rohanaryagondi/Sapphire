@@ -11,6 +11,23 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — [overnight] Task K2: corpus-first runtime retrieval (KEYSTONE)  (`main`, PR #26)
+- Built-By: `rohan` (worker) · merged by `rohan` (auditor). **Bedrock — makes the corpora pay off at run time.**
+- What: Bucket-1 agents now READ their knowledge corpus during `run_live`. New stdlib `corpus/reader.py`
+  (deterministic overlap match on lens fields + entities, capped, robust to missing/malformed); `live_engine`
+  wiring adds corpus-sourced facts (`provenance="corpus"`, `from_corpus=true`, carrying card source/tier/url)
+  to the dossier, **traced** (`corpus_retrieval` event), **generic** for any agent with a `corpus/<id>/` dir;
+  the live agent still runs the **gap** (corpus-first ≠ corpus-only). New `corpus` provenance label.
+- Gates (auditor, both independent, isolated worktrees): reviewer **Approved** + Gate-5 **PASS** — proven: an
+  aducanumab query → **5 of 14 dossier facts corpus-sourced** via `run_live` (offline, real fact dict w/ T1 +
+  FDA url); generic across all 16 agents (only fda-memory has a corpus; others contribute 0, no error); both
+  live dispatch + corpus_retrieval traced; **veto rule intact** (corpus facts never set a flag / touch
+  veto_flags — tested); `dev/run-tests.sh` change is a clean one-line `+corpus` (not gaming the gate); stdlib +
+  data boundary intact (no internal `_score` leak). Suite **368 green** (+12).
+- **Significance:** with K1 (front door = live firm) + K2 (corpora read at run time), the backend is now
+  end-to-end-capable on its own — corpus-grounded facts flow through the harnessed firm to `/api/run`. The 12
+  delegated corpora will light up automatically as they merge. **Overnight worker scope (H + K1 + K2) COMPLETE.**
+
 ## 2026-06-24 — [overnight] Task K1: run_live service boundary + real /api/run front door (KEYSTONE)  (`main`, PR #24)
 - Built-By: `rohan` (worker) · merged by `rohan` (auditor). **Bedrock — the front-door keystone.**
 - What: froze the `run_live` output contract (`contracts/run_live_schema.md` + `.py` recursive validator +
