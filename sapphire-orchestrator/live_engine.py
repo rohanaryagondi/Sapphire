@@ -28,6 +28,7 @@ from harness import trace
 import harness
 from selfimprove.reflect import reflect
 from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
+from corpus.reader import read_corpus, has_corpus
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -102,6 +103,24 @@ def _known_agent_ids(registry) -> set:
         from harness.contracts import load_registry
         registry = load_registry()
     return {a["id"] for a in registry.get("agents", [])}
+
+
+def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
+    """Convert a corpus claim-card into a corpus-sourced dossier fact.
+
+    Carries the card's own `source` / `tier` / `url` and stamps provenance="corpus"
+    (+ from_corpus=True). Deliberately sets NO `flag`: a corpus card is a T2 lead, not a
+    dispositive veto — a veto still requires its T1 primary.
+    """
+    return {
+        "value": card.get("claim") or card.get("value") or "",
+        "source": card.get("source", "corpus"),
+        "tier": card.get("tier", "T2"),
+        "url": card.get("url", ""),
+        "provenance": "corpus",
+        "from_corpus": True,
+        "field": agent_id,
+    }
 
 
 def _build_moat_agent():
@@ -246,9 +265,21 @@ def run_live(
             # Skip agents absent from the registry gracefully.
             continue
 
+        # Corpus-first retrieval: pull the matching claim-cards from this agent's
+        # pre-ingested local corpus (corpus/<agent_id>/index.jsonl), if any. These
+        # answer the stable ~70% locally; they are also handed to the agent below as
+        # `corpus_hits` so its live call can target only the uncovered gap.
+        corpus_cards = (
+            read_corpus(agent_id, query, ents) if has_corpus(agent_id) else []
+        )
+        agent_inputs = (
+            {**bucket1_inputs, "corpus_hits": corpus_cards}
+            if corpus_cards else bucket1_inputs
+        )
+
         res = harness.run(
             agent_id,
-            bucket1_inputs,
+            agent_inputs,
             engagement_id=eid,
             ctx=ctx,
             registry=registry,
@@ -275,6 +306,22 @@ def run_live(
         else:
             abstained_agents.append(agent_id)
             # A guardrail-violation or abstain is surfaced as a KNOWN_UNKNOWN.
+
+        # Surface the corpus cards as corpus-sourced dossier facts — independent of
+        # whether the live agent ran (the point of corpus-first: the stable knowledge
+        # lands even when the live backend is down). Each fact carries the card's own
+        # source/tier/url and provenance="corpus". A corpus card is a T2 LEAD, never a
+        # dispositive veto: we deliberately do NOT set flag=VETO here (a veto still
+        # requires its T1 primary, per the FDA-memory skill doc). Traced below.
+        if corpus_cards:
+            corpus_facts = [_corpus_card_to_fact(agent_id, c) for c in corpus_cards]
+            all_dossier_facts.extend(corpus_facts)
+            trace.record(eid, {
+                "type": "corpus_retrieval",
+                "agent_id": agent_id,
+                "n_cards": len(corpus_facts),
+                "facts": [f["value"][:120] for f in corpus_facts],
+            })
 
     known_unknowns = [f"abstained: {aid}" for aid in abstained_agents]
 
