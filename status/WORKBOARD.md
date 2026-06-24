@@ -19,6 +19,8 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
+| `frontend-and-data-planes` | **🔨 active (in-progress)** | **Feature.** Fork LOKA's Chainlit UI into `frontend/` (real LOKA repo untouched) as our **transparent front end** wired to `live_engine.run_live`: show the actual tools/agents + full firm process (plan→Bucket-1 per-agent→dossier→roundtable spread→synthesis), so we can see what's doing well and what isn't. PLUS **two enforced data planes** — internal moat vs external EMET/web/Q-Models, guard blocks internal→external, every fact tagged `plane` and shown distinctly. Retires `site/`. | `rohan/frontend-data-planes` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-sapphire-frontend-and-data-planes.md) |
+| `loka-integration-plan` | ✅ merged (#34) | Analyzed LOKA source (read-only), wrote plan + `/api/run` wire contract + open questions; data-boundary ruled (separate planes). | — | [frontend-loka](frontend-loka.md) |
 | `crossplatform-test-hardening` | ✅ merged (#22) | Fixed 3 cross-platform test fails (moat dir-name, cp1252). Suite 343 green. | — | [dev-harness](dev-harness.md) |
 | `k1-run-live-service` | ✅ merged (#24) | **Keystone DONE.** `/api/run` now serves the harnessed `run_live` (`via=engine-live`); contract frozen + validated; canned = labeled fallback. Suite 356. | — | [frontend-loka](frontend-loka.md) |
 | `k2-corpus-retrieval` | ✅ merged (#26) | **Keystone DONE.** Bucket-1 agents read `corpus/<id>/` at run time; corpus facts land in the dossier (traced, `provenance=corpus`), live path runs the gap. Veto rule intact. Suite 368. | — | [runtime-harness](runtime-harness.md) |
@@ -63,7 +65,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 
 | Task id | Suggested owner | Goal | Area |
 |---|---|---|---|
-| `frontdoor-wire-run-live` | rohan | Wire `run_live` into `serve.py`/Console — replace the canned path (the keystone) | [engine](engine.md) |
+| ~~`frontdoor-wire-run-live`~~ | rohan | ✅ Folded into `frontend-and-data-planes` (active above) — the new `frontend/` connects directly to `run_live`; `serve.py /api/run` already serves it (K1). | [frontend-loka](frontend-loka.md) |
 | `aso-design-tool` | hayes | Build the ASO Design tool; feed designed sequences into the `aso-tox` `sequences=` channel | [tools](tools.md) |
 | `scenario-coverage` | gavin | Broaden captured scenario coverage across the 10-axis variety matrix | [engine](engine.md) |
 | `retire-mocks` | — | Audit + honestly label/retire remaining mock surfaces | [tools](tools.md) |
