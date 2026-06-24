@@ -11,6 +11,17 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Overnight shift setup (worker plan + briefs)  (`main`, PR #21)
+- Built-By: `rohan`. Planning/docs for an autonomous overnight build run.
+- What: `docs/superpowers/plans/2026-06-24-overnight-shift.md` — a dedicated rohan *worker session* (separate
+  clone) builds 3 tasks serially: **H** crossplatform-test-hardening, **K1** run_live service boundary + real
+  front door, **K2** corpus runtime retrieval (corpus-first→search-the-gap). Rohan's *auditor session* (this
+  one) reviews + Gate-5 verifies + **auto-merges when all-green**, holds + documents anything that fails.
+  Builder ≠ approver preserved (distinct sessions). Workboard rohan rows assigned to the worker.
+- Decisions (Rohan): scope = K1+K2+hygiene; auto-merge if all-green; auditor stays purely reactive + AM report;
+  worker self-paced (halt on scope-done / blocked / unrecoverable gate).
+- Gates: docs only (342 green; audit clean).
+
 ## 2026-06-23 — LOKA end-to-end readiness prep + permanent no-Pro enforcement  (`main`, PR #20)
 - Built-By: `rohan`. Docs/harness prep for tomorrow's LOKA (front end) + Quiver-tool access; no code.
 - What: (1) **Readiness plan** `docs/superpowers/plans/2026-06-24-loka-end-to-end-readiness.md` — maps the
