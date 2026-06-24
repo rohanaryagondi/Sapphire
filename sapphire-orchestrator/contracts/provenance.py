@@ -18,9 +18,15 @@ The plane is DERIVED from provenance — it is never asserted by the caller.
 Use `plane_for(provenance) -> "internal" | "external"` to get the plane.
 For `qmodels:*` labels, the plane is always "external" (public-identifier inputs).
 
-Enforcement: `is_boundary_violation(target_provenance, fact_plane)` returns True
-when an external-provenance agent would receive an internal-plane fact, which must
-be BLOCKED by the data_boundary guardrail.  See harness/guardrails.py.
+This is the CLASSIFICATION layer: `plane_for` tags dossier facts (for the contract +
+UI) and `is_boundary_violation(target_provenance, fact_plane)` expresses the routing
+rule (True when an external-provenance agent would receive an internal-plane fact).
+The RUNTIME enforcer is a separate, complementary mechanism: `harness/guardrails.py`
+`data_boundary()` blocks a dispatch by scanning inputs for internal identifiers/keys.
+The two are deliberately kept apart — `data_boundary()` is shared with the public-only
+memory subsystem, so it keys on raw internal data, not on a fact's provenance label
+(blanket-blocking `moat-real` there would wrongly refuse legitimate internal-data-in-
+memory / internal-data-to-reasoning flows the boundary rule permits).
 """
 from __future__ import annotations
 
@@ -74,12 +80,21 @@ _PLANE_MAP: dict[str, str] = {
     "gprofiler":        "external",
 }
 
-# Sanity guard: every label in PROVENANCE must have an entry in _PLANE_MAP.
-# Evaluated at import time so a missing mapping is caught immediately.
+# Sanity guard (BIDIRECTIONAL): the PROVENANCE set and _PLANE_MAP keys must match
+# exactly. Evaluated at import time so a drift in either direction is caught immediately:
+#   - a PROVENANCE label with no plane  → plane_for() would KeyError at runtime;
+#   - an orphan _PLANE_MAP key not in PROVENANCE → is_valid_provenance() would reject it
+#     while plane_for() silently accepts it (an invisible inconsistency).
+# (qmodels:* is intentionally in NEITHER set — it is handled by the plane_for fast-path.)
 _unmapped = PROVENANCE - frozenset(_PLANE_MAP.keys())
 if _unmapped:  # pragma: no cover
     raise RuntimeError(
         f"contracts/provenance.py: provenance label(s) missing from _PLANE_MAP: {_unmapped}"
+    )
+_orphan = frozenset(_PLANE_MAP.keys()) - PROVENANCE
+if _orphan:  # pragma: no cover
+    raise RuntimeError(
+        f"contracts/provenance.py: _PLANE_MAP key(s) not in PROVENANCE: {_orphan}"
     )
 
 
@@ -111,15 +126,21 @@ def is_boundary_violation(target_provenance: str, fact_plane: str) -> bool:
 
     This function encodes the rule; the enforcement seam is ``harness/guardrails.py``
     ``data_boundary()``, which blocks the call before dispatch.
+
+    Fail-safe: only an **internal** fact can ever violate, so a non-internal
+    ``fact_plane`` is always safe; but an internal fact bound for an
+    unidentifiable target (non-str / unknown provenance) is conservatively
+    treated as a violation (block) rather than waved through.
     """
-    if not isinstance(target_provenance, str) or not isinstance(fact_plane, str):
-        return False
+    if not isinstance(fact_plane, str) or fact_plane != "internal":
+        return False  # only internal-plane facts can violate the boundary
+    if not isinstance(target_provenance, str):
+        return True   # internal fact + unidentifiable target → block (fail-safe)
     try:
         agent_plane = plane_for(target_provenance)
     except KeyError:
-        # Unknown provenance → conservatively treat as external (block internal facts).
-        agent_plane = "external"
-    return agent_plane == "external" and fact_plane == "internal"
+        agent_plane = "external"  # unknown provenance → treat as external (block internal)
+    return agent_plane == "external"
 
 
 def is_valid_provenance(p) -> bool:

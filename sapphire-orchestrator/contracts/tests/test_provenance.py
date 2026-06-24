@@ -128,10 +128,14 @@ class TestIsBoundaryViolation(unittest.TestCase):
         """An unknown target provenance is treated as external (conservative block)."""
         self.assertTrue(is_boundary_violation("unknown-tool-xyz", "internal"))
 
-    def test_non_string_inputs_safe(self):
-        """Non-string inputs must not raise; they return False (no violation)."""
-        self.assertFalse(is_boundary_violation(None, "internal"))
-        self.assertFalse(is_boundary_violation("emet-live", None))
+    def test_non_string_inputs_fail_safe(self):
+        """Non-string inputs must not raise. Fail-safe: a non-internal fact_plane is
+        always safe (only internal facts can violate); but an internal fact bound for an
+        unidentifiable (non-str) target is conservatively BLOCKED rather than waved through."""
+        self.assertFalse(is_boundary_violation("emet-live", None))   # non-internal plane → safe
+        self.assertFalse(is_boundary_violation(None, None))          # non-internal plane → safe
+        self.assertTrue(is_boundary_violation(None, "internal"))     # internal + unknown target → block
+        self.assertTrue(is_boundary_violation(123, "internal"))      # internal + non-str target → block
 
     def test_all_external_labels_block_internal_facts(self):
         """Every external-plane provenance must trigger a violation for internal facts."""

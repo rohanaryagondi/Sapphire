@@ -302,15 +302,16 @@ def run_live(
             for f in facts:
                 enriched = dict(f)
                 enriched.setdefault("provenance", prov)
-                # A3: stamp the data plane derived from the fact's provenance.
-                # plane is additive (never replaces an existing key) and derived —
-                # never asserted by the agent. Unknown provenances default to "external"
-                # (conservative: an unknown source is treated as external for safety).
+                # A3: stamp the data plane DERIVED from the fact's provenance.
+                # Authoritative + unconditional — any `plane` the agent asserted is
+                # overwritten by the derived value (the spec guarantee: plane is derived,
+                # never asserted). Unknown provenances → "external" (conservative: an
+                # unknown source is treated as external for safety).
                 fact_prov = enriched.get("provenance", prov)
                 try:
-                    enriched.setdefault("plane", plane_for(fact_prov))
+                    enriched["plane"] = plane_for(fact_prov)
                 except KeyError:
-                    enriched.setdefault("plane", "external")
+                    enriched["plane"] = "external"
                 all_dossier_facts.append(enriched)
                 flag = f.get("flag")
                 if flag == "VETO":
