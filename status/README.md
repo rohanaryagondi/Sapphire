@@ -10,6 +10,7 @@ is the bridge between the **vision** (`docs/VISION.md`), the **architecture** (`
 | [`OVERALL.md`](OVERALL.md) | The one-screen build status — phase, test count, what's live vs mock, top risks. Start here. |
 | [`WORKBOARD.md`](WORKBOARD.md) | **The workboard** — per-agent assignments (rohan / hayes / gavin) + the shared backlog. Where each contributor's Claude looks for "what's pending for me." |
 | `engine.md` | Status of the orchestrator engine (`orchestrator.py`, `live_engine.py`, `run_live`). |
+| [`frontend-loka.md`](frontend-loka.md) | Front-end / LOKA integration + the `run_live`-as-front-door keystone. |
 | `runtime-harness.md` | Status of the product runtime harness (`sapphire-orchestrator/harness/`) + the 22-agent registry. |
 | `tools.md` | Status of the fact sources/tools: moat, EMET, Q-Models, ASO-tox. |
 | `dev-harness.md` | Status of the build system itself (`dev/` — this collaborative harness). |

@@ -21,8 +21,8 @@
 - ✅ Work tracking: `status/WORKBOARD.md` (assignments) ↔ `dev/DELEGATION.md` (protocol).
 
 ## Open items
-- None blocking. If the repo ever moves to a paid plan/org, `dev/enable-branch-protection.sh` adds the
-  server-side preventive layer — not currently planned.
+- None. Enforcement is **local-and-permanent by decision** (no GitHub Pro): hooks + CODEOWNERS + audit are the
+  complete model — there is no server-side branch-protection layer coming. Don't reintroduce "pending Pro" language.
 
 ## Watch-outs
 - Hooks are **per-clone** — a contributor who skips `setup-contributor.sh` or uses `--no-verify` bypasses

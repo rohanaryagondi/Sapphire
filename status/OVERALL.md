@@ -26,18 +26,28 @@ harnessed path (`run_live`) to the front door.
 - **P6:** ASO-tox tool integrated; **`run_live(..., sequences=...)`** feeds it real GBR tox facts (shipped
   2026-06-22, PR-gated).
 
+## The end-to-end goal (LOKA arriving 2026-06-24)
+LOKA is Quiver's **front end** (per `docs/LOKA.md`); Sapphire is the agentic reasoning layer; Quiver tools are
+the predictive capability. End-to-end = **LOKA query → `live_engine.run_live` (the live harnessed firm) →
+Bucket-1 facts (EMET + moat + seams + corpora, corpus-first→search-the-gap) → Bucket-2 roundtable → synthesis
+→ back to LOKA.** Readiness plan: `docs/superpowers/plans/2026-06-24-loka-end-to-end-readiness.md`. Front-end /
+LOKA integration tracked in [frontend-loka.md](frontend-loka.md).
+
 ## Top open items (→ flow to the workboard when assigned)
-1. **Wire `run_live` to the front door** — replace the canned path in `serve.py`/Console with the live
-   harnessed firm. *The keystone.* (engine.md)
-2. **ASO Design tool** — build it; feed its designed sequences into the `aso-tox` `sequences=` channel. (tools.md)
-3. **Broaden captured scenario coverage** across the 10-axis variety matrix. (engine.md)
-4. **Retire remaining mocks honestly** / mark every track's provenance. (tools.md)
-5. **Chronic-tox model** integration (roadmap). (tools.md)
-6. **Quantitative-fact seams** (assigned `quant-fact-seams`, **hayes**) — gnomAD constraint, GTEx, InterPro,
-   g:Profiler as Bucket-1 seams: hard numbers alongside EMET's narrative. gnomAD ✅ merged; GTEx next. (tools.md)
-7. **Experiment Design tool** (`experiment-design`, **hayes**, queued after seams) — port Matt's
-   design-form-agent into Sapphire: meeting-notes → filled experiment-design sheet. Phase 1 standalone;
-   moat/firm integration later. Step toward Sapphire as Quiver's all-in-one AI. (tools.md)
+1. **Front-door = the live firm (the keystone).** `serve.py`'s `_run_live` is the headless-Claude/canned path,
+   **not** `live_engine.run_live` — so the live harnessed firm is still NOT the brain behind the front door.
+   Define `run_live` as a clean callable service boundary (the contract LOKA plugs into) + make it the real
+   entry. LOKA-independent prep; the keystone. (engine.md, frontend-loka.md)
+2. **Corpus runtime retrieval** — implement corpus-first→search-the-gap so Bucket-1 agents actually READ their
+   knowledge corpora at run time. The corpora (FDA-memory live; 12 delegated) are **inert until this exists.**
+   LOKA-independent; critical path. (runtime-harness.md, tools.md)
+3. **Bucket-1 semantic corpora** (`semantic-corpora`) — Hayes 6 / Gavin 6, dual-source, method locked. In motion. (tools.md)
+4. **Experiment Design tool** (`experiment-design`, **hayes**) — ED-1 unblocked (source vendored), then ED-2. (tools.md)
+5. **ASO Design tool** → feed sequences into the `aso-tox` channel. (tools.md)
+6. **Broaden scenario coverage**; **retire/label mocks**; **chronic-tox** (roadmap). (engine.md, tools.md)
+7. **Quant-fact seams round 2** (deferred): DepMap, AlphaMissense, Foldseek (bulk-data). (tools.md)
+
+*(✅ done: quant-fact-seams — gnomAD/GTEx/InterPro/g:Profiler all merged; FDA-memory dual-source corpus + the corpus method/gate.)*
 
 ## Top risks
 - **Enforcement is local-only** (free repo, no branch protection/Actions) — relies on cooperating agents +

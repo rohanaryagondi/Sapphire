@@ -11,6 +11,22 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — LOKA end-to-end readiness prep + permanent no-Pro enforcement  (`main`, PR #20)
+- Built-By: `rohan`. Docs/harness prep for tomorrow's LOKA (front end) + Quiver-tool access; no code.
+- What: (1) **Readiness plan** `docs/superpowers/plans/2026-06-24-loka-end-to-end-readiness.md` — maps the
+  end-to-end path (LOKA → `run_live` → Bucket-1 {EMET·moat·seams·corpora, corpus-first} → roundtable →
+  synthesis → LOKA), the honest gaps, and the two **LOKA-independent critical-path builds**: K1 `run_live` as a
+  clean service boundary (the keystone — `serve.py`'s `_run_live` is the canned path, NOT the harnessed firm)
+  and K2 corpus runtime retrieval (corpora are inert until agents read them). New Quiver tools plug in via the
+  existing seam pattern — no harness change needed. (2) `status/frontend-loka.md` area doc; reconciled
+  `status/OVERALL.md` to reality (seams done, corpora delegated).
+- **Enforcement is now permanent-no-Pro:** removed `dev/enable-branch-protection.sh` and scrubbed all
+  "pending Pro / staged for Pro / for the day we go paid" language. Hooks + CODEOWNERS + `audit-history.sh`
+  is the complete, permanent model (`dev/CONVENTIONS.md` §1) — do not reintroduce branch-protection talk.
+- Gates: docs/harness only — no engine code (342 green); audit clean.
+- Decisions surfaced to Rohan: build K1+K2 pre-LOKA (recommend yes, lead-driven); vendor LOKA into `vendor/loka/`
+  vs call `run_live` as a service (decide on seeing the code).
+
 ## 2026-06-23 — Delegate the 12 semantic-agent corpora (Hayes 6 / Gavin 6)  (`main`, PR #17)
 - Built-By: `rohan` (planning/assignment). Docs only.
 - What: opened the `semantic-corpora` delegation per the locked dual-source method. Shared brief
