@@ -11,6 +11,19 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Delegate the 12 semantic-agent corpora (Hayes 6 / Gavin 6)  (`main`, PR #17)
+- Built-By: `rohan` (planning/assignment). Docs only.
+- What: opened the `semantic-corpora` delegation per the locked dual-source method. Shared brief
+  `docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md` (per-agent lens table, Pass A browser +
+  Pass B self-authenticated EMET, the `dev/validate-corpus.sh` gate, mini pilot-gate = ship first/wait/batch).
+  Assigned — **Hayes:** patent-ip · post-market-safety · clinical-trial-registry · payer-market-access ·
+  manufacturing-cmc · dea-scheduling (after his experiment-design epic). **Gavin (his first task):**
+  global-regulatory-divergence · financial-investor · kol-social-signal · patient-advocacy · policy-legislative ·
+  reputational-institutional. Gavin onboarding note added (setup-contributor + watcher + first-corpus-then-wait).
+- Decisions (Rohan): contributors self-authenticate BenchSci for EMET; the recommended 6/6 split.
+- Gates: docs tier (no code; 342 green; audit clean). Each corpus ships as its own PR with my adversarial
+  review (EMET PMIDs + T1 verbatim + the gate) before merge — same bar as the FDA-memory pilot.
+
 ## 2026-06-23 — Corpus PERFECTED: dual-source (browser + EMET) FDA-memory + locked template  (`main`, PR #16)
 - Built-By: `rohan` (driven via subagents). Adds the two ingestion sources the pilot was missing and **locks
   the dual-source `METHOD.md` as the template** for the other 12.
