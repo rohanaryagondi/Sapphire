@@ -11,6 +11,24 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — Transparent front end (LOKA-fork → run_live) — feature work-stream B  (`main`, PR #41)
+- Built-By: `rohan` (built by Rohan Claude worker session; reviewed/gated/merged by Head Claude — separation of powers).
+- What: forks LOKA's Chainlit app into `frontend/` (real `q-state-biosciences/drug-discovery-agent` clone untouched;
+  `FORKED_FROM.md` records upstream `8685382` + escalates the no-LICENSE question to a human) and re-points it from
+  AWS Bedrock to **in-process `live_engine.run_live`** via `bridge.py`. `render.py` (chainlit-free, stdlib, unit-
+  tested) maps the run_live contract to a **transparent firm view**: plan → per-agent (id·status·provenance,
+  abstain shown) → dossier split into the **two distinct data planes** (internal moat vs external) → Bucket-2
+  roundtable **spread** (per-persona, no consensus collapse, round1→round2) → synthesis → partial-run banner. Two
+  profiles: Demo (mock ctx, $0) + Live (real firm). Engine stays stdlib-only (chainlit/pandas confined to
+  `frontend/requirements.txt`); `site/` Console marked superseded.
+- Gates: Gate 2 review (Approved-with-nits → fix-looped: non-vacuous spread test, CORS→localhost, status banner,
+  sequences forwarding) + Gate 5 functional verification (PASS — bridge calls the real engine in-process, planes
+  render with zero cross-contamination, degraded runs honest, app launches). Suite **463 green** (29 frontend tests).
+- This + work-stream A complete the `frontend-and-data-planes` feature: the backend is now reachable through a
+  transparent, honest control surface. Follow-ups: real (non-mock) Live-profile runs need the `claude` CLI;
+  per-agent timing is aspirational (no contract field — render refuses to fabricate it); LOKA license sign-off
+  before any EXTERNAL ship (internal reuse OK).
+
 ## 2026-06-24 — Two enforced data planes (internal vs external) — feature work-stream A  (`main`, PR #37)
 - Built-By: `rohan`. Tier: Feature (work-stream A of `frontend-and-data-planes`; B = the LOKA-fork front end, next).
 - What: the data-boundary call ("separate web/external from Quiver internal, + visible") made concrete.
