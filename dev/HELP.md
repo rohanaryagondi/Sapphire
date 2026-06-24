@@ -48,7 +48,8 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+_None._ (the ex-US-regulator T1 gate question was RESOLVED by rohan — see below + PR #31.)
 
 ---
 
