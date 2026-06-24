@@ -11,6 +11,23 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — Two enforced data planes (internal vs external) — feature work-stream A  (`main`, PR #37)
+- Built-By: `rohan`. Tier: Feature (work-stream A of `frontend-and-data-planes`; B = the LOKA-fork front end, next).
+- What: the data-boundary call ("separate web/external from Quiver internal, + visible") made concrete.
+  `contracts/provenance.py`: `plane_for(provenance) → internal|external` (only `moat-real` is internal;
+  EMET·web·Q-Models·seams·corpus·qmodels:* are external) with a **bidirectional** import-time totality guard;
+  `is_boundary_violation()` (fail-safe — internal fact + unidentifiable target → block) as the classification-
+  level rule. `live_engine.py`: every dossier fact carries a **derived, unconditional** `plane` (additive in
+  `run_live_schema.{md,py}`). Honest 2-layer documentation: the runtime enforcer is `harness/guardrails.py`
+  `data_boundary()` (internal keys + identifier patterns; shared with the public-only memory subsystem, so it
+  keys on raw internal data, not provenance labels); the plane map is the complementary classification layer
+  (dossier tagging + UI), not a 2nd runtime gate.
+- Gates: Gate 2 independent review (Approved-with-nits → fix-looped: unconditional plane, symmetric guard,
+  fail-safe rule, honest docs after a runtime provenance-block proved too broad — it refused legit moat facts
+  in the memory flow). Gate 5 functional verification (core: PASS — plane totality real, boundary blocks every
+  realistic vector incl. nested/embedded, facts carry correct plane, contract conformant). Suite **434 green**.
+- Follow-ups: work-stream B (front end) renders the planes distinctly; the UI plane visualization lands there.
+
 ## 2026-06-24 — global-regulatory-divergence corpus — Gavin's first Bucket-1 corpus  (`main`, PR #30)
 - Built-By: `gavin` (reviewed/approved/merged by rohan).
 - What: First contributor knowledge corpus, built dual-source (browser + EMET) per the locked METHOD. 9 cards
