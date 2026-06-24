@@ -13,9 +13,15 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ---
 
 ## rohan  (`@rohanaryagondi`) — lead + approver
+> **Overnight shift (2026-06-23→24):** a dedicated **rohan worker session** (separate clone) builds the 3 tasks
+> below serially per `docs/superpowers/plans/2026-06-24-overnight-shift.md`; the **auditor session** reviews +
+> Gate-5 verifies + auto-merges each. The auditor stays purely reactive (no own build PRs).
+
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| _none in progress_ | — | (approver: review Hayes's quant-fact-seams PRs) | — | — |
+| `crossplatform-test-hardening` | assigned (worker, 1st) | Fix 3 pre-existing cross-platform test fails (moat clone-dir-name pin; UTF-8 in test_scenarios/test_trace_view). | `rohan/crossplatform-test-hardening` | [dev-harness](dev-harness.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
+| `k1-run-live-service` | assigned (worker, 2nd) | **Keystone.** Freeze the `run_live` output contract + make `serve.py /api/run` serve the harnessed live firm (not the canned path); canned stays as labeled fallback. | `rohan/k1-run-live-service` | [frontend-loka](frontend-loka.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
+| `k2-corpus-retrieval` | assigned (worker, 3rd) | **Keystone.** Corpus-first→search-the-gap: Bucket-1 agents read `corpus/<id>/` at run time; corpus facts land in the dossier (traced, provenance), live path only for the gap. | `rohan/k2-corpus-retrieval` | [runtime-harness](runtime-harness.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
 
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
