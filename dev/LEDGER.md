@@ -11,6 +11,18 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — experiment-design ED-1: port design-form-agent  (`main`, PR #28)
+- **Built-By: `hayes`** (his first self-opened PR — PAT works; branched off fresh main, no conflict) · merged by `rohan`.
+- What: verbatim port of Matt Carey's `design-form-agent` (vendored at `vendor/`) into `tools/experiment_design/`
+  — `extract.py` + `extraction_prompt.py` + `schema.py` + the golden `sample_extraction_jan6.json`; `app.py`
+  (Slack bot) skipped; `vendor/` untouched. `anthropic` lazy-imported inside the tool (engine stays stdlib-only).
+- Gates (auditor, both independent, isolated worktrees): reviewer **Approved** + Gate-5 **PASS** — the proprietary
+  domain content (system prompt + Quiver optogenetics vocabulary + `MENUS_REFERENCE` + schema) is
+  **character-for-character identical** to the vendored original (only an attribution header added); golden JSON
+  byte-identical; fidelity test non-vacuous (`assertIn` substring lock + `assertEqual` on golden); no-key →
+  honest `ExtractionError` (no fabricated plan); zero engine imports of anthropic/pypdf/dotenv. Suite **381 green** (+13).
+- Next: **ED-2** (fill the design sheet — JSON + design MD, ± xlsx) on Hayes's queue, then his 6 semantic corpora.
+
 ## 2026-06-24 — [overnight] Task K2: corpus-first runtime retrieval (KEYSTONE)  (`main`, PR #26)
 - Built-By: `rohan` (worker) · merged by `rohan` (auditor). **Bedrock — makes the corpora pay off at run time.**
 - What: Bucket-1 agents now READ their knowledge corpus during `run_live`. New stdlib `corpus/reader.py`
