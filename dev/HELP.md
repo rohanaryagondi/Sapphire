@@ -48,7 +48,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+### [OPEN] frontend-loka-fork: license/attribution for forking the LOKA Chainlit app  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/frontend-loka-fork
+**Blocking?** no — internal reuse within Quiver proceeds now; this gates only **external** distribution of `frontend/`.
+**Context:** work-stream B forks LOKA's Chainlit shell (`q-state-biosciences/drug-discovery-agent` @ `8685382`) into a new `frontend/` dir, replacing the Bedrock loop with an in-process `run_live` bridge. The source repo has **no `LICENSE` file** and no license field in `pyproject.toml`/`README` — it's a Q-State Biosciences internal repo.
+**Question:** is internal reuse within Quiver sufficient (Q-State Biosciences ≈ Quiver), or is explicit written permission / a license header required before `frontend/` (a fork of LOKA) ships **externally**? I'm recording the provenance honestly in `frontend/FORKED_FROM.md` (upstream commit, kept/replaced/stripped, attribution to Q-State Biosciences) and proceeding with the internal build; flagging the external-distribution question for a human call.
+**What I tried / read:** `ls ../drug-discovery-agent/LICENSE*` → none; `grep -i license pyproject.toml` → none. The INTEGRATION_PLAN/OPEN-QUESTIONS docs treat LOKA as Quiver's own front end ("Quiver + LOKA's conversational front end").
+**My current best guess:** internal reuse is fine (same org); `FORKED_FROM.md` attributes to Q-State Biosciences and notes the absent license; before any external ship, get explicit permission or add a license. Non-blocking for this PR.
+**Answer (lead fills):** —
 
 ---
 

@@ -1,0 +1,47 @@
+.watermark {
+    display: none !important;
+}
+
+/* Remove gap between logo and custom title */
+img[src*="logo"] {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Target logo parent containers */
+[class*="MuiBox"] img[src*="logo"],
+[class*="Welcome"] img[src*="logo"] {
+    margin-bottom: 0 !important;
+}
+
+/* Remove gap from any div containing the logo */
+div:has(> img[src*="logo"]) {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+    gap: 0 !important;
+}
+
+/* Custom welcome page title styling */
+#custom-welcome-title {
+    animation: fadeIn 0.8s ease-in;
+    margin-top: 0 !important;
+}
+
+#custom-welcome-title h1 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#custom-welcome-title p {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
