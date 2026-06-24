@@ -1,0 +1,10 @@
+# Frontend (LOKA-fork Chainlit control surface) — its OWN deps, NEVER the engine's.
+# The Sapphire engine (sapphire-orchestrator/) stays stdlib-only; these live only in
+# the frontend process. The bridge imports live_engine in-process — that import pulls
+# in NO third-party package (the engine is stdlib), so nothing here leaks into the engine.
+#
+# Pinned to the version LOKA shipped (q-state-biosciences/drug-discovery-agent @ 8685382,
+# pyproject.toml + uv.lock): chainlit==2.9.5. The forked .chainlit/config.toml +
+# public/custom.js target Chainlit DOM selectors — keep the pin so they stay valid.
+chainlit==2.9.5
+pandas>=2.2.3
