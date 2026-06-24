@@ -22,6 +22,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 |---|---|---|---|---|
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
 | `experiment-design` | **active — ED-1 unblocked** | **Epic.** Port Matt's `design-form-agent` into Sapphire: meeting-notes → filled design sheet. Phase 1 = ED-1 (port + fidelity-lock) → ED-2 (fill the sheet). **Source vendored at `vendor/design-form-agent/`** (see its `VENDORED.md`) — start **ED-1** now: port into `tools/experiment_design/`, domain prompt/`MENUS_REFERENCE`/schema verbatim, golden-test vs `vendor/design-form-agent/sample_extraction_jan6.json`. | `hayes/experiment-design-port` (ED-1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
+| `semantic-corpora` (6) | assigned (after experiment-design) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
 > `bash dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running (board + HELP + PR-review channels).
@@ -36,7 +37,17 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 > Always branch from the **latest `main`** (`git pull` first; merge `origin/main` if it moves). Blocked? `dev/HELP.md`.
 
 ## gavin  (`@GavinWongYF`) — contributor
-_No work assigned yet._
+| Task id | Status | Goal | Branch / PR | Area |
+|---|---|---|---|---|
+| `semantic-corpora` (6) | assigned | Build dual-source knowledge corpora for **global-regulatory-divergence · financial-investor · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
+
+> **Gavin — first task, start here:** (1) `bash dev/setup-contributor.sh gavin` (installs the hooks). (2) Read
+> `dev/CONTRIBUTOR_RULES.md` (esp. §Autonomous operation) + the
+> [corpora brief](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) + study the worked
+> example `sapphire-orchestrator/corpus/fda-institutional-memory/` and its `METHOD.md`. (3) Start the watcher:
+> `bash dev/watch-assignments.sh gavin GavinWongYF`. (4) Build your **first** corpus (suggest
+> `global-regulatory-divergence`), open the PR, and **wait for Rohan's review before batching the rest**.
+> Self-authenticate `emet.benchsci.com` for the EMET pass. Blocked? post in `dev/HELP.md`.
 
 ---
 
