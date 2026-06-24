@@ -1,0 +1,4 @@
+# Sapphire Experiment Design tool (ED-1) — deps live in THIS tool's subprocess,
+# never imported by the stdlib-only Sapphire engine. The PDF is sent to Claude
+# directly (no pypdf needed); the key is read from $ANTHROPIC_API_KEY.
+anthropic

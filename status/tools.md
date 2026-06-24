@@ -28,8 +28,11 @@
    experiment-design-sheet JSON, Claude-based, Quiver optogenetics assay vocabulary) into Sapphire as a
    standalone Quiver tool (`tools/experiment_design/`). Phase 1: meeting-notes → filled design sheet
    (JSON + MD, ± xlsx). Internal-only (LLM reasoning is allowed; no external evidence source touched).
-   Moat/firm integration = later epic. → `experiment-design` (**hayes**, queued after the seams) ·
-   [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
+   Moat/firm integration = later epic. → `experiment-design` (**hayes**): **ED-1 in review (PR-E1)** — tool
+   ported to `tools/experiment_design/` (domain prompt / `MENUS_REFERENCE` / schema **verbatim** from
+   `vendor/design-form-agent/`; `anthropic` lives in the tool subprocess so the engine stays stdlib-only;
+   **internal-only** — transcripts go only to the LLM + local files, never to an external evidence source).
+   ED-2 (fill the design sheet) next · [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
 
 ## Watch-outs
 - **Data boundary is absolute**: public identifiers only leave Quiver. Tools that call external services
