@@ -48,7 +48,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+### [OPEN] global-regulatory-divergence: ex-US regulator primaries can't be T1 under the gate  ·  from: gavin  ·  date: 2026-06-24  ·  branch: gavin/corpus-global-regulatory-divergence
+**Blocking?** Partially — blocks final tiering + a CLEAN `validate-corpus.sh` for this corpus. Pass A research (loading primaries + capturing verbatim quotes) and Pass B proceed meanwhile; only the T1/T2 label is held.
+**Context:** First of my 6 semantic corpora (`semantic-corpora`; brief `docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md`), agent `global-regulatory-divergence`, built per the locked `sapphire-orchestrator/corpus/fda-institutional-memory/METHOD.md`.
+**Question:** The agent spec (`architecture/bucket1/semantic/global-regulatory-divergence.md`, Sources/tools) says **"Tier regulator decisions T1; HTA bodies T2."** But `dev/validate-corpus.sh` (L46, L62-65) accepts T1 only when the URL host ends `.gov`/`.edu` or is exactly PMC/NCBI. Every credentialed ex-US national-regulator primary domain fails it: EMA `ema.europa.eu` (.eu), MHRA `gov.uk` (.uk), PMDA `pmda.go.jp` (.jp), Health Canada `canada.ca`/`hc-sc.gc.ca` (.ca), TGA `tga.gov.au` (ends .au, not .gov), Swissmedic `swissmedic.ch` (.ch), NMPA `nmpa.gov.cn` (ends .cn). So an EMA EPAR/refusal — a primary regulatory document — cannot be T1 without failing the gate, forcing the whole ex-US corpus to T2 and contradicting the spec. (FDA-memory never hit this: fda.gov is .gov.) This likely also affects `policy-legislative` (ex-US legislation) and any other ex-US-primary agent.
+**What I tried / read:** METHOD.md Step 3 Pass A + Step 6 (T1 = primary .gov/.edu/PMC/NCBI; "do NOT weaken the gate"); `dev/CONVENTIONS.md` §3 (provenance honesty); `dev/GATES.md`; `validate-corpus.sh` L41-65. The docs define T1 in US-centric terms and are silent on ex-US regulators. Changing the gate is approver machinery (CONTRIBUTOR_RULES §6) → not mine to touch.
+**My current best guess:** Extend the gate's primary-domain allowlist to a curated set of credentialed ex-US **national drug regulators** → these tier **T1**; keep **HTA/reimbursement bodies** (NICE, PBAC, G-BA, ICER, CDA-AMC) and press as **T2** per the spec. Proposed host set: `ema.europa.eu`, `gov.uk` (MHRA), `pmda.go.jp`, `canada.ca` + `hc-sc.gc.ca` (Health Canada), `tga.gov.au`, `swissmedic.ch`, `nmpa.gov.cn`. I'll supply the exact final list once Pass A confirms which I actually cite. Until you decide, I'll do the research and hold the T1/T2 labels (provisionally T1 per spec in my draft).
+**Answer (lead fills):** —
 
 ---
 
