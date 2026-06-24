@@ -19,8 +19,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `frontend-and-data-planes` (B: front end) | **🔨 next** | **Feature, work-stream B.** Fork LOKA's Chainlit UI into `frontend/` (real LOKA repo untouched) as our **transparent front end** wired to `live_engine.run_live`: show the actual tools/agents + full firm process (plan→Bucket-1 per-agent→dossier→roundtable spread→synthesis) so we can see what's doing well and what isn't; render the two planes distinctly. Retires `site/`. | `rohan/frontend-loka-fork` (next) | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-sapphire-frontend-and-data-planes.md) |
-| `frontend-and-data-planes` (A: data planes) | **✅ reviewed+verified, shipping** | **Work-stream A DONE.** Two enforced data planes: `plane_for()` maps every provenance → internal (moat) / external (EMET·web·Q-Models·seams·corpus) with a bidirectional import-time totality guard; `is_boundary_violation()` (fail-safe) + honest 2-layer docs (runtime `data_boundary()` key/pattern enforcer, shared w/ public-only memory; plane map = classification layer); every dossier fact carries a derived `plane` (additive in `run_live_schema`). Gate 2 ✅ (fix-looped) · Gate 5 ✅ (core) · suite 434. | `rohan/frontend-data-planes` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-sapphire-frontend-and-data-planes.md) |
+| `frontend-and-data-planes` | ✅ **COMPLETE (A #37 + B #41)** | **Feature DONE.** A: two enforced data planes (`plane_for`, fail-safe boundary rule, derived `plane` on every fact). B: **transparent front end** — `frontend/` forks LOKA's Chainlit app (real repo untouched), re-points to in-process `live_engine.run_live`, renders the full firm process (plan→per-agent→dossier split by **two distinct planes**→roundtable **spread**→synthesis→partial-run banner); Demo + Live profiles; engine stays stdlib. Gate 2 ✅ + Gate 5 ✅ (PASS — bridge hits real engine, planes zero cross-contamination, app launches). Suite **463**. `site/` superseded. | — | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-sapphire-frontend-and-data-planes.md) |
 | `loka-integration-plan` | ✅ merged (#34) | Analyzed LOKA source (read-only), wrote plan + `/api/run` wire contract + open questions; data-boundary ruled (separate planes). | — | [frontend-loka](frontend-loka.md) |
 | `crossplatform-test-hardening` | ✅ merged (#22) | Fixed 3 cross-platform test fails (moat dir-name, cp1252). Suite 343 green. | — | [dev-harness](dev-harness.md) |
 | `k1-run-live-service` | ✅ merged (#24) | **Keystone DONE.** `/api/run` now serves the harnessed `run_live` (`via=engine-live`); contract frozen + validated; canned = labeled fallback. Suite 356. | — | [frontend-loka](frontend-loka.md) |
@@ -79,6 +78,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `frontend-and-data-planes` (A data planes #37 + B transparent front end #41) | rohan | 2026-06-24 | PRs #37/#41 |
+| `experiment-design` (ED-2 fill.py) · vendor robyn_scs (#39) | hayes/rohan | 2026-06-24 | PRs #36/#39 |
 | `semantic-corpora` (global-regulatory-divergence — Gavin's 1st corpus) | gavin | 2026-06-24 | PR #30 |
 | `loka-integration-plan` · overnight auditor report | rohan | 2026-06-24 | PRs #33/#34 |
 | `experiment-design` (ED-1 port) | hayes | 2026-06-24 | PR #28 |
