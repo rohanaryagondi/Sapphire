@@ -1145,5 +1145,260 @@ class TestGenesetEnrichmentWiring(unittest.TestCase):
                       f"expected data_boundary to block geneset; got {agent}")
 
 
+# ── A3: plane tagging in run_live output ─────────────────────────────────────
+
+class TestPlaneTags(unittest.TestCase):
+    """Every dossier fact in the run_live output must carry a `plane` field
+    derived from its provenance (A3 — additive, never asserted by agents)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_every_dossier_fact_has_plane_field(self):
+        """All facts in discover.dossier must carry a 'plane' field."""
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+        )
+        dossier = result["discover"]["dossier"]
+        self.assertTrue(len(dossier) > 0, "dossier is empty — cannot check plane tags")
+        for i, fact in enumerate(dossier):
+            self.assertIn(
+                "plane", fact,
+                f"dossier[{i}] (provenance={fact.get('provenance')!r}) missing 'plane' field",
+            )
+            self.assertIn(
+                fact["plane"], ("internal", "external"),
+                f"dossier[{i}] has invalid plane value: {fact['plane']!r}",
+            )
+
+    def test_plane_is_derived_from_provenance(self):
+        """plane must equal plane_for(provenance) for every fact in the dossier."""
+        from contracts.provenance import plane_for
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+        )
+        for i, fact in enumerate(result["discover"]["dossier"]):
+            prov = fact.get("provenance", "")
+            if not prov:
+                continue  # skip facts without provenance (shouldn't exist, but be safe)
+            try:
+                expected = plane_for(prov)
+            except KeyError:
+                expected = "external"  # unknown → conservative external
+            self.assertEqual(
+                fact.get("plane"), expected,
+                f"dossier[{i}] plane mismatch: provenance={prov!r}, "
+                f"expected plane={expected!r}, got {fact.get('plane')!r}",
+            )
+
+    def test_external_agent_facts_have_external_plane(self):
+        """Facts from the mock external agents must be tagged 'external'."""
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+        )
+        # The fake claude runner returns provenance="semantic-web" (not in PROVENANCE)
+        # → should default to "external" (conservative). Other expected external provenances
+        # include emet-live (but our mock emet handler is not in python_fns, it goes through
+        # the emet harness path). We check everything that isn't "moat-real" is "external".
+        for fact in result["discover"]["dossier"]:
+            prov = fact.get("provenance")
+            if prov == "moat-real":
+                self.assertEqual(
+                    fact.get("plane"), "internal",
+                    f"moat-real fact must have plane='internal'; got {fact}",
+                )
+            else:
+                self.assertEqual(
+                    fact.get("plane"), "external",
+                    f"non-moat fact (provenance={prov!r}) must have plane='external'; got {fact}",
+                )
+
+
+# ── A2: Adversarial boundary test — internal-plane fact must never reach an
+#        external-fetch agent's dispatch. Tests use the plane-anchored rule. ───
+
+class TestDataBoundaryAdversarial(unittest.TestCase):
+    """Adversarial data-boundary tests.
+
+    The enforcement mechanism: harness/guardrails.py data_boundary() scans inputs
+    for internal keys/patterns BEFORE dispatch. These tests verify the end-to-end
+    chain: internal-plane marker in inputs → agent abstains (never dispatched).
+
+    The plane-rule logic is expressed in contracts.provenance.is_boundary_violation;
+    these tests validate that both the rule function AND the runtime guardrail agree.
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _eid(self, label: str) -> str:
+        import hashlib
+        return "eng_" + hashlib.sha256(label.encode()).hexdigest()[:8]
+
+    def test_internal_score_to_emet_is_blocked(self):
+        """Feeding an internal score (internal-plane) to emet-runner must BLOCK (abstain)."""
+        from harness.contracts import load_registry
+        registry = load_registry()
+        ctx = _build_ctx()
+
+        # Inputs that carry an internal key: s_internal is a known internal field.
+        # The plane rule: plane_for("emet-live") == "external" and the fact carries
+        # internal data → is_boundary_violation("emet-live", "internal") == True.
+        # The runtime enforcer (data_boundary guardrail) fires on the key name.
+        poisoned_inputs = {
+            "candidate": "TSC2",
+            "disease": "tuberous sclerosis",
+            "query": "evaluate TSC2",
+            "s_internal": 0.97,   # ← internal key; must never reach emet
+        }
+        res = harness.run(
+            "emet-runner",
+            poisoned_inputs,
+            engagement_id=self._eid("emet-adversarial"),
+            ctx=ctx,
+            registry=registry,
+        )
+        self.assertFalse(res.ok, "Expected BLOCK: emet-runner received internal key")
+        self.assertIn(
+            res.status, ("abstained", "escalated"),
+            f"Expected abstained/escalated; got {res.status}",
+        )
+        self.assertEqual(
+            res.error, "guardrail-violation",
+            f"Expected guardrail-violation; got error={res.error}",
+        )
+
+    def test_internal_candidate_id_to_gnomad_is_blocked(self):
+        """A QS-format internal candidate id (internal-plane) sent to gnomad-constraint
+        must be blocked — the seam never fires (adversarial plane-crossing test)."""
+        from harness.contracts import load_registry
+        from tools import gnomad_constraint_seam
+
+        registry = load_registry()
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("gnomad-constraint", None)
+
+        fetch_calls = []
+
+        def _spy_fetch(symbol):
+            fetch_calls.append(symbol)
+            return {}
+
+        with mock.patch.object(gnomad_constraint_seam, "_fetch", _spy_fetch):
+            res = harness.run(
+                "gnomad-constraint",
+                {"candidate": "QS00123", "disease": "tuberous sclerosis",
+                 "query": "evaluate QS00123", "genes": ["QS00123"]},
+                engagement_id=self._eid("gnomad-adversarial"),
+                ctx=ctx,
+                registry=registry,
+            )
+
+        # The seam must NEVER have been called (data_boundary blocked before dispatch).
+        self.assertEqual(
+            fetch_calls, [],
+            f"gnomad _fetch was called with internal id QS00123: {fetch_calls}",
+        )
+        self.assertFalse(res.ok, "Expected BLOCK: gnomad received internal candidate id")
+        self.assertIn(res.status, ("abstained", "escalated"))
+        self.assertEqual(res.error, "guardrail-violation")
+
+    def test_internal_latent_vector_to_aso_tox_is_blocked(self):
+        """A latent_vector field (internal-plane) forwarded to aso-tox must be blocked —
+        aso-tox is an external-plane agent (public ASO sequences only)."""
+        from harness.contracts import load_registry
+        registry = load_registry()
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("aso-tox", None)
+
+        called = []
+
+        def _spy_predict(inputs):
+            called.append(inputs)
+            return {"candidate": "TSC2", "facts": [], "invalid_sequences": [], "provenance": "aso-tox"}
+
+        ctx["python_fns"]["aso-tox"] = _spy_predict
+
+        res = harness.run(
+            "aso-tox",
+            {"candidate": "TSC2", "disease": "ts", "query": "eval",
+             "sequences": [], "latent_vector": [0.1, 0.2, 0.3]},
+            engagement_id=self._eid("aso-tox-adversarial"),
+            ctx=ctx,
+            registry=registry,
+        )
+        # Seam must NOT have been called.
+        self.assertEqual(called, [], f"aso-tox seam was called with internal latent_vector: {called}")
+        self.assertFalse(res.ok)
+        self.assertIn(res.status, ("abstained", "escalated"))
+        self.assertEqual(res.error, "guardrail-violation")
+
+    def test_clean_external_inputs_to_external_agents_pass(self):
+        """Verify the guard does NOT trigger false-positives: a clean external-plane
+        input to an external-plane agent must not be blocked."""
+        from harness.contracts import load_registry
+        registry = load_registry()
+        ctx = _build_ctx()
+
+        # Clean inputs with only public identifiers (no internal keys/patterns).
+        clean_inputs = {
+            "candidate": "TSC2",
+            "disease": "tuberous sclerosis",
+            "query": "Is TSC2 a viable target?",
+            "genes": ["TSC2"],
+            "sequences": [],
+        }
+        res = harness.run(
+            "emet-runner",
+            clean_inputs,
+            engagement_id=self._eid("emet-clean"),
+            ctx=ctx,
+            registry=registry,
+        )
+        # Status should not be "guardrail-violation"; it may still abstain due to mock
+        # emet backend returning a result, but the error must not be guardrail-violation.
+        self.assertNotEqual(
+            res.error, "guardrail-violation",
+            f"False positive: clean inputs triggered guardrail-violation on emet-runner",
+        )
+
+    def test_is_boundary_violation_matches_runtime_block(self):
+        """The plane-rule function and the runtime guardrail must agree:
+        is_boundary_violation(provenance, 'internal') == True  ↔  data_boundary blocks.
+
+        We test this for emet-live (external plane) with an internal key present.
+        """
+        from contracts.provenance import is_boundary_violation
+        from harness.guardrails import data_boundary
+
+        # Rule function agrees: emet-live is external, internal facts → violation.
+        self.assertTrue(is_boundary_violation("emet-live", "internal"))
+
+        # Runtime agrees: data_boundary detects the internal key and returns violations.
+        viols = data_boundary({"candidate": "TSC2", "s_internal": 0.97})
+        self.assertTrue(
+            len(viols) > 0,
+            "data_boundary must return violations when s_internal is present",
+        )
+        self.assertEqual(viols[0].guardrail, "data_boundary")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

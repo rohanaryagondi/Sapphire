@@ -29,6 +29,7 @@ import harness
 from selfimprove.reflect import reflect
 from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
 from corpus.reader import read_corpus, has_corpus
+from contracts.provenance import plane_for
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -111,6 +112,9 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
     Carries the card's own `source` / `tier` / `url` and stamps provenance="corpus"
     (+ from_corpus=True). Deliberately sets NO `flag`: a corpus card is a T2 lead, not a
     dispositive veto — a veto still requires its T1 primary.
+
+    Also stamps `plane` = plane_for("corpus") = "external" (corpus is pre-ingested
+    public literature — additive A3 field).
     """
     return {
         "value": card.get("claim") or card.get("value") or "",
@@ -118,6 +122,7 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
         "tier": card.get("tier", "T2"),
         "url": card.get("url", ""),
         "provenance": "corpus",
+        "plane": plane_for("corpus"),   # "external" — additive A3 field
         "from_corpus": True,
         "field": agent_id,
     }
@@ -297,6 +302,15 @@ def run_live(
             for f in facts:
                 enriched = dict(f)
                 enriched.setdefault("provenance", prov)
+                # A3: stamp the data plane derived from the fact's provenance.
+                # plane is additive (never replaces an existing key) and derived —
+                # never asserted by the agent. Unknown provenances default to "external"
+                # (conservative: an unknown source is treated as external for safety).
+                fact_prov = enriched.get("provenance", prov)
+                try:
+                    enriched.setdefault("plane", plane_for(fact_prov))
+                except KeyError:
+                    enriched.setdefault("plane", "external")
                 all_dossier_facts.append(enriched)
                 flag = f.get("flag")
                 if flag == "VETO":
