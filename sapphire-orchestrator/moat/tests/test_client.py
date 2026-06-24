@@ -146,12 +146,20 @@ class TestMoatClientDefaultPath(unittest.TestCase):
         original = os.environ.pop("SAPPHIRE_MOAT_DB", None)
         try:
             from moat.client import MoatClient
+            from pathlib import Path
             client = MoatClient()
             # Normalise to a forward-slash string for cross-platform checking
             path = client.db_path.replace("\\", "/")
+            # Derive the repo-root dir name at runtime so a clone in ANY directory
+            # name passes (don't hardcode "sapphire-capability-map"). The test file
+            # sits at <repo>/sapphire-orchestrator/moat/tests/, so parents[3] is the
+            # repo root — the same root client.py resolves via parents[2].
+            repo_root = Path(__file__).resolve().parents[3]
+            expected_suffix = f"{repo_root.name}/RohanOnly/moat/moat.sqlite"
             self.assertTrue(
-                path.endswith("sapphire-capability-map/RohanOnly/moat/moat.sqlite"),
-                f"Default db_path does not end with expected suffix: {path!r}",
+                path.endswith(expected_suffix),
+                f"Default db_path does not end with expected suffix "
+                f"{expected_suffix!r}: {path!r}",
             )
         finally:
             if original is not None:
