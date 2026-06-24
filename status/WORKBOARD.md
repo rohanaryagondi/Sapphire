@@ -29,7 +29,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
-| `experiment-design` | **ED-1 ✅ merged (#28); ED-2 next** | **Epic.** Port Matt's `design-form-agent` → filled design sheet. **ED-1 done** (`tools/experiment_design/`, domain content verbatim from `vendor/`, golden-locked, engine stdlib-only, suite 381). **Next = ED-2: fill the design sheet** (JSON + design MD; ± real xlsx if the Quiver template is available — else stub + skip, raise via `dev/HELP.md`). Then your 6 semantic corpora. | `hayes/experiment-design-ed2` (next) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
+| `experiment-design` | **ED-1 ✅ merged (#28); ED-2 in review (PR-E2)** | **Epic.** Port Matt's `design-form-agent` → filled design sheet. **ED-1 done** (`tools/experiment_design/`, domain content verbatim from `vendor/`, golden-locked, engine stdlib-only). **ED-2 built (PR-E2): `fill.py` → filled design sheet** — form-ready JSON + design-doc MD (per-field provenance) + **menu validation** (off-menu dropdown values flagged vs `MENUS_REFERENCE`, never silently written); pure local transform, stdlib-only, suite 404. Real `.xlsx` writer = documented pending seam (HELP: `experiment-design-ed2-xlsx-template`). Then your 6 semantic corpora. | `hayes/experiment-design-ed2` (PR-E2) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 | `semantic-corpora` (6) | assigned (after experiment-design) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
@@ -47,15 +47,17 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## gavin  (`@GavinWongYF`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `semantic-corpora` (6) | assigned | Build dual-source knowledge corpora for **global-regulatory-divergence · financial-investor · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
+| `semantic-corpora` (6) | **1/6 ✅ merged (#30); 5 to go** | ~~global-regulatory-divergence ✅~~ · **financial-investor · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method. First corpus reviewed + merged (gate CLEAN, suite 381) — **method proven; batch the remaining 5.** Self-auth BenchSci for the EMET pass. | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
-> **Gavin — first task, start here:** (1) `bash dev/setup-contributor.sh gavin` (installs the hooks). (2) Read
-> `dev/CONTRIBUTOR_RULES.md` (esp. §Autonomous operation) + the
-> [corpora brief](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) + study the worked
-> example `sapphire-orchestrator/corpus/fda-institutional-memory/` and its `METHOD.md`. (3) Start the watcher:
-> `bash dev/watch-assignments.sh gavin GavinWongYF`. (4) Build your **first** corpus (suggest
-> `global-regulatory-divergence`), open the PR, and **wait for Rohan's review before batching the rest**.
-> Self-authenticate `emet.benchsci.com` for the EMET pass. Blocked? post in `dev/HELP.md`.
+> **Gavin — first corpus ✅ merged (#30); now batch the remaining 5.** The method is proven end-to-end (your
+> dual-source build passed the gate + content audit clean). Keep the watcher running
+> (`bash dev/watch-assignments.sh gavin GavinWongYF`). For each of the remaining 5
+> (financial-investor · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional):
+> branch from the **latest `main`** (`git pull` first), build per the locked
+> [METHOD](../sapphire-orchestrator/corpus/fda-institutional-memory/METHOD.md), run
+> `bash dev/validate-corpus.sh sapphire-orchestrator/corpus/<agent>` + `bash dev/run-tests.sh` until both green,
+> then open the PR. You can now run these in parallel (one PR each). Need a regulator/source added to the T1
+> allowlist? `dev/HELP.md` (don't edit the gate). Self-auth `emet.benchsci.com` for the EMET pass.
 
 ---
 
@@ -75,6 +77,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `semantic-corpora` (global-regulatory-divergence — Gavin's 1st corpus) | gavin | 2026-06-24 | PR #30 |
+| `loka-integration-plan` · overnight auditor report | rohan | 2026-06-24 | PRs #33/#34 |
 | `experiment-design` (ED-1 port) | hayes | 2026-06-24 | PR #28 |
 | overnight: `crossplatform-test-hardening` (#22) · `k1-run-live-service` (#24) · `k2-corpus-retrieval` (#26) | rohan | 2026-06-24 | PRs #22/#24/#26 |
 | `quant-fact-seams` (PR-D g:Profiler — series ✅ COMPLETE) | hayes | 2026-06-23 | PR #12 |
