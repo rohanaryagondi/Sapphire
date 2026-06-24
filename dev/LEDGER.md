@@ -11,6 +11,22 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — robyn_scs endpoint wiring — tools/robyn_scs/  (`main`, PR #44)
+- Built-By: `hayes` (reviewed/gated/merged by Head Claude).
+- What: `tools/robyn_scs/` exposes the vendored SCS/STA connectivity pipeline (`vendor/robyn_scs/`) as 10
+  correctly-wired callable endpoints (detect_events · run_scs · run_sta · merge_and_classify · visualize ·
+  run_fov · run_batch · discover_fov_quartets · load_stim_metadata · stim_mask_from_sidecar) — thin wrappers
+  that import + delegate to the vendored `utils/`, docstrings naming each `module.func :line`. `vendor/` NOT
+  modified; the full pipeline is NOT run (MATLAB splitter documented as a manual upstream step). Heavy deps
+  (numpy/scipy/pandas/matplotlib) imported LAZILY inside the endpoints + isolated to `tools/robyn_scs/
+  requirements.txt`; the Sapphire engine stays stdlib-only (enforced by a subprocess meta_path-blocker test).
+- Gates: Gate 2 review = Approved; Gate 5 verification = "Works as claimed" (signature alignment proven via a
+  FileNotFoundError-not-TypeError forward probe; `detect_events` synthetic call detects planted APs; vendor
+  untouched). Suite **478 green** (15 wiring tests).
+- Fast-follows (non-blocking, fold into next robyn touch): add a signature probe for `neuron_types_from_merged`;
+  one-line comment on `run_fov`'s P1 trace-roster forwarding. Next step (separate task): a live_engine seam so
+  the firm can call these endpoints as a Bucket-1 tool (once an ASO/SCS query path needs it).
+
 ## 2026-06-24 — Transparent front end (LOKA-fork → run_live) — feature work-stream B  (`main`, PR #41)
 - Built-By: `rohan` (built by Rohan Claude worker session; reviewed/gated/merged by Head Claude — separation of powers).
 - What: forks LOKA's Chainlit app into `frontend/` (real `q-state-biosciences/drug-discovery-agent` clone untouched;
