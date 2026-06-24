@@ -4,7 +4,7 @@
 **Built:** `gavin/corpus-global-regulatory-divergence` (first of Gavin's 6 semantic corpora; pilot per the locked `fda-institutional-memory/METHOD.md`).
 **Retrieval window:** 2026-06-24.
 **Cards:** **9** in `index.jsonl` (6 regulatory-divergence + 3 EMET biomedical-grounding) · **Notes:** 2 themed files in `notes/`.
-**Tier split:** **0 T1 / 9 T2** — see the **Tiering note** below; this is a deliberate, honest under-claim pending a gate decision, not an absence of primary evidence.
+**Tier split:** **2 T1 / 7 T2** — the two MHRA regulator-primary cards (#1, #2; host `gov.uk`) are T1 under the extended gate allowlist (PR #31); HTA (NICE), sponsor/NGO secondaries, and EMET cards are T2. See the **Tiering note** below.
 **Scope:** a representative CNS slice exercising the divergence check types across **Alzheimer's (anti-amyloid mAbs)** and **DMD (exon-skip / nonsense-readthrough)**, spanning **EMA, MHRA, NICE, FDA**. Breadth-of-method over depth (pilot).
 
 ## Dual-source method (both passes run — see METHOD.md Step 3)
@@ -17,14 +17,16 @@
   predicts, EMET's contribution is **limited for this regulatory agent** — a supporting layer explaining
   *why* regulators diverged (ARIA/ApoE4; the dystrophin surrogate), not the divergence facts themselves.
 
-## ⚠️ Tiering note — why 0 T1 (OPEN question for the approver)
-The agent spec says **"Tier regulator decisions T1; HTA bodies T2."** But `dev/validate-corpus.sh` only
-accepts **T1** on hosts ending `.gov`/`.edu` or PMC/NCBI. **Every credentialed ex-US regulator fails that
-check** (EMA `ema.europa.eu`, MHRA `gov.uk`, PMDA `pmda.go.jp`, TGA `tga.gov.au`, Health Canada
-`canada.ca`, …). So the two genuine **regulator-primary** cards here (MHRA lecanemab #1, MHRA donanemab #2)
-are **held at T2** with a `tier_note` marking them **T1-eligible**, rather than failing the gate. Logged
-to **`dev/HELP.md`** (2026-06-24) with a proposed fix (extend the gate's primary-domain allowlist to
-credentialed ex-US national regulators). **If approved, cards #1/#2 (and future EMA/PMDA primaries) flip to T1.**
+## Tiering note (RESOLVED — gate extended in PR #31)
+The agent spec says **"Tier regulator decisions T1; HTA bodies T2."** Originally `dev/validate-corpus.sh`
+only accepted **T1** on `.gov`/`.edu`/PMC/NCBI hosts, so every ex-US regulator domain failed (EMA, MHRA,
+PMDA, TGA, …). Raised in `dev/HELP.md` (2026-06-24); rohan **extended the gate's T1 allowlist to
+credentialed ex-US national regulators** (PR #31): `ema.europa.eu`, `gov.uk` (MHRA), `pmda.go.jp`,
+`canada.ca`/`hc-sc.gc.ca`, `tga.gov.au`, `swissmedic.ch`, `nmpa.gov.cn` — **HTA bodies (NICE/PBAC/G-BA/ICER)
+stay T2**. Accordingly the two MHRA regulator-primary cards (#1, #2) are now **T1**; HTA, sponsor/NGO
+secondaries, and EMET cards remain **T2**. (Cards #4 eteplirsen / #5 ataluren / #6 aducanumab are cited to
+sponsor/NGO *secondaries*, not the regulator domain, so they stay T2 — upgrade to T1 only when re-anchored
+to the EMA/FDA primary; EMA primary pending its site outage, see gap #1.)
 
 ## EMET pass — 2 Thorough queries run
 Public identifiers only. PMIDs re-verified against the PubMed abstract (numbers checked, no mislabeling).

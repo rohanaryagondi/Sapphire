@@ -52,11 +52,13 @@ press, scientific-advice registry), EU Clinical Trials Register, TGA (Australia)
 Products DB, NOC, Special Access), PMDA (Japan), NMPA (China), NICE + PBAC, WHO ICTRP, Swissmedic, ANVISA
 (Brazil), G-BA (Germany), MHRA (UK). Published context via the **EMET Analyst interface**.
 
-**Tiering:** tier regulator decisions **T1**; HTA bodies **T2**. *Note:* the corpus currently holds
-ex-US regulator-primary cards at **T2** with a `tier_note` marking them T1-eligible, because
-`dev/validate-corpus.sh` only accepts T1 on `.gov`/`.edu`/PMC/NCBI hosts — every ex-US regulator domain
-(`ema.europa.eu`, `gov.uk`, `pmda.go.jp`, …) fails that check. Flagged to the approver in `dev/HELP.md`
-(2026-06-24); when the gate's primary-domain allowlist is extended, those cards flip to T1.
+**Tiering:** tier regulator decisions **T1**; HTA bodies **T2**. `dev/validate-corpus.sh`'s T1 allowlist
+covers credentialed ex-US national regulators (`ema.europa.eu`, `gov.uk` [MHRA], `pmda.go.jp`,
+`canada.ca`/`hc-sc.gc.ca`, `tga.gov.au`, `swissmedic.ch`, `nmpa.gov.cn`) alongside US `.gov`/`.edu`/PMC
+(extended in PR #31). HTA/reimbursement bodies (NICE, PBAC, G-BA, ICER, CDA-AMC) and sponsor/NGO press
+stay **T2**. A regulator decision cited only to a *secondary* (sponsor PR, NGO) is T2 until re-anchored to
+the regulator primary. If you cite a regulator not on the allowlist, raise a `dev/HELP.md` request (don't
+edit the gate yourself).
 
 ## Rules
 - **Facts only** — report what each regulator decided and on what basis, not whether FDA "should" follow.
