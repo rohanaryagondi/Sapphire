@@ -11,6 +11,15 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — [overnight] Task H: cross-platform test hardening  (`main`, PR #22)
+- Built-By: `rohan` (overnight worker session) · merged by `rohan` (auditor session).
+- What: fixed 3 pre-existing cross-platform test failures — moat `test_client` derives the repo-dir name at
+  runtime (no hardcoded `sapphire-capability-map`); `test_scenarios` reads files as UTF-8; `trace_view.py`
+  gained `_safe_print` to tolerate a cp1252 stdout (+ a non-vacuous regression test that forces a cp1252 stream).
+- Gates (auditor): suite **343 green** (+1); `_safe_print` sound + stdlib (UTF-8 path unchanged, only rescues a
+  legacy codepage); moat assertion still substantive (full `/RohanOnly/moat/moat.sqlite` suffix); cp1252 test
+  genuinely exercises the encode path. All green → auto-merged. First overnight PR.
+
 ## 2026-06-23 — Overnight shift setup (worker plan + briefs)  (`main`, PR #21)
 - Built-By: `rohan`. Planning/docs for an autonomous overnight build run.
 - What: `docs/superpowers/plans/2026-06-24-overnight-shift.md` — a dedicated rohan *worker session* (separate
