@@ -1,0 +1,8 @@
+# robyn_scs endpoint wiring — call-time deps live in THIS tool's subprocess,
+# imported LAZILY inside endpoints.py (_utils / _viz). They are NEVER imported by
+# the stdlib-only Sapphire engine. seaborn is NOT required (the vendored code
+# references it only in a quiver_style.py docstring; nothing imports it).
+numpy
+scipy
+pandas
+matplotlib
