@@ -27,7 +27,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
-| `experiment-design` | **ED-1 in review (PR-E1)** | **Epic.** Port Matt's `design-form-agent` into Sapphire: meeting-notes → filled design sheet. **ED-1 (port + fidelity-lock) shipped** → `tools/experiment_design/` (domain prompt/`MENUS_REFERENCE`/schema verbatim from `vendor/`; `anthropic` in the tool subprocess, engine stays stdlib-only; golden-test vs `vendor/.../sample_extraction_jan6.json`). **Next = ED-2 (fill the design sheet) after ED-1 merges.** | `hayes/experiment-design-port` (PR-E1) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
+| `experiment-design` | **ED-1 ✅ merged (#28); ED-2 next** | **Epic.** Port Matt's `design-form-agent` → filled design sheet. **ED-1 done** (`tools/experiment_design/`, domain content verbatim from `vendor/`, golden-locked, engine stdlib-only, suite 381). **Next = ED-2: fill the design sheet** (JSON + design MD; ± real xlsx if the Quiver template is available — else stub + skip, raise via `dev/HELP.md`). Then your 6 semantic corpora. | `hayes/experiment-design-ed2` (next) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
 | `semantic-corpora` (6) | assigned (after experiment-design) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
@@ -73,6 +73,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `experiment-design` (ED-1 port) | hayes | 2026-06-24 | PR #28 |
+| overnight: `crossplatform-test-hardening` (#22) · `k1-run-live-service` (#24) · `k2-corpus-retrieval` (#26) | rohan | 2026-06-24 | PRs #22/#24/#26 |
 | `quant-fact-seams` (PR-D g:Profiler — series ✅ COMPLETE) | hayes | 2026-06-23 | PR #12 |
 | `quant-fact-seams` (PR-C InterPro) | hayes | 2026-06-23 | PR #11 |
 | `autonomous-contributors` | rohan | 2026-06-23 | PR #10 |
