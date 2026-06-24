@@ -32,11 +32,18 @@
    ported to `tools/experiment_design/` (domain prompt / `MENUS_REFERENCE` / schema **verbatim** from
    `vendor/design-form-agent/`; `anthropic` lives in the tool subprocess so the engine stays stdlib-only;
    **internal-only** — transcripts go only to the LLM + local files, never to an external evidence source).
-   **ED-2 in review (PR-E2)** — `fill.py` turns the extracted plan into the filled design sheet: form-ready
+   **ED-2 ✅ merged (#36)** (epic complete) — `fill.py` turns the extracted plan into the filled design sheet: form-ready
    JSON + a design-doc MD with per-field provenance + **menu validation** (off-menu dropdown values flagged for
    review against `MENUS_REFERENCE`, never silently written); pure local transform (no network/LLM, stdlib-only).
    The real `.xlsx` writer is a documented pending seam awaiting Quiver's canonical template + cell map
    (HELP: `experiment-design-ed2-xlsx-template`) · [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md).
+6. **robyn_scs endpoint wiring** — `tools/robyn_scs/` exposes Robyn's vendored SCS/STA neuronal-connectivity
+   pipeline (`vendor/robyn_scs/utils/`) as 10 callable endpoints (`detect_events` / `run_scs` / `run_sta` /
+   `merge_and_classify` / `visualize` / `run_fov` / `run_batch` / …). Thin wrappers around the vendored code
+   (`vendor/` untouched); heavy deps (numpy/scipy/pandas/matplotlib) lazy in the tool — engine stays stdlib-only.
+   **Wiring only**: NOT yet a firm / `live_engine` agent (a follow-up once the call paths are proven); the full
+   pipeline is not run here (needs MATLAB-split imaging CSVs) — verified by import + `inspect.signature` alignment.
+   → `robyn-scs-endpoint-wiring` (**hayes**): **in review** · [brief](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md).
 
 ## Watch-outs
 - **Data boundary is absolute**: public identifiers only leave Quiver. Tools that call external services
