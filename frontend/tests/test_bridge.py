@@ -38,10 +38,13 @@ class TestBridge(unittest.TestCase):
         self.assertTrue(r["_mock"])
         self.assertEqual(r["_via"], "harness-live")
 
-    def test_empty_query_degrades_not_crashes(self):
+    def test_empty_query_does_not_crash(self):
+        # An empty query never raises. The engine treats it as a general-CNS run (not a
+        # degraded/zero-fact result), so assert the contract-valid shape + that the firm
+        # really ran (_via harness-live, not a bridge error) — not a vacuous "is a dict".
         r = bridge.run("", mock=True)
-        self.assertIsInstance(r, dict)
-        self.assertIn("discover", r)  # well-formed, possibly degraded — no traceback
+        self.assertEqual(validate_run_live(r), [])
+        self.assertEqual(r["_via"], "harness-live")
 
     def test_build_ctx_live_is_none(self):
         self.assertIsNone(bridge.build_ctx(False))

@@ -69,7 +69,8 @@ firm)") so Gate-5 can run the mock path with zero model/network and a human can 
   is wanted, the bridge may time the *whole* `run_live` call and show one total — but **never** fabricate
   per-agent timings. (Brief says "timing IF available" → it is not available per-agent; render none.)
 - Each **fact** carries `value, source, tier, provenance, plane`, and MAY carry `field, confidence, flag`. The
-  dossier table columns are **value · field · tier · provenance · plane · flag** (field/flag blank when absent).
+  dossier table columns are **value · field · tier · provenance · source · flag** (field/flag blank when absent);
+  `plane` is the SECTION split (internal vs external), not a column.
 - Each **verdict** carries `persona, stance, provenance, status` and (on success) `conviction, rationale,
   fact_claims`; abstain adds `lens`. `consult` has `round1` always and `round2` only sometimes.
 - Provenance + tier strings are rendered **verbatim** — never relabel `moat-real`→"internal DB", never upgrade

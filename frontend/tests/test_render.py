@@ -188,6 +188,28 @@ class TestSynthesisAndAssembly(unittest.TestCase):
         self.assertTrue(spec["agents"])
         self.assertTrue(spec["panel"])
 
+    def test_flags_render_between_dossier_and_roundtable_when_present(self):
+        # The happy-path fixture has empty flags; inject one to verify the assembly places
+        # the flag callout AFTER the dossier and BEFORE the roundtable (the integration path
+        # the all-empty fixture leaves untested).
+        result = _load_fixture()
+        result["discover"]["flags"] = {
+            "VETO": ["aducanumab precedent"], "DIVERGENCE": [], "KNOWN_UNKNOWNS": [],
+        }
+        kinds = [s["kind"] for s in render.render_run(result)]
+        self.assertIn("flag", kinds)
+        self.assertLess(kinds.index("dossier"), kinds.index("flag"))
+        self.assertLess(kinds.index("flag"), kinds.index("roundtable"))
+
+
+class TestAbstainedCount(unittest.TestCase):
+    def test_blank_status_counted_as_not_ok(self):
+        # Defensive: a missing/blank status (malformed envelope) must NOT be undercounted as ok.
+        agents = [{"id": "a", "status": None, "provenance": "x"},
+                  {"id": "b", "status": "ok", "provenance": "y"}]
+        spec = render.render_agents(agents)
+        self.assertEqual(spec["n_abstained"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

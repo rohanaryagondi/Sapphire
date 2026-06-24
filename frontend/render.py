@@ -66,7 +66,10 @@ def render_agents(agents: list) -> dict:
          "provenance": _s(a.get("provenance"))}
         for a in (agents or [])
     ]
-    n_abstained = sum(1 for r in rows if r["status"] not in ("ok", ""))
+    # Count anything that is not "ok" as not-fully-answered. A valid harness status is
+    # "ok"|"abstained"|"escalated"; a missing/blank status (only from a malformed envelope)
+    # is also counted here rather than silently treated as ok — don't undercount.
+    n_abstained = sum(1 for r in rows if r["status"] != "ok")
     return {
         "kind": "agents",
         "name": "Firm roster (Bucket-1 fact agents)",
