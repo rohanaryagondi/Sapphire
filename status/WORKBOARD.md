@@ -29,20 +29,21 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
+| `robyn-scs-endpoint-wiring` | **🔨 assigned (DO THIS NEXT)** | **Standard.** Wire up callable endpoints for the vendored `robyn_scs` SCS/STA pipeline (`vendor/robyn_scs/`, Robyn gave full permission). Build `tools/robyn_scs/` (endpoints.py + README + wiring test) that exposes the ~8 operations by calling the vendored `utils/` code correctly — **don't modify `vendor/`, don't run the full pipeline** (verify by import + `inspect.signature`, optional cheap synthetic call). Engine stays stdlib-only (heavy deps stay in the tool). | `hayes/robyn-scs-endpoints` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md) |
 | `quant-fact-seams` | ✅ **COMPLETE** | All 4 seams shipped: gnomAD (#6) · GTEx (#9) · InterPro (#11) · g:Profiler (#12). | — | [tools](tools.md) |
-| `experiment-design` | **ED-1 ✅ merged (#28); ED-2 in review (PR-E2)** | **Epic.** Port Matt's `design-form-agent` → filled design sheet. **ED-1 done** (`tools/experiment_design/`, domain content verbatim from `vendor/`, golden-locked, engine stdlib-only). **ED-2 built (PR-E2): `fill.py` → filled design sheet** — form-ready JSON + design-doc MD (per-field provenance) + **menu validation** (off-menu dropdown values flagged vs `MENUS_REFERENCE`, never silently written); pure local transform, stdlib-only, suite 404. Real `.xlsx` writer = documented pending seam (HELP: `experiment-design-ed2-xlsx-template`). Then your 6 semantic corpora. | `hayes/experiment-design-ed2` (PR-E2) | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
-| `semantic-corpora` (6) | assigned (after experiment-design) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
+| `experiment-design` | ✅ **ED-1 (#28) + ED-2 (#36) merged** | **Epic done.** Port Matt's `design-form-agent` → filled design sheet. `tools/experiment_design/` (extract.py + fill.py), vendor-verbatim, golden-locked, stdlib-only. Follow-up nit (next ED push): add `scan_direction`/`addition_protocol` to `_MENU_FIELDS` validation. | — | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) |
+| `semantic-corpora` (6) | assigned (after robyn-scs) | Build dual-source knowledge corpora for **patent-ip · post-market-safety · clinical-trial-registry · payer-market-access · manufacturing-cmc · dea-scheduling** — one PR per agent, per the **locked** method (FDA-memory is the worked example). Self-auth BenchSci for the EMET pass. **Ship your first, wait for review, then batch the rest.** | `hayes/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
 > `bash dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running (board + HELP + PR-review channels).
-> **Status:** `quant-fact-seams` ✅ complete (all 4 seams merged). **Now active: the `experiment-design` epic —
-> ED-1 is UNBLOCKED.** Matt's source is vendored at **`vendor/design-form-agent/`** (read its `VENDORED.md`).
-> Start ED-1: port into `tools/experiment_design/` per the
-> [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) — domain prompt/`MENUS_REFERENCE`/schema
-> **verbatim**, deps in the tool subprocess (engine stays stdlib-only), golden-test vs
-> `vendor/design-form-agent/sample_extraction_jan6.json`. Don't edit anything under `vendor/`.
-> **PR flow:** you now have a PAT → **open your own PRs** (`gh pr create --base main`) and the watcher's
-> pr-review channel works. (If `gh` ever fails, the token-less push→approver-opens fallback remains sanctioned.)
+> **Status:** `quant-fact-seams` ✅ + `experiment-design` (ED-1 #28, ED-2 #36) ✅ — both complete.
+> **🔨 NOW: `robyn-scs-endpoint-wiring`** (read the [brief](../docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md)).
+> The pipeline is **already vendored** for you at **`vendor/robyn_scs/`** (read its `VENDORED.md` + the
+> 8-endpoint map). Build `tools/robyn_scs/` that wires callable endpoints around the vendored `utils/` —
+> **don't modify `vendor/`, don't run the full pipeline** (verify by import + `inspect.signature`). Engine stays
+> stdlib-only (heavy deps live in the tool). Branch from latest `main` (`git pull` first). Then your 6 corpora.
+> **PR flow:** you have a PAT → **open your own PRs** (`gh pr create --base main`); the watcher's pr-review channel
+> works. (If `gh` ever fails, the token-less push→approver-opens fallback remains sanctioned.) Blocked? `dev/HELP.md`.
 > Always branch from the **latest `main`** (`git pull` first; merge `origin/main` if it moves). Blocked? `dev/HELP.md`.
 
 ## gavin  (`@GavinWongYF`) — contributor

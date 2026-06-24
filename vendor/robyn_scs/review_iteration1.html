@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eval Review</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js" integrity="sha384-EnyY0/GSHQGSxSgMwaIPzSESbqoOLSexfnSMN2AP+39Ckmn92stwABZynq1JyzdT" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #faf9f5;
+      --surface: #ffffff;
+      --border: #e8e6dc;
+      --text: #141413;
+      --text-muted: #b0aea5;
+      --accent: #d97757;
+      --accent-hover: #c4613f;
+      --green: #788c5d;
+      --green-bg: #eef2e8;
+      --red: #c44;
+      --red-bg: #fceaea;
+      --header-bg: #141413;
+      --header-text: #faf9f5;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Lora', Georgia, serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .header h1 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .header .instructions {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.25rem;
+    }
+    .header .progress {
+      font-size: 0.875rem;
+      opacity: 0.8;
+      text-align: right;
+    }
+
+    /* ---- Main content ---- */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* ---- Sections ---- */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-shrink: 0;
+    }
+    .section-header {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.75rem 1rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .section-body {
+      padding: 1rem;
+    }
+
+    /* ---- Config badge ---- */
+    .config-badge {
+      display: inline-block;
+      padding: 0.2rem 0.625rem;
+      border-radius: 9999px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-left: 0.75rem;
+      vertical-align: middle;
+    }
+    .config-badge.config-primary {
+      background: rgba(33, 150, 243, 0.12);
+      color: #1976d2;
+    }
+    .config-badge.config-baseline {
+      background: rgba(255, 193, 7, 0.15);
+      color: #f57f17;
+    }
+
+    /* ---- Prompt ---- */
+    .prompt-text {
+      white-space: pre-wrap;
+      font-size: 0.9375rem;
+      line-height: 1.6;
+    }
+
+    /* ---- Outputs ---- */
+    .output-file {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .output-file + .output-file {
+      margin-top: 1rem;
+    }
+    .output-file-header {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .output-file-header .dl-btn {
+      font-size: 0.7rem;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+    .output-file-header .dl-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+    .output-file-content {
+      padding: 0.75rem;
+      overflow-x: auto;
+    }
+    .output-file-content pre {
+      font-size: 0.8125rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
+    }
+    .output-file-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+    }
+    .output-file-content iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .output-file-content table {
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      width: 100%;
+    }
+    .output-file-content table td,
+    .output-file-content table th {
+      border: 1px solid var(--border);
+      padding: 0.375rem 0.5rem;
+      text-align: left;
+    }
+    .output-file-content table th {
+      background: var(--bg);
+      font-weight: 600;
+    }
+    .output-file-content .download-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    .output-file-content .download-link:hover {
+      background: var(--border);
+    }
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    /* ---- Feedback ---- */
+    .prev-feedback {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.625rem 0.75rem;
+      margin-top: 0.75rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+    .prev-feedback-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+      color: var(--text-muted);
+    }
+    .feedback-textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      resize: vertical;
+      color: var(--text);
+    }
+    .feedback-textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .feedback-status {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      min-height: 1.1em;
+    }
+
+    /* ---- Grades (collapsible) ---- */
+    .grades-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .grades-toggle:hover {
+      color: var(--accent);
+    }
+    .grades-toggle .arrow {
+      margin-right: 0.5rem;
+      transition: transform 0.15s;
+      font-size: 0.75rem;
+    }
+    .grades-toggle .arrow.open {
+      transform: rotate(90deg);
+    }
+    .grades-content {
+      display: none;
+      margin-top: 0.75rem;
+    }
+    .grades-content.open {
+      display: block;
+    }
+    .grades-summary {
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .grade-badge {
+      display: inline-block;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .grade-pass { background: var(--green-bg); color: var(--green); }
+    .grade-fail { background: var(--red-bg); color: var(--red); }
+    .assertion-list {
+      list-style: none;
+    }
+    .assertion-item {
+      padding: 0.625rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8125rem;
+    }
+    .assertion-item:last-child { border-bottom: none; }
+    .assertion-status {
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    .assertion-status.pass { color: var(--green); }
+    .assertion-status.fail { color: var(--red); }
+    .assertion-evidence {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      padding-left: 1.5rem;
+    }
+
+    /* ---- View tabs ---- */
+    .view-tabs {
+      display: flex;
+      gap: 0;
+      padding: 0 2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .view-tab {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.625rem 1.25rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .view-tab:hover { color: var(--text); }
+    .view-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .view-panel { display: none; }
+    .view-panel.active { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* ---- Benchmark view ---- */
+    .benchmark-view {
+      padding: 1.5rem 2rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .benchmark-table {
+      border-collapse: collapse;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 0.8125rem;
+      width: 100%;
+      margin-bottom: 1.5rem;
+    }
+    .benchmark-table th, .benchmark-table td {
+      padding: 0.625rem 0.75rem;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .benchmark-table th {
+      font-family: 'Poppins', sans-serif;
+      background: var(--header-bg);
+      color: var(--header-text);
+      font-weight: 500;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .benchmark-table tr:hover { background: var(--bg); }
+    .benchmark-table tr.benchmark-row-with { background: rgba(33, 150, 243, 0.06); }
+    .benchmark-table tr.benchmark-row-without { background: rgba(255, 193, 7, 0.06); }
+    .benchmark-table tr.benchmark-row-with:hover { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-without:hover { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-table tr.benchmark-row-avg { font-weight: 600; border-top: 2px solid var(--border); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-with { background: rgba(33, 150, 243, 0.12); }
+    .benchmark-table tr.benchmark-row-avg.benchmark-row-without { background: rgba(255, 193, 7, 0.12); }
+    .benchmark-delta-positive { color: var(--green); font-weight: 600; }
+    .benchmark-delta-negative { color: var(--red); font-weight: 600; }
+    .benchmark-notes {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+    }
+    .benchmark-notes h3 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.875rem;
+      margin-bottom: 0.75rem;
+    }
+    .benchmark-notes ul {
+      list-style: disc;
+      padding-left: 1.25rem;
+    }
+    .benchmark-notes li {
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      margin-bottom: 0.375rem;
+    }
+    .benchmark-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    /* ---- Navigation ---- */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+    .nav-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.15s;
+    }
+    .nav-btn:hover:not(:disabled) {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .nav-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .done-btn {
+      font-family: 'Poppins', sans-serif;
+      padding: 0.5rem 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .done-btn:hover {
+      background: var(--bg);
+      border-color: var(--text-muted);
+    }
+    .done-btn.ready {
+      border: none;
+      background: var(--accent);
+      color: white;
+      font-weight: 600;
+    }
+    .done-btn.ready:hover {
+      background: var(--accent-hover);
+    }
+    /* ---- Done overlay ---- */
+    .done-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+    .done-overlay.visible {
+      display: flex;
+    }
+    .done-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 2rem 3rem;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+    }
+    .done-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .done-card p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+    .done-card .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+    .done-card button {
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 0.875rem;
+    }
+    .done-card button:hover {
+      background: var(--bg);
+    }
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed;
+      bottom: 5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--header-bg);
+      color: var(--header-text);
+      padding: 0.625rem 1.25rem;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    .toast.visible {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" style="height:100vh; display:flex; flex-direction:column;">
+    <div class="header">
+      <div>
+        <h1>Eval Review: <span id="skill-name"></span></h1>
+        <div class="instructions">Review each output and leave feedback below. Navigate with arrow keys or buttons. When done, copy feedback and paste into Claude Code.</div>
+      </div>
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <!-- View tabs (only shown when benchmark data exists) -->
+    <div class="view-tabs" id="view-tabs" style="display:none;">
+      <button class="view-tab active" onclick="switchView('outputs')">Outputs</button>
+      <button class="view-tab" onclick="switchView('benchmark')">Benchmark</button>
+    </div>
+
+    <!-- Outputs panel (qualitative review) -->
+    <div class="view-panel active" id="panel-outputs">
+    <div class="main">
+      <!-- Prompt -->
+      <div class="section">
+        <div class="section-header">Prompt <span class="config-badge" id="config-badge" style="display:none;"></span></div>
+        <div class="section-body">
+          <div class="prompt-text" id="prompt-text"></div>
+        </div>
+      </div>
+
+      <!-- Outputs -->
+      <div class="section">
+        <div class="section-header">Output</div>
+        <div class="section-body" id="outputs-body">
+          <div class="empty-state">No output files found</div>
+        </div>
+      </div>
+
+      <!-- Previous Output (collapsible) -->
+      <div class="section" id="prev-outputs-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="togglePrevOutputs()">
+            <span class="arrow" id="prev-outputs-arrow">&#9654;</span>
+            Previous Output
+          </div>
+        </div>
+        <div class="grades-content" id="prev-outputs-content"></div>
+      </div>
+
+      <!-- Grades (collapsible) -->
+      <div class="section" id="grades-section" style="display:none;">
+        <div class="section-header">
+          <div class="grades-toggle" onclick="toggleGrades()">
+            <span class="arrow" id="grades-arrow">&#9654;</span>
+            Formal Grades
+          </div>
+        </div>
+        <div class="grades-content" id="grades-content"></div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="section">
+        <div class="section-header">Your Feedback</div>
+        <div class="section-body">
+          <textarea
+            class="feedback-textarea"
+            id="feedback"
+            placeholder="What do you think of this output? Any issues, suggestions, or things that look great?"
+          ></textarea>
+          <div class="feedback-status" id="feedback-status"></div>
+          <div class="prev-feedback" id="prev-feedback" style="display:none;">
+            <div class="prev-feedback-label">Previous feedback</div>
+            <div id="prev-feedback-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav" id="outputs-nav">
+      <button class="nav-btn" id="prev-btn" onclick="navigate(-1)">&#8592; Previous</button>
+      <button class="done-btn" id="done-btn" onclick="showDoneDialog()">Submit All Reviews</button>
+      <button class="nav-btn" id="next-btn" onclick="navigate(1)">Next &#8594;</button>
+    </div>
+    </div><!-- end panel-outputs -->
+
+    <!-- Benchmark panel (quantitative stats) -->
+    <div class="view-panel" id="panel-benchmark">
+      <div class="benchmark-view" id="benchmark-content">
+        <div class="benchmark-empty">No benchmark data available. Run a benchmark to see quantitative results here.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Done overlay -->
+  <div class="done-overlay" id="done-overlay">
+    <div class="done-card">
+      <h2>Review Complete</h2>
+      <p>Your feedback has been saved. Go back to your Claude Code session and tell Claude you're done reviewing.</p>
+      <div class="btn-row">
+        <button onclick="closeDoneDialog()">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ---- Embedded data (injected by generate_review.py) ----
+    const EMBEDDED_DATA = {"skill_name": "quiver-viz", "runs": [{"id": "eval-0-with_skill", "prompt": "I'm working in my robyn_scs analysis pipeline and the figures look inconsistent \u2014 some use 'red', 'lightskyblue', 'yellowgreen' hardcoded colors, some have top/right spines, and the save calls are missing dpi settings. Can you generate a quiver_style.py I can drop into my utils/ folder and import at the top of everything, plus show me how to restyle this pie chart code to use it?\n\nHere's the pie chart code to restyle:\n\n```python\nimport matplotlib.pyplot as plt\nimport os\n\nDISPLAY_ORDER = ['Excitatory', 'Inhibitory', 'Ambiguous', 'No validated efferent connections']\ncolors = ['red', 'lightskyblue', 'yellowgreen', 'gray']\n\nfor R in all_fov_results:\n    counts = (R['neuron_tier']['consensus_type']\n              .map(DISPLAY_NAMES)\n              .value_counts()\n              .reindex(DISPLAY_ORDER, fill_value=0))\n\n    mask  = counts.values > 0\n    sizes = counts.values[mask]\n    lbls  = [l for l, m in zip(DISPLAY_ORDER, mask) if m]\n    clrs  = [c for c, m in zip(colors, mask) if m]\n\n    fig, ax = plt.subplots()\n    patches, texts, autotexts = ax.pie(\n        sizes, labels=lbls, autopct='%1.1f%%',\n        colors=clrs, startangle=140)\n    for text, color in zip(texts, clrs):\n        text.set_color(color)\n        text.set_fontweight('bold')\n    ax.set_title(R['fov'])\n    ax.axis('equal')\n\n    fov_dir = os.path.join(OUTPUT_DIR, R['fov'])\n    os.makedirs(fov_dir, exist_ok=True)\n    for ext in ['svg', 'png']:\n        plt.savefig(os.path.join(fov_dir, f'pie_chart.{ext}'), bbox_inches='tight')\n    plt.close()\n```", "eval_id": 0, "outputs": [{"name": "quiver_style.py", "type": "text", "content": "\"\"\"\nquiver_style.py\n---------------\nQuiver Bioscience matplotlib style configuration.\n\nDrop into your utils/ folder and import at the top of any script or notebook:\n\n    import utils.quiver_style  # auto-applies on import\n\nOr import helpers explicitly:\n\n    from utils.quiver_style import QUIVER_COLORS, QUIVER_CYCLE, apply_quiver_style\n    from utils.quiver_style import quiver_cmap, quiver_categorical_cmap\n\"\"\"\n\nimport matplotlib as mpl\nimport matplotlib.pyplot as plt\nimport matplotlib.colors as mcolors\nimport numpy as np\nfrom cycler import cycler\nfrom matplotlib import font_manager\n\n# ---------------------------------------------------------------------------\n# Font detection\n# ---------------------------------------------------------------------------\n_available_fonts = {f.name for f in font_manager.fontManager.ttflist}\nQUIVER_FONT = \"Poppins\" if \"Poppins\" in _available_fonts else \"DejaVu Sans\"\n\n# ---------------------------------------------------------------------------\n# Color palette\n# ---------------------------------------------------------------------------\nQUIVER_COLORS = {\n    \"purple\":      \"#9C02FA\",\n    \"red\":         \"#F51D3F\",\n    \"dark_purple\": \"#7300BF\",\n    \"magenta\":     \"#C20CA9\",\n    \"lilac\":       \"#CAA1FF\",\n    \"hot_pink\":    \"#FF85FF\",\n    \"salmon\":      \"#F9788B\",\n    \"soft_pink\":   \"#FEEBFF\",\n    \"navy\":        \"#0D1130\",\n    \"lavender_bg\": \"#F5F0FF\",\n}\n\nQUIVER_CYCLE = [\n    \"#9C02FA\",  # purple\n    \"#F51D3F\",  # red\n    \"#C20CA9\",  # magenta\n    \"#CAA1FF\",  # lilac\n    \"#F9788B\",  # salmon\n    \"#FF85FF\",  # hot pink\n    \"#7300BF\",  # dark purple\n]\n\n# ---------------------------------------------------------------------------\n# Semantic pie chart colors (neuron type)\n# ---------------------------------------------------------------------------\nQUIVER_PIE_COLORS = {\n    \"Excitatory\":                        \"#F51D3F\",\n    \"Inhibitory\":                        \"#CAA1FF\",\n    \"Ambiguous\":                         \"#C20CA9\",\n    \"No validated efferent connections\": \"#888888\",\n    \"No connections\":                    \"#888888\",\n}\n\n# ---------------------------------------------------------------------------\n# rcParams\n# ---------------------------------------------------------------------------\nQUIVER_RC = {\n    \"figure.figsize\":        (8, 5),\n    \"figure.dpi\":            150,\n    \"figure.facecolor\":      \"white\",\n    \"axes.facecolor\":        \"white\",\n    \"axes.edgecolor\":        \"#333333\",\n    \"axes.linewidth\":        0.8,\n    \"axes.spines.top\":       False,\n    \"axes.spines.right\":     False,\n    \"axes.prop_cycle\":       cycler(\"color\", QUIVER_CYCLE),\n    \"axes.titlesize\":        12,\n    \"axes.titleweight\":      \"bold\",\n    \"axes.labelsize\":        10,\n    \"xtick.major.size\":      4,\n    \"xtick.labelsize\":       9,\n    \"xtick.color\":           \"#333333\",\n    \"ytick.major.size\":      4,\n    \"ytick.labelsize\":       9,\n    \"ytick.color\":           \"#333333\",\n    \"lines.linewidth\":       1.5,\n    \"lines.markersize\":      5,\n    \"legend.fontsize\":       9,\n    \"legend.framealpha\":     0.85,\n    \"savefig.dpi\":           300,\n    \"savefig.bbox\":          \"tight\",\n    \"savefig.facecolor\":     \"white\",\n    \"font.family\":           \"sans-serif\",\n    \"font.sans-serif\":       [\"Poppins\", \"DejaVu Sans\", \"Arial\", \"Helvetica\"],\n    \"font.size\":             10,\n}\n\n# ---------------------------------------------------------------------------\n# Apply function\n# ---------------------------------------------------------------------------\n\ndef apply_quiver_style():\n    \"\"\"Apply Quiver rcParams to the current matplotlib session.\"\"\"\n    mpl.rcParams.update(QUIVER_RC)\n\n\n# ---------------------------------------------------------------------------\n# Colormap helpers\n# ---------------------------------------------------------------------------\n\ndef quiver_cmap(n: int = 256, name: str = \"quiver_gradient\") -> mcolors.LinearSegmentedColormap:\n    \"\"\"\n    Return a continuous LinearSegmentedColormap spanning the Quiver gradient\n    (soft_pink -> lilac -> purple -> dark_purple -> navy).\n\n    Parameters\n    ----------\n    n : int\n        Number of gradient steps (default 256).\n    name : str\n        Name registered with matplotlib.\n\n    Returns\n    -------\n    matplotlib.colors.LinearSegmentedColormap\n    \"\"\"\n    gradient_colors = [\n        QUIVER_COLORS[\"soft_pink\"],\n        QUIVER_COLORS[\"lilac\"],\n        QUIVER_COLORS[\"purple\"],\n        QUIVER_COLORS[\"dark_purple\"],\n        QUIVER_COLORS[\"navy\"],\n    ]\n    cmap = mcolors.LinearSegmentedColormap.from_list(name, gradient_colors, N=n)\n    try:\n        mpl.colormaps.register(cmap, force=True)\n    except AttributeError:\n        # matplotlib < 3.5 fallback\n        plt.register_cmap(name=name, cmap=cmap)\n    return cmap\n\n\ndef quiver_categorical_cmap(categories: list) -> dict:\n    \"\"\"\n    Map an ordered list of category names to Quiver cycle colors.\n\n    Parameters\n    ----------\n    categories : list of str\n        Category labels in display order.\n\n    Returns\n    -------\n    dict mapping category name -> hex color string\n    \"\"\"\n    return {cat: QUIVER_CYCLE[i % len(QUIVER_CYCLE)] for i, cat in enumerate(categories)}\n\n\ndef quiver_pie_colors(labels: list) -> list:\n    \"\"\"\n    Return a list of hex colors for pie chart labels using semantic mapping\n    (Excitatory, Inhibitory, Ambiguous, No connections).  Falls back to the\n    Quiver color cycle for unrecognised labels.\n\n    Parameters\n    ----------\n    labels : list of str\n        Pie slice labels in display order.\n\n    Returns\n    -------\n    list of hex color strings\n    \"\"\"\n    cycle_iter = iter(QUIVER_CYCLE)\n    result = []\n    for label in labels:\n        if label in QUIVER_PIE_COLORS:\n            result.append(QUIVER_PIE_COLORS[label])\n        else:\n            result.append(next(cycle_iter, QUIVER_COLORS[\"purple\"]))\n    return result\n\n\n# ---------------------------------------------------------------------------\n# Auto-apply on import\n# ---------------------------------------------------------------------------\napply_quiver_style()\nQUIVER_GRADIENT_CMAP = quiver_cmap()\n"}, {"name": "response.md", "type": "text", "content": "# Quiver Visualization Style \u2014 outputs\n\nTwo files have been generated for your robyn_scs pipeline:\n\n---\n\n## 1. utils/quiver_style.py\n\nDrop this into your `utils/` folder. It exports:\n\n| Symbol | What it is |\n|---|---|\n| `QUIVER_COLORS` | Named hex palette dict (purple, red, magenta, lilac, ...) |\n| `QUIVER_CYCLE` | 7-color list used as the default axes prop_cycle |\n| `QUIVER_RC` | Full rcParams dict |\n| `QUIVER_PIE_COLORS` | Semantic mapping for neuron-type pie charts |\n| `apply_quiver_style()` | Manually re-apply rcParams if needed |\n| `quiver_cmap()` | Continuous gradient cmap (soft_pink \u2192 navy) |\n| `quiver_categorical_cmap(categories)` | Dict mapping category names to cycle colors |\n| `quiver_pie_colors(labels)` | List of hex colors for pie labels (semantic + fallback) |\n| `QUIVER_GRADIENT_CMAP` | Pre-built gradient cmap, registered with matplotlib |\n\n`apply_quiver_style()` is called automatically on import, so a bare\n`import utils.quiver_style` at the top of any script is enough to apply\nthe full style.\n\nFont: detects Poppins at import time; falls back to DejaVu Sans if not installed.\n\n---\n\n## 2. restyled_pie_chart.py \u2014 what changed\n\n### Import\n```python\nimport utils.quiver_style as qs   # replaces nothing; added at top\n```\nThis single line applies all rcParams (figsize, dpi, font, spines, etc.)\nbefore any figure is created.\n\n### Color remapping\nThe original `colors` list used generic matplotlib names which were remapped\nto Quiver semantic hex values:\n\n| Original | Category | Quiver hex |\n|---|---|---|\n| `'red'` | Excitatory | `\"#F51D3F\"` |\n| `'lightskyblue'` | Inhibitory | `\"#CAA1FF\"` (lilac) |\n| `'yellowgreen'` | Ambiguous | `\"#C20CA9\"` (magenta) |\n| `'gray'` | No connections | `\"#888888\"` (kept neutral) |\n\n### savefig \u2014 dpi added\n```python\n# Before\nplt.savefig(os.path.join(fov_dir, f'pie_chart.{ext}'), bbox_inches='tight')\n\n# After\nplt.savefig(os.path.join(fov_dir, f'pie_chart.{ext}'), bbox_inches='tight', dpi=300)\n```\n`bbox_inches='tight'` was already present and was kept; `dpi=300` was added\nto match Quiver's publication-quality save standard.\n\n### Spines note\nPie charts do not have visible axes spines, so no spine changes were needed.\nFor all other plot types (line, bar, scatter), the rcParams already set\n`axes.spines.top: False` and `axes.spines.right: False` globally, so you\ndo not need to add `ax.spines[[\"top\",\"right\"]].set_visible(False)` manually\nunless you are overriding styles after the fact.\n\n---\n\n## Usage across other scripts\n\n```python\n# Minimal \u2014 just apply the style\nimport utils.quiver_style\n\n# With helpers\nfrom utils.quiver_style import QUIVER_COLORS, quiver_cmap, quiver_pie_colors\n\n# Use a named color\nax.axhline(y=threshold, color=QUIVER_COLORS[\"red\"])\n\n# Use the gradient cmap for a heatmap\nim = ax.imshow(matrix, cmap=quiver_cmap())\n\n# Semantic pie colors for any subset of labels\nlbls = ['Excitatory', 'Inhibitory']\nclrs = quiver_pie_colors(lbls)   # ['#F51D3F', '#CAA1FF']\n```\n"}, {"name": "restyled_pie_chart.py", "type": "text", "content": "import matplotlib.pyplot as plt\nimport os\n\n# --- Quiver style (auto-applies rcParams on import) ---\nimport utils.quiver_style as qs\n\n# Semantic color mapping: Excitatory\u2192red, Inhibitory\u2192lilac,\n# Ambiguous\u2192magenta, No validated efferent connections\u2192neutral gray\nDISPLAY_ORDER = ['Excitatory', 'Inhibitory', 'Ambiguous', 'No validated efferent connections']\ncolors = [\n    \"#F51D3F\",  # Excitatory  \u2192 Quiver red\n    \"#CAA1FF\",  # Inhibitory  \u2192 Quiver lilac\n    \"#C20CA9\",  # Ambiguous   \u2192 Quiver magenta\n    \"#888888\",  # No connections \u2192 neutral gray\n]\n\nfor R in all_fov_results:\n    counts = (R['neuron_tier']['consensus_type']\n              .map(DISPLAY_NAMES)\n              .value_counts()\n              .reindex(DISPLAY_ORDER, fill_value=0))\n\n    mask  = counts.values > 0\n    sizes = counts.values[mask]\n    lbls  = [l for l, m in zip(DISPLAY_ORDER, mask) if m]\n    clrs  = [c for c, m in zip(colors, mask) if m]\n\n    fig, ax = plt.subplots()\n    patches, texts, autotexts = ax.pie(\n        sizes, labels=lbls, autopct='%1.1f%%',\n        colors=clrs, startangle=140)\n    for text, color in zip(texts, clrs):\n        text.set_color(color)\n        text.set_fontweight('bold')\n    ax.set_title(R['fov'])\n    ax.axis('equal')\n\n    fov_dir = os.path.join(OUTPUT_DIR, R['fov'])\n    os.makedirs(fov_dir, exist_ok=True)\n    for ext in ['svg', 'png']:\n        plt.savefig(os.path.join(fov_dir, f'pie_chart.{ext}'),\n                    bbox_inches='tight', dpi=300)\n    plt.close()\n"}], "grading": {"expectations": [{"text": "quiver_style_file_created", "passed": true, "evidence": "quiver_style.py found in outputs"}, {"text": "palette_remapped", "passed": true, "evidence": "No raw generic colors found in pie code"}, {"text": "quiver_colors_used", "passed": true, "evidence": "Quiver hex colors found: ['#F51D3F', '#CAA1FF', '#C20CA9']"}, {"text": "savefig_has_dpi", "passed": true, "evidence": "dpi=300 found"}, {"text": "style_import_present", "passed": true, "evidence": "Style import/apply found"}]}}, {"id": "eval-0-without_skill", "prompt": "I'm working in my robyn_scs analysis pipeline and the figures look inconsistent \u2014 some use 'red', 'lightskyblue', 'yellowgreen' hardcoded colors, some have top/right spines, and the save calls are missing dpi settings. Can you generate a quiver_style.py I can drop into my utils/ folder and import at the top of everything, plus show me how to restyle this pie chart code to use it?\n\nHere's the pie chart code to restyle:\n\n```python\nimport matplotlib.pyplot as plt\nimport os\n\nDISPLAY_ORDER = ['Excitatory', 'Inhibitory', 'Ambiguous', 'No validated efferent connections']\ncolors = ['red', 'lightskyblue', 'yellowgreen', 'gray']\n\nfor R in all_fov_results:\n    counts = (R['neuron_tier']['consensus_type']\n              .map(DISPLAY_NAMES)\n              .value_counts()\n              .reindex(DISPLAY_ORDER, fill_value=0))\n\n    mask  = counts.values > 0\n    sizes = counts.values[mask]\n    lbls  = [l for l, m in zip(DISPLAY_ORDER, mask) if m]\n    clrs  = [c for c, m in zip(colors, mask) if m]\n\n    fig, ax = plt.subplots()\n    patches, texts, autotexts = ax.pie(\n        sizes, labels=lbls, autopct='%1.1f%%',\n        colors=clrs, startangle=140)\n    for text, color in zip(texts, clrs):\n        text.set_color(color)\n        text.set_fontweight('bold')\n    ax.set_title(R['fov'])\n    ax.axis('equal')\n\n    fov_dir = os.path.join(OUTPUT_DIR, R['fov'])\n    os.makedirs(fov_dir, exist_ok=True)\n    for ext in ['svg', 'png']:\n        plt.savefig(os.path.join(fov_dir, f'pie_chart.{ext}'), bbox_inches='tight')\n    plt.close()\n```", "eval_id": 0, "outputs": [{"name": "quiver_style.py", "type": "text", "content": "\"\"\"\nquiver_style.py \u2014 Quiver Bioscience matplotlib style utilities\n==============================================================\nDrop into utils/ and import at the top of any analysis script:\n\n    from utils.quiver_style import apply_quiver_style, COLORS, savefig_quiver\n\nCalling apply_quiver_style() once per session sets rcParams globally so all\nsubsequent figures inherit the style automatically.\n\"\"\"\n\nimport matplotlib as mpl\nimport matplotlib.pyplot as plt\n\n# ---------------------------------------------------------------------------\n# Palette \u2014 single source of truth\n# ---------------------------------------------------------------------------\n\n# Neuron-type colors (used throughout the SCS pipeline)\nCOLORS = {\n    # Neuron classification\n    \"excitatory\":   \"#27ae60\",   # green\n    \"inhibitory\":   \"#e67e22\",   # orange\n    \"ambiguous\":    \"#7f8c8d\",   # slate grey\n    \"no_efferent\":  \"#bdc3c7\",   # light grey\n\n    # Confidence / putative variants\n    \"exc_light\":    \"#82d196\",   # light green  (putative / spaghetti)\n    \"inh_light\":    \"#f5b377\",   # light orange (putative / spaghetti)\n    \"both\":         \"#1e8449\",   # dark green   (consensus 'both' tier)\n    \"conflict\":     \"#7f8c8d\",   # same as ambiguous\n\n    # Quiver Bioscience brand palette\n    \"qb_purple\":    \"#9900ff\",\n    \"qb_red\":       \"#f51d3d\",\n    \"qb_pink\":      \"#cc3ea4\",\n\n    # Neutrals\n    \"grey\":         \"#888888\",\n    \"dark\":         \"#333333\",\n    \"trace\":        \"#444444\",\n}\n\n# Convenient ordered list matching the standard DISPLAY_ORDER used in pie / bar\nNEURON_TYPE_ORDER  = [\"Excitatory\", \"Inhibitory\", \"Ambiguous\",\n                      \"No validated efferent connections\"]\nNEURON_TYPE_COLORS = [\n    COLORS[\"excitatory\"],\n    COLORS[\"inhibitory\"],\n    COLORS[\"ambiguous\"],\n    COLORS[\"no_efferent\"],\n]\n\n# Quiver brand palette (cycles for multi-condition plots)\nQB_PALETTE = [COLORS[\"qb_purple\"], COLORS[\"qb_red\"], COLORS[\"qb_pink\"]]\n\n\ndef quiver_colors(n: int) -> list:\n    \"\"\"Return *n* colors cycling through the Quiver brand palette.\"\"\"\n    return [QB_PALETTE[i % len(QB_PALETTE)] for i in range(n)]\n\n\n# ---------------------------------------------------------------------------\n# rcParams \u2014 applied globally when apply_quiver_style() is called\n# ---------------------------------------------------------------------------\n\n_QUIVER_RC = {\n    # Font\n    \"font.family\":        \"sans-serif\",\n    \"font.sans-serif\":    [\"Arial\", \"Helvetica\", \"DejaVu Sans\"],\n    \"font.size\":          11,\n    \"axes.titlesize\":     12,\n    \"axes.labelsize\":     11,\n    \"xtick.labelsize\":    10,\n    \"ytick.labelsize\":    10,\n    \"legend.fontsize\":    10,\n\n    # Axes\n    \"axes.spines.top\":    False,\n    \"axes.spines.right\":  False,\n    \"axes.linewidth\":     0.8,\n    \"axes.edgecolor\":     \"#333333\",\n    \"axes.labelcolor\":    \"#333333\",\n    \"axes.titlepad\":      8,\n\n    # Ticks\n    \"xtick.direction\":    \"out\",\n    \"ytick.direction\":    \"out\",\n    \"xtick.major.width\":  0.8,\n    \"ytick.major.width\":  0.8,\n    \"xtick.color\":        \"#333333\",\n    \"ytick.color\":        \"#333333\",\n\n    # Lines / patches\n    \"lines.linewidth\":    1.5,\n    \"patch.linewidth\":    0.5,\n\n    # Figure / save\n    \"figure.dpi\":         100,\n    \"savefig.dpi\":        300,\n    \"savefig.bbox\":       \"tight\",\n    \"savefig.transparent\": False,\n\n    # Grid (off by default \u2014 enable per-axes as needed)\n    \"axes.grid\":          False,\n}\n\n\ndef apply_quiver_style() -> None:\n    \"\"\"Apply Quiver rcParams globally for the current session.\n\n    Call once near the top of a script or notebook cell:\n\n        from utils.quiver_style import apply_quiver_style\n        apply_quiver_style()\n    \"\"\"\n    mpl.rcParams.update(_QUIVER_RC)\n\n\n# ---------------------------------------------------------------------------\n# Spine helper\n# ---------------------------------------------------------------------------\n\ndef clean_spines(ax, keep=(\"bottom\", \"left\")) -> None:\n    \"\"\"Remove all spines except those listed in *keep*.\n\n    Parameters\n    ----------\n    ax   : matplotlib Axes\n    keep : iterable of spine names to keep visible (default bottom + left)\n    \"\"\"\n    for spine in (\"top\", \"right\", \"left\", \"bottom\"):\n        ax.spines[spine].set_visible(spine in keep)\n\n\n# ---------------------------------------------------------------------------\n# Save helper\n# ---------------------------------------------------------------------------\n\ndef savefig_quiver(path_no_ext: str,\n                   formats: tuple = (\"svg\", \"png\"),\n                   dpi: int = 300,\n                   **kwargs) -> None:\n    \"\"\"Save the current figure to one or more formats with consistent settings.\n\n    Parameters\n    ----------\n    path_no_ext : str\n        Full output path *without* extension, e.g.\n        ``os.path.join(fov_dir, 'pie_chart')``\n    formats     : tuple of str\n        File extensions to write. Default ``('svg', 'png')``.\n    dpi         : int\n        Resolution for raster formats. Default 300.\n    **kwargs\n        Additional keyword arguments forwarded to ``plt.savefig``.\n    \"\"\"\n    defaults = dict(bbox_inches=\"tight\", dpi=dpi)\n    defaults.update(kwargs)\n    for ext in formats:\n        plt.savefig(f\"{path_no_ext}.{ext}\", **defaults)\n"}, {"name": "response.md", "type": "text", "content": "# Quiver Style Module \u2014 what was built and why\n\n## What was created\n\nTwo files for your `utils/` folder:\n\n- **`quiver_style.py`** \u2014 the style module itself\n- **`restyled_pie_chart.py`** \u2014 the pie chart code updated to use it\n\n---\n\n## quiver_style.py \u2014 design decisions\n\n### 1. Color palette (`COLORS` dict + `NEURON_TYPE_COLORS` list)\n\nThe hardcoded `'red'`, `'lightskyblue'`, and `'yellowgreen'` are replaced with hex values that already exist in your `visualization.py` module:\n\n| Old | New | Key |\n|---|---|---|\n| `'red'` | `#27ae60` (green) | `COLORS[\"excitatory\"]` |\n| `'lightskyblue'` | `#e67e22` (orange) | `COLORS[\"inhibitory\"]` |\n| `'yellowgreen'` | `#7f8c8d` (slate grey) | `COLORS[\"ambiguous\"]` |\n| `'gray'` | `#bdc3c7` (light grey) | `COLORS[\"no_efferent\"]` |\n\nThese match the colors your `visualization.py` already uses for excitatory/inhibitory classification, so the pie charts will now be visually consistent with your STA and trace plots.\n\nThe Quiver brand palette (`#9900ff`, `#f51d3d`, `#cc3ea4`) is also included and exposed via `quiver_colors(n)` for multi-condition plots.\n\n### 2. `apply_quiver_style()` \u2014 global rcParams\n\nCalling this function once per session applies a consistent set of `rcParams`:\n\n- **Spines**: `axes.spines.top` and `axes.spines.right` set to `False` globally \u2014 no more per-axes `spines[[\"top\",\"right\"]].set_visible(False)` calls scattered through plotting code.\n- **Font**: Arial/Helvetica/DejaVu Sans, sizes consistent across title, labels, ticks, and legend.\n- **Save defaults**: `savefig.dpi = 300` and `savefig.bbox = 'tight'` as rcParam defaults.\n- **Figure DPI**: `figure.dpi = 100` for screen display, separate from the 300 dpi used at save time.\n\n### 3. `clean_spines(ax)` \u2014 per-axes override\n\nFor cases where the global rcParam isn't enough (e.g., you want to keep all four spines on one specific plot), `clean_spines(ax, keep=(...))` lets you control it explicitly without repeating the same indexing pattern.\n\n### 4. `savefig_quiver(path_no_ext, formats, dpi)` \u2014 consistent save calls\n\nReplaces the bare `plt.savefig(..., bbox_inches='tight')` calls that were missing `dpi`. The function:\n- Accepts a path without extension and writes multiple formats in a loop.\n- Defaults to `dpi=300` and `bbox_inches='tight'`.\n- Accepts `**kwargs` to pass anything else through to `plt.savefig`.\n\n---\n\n## restyled_pie_chart.py \u2014 what changed\n\n| Before | After | Reason |\n|---|---|---|\n| `colors = ['red', 'lightskyblue', 'yellowgreen', 'gray']` | `from utils.quiver_style import NEURON_TYPE_COLORS` | Single source of truth for colors |\n| `DISPLAY_ORDER = [...]` (local) | `DISPLAY_ORDER = NEURON_TYPE_ORDER` (imported) | Same reason |\n| `apply_quiver_style()` absent | Called once at top of script | Sets spines, font, dpi globally |\n| `plt.savefig(..., bbox_inches='tight')` x2 | `savefig_quiver(path, formats=('svg', 'png'))` | Adds dpi=300, consistent across all plots |\n\nThe logic of the loop \u2014 masking zero-count slices, setting label colors and font weight, `axis('equal')` \u2014 is unchanged.\n\n---\n\n## How to use in other scripts\n\n```python\n# At the top of any analysis script or notebook cell:\nfrom utils.quiver_style import apply_quiver_style, COLORS, savefig_quiver, clean_spines\n\napply_quiver_style()   # call once per session\n\n# Later, when making a figure:\nfig, ax = plt.subplots()\nax.plot(x, y, color=COLORS[\"excitatory\"])\nclean_spines(ax)       # only needed if you want to override per-axes\nsavefig_quiver(os.path.join(output_dir, 'my_plot'))\nplt.close()\n```\n\nFor pie charts specifically, spines are not visible anyway, so `clean_spines` is not needed \u2014 but `apply_quiver_style()` still ensures consistency for any non-pie axes in the same session.\n"}, {"name": "restyled_pie_chart.py", "type": "text", "content": "\"\"\"\nrestyled_pie_chart.py \u2014 neuron-type pie charts with Quiver style\n================================================================\nDepends on quiver_style.py being importable (place both files in utils/).\n\"\"\"\n\nimport os\nimport matplotlib.pyplot as plt\n\nfrom utils.quiver_style import (\n    apply_quiver_style,\n    NEURON_TYPE_ORDER,\n    NEURON_TYPE_COLORS,\n    savefig_quiver,\n)\n\n# Apply Quiver rcParams once \u2014 affects all figures in this session.\napply_quiver_style()\n\n# ---------------------------------------------------------------------------\n# Constants\n# ---------------------------------------------------------------------------\n\n# DISPLAY_ORDER and DISPLAY_NAMES should still be defined wherever all_fov_results\n# is produced.  NEURON_TYPE_ORDER from quiver_style replaces the old hardcoded list.\nDISPLAY_ORDER = NEURON_TYPE_ORDER  # imported from quiver_style\n\n# ---------------------------------------------------------------------------\n# Per-FOV pie charts\n# ---------------------------------------------------------------------------\n\nfor R in all_fov_results:\n    counts = (\n        R[\"neuron_tier\"][\"consensus_type\"]\n        .map(DISPLAY_NAMES)\n        .value_counts()\n        .reindex(DISPLAY_ORDER, fill_value=0)\n    )\n\n    mask  = counts.values > 0\n    sizes = counts.values[mask]\n    lbls  = [l for l, m in zip(DISPLAY_ORDER, mask) if m]\n    clrs  = [c for c, m in zip(NEURON_TYPE_COLORS, mask) if m]\n\n    fig, ax = plt.subplots()\n\n    patches, texts, autotexts = ax.pie(\n        sizes,\n        labels=lbls,\n        autopct=\"%1.1f%%\",\n        colors=clrs,\n        startangle=140,\n    )\n\n    for text, color in zip(texts, clrs):\n        text.set_color(color)\n        text.set_fontweight(\"bold\")\n\n    ax.set_title(R[\"fov\"])\n    ax.axis(\"equal\")\n\n    # Pie charts have no axes frame, so spine removal is not required,\n    # but apply_quiver_style() has already set spines.top/right to False\n    # for any non-pie subplots in the same session.\n\n    fov_dir = os.path.join(OUTPUT_DIR, R[\"fov\"])\n    os.makedirs(fov_dir, exist_ok=True)\n\n    # savefig_quiver handles dpi=300 and bbox_inches='tight' consistently.\n    savefig_quiver(os.path.join(fov_dir, \"pie_chart\"), formats=(\"svg\", \"png\"))\n    plt.close()\n"}], "grading": {"expectations": [{"text": "quiver_style_file_created", "passed": true, "evidence": "quiver_style.py found in outputs"}, {"text": "palette_remapped", "passed": true, "evidence": "No raw generic colors found in pie code"}, {"text": "quiver_colors_used", "passed": false, "evidence": "No Quiver brand hex colors used \u2014 invented its own palette"}, {"text": "savefig_has_dpi", "passed": true, "evidence": "dpi=300 found"}, {"text": "style_import_present", "passed": true, "evidence": "Style import/apply found"}]}}, {"id": "eval-1-with_skill", "prompt": "Can you generate a Quiver-branded matplotlib style config I can use across my whole analysis project? I want something I can just import at the top of my notebooks and scripts. I'm using Python with matplotlib and seaborn for neuroscience figures \u2014 bar plots, line traces, pie charts, and heatmaps. Should include the color palette, font settings (Poppins if available), axis styles, and save settings.", "eval_id": 1, "outputs": [{"name": "quiver_style.py", "type": "text", "content": "\"\"\"\nquiver_style.py\n---------------\nQuiver Bioscience matplotlib / seaborn style configuration.\n\nUsage\n-----\n    import utils.quiver_style          # auto-applies on import\n\n    # or explicitly\n    from utils.quiver_style import apply_quiver_style\n    apply_quiver_style()\n\n    # Access palette\n    from utils.quiver_style import QUIVER_COLORS, QUIVER_CYCLE\n\n    # Colormaps\n    from utils.quiver_style import quiver_diverging_cmap, quiver_sequential_cmap\n    heatmap_cmap = quiver_diverging_cmap()\n    seq_cmap     = quiver_sequential_cmap()\n\"\"\"\n\nimport matplotlib.pyplot as plt\nimport matplotlib.colors as mcolors\nfrom matplotlib.colors import LinearSegmentedColormap\nfrom cycler import cycler\nfrom matplotlib import font_manager\n\n# ---------------------------------------------------------------------------\n# Color palette\n# ---------------------------------------------------------------------------\n\nQUIVER_COLORS = {\n    \"purple\":      \"#9C02FA\",\n    \"red\":         \"#F51D3F\",\n    \"dark_purple\": \"#7300BF\",\n    \"magenta\":     \"#C20CA9\",\n    \"lilac\":       \"#CAA1FF\",\n    \"hot_pink\":    \"#FF85FF\",\n    \"salmon\":      \"#F9788B\",\n    \"soft_pink\":   \"#FEEBFF\",\n    \"navy\":        \"#0D1130\",\n    \"lavender_bg\": \"#F5F0FF\",\n}\n\n# Ordered cycle for multi-series plots\nQUIVER_CYCLE = [\n    \"#9C02FA\",  # purple\n    \"#F51D3F\",  # red\n    \"#C20CA9\",  # magenta\n    \"#CAA1FF\",  # lilac\n    \"#F9788B\",  # salmon\n    \"#FF85FF\",  # hot pink\n    \"#7300BF\",  # dark purple\n]\n\n# ---------------------------------------------------------------------------\n# Font detection\n# ---------------------------------------------------------------------------\n\n_available_fonts = {f.name for f in font_manager.fontManager.ttflist}\nQUIVER_FONT = \"Poppins\" if \"Poppins\" in _available_fonts else \"DejaVu Sans\"\n\n# ---------------------------------------------------------------------------\n# rcParams dictionary\n# ---------------------------------------------------------------------------\n\nQUIVER_RC = {\n    # Figure\n    \"figure.figsize\":        (8, 5),\n    \"figure.dpi\":            150,\n    \"figure.facecolor\":      \"white\",\n\n    # Axes\n    \"axes.facecolor\":        \"white\",\n    \"axes.edgecolor\":        \"#333333\",\n    \"axes.linewidth\":        0.8,\n    \"axes.spines.top\":       False,\n    \"axes.spines.right\":     False,\n    \"axes.prop_cycle\":       cycler(\"color\", QUIVER_CYCLE),\n    \"axes.titlesize\":        12,\n    \"axes.titleweight\":      \"bold\",\n    \"axes.labelsize\":        10,\n\n    # Ticks\n    \"xtick.major.size\":      4,\n    \"xtick.labelsize\":       9,\n    \"xtick.color\":           \"#333333\",\n    \"ytick.major.size\":      4,\n    \"ytick.labelsize\":       9,\n    \"ytick.color\":           \"#333333\",\n\n    # Lines & markers\n    \"lines.linewidth\":       1.5,\n    \"lines.markersize\":      5,\n\n    # Legend\n    \"legend.fontsize\":       9,\n    \"legend.framealpha\":     0.85,\n\n    # Save\n    \"savefig.dpi\":           300,\n    \"savefig.bbox\":          \"tight\",\n    \"savefig.facecolor\":     \"white\",\n\n    # Font\n    \"font.family\":           \"sans-serif\",\n    \"font.sans-serif\":       [\"Poppins\", \"DejaVu Sans\", \"Arial\", \"Helvetica\"],\n    \"font.size\":             10,\n}\n\n# ---------------------------------------------------------------------------\n# Apply function\n# ---------------------------------------------------------------------------\n\ndef apply_quiver_style():\n    \"\"\"Apply Quiver rcParams to the current matplotlib session.\"\"\"\n    plt.rcParams.update(QUIVER_RC)\n\n\n# ---------------------------------------------------------------------------\n# Colormaps\n# ---------------------------------------------------------------------------\n\ndef quiver_diverging_cmap(name: str = \"quiver_diverging\") -> LinearSegmentedColormap:\n    \"\"\"\n    Diverging colormap: Quiver purple -> white -> Quiver red.\n\n    Good for signed-value heatmaps (e.g. z-scored dF/F, correlation matrices).\n    \"\"\"\n    return LinearSegmentedColormap.from_list(\n        name,\n        [QUIVER_COLORS[\"purple\"], \"white\", QUIVER_COLORS[\"red\"]],\n    )\n\n\ndef quiver_sequential_cmap(name: str = \"quiver_sequential\") -> LinearSegmentedColormap:\n    \"\"\"\n    Sequential colormap: white -> Quiver magenta -> Quiver purple.\n\n    Good for density / intensity heatmaps (e.g. spike rasters, firing-rate maps).\n    \"\"\"\n    return LinearSegmentedColormap.from_list(\n        name,\n        [\"white\", QUIVER_COLORS[\"magenta\"], QUIVER_COLORS[\"purple\"]],\n    )\n\n\n# ---------------------------------------------------------------------------\n# Register colormaps with matplotlib so they can be referenced by name\n# ---------------------------------------------------------------------------\n\ndef _register_colormaps():\n    for _cmap_fn in (quiver_diverging_cmap, quiver_sequential_cmap):\n        _cmap = _cmap_fn()\n        try:\n            mcolors.LinearSegmentedColormap  # sanity check\n            if _cmap.name not in plt.colormaps():\n                plt.colormaps.register(_cmap)\n        except Exception:\n            pass  # older matplotlib \u2014 skip registration, cmap objects still work\n\n\n# ---------------------------------------------------------------------------\n# Seaborn integration helper (optional \u2014 only runs if seaborn is installed)\n# ---------------------------------------------------------------------------\n\ndef apply_quiver_seaborn_style():\n    \"\"\"\n    Apply a seaborn theme that is consistent with Quiver rcParams.\n    Call this *after* importing seaborn and *instead of* apply_quiver_style()\n    (it calls apply_quiver_style() internally).\n    \"\"\"\n    try:\n        import seaborn as sns\n        sns.set_theme(\n            style=\"ticks\",\n            rc={\n                \"axes.facecolor\":    \"white\",\n                \"figure.facecolor\":  \"white\",\n                \"axes.spines.top\":   False,\n                \"axes.spines.right\": False,\n            },\n        )\n        apply_quiver_style()\n        sns.set_palette(QUIVER_CYCLE)\n    except ImportError:\n        # seaborn not installed \u2014 fall back to pure matplotlib style\n        apply_quiver_style()\n\n\n# ---------------------------------------------------------------------------\n# Auto-apply on import\n# ---------------------------------------------------------------------------\n\napply_quiver_style()\n_register_colormaps()\n"}, {"name": "response.md", "type": "text", "content": "# Quiver Matplotlib Style Config\n\nI've generated `utils/quiver_style.py` \u2014 a drop-in style module for all your analysis scripts and notebooks. Here's what it contains and how to use it.\n\n---\n\n## What's included\n\n### Color palette (`QUIVER_COLORS`)\nTen named brand colors: purple, red, dark purple, magenta, lilac, hot pink, salmon, soft pink, navy, and lavender background.\n\n### Plot cycle (`QUIVER_CYCLE`)\nSeven colors in priority order for multi-series plots. Matplotlib uses these automatically for lines, bars, and scatter points once the style is applied.\n\n### Font (`QUIVER_FONT`)\nDetects whether Poppins is installed at runtime. If it is, Poppins is used; otherwise it falls back to DejaVu Sans. The `font.sans-serif` list also includes Arial and Helvetica as additional fallbacks.\n\n### rcParams (`QUIVER_RC`)\n- **Figure**: 8\u00d75 inches, 150 dpi screen, white background\n- **Axes**: white face, no top/right spines, bold titles\n- **Ticks**: 4pt major ticks, dark grey labels\n- **Lines/markers**: 1.5pt line width, 5pt markers\n- **Legend**: 9pt, semi-transparent frame\n- **Save**: 300 dpi, tight bounding box, white background\n\n### Colormaps\n- `quiver_diverging_cmap()` \u2014 purple \u2192 white \u2192 red. Use for signed-value heatmaps (z-scored dF/F, correlation matrices).\n- `quiver_sequential_cmap()` \u2014 white \u2192 magenta \u2192 purple. Use for density/intensity heatmaps (spike rasters, firing-rate maps).\n\nBoth are also registered with matplotlib by name so you can pass the name string anywhere a colormap is expected.\n\n---\n\n## How to use it\n\n### Plain matplotlib (scripts or notebooks)\n```python\nimport utils.quiver_style  # style applies automatically on import\nimport matplotlib.pyplot as plt\n\n# Access palette\nfrom utils.quiver_style import QUIVER_COLORS, QUIVER_CYCLE\n\n# Use a colormap\nfrom utils.quiver_style import quiver_diverging_cmap\nim = ax.imshow(data, cmap=quiver_diverging_cmap())\n```\n\n### With seaborn\n```python\nfrom utils.quiver_style import apply_quiver_seaborn_style\napply_quiver_seaborn_style()  # sets seaborn ticks theme + Quiver palette + rcParams\nimport seaborn as sns\n```\n\n### Figure types\n| Figure type | Recommendation |\n|---|---|\n| Bar plots | Auto-styled via QUIVER_CYCLE; use `QUIVER_COLORS[\"purple\"]` for single-color bars |\n| Line traces | Auto-styled; consider `QUIVER_COLORS[\"lilac\"]` for secondary traces |\n| Pie charts | Pass `colors=QUIVER_CYCLE` to `ax.pie()` |\n| Heatmaps | Use `quiver_diverging_cmap()` (signed) or `quiver_sequential_cmap()` (unsigned) |\n\n---\n\n## File location\nPlace `quiver_style.py` at `utils/quiver_style.py` relative to your project root, then import as shown above. If your notebooks are in a subdirectory, add the project root to `sys.path` first:\n\n```python\nimport sys, pathlib\nsys.path.insert(0, str(pathlib.Path.cwd().parent))\nimport utils.quiver_style\n```\n"}], "grading": {"expectations": [{"text": "contains_quiver_colors_dict", "passed": true, "evidence": "QUIVER_COLORS with purple and red hex found"}, {"text": "contains_quiver_cycle", "passed": true, "evidence": "QUIVER_CYCLE found"}, {"text": "poppins_font_handling", "passed": true, "evidence": "Poppins: True, fallback logic: True"}, {"text": "rcparams_included", "passed": true, "evidence": "rcParams: True, dpi: True, spines: True"}, {"text": "apply_function_exists", "passed": true, "evidence": "apply_quiver_style function found"}]}}, {"id": "eval-1-without_skill", "prompt": "Can you generate a Quiver-branded matplotlib style config I can use across my whole analysis project? I want something I can just import at the top of my notebooks and scripts. I'm using Python with matplotlib and seaborn for neuroscience figures \u2014 bar plots, line traces, pie charts, and heatmaps. Should include the color palette, font settings (Poppins if available), axis styles, and save settings.", "eval_id": 1, "outputs": [{"name": "quiver_style.py", "type": "text", "content": "\"\"\"\nquiver_style.py\n---------------\nQuiver Bioscience matplotlib/seaborn style configuration.\n\nUsage\n-----\n    import quiver_style  # apply styles globally at import time\n\n    # or apply manually:\n    from quiver_style import apply_quiver_style\n    apply_quiver_style()\n\n    # access the palette directly:\n    from quiver_style import PALETTE, PALETTE_LIST\n\nColor reference\n---------------\n    Primary Purple  #9C02FA\n    Primary Red     #F51D3F\n    Dark Purple     #7300BF\n    Magenta         #C20CA9\n    Lilac           #CAA1FF\n    Hot Pink        #FF85FF\n    Salmon          #F9788B\n\"\"\"\n\nimport matplotlib as mpl\nimport matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\n\n# ---------------------------------------------------------------------------\n# Brand colors\n# ---------------------------------------------------------------------------\n\nPALETTE = {\n    \"primary_purple\": \"#9C02FA\",\n    \"primary_red\":    \"#F51D3F\",\n    \"dark_purple\":    \"#7300BF\",\n    \"magenta\":        \"#C20CA9\",\n    \"lilac\":          \"#CAA1FF\",\n    \"hot_pink\":       \"#FF85FF\",\n    \"salmon\":         \"#F9788B\",\n}\n\n# Ordered list \u2014 use as default color cycle (perceptually distinct first)\nPALETTE_LIST = [\n    PALETTE[\"primary_purple\"],\n    PALETTE[\"primary_red\"],\n    PALETTE[\"dark_purple\"],\n    PALETTE[\"magenta\"],\n    PALETTE[\"lilac\"],\n    PALETTE[\"hot_pink\"],\n    PALETTE[\"salmon\"],\n]\n\n# Convenience aliases\nPURPLE      = PALETTE[\"primary_purple\"]\nRED         = PALETTE[\"primary_red\"]\nDARK_PURPLE = PALETTE[\"dark_purple\"]\nMAGENTA     = PALETTE[\"magenta\"]\nLILAC       = PALETTE[\"lilac\"]\nHOT_PINK    = PALETTE[\"hot_pink\"]\nSALMON      = PALETTE[\"salmon\"]\n\n# Diverging / sequential helpers\nDIVERGING_PALETTE  = [PALETTE[\"dark_purple\"], \"#FFFFFF\", PALETTE[\"primary_red\"]]\nSEQUENTIAL_PALETTE = [PALETTE[\"lilac\"], PALETTE[\"primary_purple\"], PALETTE[\"dark_purple\"]]\n\n# ---------------------------------------------------------------------------\n# Font detection\n# ---------------------------------------------------------------------------\n\ndef _poppins_available() -> bool:\n    \"\"\"Return True if any Poppins variant is installed on this system.\"\"\"\n    available = {f.name for f in fm.fontManager.ttflist}\n    return \"Poppins\" in available\n\n\ndef _best_font() -> str:\n    \"\"\"Return 'Poppins' if available, otherwise a clean sans-serif fallback.\"\"\"\n    if _poppins_available():\n        return \"Poppins\"\n    # Common cross-platform fallbacks\n    for font in (\"Inter\", \"Helvetica Neue\", \"Helvetica\", \"Arial\", \"DejaVu Sans\"):\n        if font in {f.name for f in fm.fontManager.ttflist}:\n            return font\n    return \"sans-serif\"\n\n\n# ---------------------------------------------------------------------------\n# Core style parameters\n# ---------------------------------------------------------------------------\n\ndef _build_rc_params(font: str) -> dict:\n    \"\"\"Build the full rcParams dictionary.\"\"\"\n    return {\n        # --- Figure ---\n        \"figure.facecolor\":      \"white\",\n        \"figure.edgecolor\":      \"white\",\n        \"figure.dpi\":            150,\n        \"figure.figsize\":        (7, 4.5),\n        \"figure.autolayout\":     False,   # use tight_layout() or constrained_layout explicitly\n\n        # --- Saving ---\n        \"savefig.dpi\":           300,\n        \"savefig.format\":        \"pdf\",   # vector-safe default; override with .png/.svg as needed\n        \"savefig.bbox\":          \"tight\",\n        \"savefig.facecolor\":     \"white\",\n        \"savefig.edgecolor\":     \"white\",\n        \"savefig.transparent\":   False,\n\n        # --- Font ---\n        \"font.family\":           \"sans-serif\",\n        \"font.sans-serif\":       [font, \"DejaVu Sans\", \"Arial\", \"sans-serif\"],\n        \"font.size\":             11,\n\n        # --- Text ---\n        \"text.color\":            \"#1A1A2E\",   # near-black, slightly cool\n        \"text.usetex\":           False,\n\n        # --- Axes ---\n        \"axes.facecolor\":        \"white\",\n        \"axes.edgecolor\":        \"#CCCCCC\",\n        \"axes.linewidth\":        0.8,\n        \"axes.labelcolor\":       \"#1A1A2E\",\n        \"axes.labelsize\":        12,\n        \"axes.labelpad\":         6,\n        \"axes.titlesize\":        14,\n        \"axes.titleweight\":      \"semibold\",\n        \"axes.titlepad\":         10,\n        \"axes.spines.top\":       False,\n        \"axes.spines.right\":     False,\n        \"axes.prop_cycle\":       mpl.cycler(color=PALETTE_LIST),\n        \"axes.grid\":             True,\n        \"axes.axisbelow\":        True,\n\n        # --- Grid ---\n        \"grid.color\":            \"#E8E8F0\",\n        \"grid.linewidth\":        0.6,\n        \"grid.linestyle\":        \"--\",\n        \"grid.alpha\":            0.8,\n\n        # --- Ticks ---\n        \"xtick.labelsize\":       10,\n        \"ytick.labelsize\":       10,\n        \"xtick.color\":           \"#555555\",\n        \"ytick.color\":           \"#555555\",\n        \"xtick.direction\":       \"out\",\n        \"ytick.direction\":       \"out\",\n        \"xtick.major.size\":      4,\n        \"ytick.major.size\":      4,\n        \"xtick.minor.size\":      2,\n        \"ytick.minor.size\":      2,\n        \"xtick.major.pad\":       4,\n        \"ytick.major.pad\":       4,\n\n        # --- Lines ---\n        \"lines.linewidth\":       1.8,\n        \"lines.markersize\":      6,\n        \"lines.markeredgewidth\": 0.5,\n\n        # --- Patches (bar plots, pie, etc.) ---\n        \"patch.linewidth\":       0.8,\n        \"patch.edgecolor\":       \"white\",\n        \"patch.force_edgecolor\": True,\n\n        # --- Error bars ---\n        \"errorbar.capsize\":      3,\n\n        # --- Legend ---\n        \"legend.frameon\":        True,\n        \"legend.framealpha\":     0.9,\n        \"legend.edgecolor\":      \"#CCCCCC\",\n        \"legend.fontsize\":       10,\n        \"legend.title_fontsize\": 11,\n        \"legend.borderpad\":      0.5,\n        \"legend.labelspacing\":   0.4,\n\n        # --- Image / heatmap ---\n        \"image.cmap\":            \"quiver_sequential\",   # registered below; fallback: \"magma\"\n        \"image.interpolation\":   \"nearest\",\n        \"image.aspect\":          \"auto\",\n    }\n\n\n# ---------------------------------------------------------------------------\n# Custom colormaps\n# ---------------------------------------------------------------------------\n\ndef _register_colormaps() -> None:\n    \"\"\"Register Quiver-branded colormaps with matplotlib.\"\"\"\n    from matplotlib.colors import LinearSegmentedColormap\n\n    # Sequential: lilac -> primary_purple -> dark_purple\n    seq_cmap = LinearSegmentedColormap.from_list(\n        \"quiver_sequential\",\n        [PALETTE[\"lilac\"], PALETTE[\"primary_purple\"], PALETTE[\"dark_purple\"]],\n        N=256,\n    )\n\n    # Diverging: dark_purple <-> white <-> primary_red\n    div_cmap = LinearSegmentedColormap.from_list(\n        \"quiver_diverging\",\n        [PALETTE[\"dark_purple\"], \"#FFFFFF\", PALETTE[\"primary_red\"]],\n        N=256,\n    )\n\n    # Hot: white -> hot_pink -> magenta -> dark_purple\n    hot_cmap = LinearSegmentedColormap.from_list(\n        \"quiver_hot\",\n        [\"#FFFFFF\", PALETTE[\"hot_pink\"], PALETTE[\"magenta\"], PALETTE[\"dark_purple\"]],\n        N=256,\n    )\n\n    for cmap in (seq_cmap, div_cmap, hot_cmap):\n        try:\n            mpl.colormaps.register(cmap, force=True)\n        except AttributeError:\n            # matplotlib < 3.5 fallback\n            plt.register_cmap(cmap=cmap)\n\n\n# ---------------------------------------------------------------------------\n# Seaborn integration\n# ---------------------------------------------------------------------------\n\ndef _apply_seaborn_theme() -> None:\n    \"\"\"Apply a matching seaborn theme if seaborn is installed.\"\"\"\n    try:\n        import seaborn as sns\n        sns.set_theme(\n            style=\"ticks\",\n            palette=PALETTE_LIST,\n            font=_best_font(),\n            font_scale=1.0,\n            rc={\n                \"axes.spines.top\":   False,\n                \"axes.spines.right\": False,\n            },\n        )\n        sns.set_palette(PALETTE_LIST)\n    except ImportError:\n        pass  # seaborn not required\n\n\n# ---------------------------------------------------------------------------\n# Public API\n# ---------------------------------------------------------------------------\n\ndef apply_quiver_style(seaborn: bool = True) -> None:\n    \"\"\"\n    Apply Quiver Bioscience brand styles to matplotlib (and optionally seaborn).\n\n    Parameters\n    ----------\n    seaborn : bool\n        If True (default) and seaborn is installed, also apply the matching\n        seaborn theme.\n    \"\"\"\n    _register_colormaps()\n    font = _best_font()\n    mpl.rcParams.update(_build_rc_params(font))\n    if seaborn:\n        _apply_seaborn_theme()\n\n\ndef get_heatmap_cmap(diverging: bool = False, hot: bool = False) -> str:\n    \"\"\"\n    Return the name of the appropriate Quiver colormap for heatmaps.\n\n    Parameters\n    ----------\n    diverging : bool\n        Return the diverging colormap (purple-white-red).\n    hot      : bool\n        Return the hot colormap (white -> hot_pink -> dark_purple).\n\n    Returns\n    -------\n    str  \u2014 colormap name, usable in sns.heatmap(cmap=...) or plt.imshow(cmap=...)\n    \"\"\"\n    if diverging:\n        return \"quiver_diverging\"\n    if hot:\n        return \"quiver_hot\"\n    return \"quiver_sequential\"\n\n\ndef bar_colors(n: int) -> list:\n    \"\"\"Return n brand colors cycling through PALETTE_LIST.\"\"\"\n    return [PALETTE_LIST[i % len(PALETTE_LIST)] for i in range(n)]\n\n\ndef figure(width: float = 7, height: float = 4.5, **kwargs) -> tuple:\n    \"\"\"\n    Convenience wrapper: create a figure+axes with Quiver defaults.\n\n    Returns\n    -------\n    fig, ax\n    \"\"\"\n    fig, ax = plt.subplots(figsize=(width, height), **kwargs)\n    return fig, ax\n\n\ndef save(fig, path: str, **kwargs) -> None:\n    \"\"\"\n    Save a figure using Quiver defaults (300 dpi, tight bbox, white bg).\n    Extra kwargs are forwarded to fig.savefig().\n    \"\"\"\n    defaults = dict(dpi=300, bbox_inches=\"tight\", facecolor=\"white\", edgecolor=\"white\")\n    defaults.update(kwargs)\n    fig.savefig(path, **defaults)\n\n\n# ---------------------------------------------------------------------------\n# Auto-apply on import\n# ---------------------------------------------------------------------------\n\napply_quiver_style()\n"}, {"name": "response.md", "type": "text", "content": "# Quiver Bioscience Matplotlib Style Config\n\nHere's `quiver_style.py` \u2014 a drop-in style module you can import at the top of any notebook or script to get consistent Quiver-branded figures.\n\n---\n\n## Quick start\n\n```python\nimport quiver_style  # styles are applied automatically on import\n```\n\nThat's it. Every subsequent `plt` or `sns` call will use Quiver branding.\n\n---\n\n## What it covers\n\n### Color palette\n\nAll seven brand colors are available as named constants and a list:\n\n```python\nfrom quiver_style import PALETTE, PALETTE_LIST, PURPLE, RED, LILAC  # etc.\n```\n\n| Name | Hex | Use |\n|---|---|---|\n| `PURPLE` / `primary_purple` | `#9C02FA` | Default first color, lines, bars |\n| `RED` / `primary_red` | `#F51D3F` | Second color, highlights |\n| `DARK_PURPLE` / `dark_purple` | `#7300BF` | Emphasis, heatmap deep end |\n| `MAGENTA` / `magenta` | `#C20CA9` | Third accent |\n| `LILAC` / `lilac` | `#CAA1FF` | Light fills, heatmap light end |\n| `HOT_PINK` / `hot_pink` | `#FF85FF` | Scatter highlights |\n| `SALMON` / `salmon` | `#F9788B` | Bar fills, p-value annotations |\n\nThe color cycle is set to `PALETTE_LIST` automatically, so multi-series plots rotate through all seven colors without any extra code.\n\n### Fonts\n\nOn import, the module checks whether **Poppins** is installed. If it is, it's used everywhere (axes labels, titles, tick labels, legends). If not, it falls back through Inter \u2192 Helvetica Neue \u2192 Helvetica \u2192 Arial \u2192 DejaVu Sans \u2014 so figures won't break on machines that don't have Poppins.\n\nTo install Poppins if you don't have it: download from [Google Fonts](https://fonts.google.com/specimen/Poppins), install the TTFs, then run `matplotlib.font_manager._rebuild()` once.\n\n### Axis styles\n\n- Top and right spines removed\n- Light dashed grid (`#E8E8F0`, 60% alpha) drawn behind data\n- Outward ticks, muted tick label color (`#555555`)\n- Label size 12, title size 14 semi-bold\n- White figure and axes background throughout\n\n### Plot-type specifics\n\n**Bar plots** \u2014 `patch.edgecolor` is white with `force_edgecolor=True`, giving clean separated bars. Use `bar_colors(n)` to get exactly `n` colors cycling through the palette.\n\n**Line traces** \u2014 `lines.linewidth=1.8` is set for neuroscience-appropriate weight. Error bars have a 3pt cap by default (`errorbar.capsize=3`).\n\n**Pie charts** \u2014 `patch.linewidth=0.8` with white edges makes slices visually distinct. Pass `colors=PALETTE_LIST` directly to `plt.pie()`.\n\n**Heatmaps** \u2014 Three custom colormaps are registered:\n\n| Name | Colors | When to use |\n|---|---|---|\n| `quiver_sequential` | Lilac \u2192 Purple \u2192 Dark Purple | Default; raw fluorescence, firing rates |\n| `quiver_diverging` | Dark Purple \u2194 White \u2194 Red | Z-scores, correlations, change from baseline |\n| `quiver_hot` | White \u2192 Hot Pink \u2192 Magenta \u2192 Dark Purple | Spike density, intensity maps |\n\n```python\nimport seaborn as sns\nfrom quiver_style import get_heatmap_cmap\n\nsns.heatmap(data, cmap=get_heatmap_cmap())                # sequential\nsns.heatmap(data, cmap=get_heatmap_cmap(diverging=True))  # diverging\nsns.heatmap(data, cmap=get_heatmap_cmap(hot=True))        # hot\n```\n\n### Save settings\n\n`savefig.dpi=300`, `savefig.bbox=tight`, white background. Default format is `pdf` (vector, publication-safe). Override per-save:\n\n```python\nfig.savefig(\"figure1.png\")   # 300 dpi PNG, tight, white bg \u2014 no extra args needed\n```\n\nOr use the convenience wrapper:\n\n```python\nfrom quiver_style import save\nsave(fig, \"figure1.svg\")\n```\n\n---\n\n## Selective / manual apply\n\nIf you don't want auto-apply on import, comment out the last line of `quiver_style.py`:\n\n```python\n# apply_quiver_style()  # comment this out\n```\n\nThen call it yourself when you're ready:\n\n```python\nfrom quiver_style import apply_quiver_style\napply_quiver_style()          # with seaborn\napply_quiver_style(seaborn=False)  # matplotlib only\n```\n\n---\n\n## Convenience helpers\n\n```python\nfrom quiver_style import figure, save, bar_colors\n\n# Pre-styled figure\nfig, ax = figure(width=8, height=5)\n\n# N colors for a bar chart\ncolors = bar_colors(5)  # ['#9C02FA', '#F51D3F', '#7300BF', '#C20CA9', '#CAA1FF']\n\n# Save with brand defaults\nsave(fig, \"output/figure1.png\")\nsave(fig, \"output/figure1.pdf\")  # vector\n```\n\n---\n\n## File placement\n\nPut `quiver_style.py` somewhere on your Python path \u2014 ideally the root of your analysis project or a shared `utils/` folder. Then any notebook or script can do:\n\n```python\nimport quiver_style\n```\n\nIf you use a `src/` layout, add the parent directory to `sys.path` first, or install the file as part of a local package.\n"}], "grading": {"expectations": [{"text": "contains_quiver_colors_dict", "passed": false, "evidence": "No QUIVER_COLORS dict with canonical hex values"}, {"text": "contains_quiver_cycle", "passed": false, "evidence": "QUIVER_CYCLE not defined \u2014 used different naming"}, {"text": "poppins_font_handling", "passed": true, "evidence": "Poppins with fallback"}, {"text": "rcparams_included", "passed": true, "evidence": "rcParams: True, dpi: True, spines: True"}, {"text": "apply_function_exists", "passed": true, "evidence": "apply_quiver_style function found"}]}}, {"id": "eval-2-with_skill", "prompt": "Here's some matplotlib code for a bar plot comparing neuron counts across experimental conditions. Can you restyle it to look consistent with Quiver Bioscience's visual identity? I want polished, publication-quality output.\n\n```python\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nconditions = ['Control', 'Drug A', 'Drug B', 'Drug C']\nexc_counts = [45, 32, 51, 28]\ninh_counts = [18, 22, 15, 31]\n\nx = np.arange(len(conditions))\nwidth = 0.35\n\nfig, ax = plt.subplots(figsize=(8, 5))\nbars1 = ax.bar(x - width/2, exc_counts, width, label='Excitatory', color='red')\nbars2 = ax.bar(x + width/2, inh_counts, width, label='Inhibitory', color='blue')\n\nax.set_xlabel('Condition')\nax.set_ylabel('Neuron count')\nax.set_title('Excitatory vs Inhibitory Neurons by Condition')\nax.set_xticks(x)\nax.set_xticklabels(conditions)\nax.legend()\n\nplt.tight_layout()\nplt.savefig('neuron_counts.png')\nplt.show()\n```", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# Restyled Bar Chart \u2014 Quiver Bioscience Visual Identity\n\nHere's your bar chart restyled to match Quiver Bioscience's visual identity. The changes applied:\n\n## What Changed\n\n### Colors\n- **Excitatory bars**: `'red'` \u2192 `#F51D3F` (Quiver warm red) \u2014 semantic meaning preserved\n- **Inhibitory bars**: `'blue'` \u2192 `#CAA1FF` (Quiver lilac) \u2014 semantic meaning preserved with a cool brand color\n\nThe Excitatory/Inhibitory semantic convention is intentionally maintained: warm Quiver red for excitatory activity, cool Quiver lilac for inhibitory activity.\n\n### Style & Typography\n- Applied the full `QUIVER_RC` rcParams block, which sets:\n  - **Font**: Poppins (falling back to DejaVu Sans / Arial)\n  - **Figure background**: white, `dpi=150` for display, `dpi=300` for saved output\n  - **Title**: bold, 12pt\n  - **Axes labels**: 10pt\n  - **Tick labels**: 9pt, color `#333333`\n  - **Axes color cycle**: Quiver brand palette\n\n### Spine Cleanup\n- Removed top and right spines (`ax.spines[[\"top\", \"right\"]].set_visible(False)`) for a clean, publication-quality look \u2014 redundant framing removed.\n\n### Save Quality\n- `savefig` updated to `dpi=300, bbox_inches='tight', facecolor='white'` for print-ready output.\n\n## File\nSee `restyled_bar_chart.py` for the complete updated code.\n"}, {"name": "restyled_bar_chart.py", "type": "text", "content": "import matplotlib as mpl\nimport matplotlib.pyplot as plt\nimport numpy as np\nfrom cycler import cycler\n\n# Quiver Bioscience color palette\nQUIVER_COLORS = {\n    \"purple\": \"#9C02FA\", \"red\": \"#F51D3F\", \"dark_purple\": \"#7300BF\",\n    \"magenta\": \"#C20CA9\", \"lilac\": \"#CAA1FF\", \"hot_pink\": \"#FF85FF\",\n    \"salmon\": \"#F9788B\", \"soft_pink\": \"#FEEBFF\", \"navy\": \"#0D1130\", \"lavender_bg\": \"#F5F0FF\",\n}\nQUIVER_CYCLE = [\"#9C02FA\", \"#F51D3F\", \"#C20CA9\", \"#CAA1FF\", \"#F9788B\", \"#FF85FF\", \"#7300BF\"]\n\nQUIVER_RC = {\n    \"figure.figsize\": (8, 5), \"figure.dpi\": 150, \"figure.facecolor\": \"white\",\n    \"axes.facecolor\": \"white\", \"axes.edgecolor\": \"#333333\", \"axes.linewidth\": 0.8,\n    \"axes.spines.top\": False, \"axes.spines.right\": False,\n    \"axes.prop_cycle\": cycler(\"color\", QUIVER_CYCLE),\n    \"axes.titlesize\": 12, \"axes.titleweight\": \"bold\", \"axes.labelsize\": 10,\n    \"xtick.major.size\": 4, \"xtick.labelsize\": 9, \"xtick.color\": \"#333333\",\n    \"ytick.major.size\": 4, \"ytick.labelsize\": 9, \"ytick.color\": \"#333333\",\n    \"lines.linewidth\": 1.5, \"lines.markersize\": 5,\n    \"legend.fontsize\": 9, \"legend.framealpha\": 0.85,\n    \"savefig.dpi\": 300, \"savefig.bbox\": \"tight\", \"savefig.facecolor\": \"white\",\n    \"font.family\": \"sans-serif\",\n    \"font.sans-serif\": [\"Poppins\", \"DejaVu Sans\", \"Arial\", \"Helvetica\"],\n    \"font.size\": 10,\n}\n\nmpl.rcParams.update(QUIVER_RC)\n\nconditions = ['Control', 'Drug A', 'Drug B', 'Drug C']\nexc_counts = [45, 32, 51, 28]\ninh_counts = [18, 22, 15, 31]\n\nx = np.arange(len(conditions))\nwidth = 0.35\n\nfig, ax = plt.subplots(figsize=(8, 5))\n\n# Excitatory: warm Quiver red (#F51D3F) \u2014 preserves semantic convention\n# Inhibitory: cool Quiver lilac (#CAA1FF) \u2014 preserves semantic convention\nbars1 = ax.bar(x - width/2, exc_counts, width, label='Excitatory', color=QUIVER_COLORS[\"red\"])\nbars2 = ax.bar(x + width/2, inh_counts, width, label='Inhibitory', color=QUIVER_COLORS[\"lilac\"])\n\nax.set_xlabel('Condition')\nax.set_ylabel('Neuron count')\nax.set_title('Excitatory vs Inhibitory Neurons by Condition')\nax.set_xticks(x)\nax.set_xticklabels(conditions)\nax.legend()\n\n# Remove top and right spines for clean publication style\nax.spines[[\"top\", \"right\"]].set_visible(False)\n\nplt.tight_layout()\nplt.savefig('neuron_counts.png', dpi=300, bbox_inches='tight', facecolor='white')\nplt.show()\n"}], "grading": {"expectations": [{"text": "generic_colors_replaced", "passed": true, "evidence": "Generic 'red'/'blue' color args removed"}, {"text": "quiver_hex_used", "passed": true, "evidence": "All 7 Quiver hex colors referenced"}, {"text": "spines_removed", "passed": true, "evidence": "Spine removal code found"}, {"text": "savefig_dpi", "passed": true, "evidence": "dpi= found in savefig"}, {"text": "style_applied", "passed": true, "evidence": "Style application found"}]}}, {"id": "eval-2-without_skill", "prompt": "Here's some matplotlib code for a bar plot comparing neuron counts across experimental conditions. Can you restyle it to look consistent with Quiver Bioscience's visual identity? I want polished, publication-quality output.\n\n```python\nimport matplotlib.pyplot as plt\nimport numpy as np\n\nconditions = ['Control', 'Drug A', 'Drug B', 'Drug C']\nexc_counts = [45, 32, 51, 28]\ninh_counts = [18, 22, 15, 31]\n\nx = np.arange(len(conditions))\nwidth = 0.35\n\nfig, ax = plt.subplots(figsize=(8, 5))\nbars1 = ax.bar(x - width/2, exc_counts, width, label='Excitatory', color='red')\nbars2 = ax.bar(x + width/2, inh_counts, width, label='Inhibitory', color='blue')\n\nax.set_xlabel('Condition')\nax.set_ylabel('Neuron count')\nax.set_title('Excitatory vs Inhibitory Neurons by Condition')\nax.set_xticks(x)\nax.set_xticklabels(conditions)\nax.legend()\n\nplt.tight_layout()\nplt.savefig('neuron_counts.png')\nplt.show()\n```", "eval_id": 2, "outputs": [{"name": "response.md", "type": "text", "content": "# Restyled Bar Chart \u2014 Quiver Bioscience Visual Identity\n\nHere is the restyled code applying Quiver Bioscience's brand colors and general publication-quality conventions.\n\n## What changed\n\n**Colors**\n- Excitatory bars: Quiver Purple `#9C02FA`\n- Inhibitory bars: Quiver Magenta `#C20CA9`\n- These are the two most visually distinct hues from the brand palette, making the two neuron populations easy to tell apart.\n\n**Typography**\n- Font set to Poppins (with a DejaVu Sans fallback if Poppins is not installed).\n- Title is bold at 14 pt; axis labels at 12 pt; tick labels and legend at 10\u201311 pt.\n- All text uses a near-black `#1A1A1A` / `#3A3A3A` to stay readable on white.\n\n**Layout and spines**\n- Top and right spines removed for a clean, publication-standard look.\n- Bottom and left spines retained in a light grey `#CCCCCC`.\n- Horizontal dashed grid lines in a very light purple-tinted grey `#E8E0F0` sit behind the bars (zorder 3) without competing visually.\n\n**Bar styling**\n- Thin white edge lines between bars give a slight separation without a heavy border.\n- Y-axis upper limit is padded to 120 % of the tallest bar so value labels have breathing room.\n\n**Value labels**\n- Each bar gets a numeric label above it so exact counts are readable without gridline hunting \u2014 standard practice in neuroscience figures.\n\n**Export**\n- `savefig` uses `dpi=300` and `bbox_inches='tight'` for print-ready output.\n\n## Usage note\n\nIf Poppins is not yet installed in your Python environment, add it via:\n\n```\npip install matplotlib\n# then install the Poppins font to your system or use:\nfrom matplotlib import font_manager\nfont_manager.fontManager.addfont('/path/to/Poppins-Regular.ttf')\n```\n\nThe script will fall back to DejaVu Sans gracefully if Poppins is unavailable.\n"}, {"name": "restyled_bar_chart.py", "type": "text", "content": "import matplotlib.pyplot as plt\nimport matplotlib.font_manager as fm\nimport numpy as np\n\n# Quiver Bioscience brand colors\nQUIVER_PURPLE = '#9C02FA'\nQUIVER_MAGENTA = '#C20CA9'\nQUIVER_RED = '#F51D3F'\nQUIVER_LILAC = '#CAA1FF'\n\n# Use Poppins if available, otherwise fall back to a sans-serif\navailable_fonts = [f.name for f in fm.fontManager.ttflist]\nfont_family = 'Poppins' if 'Poppins' in available_fonts else 'DejaVu Sans'\n\nplt.rcParams.update({\n    'font.family': font_family,\n    'axes.spines.top': False,\n    'axes.spines.right': False,\n    'axes.spines.left': True,\n    'axes.spines.bottom': True,\n    'axes.linewidth': 1.2,\n    'axes.grid': True,\n    'axes.grid.axis': 'y',\n    'grid.color': '#E8E0F0',\n    'grid.linewidth': 0.8,\n    'grid.linestyle': '--',\n    'xtick.bottom': False,\n    'ytick.left': True,\n    'xtick.major.pad': 6,\n    'ytick.major.pad': 4,\n})\n\nconditions = ['Control', 'Drug A', 'Drug B', 'Drug C']\nexc_counts = [45, 32, 51, 28]\ninh_counts = [18, 22, 15, 31]\n\nx = np.arange(len(conditions))\nwidth = 0.35\n\nfig, ax = plt.subplots(figsize=(8, 5.5))\nfig.patch.set_facecolor('white')\nax.set_facecolor('white')\n\nbars1 = ax.bar(\n    x - width / 2, exc_counts, width,\n    label='Excitatory',\n    color=QUIVER_PURPLE,\n    edgecolor='white',\n    linewidth=0.8,\n    zorder=3\n)\nbars2 = ax.bar(\n    x + width / 2, inh_counts, width,\n    label='Inhibitory',\n    color=QUIVER_MAGENTA,\n    edgecolor='white',\n    linewidth=0.8,\n    zorder=3\n)\n\n# Value labels on top of each bar\nfor bar in bars1:\n    height = bar.get_height()\n    ax.text(\n        bar.get_x() + bar.get_width() / 2., height + 0.8,\n        str(int(height)),\n        ha='center', va='bottom',\n        fontsize=9, color='#3A3A3A',\n        fontfamily=font_family\n    )\n\nfor bar in bars2:\n    height = bar.get_height()\n    ax.text(\n        bar.get_x() + bar.get_width() / 2., height + 0.8,\n        str(int(height)),\n        ha='center', va='bottom',\n        fontsize=9, color='#3A3A3A',\n        fontfamily=font_family\n    )\n\n# Axis labels and title\nax.set_xlabel(\n    'Condition',\n    fontsize=12, fontfamily=font_family,\n    color='#3A3A3A', labelpad=10\n)\nax.set_ylabel(\n    'Neuron Count',\n    fontsize=12, fontfamily=font_family,\n    color='#3A3A3A', labelpad=10\n)\nax.set_title(\n    'Excitatory vs Inhibitory Neurons by Condition',\n    fontsize=14, fontfamily=font_family,\n    color='#1A1A1A', fontweight='bold', pad=14\n)\n\nax.set_xticks(x)\nax.set_xticklabels(conditions, fontsize=11, fontfamily=font_family, color='#3A3A3A')\nax.tick_params(axis='y', labelsize=10, colors='#3A3A3A')\n\n# Set y-axis upper limit with breathing room\nax.set_ylim(0, max(max(exc_counts), max(inh_counts)) * 1.2)\n\n# Spine color\nfor spine in ax.spines.values():\n    spine.set_edgecolor('#CCCCCC')\n\n# Legend\nlegend = ax.legend(\n    frameon=True,\n    framealpha=0.95,\n    edgecolor='#DDDDDD',\n    fancybox=False,\n    fontsize=11,\n    title_fontsize=11,\n    prop={'family': font_family, 'size': 11}\n)\nlegend.get_frame().set_linewidth(0.8)\n\nplt.tight_layout()\nplt.savefig('neuron_counts.png', dpi=300, bbox_inches='tight', facecolor='white')\nplt.show()\n"}], "grading": {"expectations": [{"text": "generic_colors_replaced", "passed": true, "evidence": "Generic 'red'/'blue' removed"}, {"text": "quiver_hex_used", "passed": true, "evidence": "Found: ['#9C02FA', '#F51D3F', '#C20CA9', '#CAA1FF']"}, {"text": "spines_removed", "passed": true, "evidence": "Spine removal code found"}, {"text": "savefig_dpi", "passed": true, "evidence": "dpi= found in savefig"}, {"text": "style_applied", "passed": true, "evidence": "Style application found"}]}}], "previous_feedback": {}, "previous_outputs": {}, "benchmark": {"metadata": {"skill_name": "quiver-viz", "skill_path": "<path/to/skill>", "executor_model": "<model-name>", "analyzer_model": "<model-name>", "timestamp": "2026-05-22T12:55:08Z", "evals_run": [0, 1, 2], "runs_per_configuration": 3}, "runs": [{"eval_id": 0, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 69.4, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "quiver_style_file_created", "passed": true, "evidence": "quiver_style.py found in outputs"}, {"text": "palette_remapped", "passed": true, "evidence": "No raw generic colors found in pie code"}, {"text": "quiver_colors_used", "passed": true, "evidence": "Quiver hex colors found: ['#F51D3F', '#CAA1FF', '#C20CA9']"}, {"text": "savefig_has_dpi", "passed": true, "evidence": "dpi=300 found"}, {"text": "style_import_present", "passed": true, "evidence": "Style import/apply found"}], "notes": []}, {"eval_id": 1, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 55.9, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "contains_quiver_colors_dict", "passed": true, "evidence": "QUIVER_COLORS with purple and red hex found"}, {"text": "contains_quiver_cycle", "passed": true, "evidence": "QUIVER_CYCLE found"}, {"text": "poppins_font_handling", "passed": true, "evidence": "Poppins: True, fallback logic: True"}, {"text": "rcparams_included", "passed": true, "evidence": "rcParams: True, dpi: True, spines: True"}, {"text": "apply_function_exists", "passed": true, "evidence": "apply_quiver_style function found"}], "notes": []}, {"eval_id": 2, "configuration": "with_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 28.6, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "generic_colors_replaced", "passed": true, "evidence": "Generic 'red'/'blue' color args removed"}, {"text": "quiver_hex_used", "passed": true, "evidence": "All 7 Quiver hex colors referenced"}, {"text": "spines_removed", "passed": true, "evidence": "Spine removal code found"}, {"text": "savefig_dpi", "passed": true, "evidence": "dpi= found in savefig"}, {"text": "style_applied", "passed": true, "evidence": "Style application found"}], "notes": []}, {"eval_id": 0, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.8, "passed": 4, "failed": 1, "total": 5, "time_seconds": 92.0, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "quiver_style_file_created", "passed": true, "evidence": "quiver_style.py found in outputs"}, {"text": "palette_remapped", "passed": true, "evidence": "No raw generic colors found in pie code"}, {"text": "quiver_colors_used", "passed": false, "evidence": "No Quiver brand hex colors \u2014 invented its own palette"}, {"text": "savefig_has_dpi", "passed": true, "evidence": "dpi=300 found"}, {"text": "style_import_present", "passed": true, "evidence": "Style import/apply found"}], "notes": []}, {"eval_id": 1, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 0.6, "passed": 3, "failed": 2, "total": 5, "time_seconds": 82.5, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "contains_quiver_colors_dict", "passed": false, "evidence": "No QUIVER_COLORS dict with canonical hex values"}, {"text": "contains_quiver_cycle", "passed": false, "evidence": "QUIVER_CYCLE not defined \u2014 used different naming"}, {"text": "poppins_font_handling", "passed": true, "evidence": "Poppins with fallback"}, {"text": "rcparams_included", "passed": true, "evidence": "rcParams: True, dpi: True, spines: True"}, {"text": "apply_function_exists", "passed": true, "evidence": "apply_quiver_style function found"}], "notes": []}, {"eval_id": 2, "configuration": "without_skill", "run_number": 1, "result": {"pass_rate": 1.0, "passed": 5, "failed": 0, "total": 5, "time_seconds": 38.3, "tokens": 0, "tool_calls": 0, "errors": 0}, "expectations": [{"text": "generic_colors_replaced", "passed": true, "evidence": "Generic 'red'/'blue' removed"}, {"text": "quiver_hex_used", "passed": true, "evidence": "Found: ['#9C02FA', '#F51D3F', '#C20CA9', '#CAA1FF']"}, {"text": "spines_removed", "passed": true, "evidence": "Spine removal code found"}, {"text": "savefig_dpi", "passed": true, "evidence": "dpi= found in savefig"}, {"text": "style_applied", "passed": true, "evidence": "Style application found"}], "notes": []}], "run_summary": {"with_skill": {"pass_rate": {"mean": 1.0, "stddev": 0.0, "min": 1.0, "max": 1.0}, "time_seconds": {"mean": 51.3, "stddev": 20.7853, "min": 28.6, "max": 69.4}, "tokens": {"mean": 0.0, "stddev": 0.0, "min": 0, "max": 0}}, "without_skill": {"pass_rate": {"mean": 0.8, "stddev": 0.2, "min": 0.6, "max": 1.0}, "time_seconds": {"mean": 70.9333, "stddev": 28.6577, "min": 38.3, "max": 92.0}, "tokens": {"mean": 0.0, "stddev": 0.0, "min": 0, "max": 0}}, "delta": {"pass_rate": "+0.20", "time_seconds": "-19.6", "tokens": "+0"}}, "notes": []}};
+
+    // ---- State ----
+    let feedbackMap = {};  // run_id -> feedback text
+    let currentIndex = 0;
+    let visitedRuns = new Set();
+
+    // ---- Init ----
+    async function init() {
+      // Load saved feedback from server — but only if this isn't a fresh
+      // iteration (indicated by previous_feedback being present). When
+      // previous feedback exists, the feedback.json on disk is stale from
+      // the prior iteration and should not pre-fill the textareas.
+      const hasPrevious = Object.keys(EMBEDDED_DATA.previous_feedback || {}).length > 0
+        || Object.keys(EMBEDDED_DATA.previous_outputs || {}).length > 0;
+      if (!hasPrevious) {
+        try {
+          const resp = await fetch("/api/feedback");
+          const data = await resp.json();
+          if (data.reviews) {
+            for (const r of data.reviews) feedbackMap[r.run_id] = r.feedback;
+          }
+        } catch { /* first run, no feedback yet */ }
+      }
+
+      document.getElementById("skill-name").textContent = EMBEDDED_DATA.skill_name;
+      showRun(0);
+
+      // Wire up feedback auto-save
+      const textarea = document.getElementById("feedback");
+      let saveTimeout = null;
+      textarea.addEventListener("input", () => {
+        clearTimeout(saveTimeout);
+        document.getElementById("feedback-status").textContent = "";
+        saveTimeout = setTimeout(() => saveCurrentFeedback(), 800);
+      });
+    }
+
+    // ---- Navigation ----
+    function navigate(delta) {
+      const newIndex = currentIndex + delta;
+      if (newIndex >= 0 && newIndex < EMBEDDED_DATA.runs.length) {
+        saveCurrentFeedback();
+        showRun(newIndex);
+      }
+    }
+
+    function updateNavButtons() {
+      document.getElementById("prev-btn").disabled = currentIndex === 0;
+      document.getElementById("next-btn").disabled =
+        currentIndex === EMBEDDED_DATA.runs.length - 1;
+    }
+
+    // ---- Show a run ----
+    function showRun(index) {
+      currentIndex = index;
+      const run = EMBEDDED_DATA.runs[index];
+
+      // Progress
+      document.getElementById("progress").textContent =
+        `${index + 1} of ${EMBEDDED_DATA.runs.length}`;
+
+      // Prompt
+      document.getElementById("prompt-text").textContent = run.prompt;
+
+      // Config badge
+      const badge = document.getElementById("config-badge");
+      const configMatch = run.id.match(/(with_skill|without_skill|new_skill|old_skill)/);
+      if (configMatch) {
+        const config = configMatch[1];
+        const isBaseline = config === "without_skill" || config === "old_skill";
+        badge.textContent = config.replace(/_/g, " ");
+        badge.className = "config-badge " + (isBaseline ? "config-baseline" : "config-primary");
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+
+      // Outputs
+      renderOutputs(run);
+
+      // Previous outputs
+      renderPrevOutputs(run);
+
+      // Grades
+      renderGrades(run);
+
+      // Previous feedback
+      const prevFb = (EMBEDDED_DATA.previous_feedback || {})[run.id];
+      const prevEl = document.getElementById("prev-feedback");
+      if (prevFb) {
+        document.getElementById("prev-feedback-text").textContent = prevFb;
+        prevEl.style.display = "block";
+      } else {
+        prevEl.style.display = "none";
+      }
+
+      // Feedback
+      document.getElementById("feedback").value = feedbackMap[run.id] || "";
+      document.getElementById("feedback-status").textContent = "";
+
+      updateNavButtons();
+
+      // Track visited runs and promote done button when all visited
+      visitedRuns.add(index);
+      const doneBtn = document.getElementById("done-btn");
+      if (visitedRuns.size >= EMBEDDED_DATA.runs.length) {
+        doneBtn.classList.add("ready");
+      }
+
+      // Scroll main content to top
+      document.querySelector(".main").scrollTop = 0;
+    }
+
+    // ---- Render outputs ----
+    function renderOutputs(run) {
+      const container = document.getElementById("outputs-body");
+      container.innerHTML = "";
+
+      const outputs = run.outputs || [];
+      if (outputs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No output files</div>';
+        return;
+      }
+
+      for (const file of outputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        // Always show file header with download link
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const content = document.createElement("div");
+        content.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          content.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          content.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          content.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(content, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          content.appendChild(a);
+        } else if (file.type === "error") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          pre.style.color = "var(--red)";
+          content.appendChild(pre);
+        }
+
+        fileDiv.appendChild(content);
+        container.appendChild(fileDiv);
+      }
+    }
+
+    // ---- XLSX rendering via SheetJS ----
+    function renderXlsx(container, b64Data) {
+      try {
+        const raw = Uint8Array.from(atob(b64Data), c => c.charCodeAt(0));
+        const wb = XLSX.read(raw, { type: "array" });
+
+        for (let i = 0; i < wb.SheetNames.length; i++) {
+          const sheetName = wb.SheetNames[i];
+          const ws = wb.Sheets[sheetName];
+
+          if (wb.SheetNames.length > 1) {
+            const sheetLabel = document.createElement("div");
+            sheetLabel.style.cssText =
+              "font-weight:600; font-size:0.8rem; color:#b0aea5; margin-top:0.5rem; margin-bottom:0.25rem;";
+            sheetLabel.textContent = "Sheet: " + sheetName;
+            container.appendChild(sheetLabel);
+          }
+
+          const htmlStr = XLSX.utils.sheet_to_html(ws, { editable: false });
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = htmlStr;
+          container.appendChild(wrapper);
+        }
+      } catch (err) {
+        container.textContent = "Error rendering spreadsheet: " + err.message;
+      }
+    }
+
+    // ---- Grades ----
+    function renderGrades(run) {
+      const section = document.getElementById("grades-section");
+      const content = document.getElementById("grades-content");
+
+      if (!run.grading) {
+        section.style.display = "none";
+        return;
+      }
+
+      const grading = run.grading;
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("grades-arrow").classList.remove("open");
+
+      const summary = grading.summary || {};
+      const expectations = grading.expectations || [];
+
+      let html = '<div style="padding: 1rem;">';
+
+      // Summary line
+      const passRate = summary.pass_rate != null
+        ? Math.round(summary.pass_rate * 100) + "%"
+        : "?";
+      const badgeClass = summary.pass_rate >= 0.8 ? "grade-pass" : summary.pass_rate >= 0.5 ? "" : "grade-fail";
+      html += '<div class="grades-summary">';
+      html += '<span class="grade-badge ' + badgeClass + '">' + passRate + '</span>';
+      html += '<span>' + (summary.passed || 0) + ' passed, ' + (summary.failed || 0) + ' failed of ' + (summary.total || 0) + '</span>';
+      html += '</div>';
+
+      // Assertions list
+      html += '<ul class="assertion-list">';
+      for (const exp of expectations) {
+        const statusClass = exp.passed ? "pass" : "fail";
+        const statusIcon = exp.passed ? "\u2713" : "\u2717";
+        html += '<li class="assertion-item">';
+        html += '<span class="assertion-status ' + statusClass + '">' + statusIcon + '</span>';
+        html += '<span>' + escapeHtml(exp.text) + '</span>';
+        if (exp.evidence) {
+          html += '<div class="assertion-evidence">' + escapeHtml(exp.evidence) + '</div>';
+        }
+        html += '</li>';
+      }
+      html += '</ul>';
+
+      html += '</div>';
+      content.innerHTML = html;
+    }
+
+    function toggleGrades() {
+      const content = document.getElementById("grades-content");
+      const arrow = document.getElementById("grades-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Previous outputs (collapsible) ----
+    function renderPrevOutputs(run) {
+      const section = document.getElementById("prev-outputs-section");
+      const content = document.getElementById("prev-outputs-content");
+      const prevOutputs = (EMBEDDED_DATA.previous_outputs || {})[run.id];
+
+      if (!prevOutputs || prevOutputs.length === 0) {
+        section.style.display = "none";
+        return;
+      }
+
+      section.style.display = "block";
+      // Reset to collapsed
+      content.classList.remove("open");
+      document.getElementById("prev-outputs-arrow").classList.remove("open");
+
+      // Render the files into the content area
+      content.innerHTML = "";
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "1rem";
+
+      for (const file of prevOutputs) {
+        const fileDiv = document.createElement("div");
+        fileDiv.className = "output-file";
+
+        const header = document.createElement("div");
+        header.className = "output-file-header";
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = file.name;
+        header.appendChild(nameSpan);
+        const dlBtn = document.createElement("a");
+        dlBtn.className = "dl-btn";
+        dlBtn.textContent = "Download";
+        dlBtn.download = file.name;
+        dlBtn.href = getDownloadUri(file);
+        header.appendChild(dlBtn);
+        fileDiv.appendChild(header);
+
+        const fc = document.createElement("div");
+        fc.className = "output-file-content";
+
+        if (file.type === "text") {
+          const pre = document.createElement("pre");
+          pre.textContent = file.content;
+          fc.appendChild(pre);
+        } else if (file.type === "image") {
+          const img = document.createElement("img");
+          img.src = file.data_uri;
+          img.alt = file.name;
+          fc.appendChild(img);
+        } else if (file.type === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = file.data_uri;
+          fc.appendChild(iframe);
+        } else if (file.type === "xlsx") {
+          renderXlsx(fc, file.data_b64);
+        } else if (file.type === "binary") {
+          const a = document.createElement("a");
+          a.className = "download-link";
+          a.href = file.data_uri;
+          a.download = file.name;
+          a.textContent = "Download " + file.name;
+          fc.appendChild(a);
+        }
+
+        fileDiv.appendChild(fc);
+        wrapper.appendChild(fileDiv);
+      }
+
+      content.appendChild(wrapper);
+    }
+
+    function togglePrevOutputs() {
+      const content = document.getElementById("prev-outputs-content");
+      const arrow = document.getElementById("prev-outputs-arrow");
+      content.classList.toggle("open");
+      arrow.classList.toggle("open");
+    }
+
+    // ---- Feedback (saved to server -> feedback.json) ----
+    function saveCurrentFeedback() {
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // Build reviews array from map
+      const reviews = [];
+      for (const [run_id, feedback] of Object.entries(feedbackMap)) {
+        if (feedback.trim()) {
+          reviews.push({ run_id, feedback, timestamp: new Date().toISOString() });
+        }
+      }
+
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reviews, status: "in_progress" }),
+      }).then(() => {
+        document.getElementById("feedback-status").textContent = "Saved";
+      }).catch(() => {
+        // Static mode or server unavailable — no-op on auto-save,
+        // feedback will be downloaded on final submit
+        document.getElementById("feedback-status").textContent = "Will download on submit";
+      });
+    }
+
+    // ---- Done ----
+    function showDoneDialog() {
+      // Save current textarea to feedbackMap (but don't POST yet)
+      const run = EMBEDDED_DATA.runs[currentIndex];
+      const text = document.getElementById("feedback").value;
+      if (text.trim() === "") {
+        delete feedbackMap[run.id];
+      } else {
+        feedbackMap[run.id] = text;
+      }
+
+      // POST once with status: complete — include ALL runs so the model
+      // can distinguish "no feedback" (looks good) from "not reviewed"
+      const reviews = [];
+      const ts = new Date().toISOString();
+      for (const r of EMBEDDED_DATA.runs) {
+        reviews.push({ run_id: r.id, feedback: feedbackMap[r.id] || "", timestamp: ts });
+      }
+      const payload = JSON.stringify({ reviews, status: "complete" }, null, 2);
+      fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: payload,
+      }).then(() => {
+        document.getElementById("done-overlay").classList.add("visible");
+      }).catch(() => {
+        // Server not available (static mode) — download as file
+        const blob = new Blob([payload], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "feedback.json";
+        a.click();
+        URL.revokeObjectURL(url);
+        document.getElementById("done-overlay").classList.add("visible");
+      });
+    }
+
+    function closeDoneDialog() {
+      // Reset status back to in_progress
+      saveCurrentFeedback();
+      document.getElementById("done-overlay").classList.remove("visible");
+    }
+
+    // ---- Toast ----
+    function showToast(message) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2000);
+    }
+
+    // ---- Keyboard nav ----
+    document.addEventListener("keydown", (e) => {
+      // Don't capture when typing in textarea
+      if (e.target.tagName === "TEXTAREA") return;
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+        e.preventDefault();
+        navigate(-1);
+      } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+        e.preventDefault();
+        navigate(1);
+      }
+    });
+
+    // ---- Util ----
+    function getDownloadUri(file) {
+      if (file.data_uri) return file.data_uri;
+      if (file.data_b64) return "data:application/octet-stream;base64," + file.data_b64;
+      if (file.type === "text") return "data:text/plain;charset=utf-8," + encodeURIComponent(file.content);
+      return "#";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // ---- View switching ----
+    function switchView(view) {
+      document.querySelectorAll(".view-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".view-panel").forEach(p => p.classList.remove("active"));
+      document.querySelector(`[onclick="switchView('${view}')"]`).classList.add("active");
+      document.getElementById("panel-" + view).classList.add("active");
+    }
+
+    // ---- Benchmark rendering ----
+    function renderBenchmark() {
+      const data = EMBEDDED_DATA.benchmark;
+      if (!data) return;
+
+      // Show the tabs
+      document.getElementById("view-tabs").style.display = "flex";
+
+      const container = document.getElementById("benchmark-content");
+      const summary = data.run_summary || {};
+      const metadata = data.metadata || {};
+      const notes = data.notes || [];
+
+      let html = "";
+
+      // Header
+      html += "<h2 style='font-family: Poppins, sans-serif; margin-bottom: 0.5rem;'>Benchmark Results</h2>";
+      html += "<p style='color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.25rem;'>";
+      if (metadata.skill_name) html += "<strong>" + escapeHtml(metadata.skill_name) + "</strong> &mdash; ";
+      if (metadata.timestamp) html += metadata.timestamp + " &mdash; ";
+      if (metadata.evals_run) html += "Evals: " + metadata.evals_run.join(", ") + " &mdash; ";
+      html += (metadata.runs_per_configuration || "?") + " runs per configuration";
+      html += "</p>";
+
+      // Summary table
+      html += '<table class="benchmark-table">';
+
+      function fmtStat(stat, pct) {
+        if (!stat) return "—";
+        const suffix = pct ? "%" : "";
+        const m = pct ? (stat.mean * 100).toFixed(0) : stat.mean.toFixed(1);
+        const s = pct ? (stat.stddev * 100).toFixed(0) : stat.stddev.toFixed(1);
+        return m + suffix + " ± " + s + suffix;
+      }
+
+      function deltaClass(val) {
+        if (!val) return "";
+        const n = parseFloat(val);
+        if (n > 0) return "benchmark-delta-positive";
+        if (n < 0) return "benchmark-delta-negative";
+        return "";
+      }
+
+      // Discover config names dynamically (everything except "delta")
+      const configs = Object.keys(summary).filter(k => k !== "delta");
+      const configA = configs[0] || "config_a";
+      const configB = configs[1] || "config_b";
+      const labelA = configA.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const labelB = configB.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+      const a = summary[configA] || {};
+      const b = summary[configB] || {};
+      const delta = summary.delta || {};
+
+      html += "<thead><tr><th>Metric</th><th>" + escapeHtml(labelA) + "</th><th>" + escapeHtml(labelB) + "</th><th>Delta</th></tr></thead>";
+      html += "<tbody>";
+
+      html += "<tr><td><strong>Pass Rate</strong></td>";
+      html += "<td>" + fmtStat(a.pass_rate, true) + "</td>";
+      html += "<td>" + fmtStat(b.pass_rate, true) + "</td>";
+      html += '<td class="' + deltaClass(delta.pass_rate) + '">' + (delta.pass_rate || "—") + "</td></tr>";
+
+      // Time (only show row if data exists)
+      if (a.time_seconds || b.time_seconds) {
+        html += "<tr><td><strong>Time (s)</strong></td>";
+        html += "<td>" + fmtStat(a.time_seconds, false) + "</td>";
+        html += "<td>" + fmtStat(b.time_seconds, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.time_seconds) + '">' + (delta.time_seconds ? delta.time_seconds + "s" : "—") + "</td></tr>";
+      }
+
+      // Tokens (only show row if data exists)
+      if (a.tokens || b.tokens) {
+        html += "<tr><td><strong>Tokens</strong></td>";
+        html += "<td>" + fmtStat(a.tokens, false) + "</td>";
+        html += "<td>" + fmtStat(b.tokens, false) + "</td>";
+        html += '<td class="' + deltaClass(delta.tokens) + '">' + (delta.tokens || "—") + "</td></tr>";
+      }
+
+      html += "</tbody></table>";
+
+      // Per-eval breakdown (if runs data available)
+      const runs = data.runs || [];
+      if (runs.length > 0) {
+        const evalIds = [...new Set(runs.map(r => r.eval_id))].sort((a, b) => a - b);
+
+        html += "<h3 style='font-family: Poppins, sans-serif; margin-bottom: 0.75rem;'>Per-Eval Breakdown</h3>";
+
+        const hasTime = runs.some(r => r.result && r.result.time_seconds != null);
+        const hasErrors = runs.some(r => r.result && r.result.errors > 0);
+
+        for (const evalId of evalIds) {
+          const evalRuns = runs.filter(r => r.eval_id === evalId);
+          const evalName = evalRuns[0] && evalRuns[0].eval_name ? evalRuns[0].eval_name : "Eval " + evalId;
+
+          html += "<h4 style='font-family: Poppins, sans-serif; margin: 1rem 0 0.5rem; color: var(--text);'>" + escapeHtml(evalName) + "</h4>";
+          html += '<table class="benchmark-table">';
+          html += "<thead><tr><th>Config</th><th>Run</th><th>Pass Rate</th>";
+          if (hasTime) html += "<th>Time (s)</th>";
+          if (hasErrors) html += "<th>Crashes During Execution</th>";
+          html += "</tr></thead>";
+          html += "<tbody>";
+
+          // Group by config and render with average rows
+          const configGroups = [...new Set(evalRuns.map(r => r.configuration))];
+          for (let ci = 0; ci < configGroups.length; ci++) {
+            const config = configGroups[ci];
+            const configRuns = evalRuns.filter(r => r.configuration === config);
+            if (configRuns.length === 0) continue;
+
+            const rowClass = ci === 0 ? "benchmark-row-with" : "benchmark-row-without";
+            const configLabel = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+
+            for (const run of configRuns) {
+              const r = run.result || {};
+              const prClass = r.pass_rate >= 0.8 ? "benchmark-delta-positive" : r.pass_rate < 0.5 ? "benchmark-delta-negative" : "";
+              html += '<tr class="' + rowClass + '">';
+              html += "<td>" + configLabel + "</td>";
+              html += "<td>" + run.run_number + "</td>";
+              html += '<td class="' + prClass + '">' + ((r.pass_rate || 0) * 100).toFixed(0) + "% (" + (r.passed || 0) + "/" + (r.total || 0) + ")</td>";
+              if (hasTime) html += "<td>" + (r.time_seconds != null ? r.time_seconds.toFixed(1) : "—") + "</td>";
+              if (hasErrors) html += "<td>" + (r.errors || 0) + "</td>";
+              html += "</tr>";
+            }
+
+            // Average row
+            const rates = configRuns.map(r => (r.result || {}).pass_rate || 0);
+            const avgRate = rates.reduce((a, b) => a + b, 0) / rates.length;
+            const avgPrClass = avgRate >= 0.8 ? "benchmark-delta-positive" : avgRate < 0.5 ? "benchmark-delta-negative" : "";
+            html += '<tr class="benchmark-row-avg ' + rowClass + '">';
+            html += "<td>" + configLabel + "</td>";
+            html += "<td>Avg</td>";
+            html += '<td class="' + avgPrClass + '">' + (avgRate * 100).toFixed(0) + "%</td>";
+            if (hasTime) {
+              const times = configRuns.map(r => (r.result || {}).time_seconds).filter(t => t != null);
+              html += "<td>" + (times.length ? (times.reduce((a, b) => a + b, 0) / times.length).toFixed(1) : "—") + "</td>";
+            }
+            if (hasErrors) html += "<td></td>";
+            html += "</tr>";
+          }
+          html += "</tbody></table>";
+
+          // Per-assertion detail for this eval
+          const runsWithExpectations = {};
+          for (const config of configGroups) {
+            runsWithExpectations[config] = evalRuns.filter(r => r.configuration === config && r.expectations && r.expectations.length > 0);
+          }
+          const hasAnyExpectations = Object.values(runsWithExpectations).some(runs => runs.length > 0);
+          if (hasAnyExpectations) {
+            // Collect all unique assertion texts across all configs
+            const allAssertions = [];
+            const seen = new Set();
+            for (const config of configGroups) {
+              for (const run of runsWithExpectations[config]) {
+                for (const exp of (run.expectations || [])) {
+                  if (!seen.has(exp.text)) {
+                    seen.add(exp.text);
+                    allAssertions.push(exp.text);
+                  }
+                }
+              }
+            }
+
+            html += '<table class="benchmark-table" style="margin-top: 0.5rem;">';
+            html += "<thead><tr><th>Assertion</th>";
+            for (const config of configGroups) {
+              const label = config.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+              html += "<th>" + escapeHtml(label) + "</th>";
+            }
+            html += "</tr></thead><tbody>";
+
+            for (const assertionText of allAssertions) {
+              html += "<tr><td>" + escapeHtml(assertionText) + "</td>";
+
+              for (const config of configGroups) {
+                html += "<td>";
+                for (const run of runsWithExpectations[config]) {
+                  const exp = (run.expectations || []).find(e => e.text === assertionText);
+                  if (exp) {
+                    const cls = exp.passed ? "benchmark-delta-positive" : "benchmark-delta-negative";
+                    const icon = exp.passed ? "\u2713" : "\u2717";
+                    html += '<span class="' + cls + '" title="Run ' + run.run_number + ': ' + escapeHtml(exp.evidence || "") + '">' + icon + "</span> ";
+                  } else {
+                    html += "— ";
+                  }
+                }
+                html += "</td>";
+              }
+              html += "</tr>";
+            }
+            html += "</tbody></table>";
+          }
+        }
+      }
+
+      // Notes
+      if (notes.length > 0) {
+        html += '<div class="benchmark-notes">';
+        html += "<h3>Analysis Notes</h3>";
+        html += "<ul>";
+        for (const note of notes) {
+          html += "<li>" + escapeHtml(note) + "</li>";
+        }
+        html += "</ul></div>";
+      }
+
+      container.innerHTML = html;
+    }
+
+    // ---- Start ----
+    init();
+    renderBenchmark();
+  </script>
+</body>
+</html>

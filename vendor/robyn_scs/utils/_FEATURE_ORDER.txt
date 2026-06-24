@@ -1,0 +1,66 @@
+_FEATURE_ORDER:
+# PSP properties (EXC)
+psp_amplitude_exc    
+psp_auc_exc    
+psp_peak_exc
+psp_rate_exc
+psp_onset_exc    
+psp_delay_exc    
+psp_rise_exc
+psp_rise_time_ms_exc    
+psp_decay_exc
+psp_duration_exc    
+psp_half_width_exc
+psp_snr_exc
+# PSP properties (INH)
+psp_amplitude_inh    
+psp_auc_inh    
+psp_peak_inh
+psp_rate_inh
+psp_onset_inh    
+psp_delay_inh    
+psp_rise_inh    
+psp_decay_inh
+psp_duration_inh    
+psp_half_width_inh
+psp_snr_inh
+# connection properties
+conn_n_total
+conn_density_index
+conn_exc_inh_ratio
+conn_n_exc
+conn_n_exc_per_active_exc    
+conn_n_inh
+conn_n_inh_per_active_inh
+conn_n_total_per_neuron    
+conn_n_total_per_active
+conn_mean_per_source    
+conn_mean_inputs_per_post
+conn_pct_hub_sources
+conn_n_reciprocal    
+conn_pct_reciprocal
+conn_pct_post_both_input    
+conn_pct_post_exc_input
+conn_pct_post_inh_input    
+conn_pct_post_no_input
+conn_n_e2e    
+conn_n_e2i    
+conn_n_i2e    
+conn_n_i2i
+# Source properties
+neuron_n_total
+neuron_pct_exc
+neuron_pct_inh
+nonfiring_neurons_pct    
+neuron_pct_active
+ap_mean_rate_exc    
+ap_mean_count_exc
+ap_mean_rate_inh    
+ap_mean_count_inh
+# Discovery properties
+conn_pct_validated
+conn_mean_score_exc    
+conn_mean_score_inh
+dlx_pct_exc_correct    
+dlx_pct_inh_correct
+dlx_threshold
