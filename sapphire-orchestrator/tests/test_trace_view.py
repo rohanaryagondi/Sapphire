@@ -199,6 +199,19 @@ class TestTraceView(unittest.TestCase):
         rc = main([])
         self.assertNotEqual(rc, 0)
 
+    def test_main_survives_cp1252_stdout(self):
+        # Regression: rendering a trace with a non-ASCII glyph (✓) to a legacy
+        # codepage stdout must not raise UnicodeEncodeError (Windows cp1252).
+        import io
+        real_stdout = sys.stdout
+        # A text stream whose encoding cannot represent ✓ (cp1252 has no U+2713).
+        sys.stdout = io.TextIOWrapper(io.BytesIO(), encoding="cp1252")
+        try:
+            rc = main([self.eid])
+        finally:
+            sys.stdout = real_stdout
+        self.assertEqual(rc, 0)
+
 
 if __name__ == "__main__":
     unittest.main()

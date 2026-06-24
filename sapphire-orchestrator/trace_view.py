@@ -218,8 +218,24 @@ def main(argv: list[str]) -> int:
         sys.stderr.write("error: engagement_id is required\n")
         return 2
 
-    print(render(args.engagement_id, full=args.full))
+    _safe_print(render(args.engagement_id, full=args.full))
     return 0
+
+
+def _safe_print(text: str) -> None:
+    """Print, tolerating a non-UTF-8 stdout (e.g. cp1252 on Windows).
+
+    The rendered trace can contain non-ASCII glyphs (✓). A naive ``print`` to a
+    legacy-codepage stdout raises UnicodeEncodeError; here we round-trip through
+    the stream's own encoding with ``errors="replace"`` so the CLI never crashes
+    on a locale it didn't pick.
+    """
+    enc = getattr(sys.stdout, "encoding", None) or "utf-8"
+    try:
+        sys.stdout.write(text + "\n")
+    except UnicodeEncodeError:
+        safe = text.encode(enc, errors="replace").decode(enc)
+        sys.stdout.write(safe + "\n")
 
 
 if __name__ == "__main__":
