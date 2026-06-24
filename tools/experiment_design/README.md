@@ -46,3 +46,20 @@ byte-verbatim against `vendor/design-form-agent/`; the golden sample conforms to
 (`experiments[]` with `metadata/culture/imaging/treatments/plate_layout/timeline`, `{value,
 confidence, source}` leaves, `action_items`, `open_questions`); and a key-gated live test runs
 `extract()` on a vendored transcript (skips cleanly without `ANTHROPIC_API_KEY`).
+
+## ED-2 — fill the design sheet (`fill.py`)
+Turns ED-1's extracted plan JSON into the **filled design sheet**:
+```
+python tools/experiment_design/fill.py path/to/plan_extraction.json [--output-dir ./out] [--xlsx-template path]
+```
+Writes `<name>_design_sheet.json` (the plan **untouched**, plus an additive `design_sheet` block) and
+`<name>_design_sheet.md` (the ED-1 render + a **Design Sheet Validation** section). Pure local transform — no
+network, no LLM, stdlib-only.
+
+**Menu validation is conservative by design.** Values for closed single-select dropdowns (Assay Types, Sub-Assay
+Types, Imaging Buffers, Temperature Options) are checked against `MENUS_REFERENCE` by **exact** string match. An
+off-menu value is **flagged for human review — never silently written or auto-coerced** — so a flag may be a
+*formatting* mismatch (case/whitespace, e.g. `"synaptic"` vs `"Synaptic"`, or free-text elaboration such as
+`"Tyrodes (modified with KMeSO4)"`) rather than a wrong value. Open menus (`…and others`) and null values never
+flag. The real `.xlsx` writer is a pending seam (`TemplateUnavailable`) awaiting Quiver's template + cell map
+(see `dev/HELP.md`: `experiment-design-ed2-xlsx-template`).
