@@ -11,6 +11,17 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — Corpus gate: T1 allowlist extended to ex-US national regulators  (`main`, PR #31)
+- Built-By: `rohan` (approver-owned gate machinery; prompted by Gavin's HELP request on PR #30).
+- What: `dev/validate-corpus.sh` T1-domain rule was US-centric (`.gov`/`.edu`/PMC), so credentialed ex-US
+  national-regulator *primaries* (EMA, MHRA/gov.uk, PMDA, Health Canada, TGA, Swissmedic, NMPA) failed it —
+  wrongly forcing ex-US corpora to T2 vs the agent spec. Extended the T1 allowlist to those regulators
+  (host-or-subdomain match, spoof-safe); HTA/reimbursement bodies (NICE/PBAC/G-BA/ICER) stay T2. METHOD.md T1
+  definition updated; allowlist documented as approver-owned (add via HELP, don't edit the gate). Unblocks
+  global-regulatory-divergence + future ex-US-primary corpora (policy-legislative).
+- Gates: gate logic unit-tested (regulators incl. subdomains → T1; NICE/press/spoof-domain → T2); suite 381;
+  audit clean. Answered + resolved Gavin's HELP request.
+
 ## 2026-06-24 — experiment-design ED-1: port design-form-agent  (`main`, PR #28)
 - **Built-By: `hayes`** (his first self-opened PR — PAT works; branched off fresh main, no conflict) · merged by `rohan`.
 - What: verbatim port of Matt Carey's `design-form-agent` (vendored at `vendor/`) into `tools/experiment_design/`
