@@ -1,5 +1,20 @@
 """Mechanical guardrails enforcing the CLAUDE.md hard rules (spec §A.5).
-Input guards BLOCK (return violations) — they never strip-and-proceed."""
+Input guards BLOCK (return violations) — they never strip-and-proceed.
+
+Data boundary — two layers at DIFFERENT stages (not one wrapping the other):
+  * RUNTIME ENFORCER (this module, `data_boundary()`): scans an agent's *inputs* for
+    internal key names (`_INTERNAL_KEYS`) and internal identifier patterns
+    (`_FORBIDDEN_PATTERNS`). This is what actually blocks a dispatch. It is shared by
+    the external-fetch agent guards AND the public-only memory subsystem, so it
+    deliberately keys on raw internal data (ids/scores/traces), NOT on a fact's
+    `provenance` label — blanket-blocking every `provenance=moat-real` dict here would
+    wrongly refuse the legitimate internal-data-in-memory / internal-data-to-reasoning
+    flows the data-boundary rule explicitly permits.
+  * CLASSIFICATION LAYER (`contracts.provenance`: `plane_for` / `is_boundary_violation`):
+    a higher-level view used to tag dossier facts with their plane (internal/external)
+    for the contract + UI, and to reason about routing. It expresses the rule; it is not
+    a second runtime gate. The two are complementary, kept separate on purpose.
+"""
 from __future__ import annotations
 
 import copy
@@ -45,9 +60,11 @@ def _walk_keys(obj):
 
 def data_boundary(inputs) -> "list[Violation]":
     viols = []
+    # Internal key names anywhere in the (possibly nested) inputs.
     for key in _walk_keys(inputs):
         if isinstance(key, str) and key in _INTERNAL_KEYS:
             viols.append(Violation("data_boundary", f"internal key present: {key}", key))
+    # Internal identifier patterns anywhere in the serialized payload (key OR value).
     blob = json.dumps(inputs, ensure_ascii=False)
     for pat in _FORBIDDEN_PATTERNS:
         if pat.search(blob):

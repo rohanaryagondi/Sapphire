@@ -333,7 +333,7 @@
         }
       },
       "tools_allowed": [],
-      "guardrails": ["facts_only_cited", "stamp_provenance"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "aso-tox",
       "timeout_s": 120,
       "retry": {"max_repair": 1, "on_hard_fail": "abstain"}

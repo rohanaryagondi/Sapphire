@@ -54,10 +54,19 @@ discover = {
 }
 ```
 
-Each **fact** always carries `value`, `source`, `tier`, `provenance`; it MAY carry `field`,
-`confidence`, and a `flag` (`VETO` | `DIVERGENCE` | `KNOWN_UNKNOWN`). Provenance is one of the
-allowed labels in [`provenance.py`](provenance.py) (e.g. `moat-real`, `emet-live`, `aso-tox`,
-`gnomad`, …).
+Each **fact** always carries `value`, `source`, `tier`, `provenance`; it also carries an additive
+`plane` field (`"internal"` or `"external"`, derived from provenance via
+`contracts.provenance.plane_for` — never asserted by an agent). It MAY additionally carry
+`field`, `confidence`, and a `flag` (`VETO` | `DIVERGENCE` | `KNOWN_UNKNOWN`). Provenance is one
+of the allowed labels in [`provenance.py`](provenance.py) (e.g. `moat-real`, `emet-live`,
+`aso-tox`, `gnomad`, …).
+
+The `plane` field implements the **two enforced data planes** (Feature brief A1–A3): `"internal"`
+facts originate from Quiver's private CNS_DFP moat (`moat-real`); `"external"` facts come from
+any public source. The UI renders these in separate, clearly-labelled regions. Code enforcement:
+`contracts.provenance.is_boundary_violation(target_provenance, fact_plane)` returns `True` when
+routing an `"internal"` fact toward an `"external"` agent; the `data_boundary` guardrail in
+`harness/guardrails.py` blocks the call before dispatch.
 
 ### `consult.round1` (partner verdicts)
 
