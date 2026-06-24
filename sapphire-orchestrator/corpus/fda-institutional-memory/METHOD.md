@@ -41,23 +41,47 @@ For a different agent, swap the domain fields (e.g. Clinical-Trial-Registry woul
 `date`, `reason`/implication, `source`, `url`, `quote`, `tier`. **`precedent_implication` is the
 value-add** — it pre-computes the "so what" the agent would otherwise reason out at runtime.
 
-## Step 3 — Sourcing strategy (authoritative-first)
+## Step 3 — Sourcing strategy (authoritative-first): two STANDARD ingestion passes
 
-Rank sources by authority for the agent's domain and prefer the highest tier that resolves:
-- **T1 (primary / regulatory).** For FDA-memory: `fda.gov` — Drugs@FDA approval packages, CRL
-  disclosures, AdComm briefing docs/transcripts, FDA guidance database, MedWatch / drug-safety
-  communications, Federal Register, openFDA. These are the only valid basis for a **veto**.
-- **T2 (secondary, confirming).** Reputable trade/press (Endpoints, STAT, Reuters, FiercePharma) or a
-  sponsor SEC/press release **only as a pointer** to confirm the existence + date of an action you then
-  trace to a primary record where possible. Tag T2 honestly.
+Every agent's build runs **both** passes below — they are not optional. They produce two complementary,
+honestly-tiered source streams. Rank by authority and prefer the highest tier that resolves.
 
-Use `WebSearch` to find candidates, then **`WebFetch` the actual page** to read the facts. EMET
-(`emet-runner` skill) is supplementary — use it only where biomedical evidence genuinely helps (e.g.
-confirming a *class* safety liability). For a regulatory agent its role is limited.
+### Pass A — the **browser pass** (FDA-primary → T1)
+Drive the **shared Playwright browser** (`browser_navigate` to the primary URL, then `browser_evaluate`
+returning `document.querySelector('main')?.innerText`/`document.body.innerText`; for PDFs, fetch the bytes
+and `pdftotext`) to open the **actual primary document** and verify a **verbatim** supporting substring:
+- **T1 (primary / regulatory).** For FDA-memory: `fda.gov` (drug-safety communications, news releases,
+  AdComm meeting **summary** docs + decision memos under `fda.gov/media/<id>/download`), `accessdata.fda.gov`
+  (Drugs@FDA labels/reviews), `federalregister.gov`, `govinfo.gov`. **T1 requires that you actually loaded
+  the primary AND found verbatim support.** These are the only valid basis for a **veto**.
+- If a primary genuinely won't render (some Akamai-fronted PDFs, image-only scans), keep the card **T2** (or
+  tag `"unverifiable_by_fetch": true` honestly) — never claim a T1 you did not fetch. A wrong/dead URL (404)
+  is a hard failure, repoint it.
+- The browser pass is what **upgrades T2 → T1**: re-anchor a sponsor/press-confirmed action to its
+  Drugs@FDA review / AdComm summary / FDA press page, replace the `quote` with a verbatim substring of the
+  fetched primary, set `tier:"T1"`, and drop any `unverifiable_by_fetch`.
 
-**Parallelize by theme.** Split the domain into themes (CRLs, withdrawals, AdComm, guidances,
-holds/accelerated-approval) and run one focused researcher per theme. Each returns verified claim-cards
-+ note prose for its theme.
+### Pass B — the **EMET pass** (biomedical class-grounding → T2, `emet-live`)
+Drive **EMET (BenchSci)** live per `sapphire-cascade/emet_protocol.md` (open your own tab at
+`emet.benchsci.com`, set thinking level **Thorough**, type into the TipTap input, **submit with the
+`.lucide-arrow-up` send button — Enter does NOT submit**, wait for the slow agentic run, read the inline
+PMID citations + the Sources panel, capture the `chat_url`). Public identifiers only ever go to EMET; if a
+login wall (`id.summit.benchsci.com`) appears, STOP and report `login_required` — never log in.
+- EMET adds the **cited biomedical basis** *behind* the regulatory record — the C1–C2 class-liability /
+  biomarker mechanism that explains *why* the FDA acted (e.g. 5-HT2B agonism → valvulopathy behind the
+  pergolide withdrawal; ARIA behind the amyloid-mAb scrutiny; NfL behind tofersen's surrogate approval).
+- EMET cards are **T2**, `source:"EMET (BenchSci)"`, `provenance:"emet-live"`, `emet_chat_url:"<uuid url>"`,
+  and `url` set to the **PMID/PMC/DOI** the answer returned (`pubmed.ncbi.nlm.nih.gov/<pmid>/` — fetchable,
+  so the gate verifies liveness). `quote` is a **verbatim substring of the EMET answer** (≤2 sentences).
+  **Only real PMIDs EMET actually returned** — if a query returns nothing citable, record it as a gap in
+  the manifest; never invent a PMID.
+- **EMET's contribution varies by agent.** For this regulatory agent it is *limited* (a supporting layer
+  behind the regulatory facts). For **post-market-safety, clinical-trial-registry, target-validation**
+  agents it is *central*. Run it regardless; let the yield be honest.
+
+Use `WebSearch` to find primary-document candidates (then verify in the browser). **Parallelize by theme**
+for the browser pass (CRLs, withdrawals, AdComm, guidances, holds/accelerated-approval — one researcher
+per theme); run the EMET pass as a focused set of ~5 Thorough queries on the domain's key class-mechanisms.
 
 ## Step 4 — Extraction rules (ANTI-FABRICATION is the whole game)
 
@@ -69,9 +93,16 @@ This is a **veto-class** agent: a fabricated precedent could wrongly gate a prog
   Never include a vote count you did not read.
 - **Store extracted facts + citations, never dumps.** Quotes are **≤2 sentences (~50 words), fair use** —
   enough to anchor the claim, never a copyrighted block.
-- **A `quote` must be a verbatim substring of the fetched source.** If you're summarizing, it is NOT a quote —
-  rewrite the `claim` as your summary and either drop `quote` or use a real substring. (Pilot audit caught
-  paraphrases presented as verbatim quotes — a serious integrity defect on a veto-class agent.)
+- **Quote fidelity differs by source type — be precise about which you're producing:**
+  - **Browser/web cards (T1 + secondary T2):** the `quote` MUST be a **verbatim substring** of the fetched
+    page. If you're summarizing, it is NOT a quote — put the summary in `claim` and either drop `quote` or use
+    a real substring. (Pilot audit caught paraphrases passed as verbatim quotes — a serious integrity defect.)
+  - **EMET cards (`provenance:"emet-live"`):** the `quote` is a **synthesized, EMET-grounded statement**, not
+    necessarily a verbatim string from the cited PMID abstract — but it **must be faithful to and not overstate
+    the cited evidence**: verify every number against the PMID's abstract and label genotypes/subgroups exactly
+    as the source does (the pilot's EMET audit caught a "carriers" figure mislabeled "heterozygotes" and a
+    fold-estimate above the cited OR). The PMID `url` is what's independently verifiable; the quote is your
+    faithful synthesis of the EMET answer.
 - **`url` must resolve to the page that supports the claim.** If the correct primary URL is blocked/un-fetchable
   (e.g. `fda.gov`/`federalregister.gov` often block automated fetch), set **`"unverifiable_by_fetch": true`** on
   the card — never leave a URL you couldn't actually open without flagging it. A wrong/dead URL (404) is a hard
@@ -111,7 +142,10 @@ bash dev/validate-corpus.sh sapphire-orchestrator/corpus/<agent>/
 It enforces, deterministically: valid JSON + invariant fields + quote ≤60 words; **tier T1 only on a primary
 domain** (.gov/.edu/PMC/NCBI); and **every `url` resolves** (a 404/4xx is a hard fail; a 403/timeout is a fail
 *unless* the card is tagged `"unverifiable_by_fetch": true`). This catches the pilot's defect class (dead URLs,
-press-wire-as-T1, silently-unfetched URLs) before it can propagate. Quote-verbatim fidelity is not fully
+press-wire-as-T1, silently-unfetched URLs) before it can propagate. **EMET cards** (Pass B) pass cleanly: they
+are **T2** (so the T1-domain rule does not apply) citing a `pubmed.ncbi.nlm.nih.gov/<pmid>/` URL (which resolves
+2xx), and the extra `provenance`/`emet_chat_url` fields are additive — the invariant-field check is a subset
+test, so extra fields never break it. Do **not** weaken the gate to admit EMET cards; they already conform. Quote-verbatim fidelity is not fully
 mechanizable (primary domains block fetch) — it stays a Step-4 discipline + the adversarial review.
 
 Be **frank in the report** about where coverage is thin and which claims you omitted for lack of a verifiable

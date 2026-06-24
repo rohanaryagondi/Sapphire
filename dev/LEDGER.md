@@ -11,6 +11,25 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-23 — Corpus PERFECTED: dual-source (browser + EMET) FDA-memory + locked template  (`main`, PR #16)
+- Built-By: `rohan` (driven via subagents). Adds the two ingestion sources the pilot was missing and **locks
+  the dual-source `METHOD.md` as the template** for the other 12.
+- Browser pass: **T1 11 → 21** — 10 cards upgraded by actually loading the FDA-primary (aducanumab Dunn memo,
+  tofersen/MDMA AdComm summaries, accessdata label PDFs, FDA press) with verbatim quotes. Honest about what
+  stayed T2 (FDA doesn't publish CRLs; pergolide 2007 has no fetchable primary).
+- EMET pass: **5 Thorough EMET queries** (auth required — Rohan logged into BenchSci; EMET hits a login wall
+  otherwise) → **10 `emet-live` T2 cards** citing real PMIDs, grounding the class-safety/biomarker mechanism
+  behind the precedents (5-HT2B→valvulopathy, amyloid→ARIA, NfL surrogate, SSRI pediatric suicidality,
+  antipsychotic elderly mortality). Corpus now **45 cards** (35 regulatory + 10 EMET).
+- Quality: adversarial verifier — **0 critical findings**; EMET PMIDs **10/10 real, on-topic, supported**
+  (numbers checked vs abstracts); T1 quotes **6/6+1 verbatim** vs FDA-primary. 2 nits fixed (#39 "ApoE e4
+  carriers" not "heterozygotes"; #44 aligned to its source OR 1.54). `METHOD.md` now distinguishes
+  **T1/web quotes = verbatim substring** vs **EMET-card quotes = synthesized-but-faithful** (verify numbers/
+  labels vs the PMID). `dev/validate-corpus.sh` documents both sources (logic unchanged, not weakened).
+  Gate CLEAN 45/45; audit clean.
+- **Template LOCKED.** Next: delegate Hayes 6 / Gavin 6 — each replicating the dual-source METHOD + passing
+  the gate. NOTE for delegation: contributors need an authenticated EMET/BenchSci session (browser) for Pass B.
+
 ## 2026-06-23 — Bucket-1 knowledge-corpus PILOT: FDA Institutional Memory + the method  (`main`, PR #15)
 - Built-By: `rohan` (driven via subagents). The pilot of a new initiative: give each Bucket-1 semantic agent a
   pre-ingested, queryable knowledge corpus so a run hits local for the stable ~70% and only searches the

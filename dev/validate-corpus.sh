@@ -7,9 +7,18 @@
 # which found real facts but leaky citations (a 404 URL, quotes not in their source,
 # a T1 tier on a press-wire). This makes those failure modes mechanical, not trust-based.
 #
+# Two ingestion sources, both verified here (see corpus METHOD.md Step 3):
+#   - Browser pass  → FDA-primary, tier T1 (must be on a primary .gov/.edu/PMC domain).
+#   - EMET pass     → biomedical class-grounding, tier T2, source "EMET (BenchSci)",
+#                     url = pubmed.ncbi.nlm.nih.gov/<pmid>/ (resolves 2xx), plus additive
+#                     "provenance"/"emet_chat_url" fields. EMET cards conform as-is: the
+#                     invariant-field check below is a SUBSET test (inv - set(c)), so the
+#                     extra fields never trip it, and T2 is exempt from the T1-domain rule.
+#                     Do NOT weaken these checks to admit EMET cards — they already pass.
+#
 # Checks index.jsonl, per card:
 #   1. valid JSON; invariant fields present (claim, date, source, url, quote, tier);
-#      tier in {T1,T2}; quote <= 60 words.
+#      tier in {T1,T2}; quote <= 60 words. (Extra fields beyond the invariant set are allowed.)
 #   2. tier T1 ONLY if the url host is a primary/authoritative domain
 #      (*.gov, pmc.ncbi.nlm.nih.gov, ncbi.nlm.nih.gov, *.edu). Else it must be T2.
 #   3. every url resolves: HTTP 2xx/3xx = ok; 4xx (dead/wrong, e.g. 404) = HARD FAIL;
