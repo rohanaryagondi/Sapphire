@@ -18,6 +18,42 @@ The people building Sapphire and the Claude each one drives. This is the source 
 > hooks that block it), obey **`dev/CONTRIBUTOR_RULES.md`**, and never use `--no-verify`. See the enforcement
 > model in `dev/CONVENTIONS.md` §1.
 
+## Cold start — from nothing to ready (a contributor's Claude runs this once)
+
+**Repo:** `https://github.com/rohanaryagondi/Sapphire` (private; default branch `main`). Hayes/Gavin are
+collaborators with write access. Do this on the contributor's machine before any task:
+
+1. **Auth git to GitHub** (the repo is private). Use the contributor's PAT or `gh auth login`:
+   ```
+   gh auth login            # OR: git config --global credential.helper + a PAT when prompted on clone
+   gh auth status           # confirm authenticated as your @github-user
+   ```
+2. **Clone into the canonical directory name `sapphire-capability-map`** — NOT `Sapphire`. (A test pins this
+   path; cloning into a differently-named dir fails `moat/tests/test_client.py`. Learned the hard way.)
+   ```
+   git clone https://github.com/rohanaryagondi/Sapphire.git sapphire-capability-map
+   cd sapphire-capability-map
+   ```
+3. **Set your git identity** (so commits attribute correctly; the `Built-By` trailer is added per-commit and
+   enforced by the hook):
+   ```
+   git config user.name  "<Your Name>"
+   git config user.email "<your @quiverbioscience.com email>"
+   ```
+4. **Arm the harness** (installs the pre-commit/commit-msg/pre-push hooks + records your handle):
+   ```
+   bash dev/setup-contributor.sh <handle>      # <handle> = hayes | gavin
+   ```
+5. **Windows only:** export `PYTHONUTF8=1` (the codebase assumes UTF-8; without it two tests fail on cp1252).
+6. **Tooling for the corpora task:** install the Playwright browser MCP for browser + EMET passes —
+   `claude mcp add playwright npx '@playwright/mcp@latest'` then `npx playwright install chromium`. EMET (Pass B)
+   needs a signed-in BenchSci session — the agent opens `https://emet.benchsci.com/` and asks its human to sign
+   in (or sign up with a `.edu` email); the agent never logs in itself. (See the corpora brief Step 0.)
+7. **Run autonomously:** start the watcher and work your queue — `bash dev/watch-assignments.sh <handle> <github-user>`
+   (see `dev/CONTRIBUTOR_RULES.md` §Autonomous operation). Your tasks are under your name on `status/WORKBOARD.md`.
+
+You are now ready. Read `dev/CONTRIBUTOR_RULES.md` + your workboard section, then build.
+
 ## Ownership (default areas — see `dev/DELEGATION.md` for live assignments)
 
 | Subsystem | Primary | Notes |
