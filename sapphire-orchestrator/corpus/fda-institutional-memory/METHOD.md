@@ -107,8 +107,12 @@ This is a **veto-class** agent: a fabricated precedent could wrongly gate a prog
   (e.g. `fda.gov`/`federalregister.gov` often block automated fetch), set **`"unverifiable_by_fetch": true`** on
   the card — never leave a URL you couldn't actually open without flagging it. A wrong/dead URL (404) is a hard
   failure, not an "unverifiable" — repoint it.
-- **`tier` T1 requires a primary domain** (`*.gov` / `*.edu` / PMC / NCBI). A press-wire or sponsor page that
-  merely reproduces FDA text is **T2**, even if the text is verbatim.
+- **`tier` T1 requires a primary domain** — US `*.gov` / `*.edu` / PMC / NCBI, **or a credentialed ex-US
+  national drug regulator** (EMA `ema.europa.eu`, MHRA `gov.uk`, PMDA `pmda.go.jp`, Health Canada
+  `canada.ca`/`hc-sc.gc.ca`, TGA `tga.gov.au`, Swissmedic `swissmedic.ch`, NMPA `nmpa.gov.cn` — the
+  `validate-corpus.sh` allowlist). **HTA/reimbursement bodies** (NICE, PBAC, G-BA, ICER, CDA-AMC) and any
+  press-wire/sponsor page that merely reproduces a regulator's text are **T2**, even if verbatim. (The
+  allowlist is approver-owned — if you need a regulator added, raise it in `dev/HELP.md`, don't edit the gate.)
 - **Public identifiers only** (drug names, gene symbols, indications, SMILES, PMIDs). Never any
   Quiver-internal data.
 - **Provenance honesty** (`dev/CONVENTIONS.md` §3): T1 vs T2 reflects the *actual* source you read.

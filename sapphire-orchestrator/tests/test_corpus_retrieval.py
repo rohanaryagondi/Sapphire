@@ -48,13 +48,21 @@ class TestCorpusRetrievalThroughRunLive(unittest.TestCase):
         corpus_facts = [f for f in dossier if f.get("provenance") == "corpus"]
         self.assertGreaterEqual(len(corpus_facts), 1,
                                 "expected >=1 corpus-sourced fact in the dossier")
-        # Each corpus fact carries its card's source/tier/url + the corpus marker.
+        # Corpus-agnostic invariants: every corpus fact carries its card's source/tier +
+        # the corpus marker, and names SOME agent's corpus (non-empty field). Do NOT assert
+        # a specific agent in this loop — more than one corpus may legitimately surface for
+        # the same query, and the suite must not break when a second corpus lands.
         for f in corpus_facts:
             self.assertTrue(f.get("from_corpus"))
             self.assertIn("value", f)
             self.assertIn("source", f)
             self.assertIn("tier", f)
-            self.assertEqual(f["field"], "fda-institutional-memory")
+            self.assertTrue(f.get("field"), "corpus fact must name its source agent (field)")
+        # This test seeds on the fda-institutional-memory corpus (guaranteed present per
+        # setUp); prove ITS facts specifically surface for this Alzheimer's query.
+        fda_facts = [f for f in corpus_facts if f.get("field") == "fda-institutional-memory"]
+        self.assertGreaterEqual(len(fda_facts), 1,
+                                "expected >=1 fda-institutional-memory corpus fact for this query")
 
     def test_corpus_facts_do_not_create_a_veto(self):
         # A corpus card is a LEAD, not a dispositive veto — even decision=CRL/approval
