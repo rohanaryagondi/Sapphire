@@ -49,7 +49,13 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 
 ## Open requests
 
-_None._ (the ex-US-regulator T1 gate question was RESOLVED by rohan — see below + PR #31.)
+### [OPEN] experiment-design-ed2-xlsx-template: need Quiver's canonical .xlsx design template + cell map + output location  ·  from: hayes  ·  date: 2026-06-24  ·  branch: hayes/experiment-design-ed2
+**Blocking?** no — ED-2 ships the form-ready JSON + the design-doc MD + menu validation now; ONLY the optional `.xlsx` writer is gated on this.
+**Context:** `experiment-design` epic, ED-2 (PR-E2). `tools/experiment_design/fill.py` turns ED-1's extracted plan JSON into the filled design sheet. The [brief](../docs/superpowers/plans/2026-06-23-experiment-design-tool.md) (ED-2) says: *"write the real Excel design sheet if the template is obtainable … coordination needed: the canonical .xlsx template + where filled sheets should land — raise via dev/HELP.md."*
+**Question:** to wire `write_xlsx()` (currently a clean seam) I need three things from Rohan/Matt: (1) Quiver's canonical experiment-design **.xlsx template** (the file, or a repo/vendor path I can use); (2) its **cell map** — which cell or named range each field writes to (e.g. `metadata.assay_type` → ?, `imaging.imaging_buffer` → ?, the treatments table, the plate layout); (3) where **filled sheets should land** (output dir + naming; does the firm/engine consume them, or is this an analyst hand-off only?).
+**What I tried / read:** the brief's ED-2 section; `vendor/design-form-agent/` (Matt's source has NO xlsx writer or template — only the Otter→JSON extractor + a Slack bot); `MENUS_REFERENCE` in `extraction_prompt.py` gives the dropdown vocabulary but not the sheet's cell layout. I deliberately did NOT guess the layout — a guessed cell map risks a silently-wrong sheet, which the data-integrity rules forbid.
+**My current best guess:** ship ED-2 as JSON + design-doc MD + menu validation now, with `write_xlsx()` as a documented seam (raises `TemplateUnavailable`) + a skipped test; wire the real `openpyxl` population (in the tool subprocess — engine stays stdlib-only) in a small follow-up once you provide the template + cell map. Menu-flagged values get routed to a "review" note, never written into a dropdown cell.
+**Answer (lead fills):** —
 
 ---
 
