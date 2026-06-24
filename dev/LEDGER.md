@@ -11,6 +11,17 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — global-regulatory-divergence corpus — Gavin's first Bucket-1 corpus  (`main`, PR #30)
+- Built-By: `gavin` (reviewed/approved/merged by rohan).
+- What: First contributor knowledge corpus, built dual-source (browser + EMET) per the locked METHOD. 9 cards
+  (T1×2 MHRA/gov.uk regulator primaries, T2×7 HTA/secondary), themed notes, manifest with honest known-gaps,
+  QUERIES.md, + the agent skill doc upgraded to corpus-first → search-the-gap. Lands at run time via K2.
+- Gates: suite **381 green** · `validate-corpus.sh` **CLEAN** (all URLs resolve) · content audited CLEAN
+  last pass (0 fabricated, all 3 EMET PMIDs real) · scope clean (no secrets/binaries). Branch carried the #31
+  gate fix + #32 test fix (merged main before re-tier).
+- Follow-ups: Gavin's remaining 5 corpora (financial-investor · kol-social-signal · patient-advocacy ·
+  policy-legislative · reputational-institutional).
+
 ## 2026-06-24 — Fix: make the corpus-retrieval test corpus-agnostic (unblocks all multi-corpus PRs)  (`main`, PR #32)
 - Built-By: `rohan` (engine/test fix — latent brittleness in the K2 keystone, surfaced by Gavin's PR #30 audit).
 - What: `tests/test_corpus_retrieval.py::test_corpus_fact_lands_in_dossier` asserted EVERY corpus fact carried
