@@ -6,9 +6,10 @@ Every change to Sapphire follows these. They are not style preferences; they are
 - **`main` is the bedrock.** (As of 2026-06-22 the former `Rohan` branch *is* `main`; the pre-collaboration
   `main` is preserved at `main-backup-2026-06-22`.) **Nobody pushes directly to `main`** — all changes land via
   a reviewed PR.
-  > **Enforcement model (2026-06-22)** on `rohanaryagondi/Sapphire`. The repo is a **free private** repo and
-  > **stays free** — no server-side branch protection, no GitHub Actions. Enforcement is therefore **local and
-  > layered**, and every clone must run `bash dev/setup-contributor.sh <handle>` to arm it:
+  > **Enforcement model** on `rohanaryagondi/Sapphire`. The repo is a **free private** repo and **stays free by
+  > decision** (no GitHub Pro, ever — so server-side branch protection and Actions are permanently off the
+  > table; this is the design, not a stopgap). Enforcement is **local, layered, and complete as-is**, and every
+  > clone must run `bash dev/setup-contributor.sh <handle>` to arm it:
   > 1. **`pre-commit`** — blocks staging obvious secrets (tokens/keys/.env). Backstop for §5.
   > 2. **`commit-msg`** — requires a real `Built-By` trailer matching the clone's `sapphire.handle`.
   > 3. **`pre-push`** — blocks pushes to `main`/protected branches and non-`<handle>/<slug>` branches; and if
@@ -17,10 +18,10 @@ Every change to Sapphire follows these. They are not style preferences; they are
   > 5. **`dev/audit-history.sh`** — the detective backup (run periodically / before trusting `main`): scans
   >    history for missing `Built-By` and leaked secrets. Replaces the (unavailable) CI check.
   >
-  > **Known limitation:** the hooks are per-clone and bypassable with `git push --no-verify` — a hard
-  > violation (`dev/CONTRIBUTOR_RULES.md`). Collaborators have write access, so the model relies on cooperating
-  > agents + the audit backstop catching anything that slips. (`dev/enable-branch-protection.sh` remains in the
-  > repo for the day this ever moves to a paid plan/org, but that is not the plan.)
+  > **Known limitation (accepted, permanent):** the hooks are per-clone and bypassable with `git push
+  > --no-verify` — a hard violation (`dev/CONTRIBUTOR_RULES.md`). Collaborators have write access, so the model
+  > relies on cooperating agents + the audit backstop (`dev/audit-history.sh`) catching anything that slips.
+  > This is the chosen trade-off for a free private repo; there is no branch-protection fallback coming.
 - **Everyone works on a feature branch** named `<handle>/<slug>` cut from the latest `main`
   (e.g. `hayes/aso-design-tool`). The handle is your id in `dev/CONTRIBUTORS.md`.
 - **Ship by opening a PR to `main`.** Contributors run the full local lifecycle (Gates 1–5) on their branch,
