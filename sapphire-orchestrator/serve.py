@@ -18,7 +18,10 @@ How "Claude under the hood" works here:
 
 Endpoints:
   GET /api/health            -> {"live": bool, "model": str, "scenarios": [...]}
-  GET /api/run?q=<query>     -> canonical run object (+ "via": engine|claude-subscription|plan)
+  GET /api/run?q=<query>     -> the harnessed firm via live_engine.run_live (default; via=engine-live).
+                                ?mode=canned -> pre-captured scenario ($0 offline, via=canned);
+                                ?mode=claude -> headless-Claude reconstruction (via=claude-subscription).
+                                Output schema: contracts/run_live_schema.md (single source of truth).
   GET /  (and any path)      -> static files from ../site
 """
 from __future__ import annotations
@@ -37,6 +40,7 @@ SITE = os.path.join(ROOT, "site")
 
 sys.path.insert(0, HERE)
 from orchestrator import ENGINE, SCENARIOS  # noqa: E402
+import live_engine  # noqa: E402  (the harnessed live firm — the real front door)
 
 PORT = int(os.environ.get("SAPPHIRE_PORT", "8077"))
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
@@ -234,6 +238,63 @@ def _run_live(query: str) -> dict:
     return _stamp(run, "live")
 
 
+def _run_engine_live(query: str, ctx: dict | None = None) -> dict:
+    """Run the REAL harnessed firm (`live_engine.run_live`) and stamp the HTTP envelope.
+
+    This is the live-firm service boundary K1 exposes — the integration point LOKA will call.
+    `run_live` never raises for a down backend (the harness abstains honestly), so the result is
+    always well-formed, possibly degraded. We still wrap in try/except so a *programming* error
+    can never take down the endpoint; on that path we return an honest plan-only envelope.
+
+    The returned dict is the documented `run_live` contract
+    (`contracts/run_live_schema.md`) plus two HTTP stamps: `via="engine-live"`, `live=True`.
+    """
+    try:
+        result = live_engine.run_live(query, ctx=ctx)
+    except Exception as e:  # defensive — run_live is designed not to raise
+        plan = ENGINE.plan(query)
+        plan_public = {k: v for k, v in plan.items() if not k.startswith("_")}
+        return {"query": query, "plan": plan_public, "via": "plan", "live": False,
+                "note": f"engine-live unavailable ({type(e).__name__}: {str(e)[:160]})."}
+    result["via"] = "engine-live"
+    result["live"] = True
+    return result
+
+
+def _run_canned(query: str) -> dict:
+    """The pre-captured-scenario path — an explicit, clearly-labeled $0 offline fallback.
+
+    Routes the query to a shipped scenario by disease; if none matches, returns an honest note
+    (so `?mode=canned` never silently degrades to a different path)."""
+    from orchestrator import DISEASE_TO_SCENARIO
+    sid = DISEASE_TO_SCENARIO.get(ENGINE.triage(query)["disease"])
+    if sid:
+        run = _stamp(ENGINE.run(sid), "captured")
+        run.update({"via": "canned", "live": False, "_routed_from_query": query})
+        return run
+    plan = ENGINE.plan(query)
+    plan_public = {k: v for k, v in plan.items() if not k.startswith("_")}
+    return {"query": query, "plan": plan_public, "via": "canned", "live": False,
+            "note": "No canned scenario matches this query; omit ?mode=canned for the live engine."}
+
+
+def route_api_run(query: str, mode: str = "live") -> dict:
+    """Pure routing decision for GET /api/run (testable without a live server).
+
+    mode:
+      "live"   (default) -> the harnessed firm via run_live           (via=engine-live)
+      "canned"           -> a pre-captured scenario, $0 offline        (via=canned)
+      "claude"           -> headless-Claude reconstruction (subscription) (via=claude-subscription)
+    """
+    if mode == "canned":
+        return _run_canned(query)
+    if mode == "claude":
+        return _run_live(query)
+    # "live" and any unrecognised mode fall through to the live firm (the safe,
+    # forward-compatible default). Covered by test_unknown_mode_defaults_to_engine_live.
+    return _run_engine_live(query)
+
+
 def _qmodels_status() -> str:
     """Real Q-Models status for the systems panel: live-local (CPU endpoint serving real joblibs) /
     stub (endpoint up, placeholder) / mock (endpoint down)."""
@@ -270,17 +331,15 @@ class Handler(SimpleHTTPRequestHandler):
         if parsed.path == "/api/tools":
             return self._json({"tools": ENGINE.tools_catalog()})
         if parsed.path == "/api/run":
-            q = urllib.parse.parse_qs(parsed.query).get("q", [""])[0].strip()
+            qs = urllib.parse.parse_qs(parsed.query)
+            q = qs.get("q", [""])[0].strip()
             if not q:
                 return self._json({"error": "missing q"}, 400)
-            tri = ENGINE.triage(q)
-            from orchestrator import DISEASE_TO_SCENARIO
-            sid = DISEASE_TO_SCENARIO.get(tri["disease"])
-            if sid:
-                run = _stamp(ENGINE.run(sid), "captured")
-                run.update({"via": "engine", "live": False, "_routed_from_query": q})
-                return self._json(run)
-            return self._json(_run_live(q))
+            # Default: the REAL harnessed firm (via=engine-live). The canned scenarios remain
+            # reachable as an explicit $0 offline fallback via ?mode=canned; the headless-Claude
+            # reconstruction via ?mode=claude.
+            mode = qs.get("mode", ["live"])[0].strip().lower()
+            return self._json(route_api_run(q, mode))
         return super().do_GET()
 
     def do_POST(self):
