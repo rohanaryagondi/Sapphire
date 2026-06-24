@@ -9,7 +9,7 @@ cd "$ROOT/sapphire-orchestrator" || { echo "run-tests: cannot find sapphire-orch
 
 fail=0
 total=0
-for s in contracts harness emet memory selfimprove moat; do
+for s in contracts harness emet memory selfimprove moat corpus; do
   out="$(python -m unittest discover -s "$s/tests" 2>&1)"
   n="$(printf '%s' "$out" | grep -oE 'Ran [0-9]+' | grep -oE '[0-9]+' | head -1)"
   if printf '%s' "$out" | grep -qE '^OK'; then
