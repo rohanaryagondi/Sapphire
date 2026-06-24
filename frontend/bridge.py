@@ -78,17 +78,20 @@ def _error_envelope(query: str, exc: Exception) -> dict:
     }
 
 
-def run(query: str, *, mock: bool = True) -> dict:
+def run(query: str, *, mock: bool = True, sequences: list | None = None) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
 
-    Never raises. On a hard failure returns `_error_envelope`. Adds a single TOTAL wall-clock
-    (`_elapsed_s`) — per-agent timing is NOT available from the contract and is never faked.
+    `sequences` is forwarded to `run_live` (the documented ASO-Design handoff: when ASO
+    candidates are present they reach the aso-tox agent; `None` lets run_live extract any
+    A/T/G/C tokens from the query itself). Never raises. On a hard failure returns
+    `_error_envelope`. Adds a single TOTAL wall-clock (`_elapsed_s`) — per-agent timing is NOT
+    available from the contract and is never faked.
     """
     started = time.monotonic()
     try:
         _ensure_engine_on_path()
         from live_engine import run_live
-        result = run_live(query, ctx=build_ctx(mock))
+        result = run_live(query, sequences=sequences, ctx=build_ctx(mock))
     except Exception as exc:  # defensive — run_live is designed not to raise
         result = _error_envelope(query, exc)
     result["_elapsed_s"] = round(time.monotonic() - started, 2)

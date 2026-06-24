@@ -200,6 +200,22 @@ def render_synthesis(synthesize: dict) -> dict:
     }
 
 
+def render_status(discover: dict) -> dict | None:
+    """A run-completeness banner from `discover.status` (contract: `complete` |
+    `complete-with-known-unknowns`). Returns None for a fully-complete run (no banner);
+    a "⚠ Partial run" spec when status is anything else or known-unknowns are present —
+    so a degraded run is never read as a clean one.
+    """
+    discover = discover or {}
+    status = _s(discover.get("status"))
+    n_unknown = len((discover.get("flags", {}) or {}).get("KNOWN_UNKNOWNS", []) or [])
+    if status in ("", "complete") and n_unknown == 0:
+        return None
+    note = f"{n_unknown} known-unknown(s)" if n_unknown else "see below"
+    return {"kind": "status", "status": status or "incomplete",
+            "title": f"⚠ Partial run — status: {status or 'incomplete'} ({note})"}
+
+
 # ---------------------------------------------------------------------------
 # top-level assembly
 # ---------------------------------------------------------------------------
@@ -216,6 +232,9 @@ def render_run(result: dict) -> list:
     specs.append(render_plan(result.get("plan", {})))
 
     discover = result.get("discover", {}) or {}
+    status_spec = render_status(discover)
+    if status_spec:
+        specs.append(status_spec)
     specs.append(render_agents(discover.get("agents", [])))
     specs.extend(render_dossier(discover))
     specs.extend(render_flags(discover.get("flags", {})))

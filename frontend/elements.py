@@ -87,6 +87,8 @@ def to_messages(specs: list) -> list:
             msgs.append({"content": f"# {spec['query']}", "elements": []})
         elif kind == "plan":
             msgs.append({"content": _plan_md(spec), "elements": []})
+        elif kind == "status":
+            msgs.append({"content": f"**{spec['title']}**", "elements": []})
         elif kind == "agents":
             note = (f"\n\n_{spec['n_abstained']} of {spec['n_total']} agents abstained/escalated._"
                     if spec["n_abstained"] else "")

@@ -152,6 +152,50 @@ class TestRoundtableSpread(unittest.TestCase):
         spec = render.render_roundtable(consult)
         self.assertEqual(spec["round1"][0]["fact_claims"], [{"claim": "X", "cite": "PMID:1"}])
 
+    def test_spread_preserves_distinct_stances_no_collapse(self):
+        # A genuine spread (distinct personas + stances) must render as distinct cards — proving
+        # the render does NOT collapse to a consensus. (The captured mock fixture has identical
+        # personas by construction, so a real-divergence test needs a synthetic input.)
+        consult = {"round1": [
+            {"persona": "Biotech CSO", "stance": "champion", "conviction": 4,
+             "status": "ok", "rationale": "strong genetics", "fact_claims": []},
+            {"persona": "Adversarial Red-Team", "stance": "veto", "conviction": 5,
+             "status": "ok", "rationale": "BBB penetration unproven", "fact_claims": []},
+            {"persona": "Payer", "stance": "conditional", "conviction": 2,
+             "status": "ok", "rationale": "needs a biomarker", "fact_claims": []},
+        ]}
+        spec = render.render_roundtable(consult)
+        personas = [c["persona"] for c in spec["round1"]]
+        stances = [c["stance"] for c in spec["round1"]]
+        self.assertEqual(len(spec["round1"]), 3)
+        self.assertEqual(len(set(personas)), 3)          # distinct personas preserved
+        self.assertGreater(len(set(stances)), 1)         # the spread is NOT collapsed to one stance
+        self.assertIn("veto", stances)                   # the dissent survives
+
+
+class TestStatusBanner(unittest.TestCase):
+    def test_complete_run_no_banner(self):
+        discover = {"status": "complete",
+                    "flags": {"VETO": [], "DIVERGENCE": [], "KNOWN_UNKNOWNS": []}}
+        self.assertIsNone(render.render_status(discover))
+
+    def test_known_unknowns_trigger_partial_banner(self):
+        discover = {"status": "complete-with-known-unknowns",
+                    "flags": {"VETO": [], "DIVERGENCE": [],
+                              "KNOWN_UNKNOWNS": ["abstained: emet-runner"]}}
+        spec = render.render_status(discover)
+        self.assertIsNotNone(spec)
+        self.assertEqual(spec["kind"], "status")
+        self.assertIn("Partial run", spec["title"])
+
+    def test_status_banner_placed_before_roster_in_assembly(self):
+        result = _load_fixture()
+        result["discover"]["status"] = "complete-with-known-unknowns"
+        result["discover"]["flags"]["KNOWN_UNKNOWNS"] = ["abstained: x"]
+        kinds = [s["kind"] for s in render.render_run(result)]
+        self.assertIn("status", kinds)
+        self.assertLess(kinds.index("status"), kinds.index("agents"))
+
 
 class TestSynthesisAndAssembly(unittest.TestCase):
     def setUp(self):

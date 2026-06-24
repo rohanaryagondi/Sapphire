@@ -46,6 +46,24 @@ class TestBridge(unittest.TestCase):
         self.assertEqual(validate_run_live(r), [])
         self.assertEqual(r["_via"], "harness-live")
 
+    def test_sequences_forwarded_to_run_live(self):
+        # The bridge must accept and forward `sequences` (the ASO-Design handoff), not drop it.
+        captured = {}
+        import live_engine
+        orig = live_engine.run_live
+
+        def _spy(query, *, sequences=None, ctx=None, **kw):
+            captured["sequences"] = sequences
+            return orig(query, sequences=sequences, ctx=ctx, **kw)
+
+        live_engine.run_live = _spy
+        try:
+            r = bridge.run("screen this ASO", mock=True, sequences=["GCACTTGAATTTCACGTTGT"])
+        finally:
+            live_engine.run_live = orig
+        self.assertEqual(captured["sequences"], ["GCACTTGAATTTCACGTTGT"])
+        self.assertEqual(validate_run_live(r), [])
+
     def test_build_ctx_live_is_none(self):
         self.assertIsNone(bridge.build_ctx(False))
         self.assertIsInstance(bridge.build_ctx(True), dict)
