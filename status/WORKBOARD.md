@@ -20,7 +20,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `crossplatform-test-hardening` | ✅ merged (#22) | Fixed 3 cross-platform test fails (moat dir-name, cp1252). Suite 343 green. | — | [dev-harness](dev-harness.md) |
-| `k1-run-live-service` | assigned (worker, 2nd) | **Keystone.** Freeze the `run_live` output contract + make `serve.py /api/run` serve the harnessed live firm (not the canned path); canned stays as labeled fallback. | `rohan/k1-run-live-service` | [frontend-loka](frontend-loka.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
+| `k1-run-live-service` | ✅ merged (#24) | **Keystone DONE.** `/api/run` now serves the harnessed `run_live` (`via=engine-live`); contract frozen + validated; canned = labeled fallback. Suite 356. | — | [frontend-loka](frontend-loka.md) |
 | `k2-corpus-retrieval` | assigned (worker, 3rd) | **Keystone.** Corpus-first→search-the-gap: Bucket-1 agents read `corpus/<id>/` at run time; corpus facts land in the dossier (traced, provenance), live path only for the gap. | `rohan/k2-corpus-retrieval` | [runtime-harness](runtime-harness.md) · [plan](../docs/superpowers/plans/2026-06-24-overnight-shift.md) |
 
 ## hayes  (`@HayesStewart-QuiverBS`) — contributor

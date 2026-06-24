@@ -11,6 +11,24 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — [overnight] Task K1: run_live service boundary + real /api/run front door (KEYSTONE)  (`main`, PR #24)
+- Built-By: `rohan` (worker) · merged by `rohan` (auditor). **Bedrock — the front-door keystone.**
+- What: froze the `run_live` output contract (`contracts/run_live_schema.md` + `.py` recursive validator +
+  drift test) and made `serve.py`'s `/api/run` **default to the harnessed `live_engine.run_live`** (`via=engine-live`)
+  — the canned scenarios + headless-claude paths kept as explicit labeled fallbacks (`?mode=canned`/`claude`).
+  Honest degradation to a plan-only envelope if run_live ever raises. `live_engine.py`/`orchestrator.py`
+  untouched (additive-only).
+- Gates (auditor, both independent): reviewer **Approved** — contract cross-checked field-by-field vs
+  `live_engine.py` (no invented/missing fields), validator real+recursive, serve routes to the real firm,
+  stdlib-clean, scope-disciplined, non-vacuous tests incl. a real-run conformance test that fails on drift.
+  Gate-5 **PASS** — `/api/run?mode=live` returns a genuine run_live result (fresh engagement, 71 dossier facts,
+  5 partners, real synthesis), NOT canned; validator rejects broken dicts; canned fallback labeled; honest
+  degradation; data boundary intact (harness guards block internal data pre-dispatch). Suite **356 green** (+13).
+- **Significance:** the live harnessed firm is now reachable behind a stable contract — the integration point
+  LOKA plugs into. The "front door is canned, not the live firm" gap is CLOSED.
+- Follow-up (non-blocking nit): add a one-line test locking the canned *success* branch (scenario-hit +
+  `_routed_from_query`) — reviewer verified it manually; worth a test later.
+
 ## 2026-06-24 — [overnight] Task H: cross-platform test hardening  (`main`, PR #22)
 - Built-By: `rohan` (overnight worker session) · merged by `rohan` (auditor session).
 - What: fixed 3 pre-existing cross-platform test failures — moat `test_client` derives the repo-dir name at
