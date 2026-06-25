@@ -116,3 +116,34 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
     result["_mock"] = bool(mock)
     result["_model"] = model or ""
     return result
+
+
+# Captured-scenario directory (real run_live outputs frozen for $0 deterministic replay).
+_SCENARIOS = _ENGINE / "scenarios"
+
+
+def replay(scenario: str = "tsc2_live_run") -> dict:
+    """Load a frozen, real `run_live` capture for **$0 deterministic replay** (no model, no
+    network). The captured dict is a real engagement (real moat + real EMET PMIDs + the live
+    spread) — rendered identically to a live run; provenance/tier/flags preserved verbatim.
+    Stamps `_via="replay"`, `_mock=False` (the facts are real, just frozen). On a missing/bad
+    file returns an honest error envelope (never fabricates)."""
+    import json
+    _ensure_engine_on_path()
+    path = _SCENARIOS / f"{scenario}.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return _error_envelope(f"replay:{scenario}", exc)
+    data["_via"] = "replay"
+    data["_mock"] = False
+    data["_replay"] = True
+    data["_elapsed_s"] = 0.0
+    return data
+
+
+def available_replays() -> list:
+    """List the frozen captured scenarios available for replay."""
+    if not _SCENARIOS.is_dir():
+        return []
+    return sorted(p.stem for p in _SCENARIOS.glob("*_live_run.json"))

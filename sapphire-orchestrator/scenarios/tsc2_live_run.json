@@ -1,0 +1,2274 @@
+{
+  "query": "Is TSC2 a viable target in tuberous sclerosis?",
+  "plan": {
+    "deliverable": "a ranked, de-risked target list",
+    "type": "prioritization",
+    "disease": "tuberous sclerosis / mTORopathy CNS",
+    "modality": "small molecule (default)",
+    "required_fields": [
+      "A Target & mechanism",
+      "B Scientific validation",
+      "C Safety"
+    ],
+    "skip_fields": [
+      "D Clinical & regulatory",
+      "E Competitive, IP & commercial",
+      "F Ecosystem / perception"
+    ],
+    "agents": [
+      {
+        "name": "Internal Science Lead",
+        "why": "owns the moat hypothesis (the #N starting ranks)"
+      },
+      {
+        "name": "EMET Analyst",
+        "why": "biomedical evidence \u2014 genetics, pathway, drug-safety (live)"
+      },
+      {
+        "name": "Q-Models Runner",
+        "why": "quantify binding / selectivity / ADMET on the surfaced candidate"
+      },
+      {
+        "name": "FDA Institutional Memory \u26d4",
+        "why": "dispositive-veto check on the class (prior CRL/withdrawal)"
+      },
+      {
+        "name": "Post-Market Safety",
+        "why": "class FAERS / label liabilities"
+      }
+    ],
+    "panel": [
+      {
+        "lens": "scientific",
+        "persona": "Biotech CSO \u2014 CNS translational (Denali)",
+        "why": "Biotech CSO \u2014 CNS translational (Denali)"
+      },
+      {
+        "lens": "commercial",
+        "persona": "Pharma BD \u2014 rare disease (BioMarin)",
+        "why": "Pharma BD \u2014 rare disease (BioMarin)"
+      },
+      {
+        "lens": "investability",
+        "persona": "Venture GP \u2014 neuro (Third Rock)",
+        "why": "Venture GP \u2014 neuro (Third Rock)"
+      },
+      {
+        "lens": "regulatory",
+        "persona": "Pharma Neuro SVP / ex-FDA (Takeda Neuro)",
+        "why": "Pharma Neuro SVP / ex-FDA (Takeda Neuro)"
+      },
+      {
+        "lens": "adversarial",
+        "persona": "Adversarial Red-Team (always seated)",
+        "why": "institutional \u2014 must stay adversarial; stress every claim"
+      }
+    ]
+  },
+  "priors": [],
+  "discover": {
+    "dossier": [
+      {
+        "value": "EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)",
+        "source": "Quiver moat (CNS_DFP, real)",
+        "tier": "T2",
+        "provenance": "moat-real",
+        "plane": "internal"
+      },
+      {
+        "value": "Tuberous sclerosis complex is an autosomal dominant disorder caused by inactivating mutations in TSC1 (hamartin) or TSC2 (tuberin).",
+        "source": "EMET (PubMed) \u2014 TSC genetics review [PMID:27226234]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb; loss of TSC2 de-represses Rheb -> mTORC1 signaling.",
+        "source": "EMET (PubMed) \u2014 TSC1/TSC2 GAP mechanism [PMID:21329690]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "Alesi et al. (2024) provided a mechanistic refinement of TSC2/mTORC1 with therapeutic implications in TSC2-driven mouse models.",
+        "source": "EMET (PubMed) \u2014 Alesi et al. 2024 [PMID:38195686]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "mTORC1 drives anabolic programs (protein synthesis via S6K1/4E-BP1, lipid biosynthesis, ribosome biogenesis).",
+        "source": "EMET (PubMed) \u2014 mTORC1 anabolic programs [PMID:26060906]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "EXIST-1 phase III (n=117, TSC-associated SEGA): everolimus objective response 35% vs 0% placebo (p<0.0001).",
+        "source": "EMET (PubMed) \u2014 EXIST-1 phase III [PMID:22136276]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "EXIST-2 (Cochrane meta-analysis, 235 pts): everolimus significantly increased >=50% renal AML volume reduction (RR 24.69) vs placebo.",
+        "source": "EMET (PubMed) \u2014 EXIST-2 / Cochrane 2016 [PMID:27409709]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "EXIST-3 phase III: adjunctive everolimus gave a significant dose-dependent reduction in drug-resistant focal seizures in TSC.",
+        "source": "EMET (PubMed) \u2014 EXIST-3 phase III [PMID:29338461]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "Everolimus is FDA/EMA-approved for TSC-associated SEGA and renal AML (and EU-approved for TSC-related seizures).",
+        "source": "EMET (PubMed) \u2014 everolimus TSC approvals [PMID:30069763]",
+        "tier": "T2",
+        "provenance": "emet-live",
+        "plane": "external"
+      },
+      {
+        "value": "",
+        "source": "Q-Models",
+        "tier": "T2",
+        "provenance": "qmodels",
+        "plane": "external"
+      },
+      {
+        "value": "FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.",
+        "source": "BrainStorm Cell Therapeutics press release; FDA CRL Nov 2022",
+        "tier": "T2",
+        "flag": "DIVERGENCE",
+        "provenance": "fda-primary",
+        "plane": "external"
+      },
+      {
+        "value": "FDA ALS drug-development guidance (Sept 2019): trial designs should minimize placebo-only exposure and target core motor aspects (weakness/survival).",
+        "source": "FDA / Federal Register 2019-20629",
+        "tier": "T1",
+        "provenance": "fda-primary",
+        "plane": "external"
+      },
+      {
+        "value": "No TSC2-specific FDA precedent found in corpus. Gap areas: mTOR inhibitor history in tuberous sclerosis, TS-specific endpoint guidance, pediatric CNS seizure development precedent.",
+        "source": "Corpus gap analysis",
+        "tier": "T3",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "fda-primary",
+        "plane": "external"
+      },
+      {
+        "value": "FDA issued a Refusal to File letter for NurOwn (autologous MSC-NTF cells) in ALS; the BLA did not meet the threshold of substantial evidence and the pivotal Phase 3 missed its primary endpoint.",
+        "source": "BrainStorm Cell Therapeutics press release (PRNewswire)",
+        "tier": "T2",
+        "url": "https://www.prnewswire.com/news-releases/brainstorm-cell-therapeutics-receives-refusal-to-file-letter-from-fda-for-its-new-biologics-license-application-for-nurown-for-the-treatment-of-als-301673753.html",
+        "provenance": "corpus",
+        "plane": "external",
+        "from_corpus": true,
+        "field": "fda-institutional-memory"
+      },
+      {
+        "value": "FDA's final ALS drug-development guidance (Sept 2019) advises trial designs that minimize placebo-only exposure and addresses muscle weakness and survival as the disease's core motor aspects.",
+        "source": "FDA / Federal Register 2019-20629",
+        "tier": "T1",
+        "url": "https://www.federalregister.gov/documents/2019/09/24/2019-20629/amyotrophic-lateral-sclerosis-developing-drugs-for-treatment-guidance-for-industry-availability",
+        "provenance": "corpus",
+        "plane": "external",
+        "from_corpus": true,
+        "field": "fda-institutional-memory"
+      },
+      {
+        "value": "Foundational TSC2 gene patent US6207374B1 ('Tuberous sclerosis 2 gene and uses thereof') is expired as of 2015; no blocking IP on basic TSC2 identification/diagnostics.",
+        "source": "US6207374B1, Google Patents",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Cold Spring Harbor Laboratory / Massachusetts General Hospital holds WO2018213618A1 ('Gene therapy for tuberous sclerosis'), covering AAV-mediated TSC2 replacement with condensed tuberin (cTuberin) to overcome ~5.4 kb packaging constraint. US grant US11958887B2. Estimated expiry 2038-2040.",
+        "source": "WO2018213618A1, US11958887B2, Google Patents",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "BridgeBio Gene Therapy Research has pending patents (Canada 2022, US 2024) on recombinant AAV with engineered condensed tuberin (cTuberin/micro-Tuberin) for TSC2 gene therapy. Most advanced gene therapy IP in this space. Estimated expiry 2042-2044 if granted.",
+        "source": "BridgeBio patent filings, PatSnap, Pharmaceutical Technology",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Everolimus (Afinitor, Novartis rapalog) is FDA-approved for TSC-related subependymal giant cell astrocytomas (SEGAs, 2009) and renal angiomyolipomas. Orange Book listed. Composition/method patents US11406623B2, US12102619B2, US11160795B2. Estimated expiry 2032-2034.",
+        "source": "US11406623B2, US12102619B2, Orange Book listings, Google Patents",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Multiple independent assignees (Anaclia/Janssen, Delos Pharmaceuticals, Eobian Pharmaceuticals) are developing next-generation rapalogues with mTORC1/mTORC2 selectivity for TSC, focal cortical dysplasia, and LAM. Patents pending/granted 2022-2024. No single blocking patent identified.",
+        "source": "PatSnap, Google Patents, Pharmaceutical Technology",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "ASO approach targeting TSC2 pre-mRNA splicing / haploinsufficiency was pursued by Cold Spring Harbor Laboratory (Canada 2017, EP 2018 patent marked inactive). Suggests prosecution challenges; US patent status unclear. No active competitor ASO patents on TSC2 identified.",
+        "source": "PatSnap, search results on ASO patent considerations",
+        "tier": "T2",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "No dispositive blocking patents identified. TSC2 landscape is crowded (foundational gene patents expired; multiple modalities in flight) but clearable. Small-molecule mTOR inhibition broadly clearable; AAV gene therapy requires design-around or licensing of condensed tuberin IP (BridgeBio/Cold Spring Harbor); ASO path less mature.",
+        "source": "Integrated analysis of USPTO, Google Patents, PatSnap, Lens.org sources",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "BridgeBio TSC2 gene therapy patents are pending (2024 US filings, 2022 Canada filing). Grant status and prosecution timeline not yet detailed. Requires monitoring of USPTO PAIR / Espacenet status.",
+        "source": "BridgeBio patent filings, Pharmaceutical Technology patent activity reports",
+        "tier": "T3",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Specific freedom-to-operate depth for condensed tuberin designs unclear: whether existing general AAV capsid patents or other viral vector IP creates additional clearance burdens beyond BridgeBio/Cold Spring Harbor molecule-specific patents requires FTO legal counsel assessment.",
+        "source": "Patent landscape analysis, patent considerations in gene therapy literature",
+        "tier": "T3",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "TSC2/tuberous sclerosis regulatory divergence not in local corpus (therapeutic-breadth gap: corpus covers Alzheimer's + DMD only, retrieval window 2026-06-24)",
+        "source": "sapphire-orchestrator/corpus/global-regulatory-divergence/manifest.md",
+        "tier": "T2",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "No FDA vs. EMA/MHRA/PMDA/NMPA/TGA/Health Canada/Swissmedic regulatory divergences on TSC2 inhibitors in tuberous sclerosis identified from the pilot corpus",
+        "source": "sapphire-orchestrator/corpus/global-regulatory-divergence/index.jsonl",
+        "tier": "T2",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "EXIST-3 (NCT01713946) Phase III trial: 366 patients randomized across 99 centers in 25 countries; primary endpoint met\u2014everolimus (mTOR inhibitor downstream of TSC2) reduced seizure frequency 31.7% at week 18, 46.7% at 1 year, 56.9% at 2 years vs placebo in TSC-associated refractory seizures.",
+        "source": "ClinicalTrials.gov + The Lancet published primary results",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "EXIST-3 adverse events: 40.2% grade 3/4 AE rate; 13% discontinued due to AEs. Most common serious AEs: pneumonia (10.5%), seizure (5.0%), status epilepticus (4.2%); 2 deaths suspected treatment-related (pneumonia, septic shock).",
+        "source": "The Lancet EXIST-3 main results + Epilepsia extension results",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "NCT05104983 (STOP-TSC2B): Phase II FDA-funded (OOPD) randomized, double-blind, placebo-controlled trial of sirolimus (mTOR inhibitor) to prevent/delay seizure onset in TSC infants (0\u20136 months). Status: active but not recruiting. Mechanism-based disease prevention approach.",
+        "source": "ClinicalTrials.gov NCT05104983",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "TSC2 genetic testing confirms diagnosis in 85\u201390% of clinically diagnosed TSC patients; pathogenic TSC2 variant alone is sufficient diagnostic criterion since 2012 (per clinical standards).",
+        "source": "European Journal of Human Genetics; NCBI GTR",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "EXIST-3 protocol amendment timeline: primary analysis data cutoff 2015-10-02 (efficacy bar met); Amendment 3 issued 2016-03-25 extending trial post-positive interim; 279/366 patients continued to extension phase.",
+        "source": "ClinicalTrials.gov amendment records + Lancet/Epilepsia publications",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "NCT03082833 (AZD2014 in TSC1/2-mutated gastric cancer): Phase II trial terminated for lack of efficacy (2019-05). Note: TSC1/2 mutation in oncology context (gastric cancer), not primary CNS TSC indication; relevance to CNS target unclear.",
+        "source": "ClinicalTrials.gov NCT03082833",
+        "flag": "DIVERGENCE",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T2",
+        "value": "Paxalisib (PI3K/mTOR dual inhibitor with BBB penetration) licensed by Kazia/Sovargen for intractable seizures in TSC; Phase 2 clinical trial anticipated in latter half of 2024, addressing CNS-specific TSC phenotype.",
+        "source": "PR Newswire (2024); Kazia Therapeutics press release",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T3",
+        "value": "PROTECT study (ongoing Phase IIb): randomized, observer-blind trial of pre-emptive mTOR inhibitor treatment in TSC infants <4 months of age; endpoints include long-term neuropsychologic outcomes. Signals early-intervention hypothesis; results not yet published.",
+        "source": "NCBI PMC; study protocol",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T3",
+        "value": "No published clinical trials directly target TSC2 restoration or reconstitution; all clinical development targets mTOR pathway downstream. TSC2 loss-of-function is the genetic driver, but TSC2 gene/protein restoration has not entered clinical development.",
+        "source": "Comprehensive ClinicalTrials.gov search (absence of TSC2-targeting approaches)",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T3",
+        "value": "Published EXIST-3 and other TSC trials do not report TSC2 pathway engagement biomarkers (pTSC2, TSC complex activity, mTORC1 inhibition in CSF/brain tissue); efficacy inferred from seizure-frequency reduction only, not mechanistic confirmation in target tissue.",
+        "source": "Published trial results in Lancet, Epilepsia, Neurology journals (absence of biomarker reporting)",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T3",
+        "value": "EXIST-3 and NCT05104983 enroll unselected on TSC1 or TSC2 mutation but do not stratify efficacy by TSC2 mutation subclass (haploinsufficiency, dominant-negative, frameshift); response heterogeneity possible but unpublished.",
+        "source": "Published trial protocols and results (absence of mutation subtype stratification)",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T3",
+        "value": "Long-term CNS outcomes (cognitive/developmental decline, brain atrophy, behavioral comorbidities) in TSC2 patients not addressed in published mTOR-inhibitor trials; prevention trials (STOP-TSC2B, PROTECT) may yield data, but results remain unpublished.",
+        "source": "Published trial endpoints (focus on seizure reduction, not neurodevelopment)",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "tier": "T1",
+        "value": "TSC2 is supported as a viable CNS target: class-effect efficacy of mTOR inhibition downstream of TSC2 demonstrated in large Phase III trial (EXIST-3, 366 patients, 99 centers, 25 countries); FDA-funded prevention trial (NCT05104983) ongoing; emerging PI3K/mTOR dual inhibitors in development. Safety profile meaningful but tolerable.",
+        "source": "Synthesis of EXIST-3 results + ClinicalTrials.gov active trial roster",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Approved mTOR inhibitors for TSC: sirolimus (Rapamune, TSC-associated angiomyolipoma/LAM) and everolimus (Afinitor, TSC-associated seizures, SEGA)",
+        "source": "FDA approved indications",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Class safety signal \u2014 mTOR inhibitor adverse events: hyperglycemia, hyperlipidemia, immunosuppression (infections, fungal pneumonia), stomatitis, thrombocytopenia, pneumonitis (rare but serious)",
+        "source": "FDA drug labels, approved summary of product characteristics",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Trial-to-real-world gap: immunosuppression-related infections emerge as dominant signal post-approval in immunocompromised or high-risk subgroups; rates exceed trial expectations in transplant/immunosuppressed cohorts",
+        "source": "Published case series, post-market surveillance literature",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Pulmonary complications (pneumonitis, pulmonary hypertension) rare but reportable in TSC cohorts; LAM-mTOR inhibitor interaction not fully characterized (LAM prevalence 30\u201350% females with TSC)",
+        "source": "TSC specialist case reports, pulmonary registries",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Known unknowns: long-term renal function trajectory in pediatric TSC (sirolimus/everolimus approved off-label in children); cumulative metabolic derangement (glucose/lipid) in extended therapy",
+        "source": "Thin post-market pediatric data, observational cohorts",
+        "tier": "T2",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "FAERS disproportionality data (live) and PMR/PMC commitments not accessed; live EMET/FAERS pull required for full real-time signal landscape",
+        "source": "Data boundary: structured query to live FAERS/FDA MedWatch required",
+        "tier": "T3",
+        "flag": "DIVERGENCE",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures, subependymal giant cell astrocytomas (SEGAs), renal angiomyolipomas (AMLs), and lymphangioleiomyomatosis (LAM)",
+        "source": "FDA regulatory database",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "CMS provides NCD coverage for everolimus in TSC-associated indications (seizures, AMLs, SEGAs) under Medicare Part B",
+        "source": "CMS Coverage Database",
+        "tier": "T1",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Everolimus pricing: ~$4,200\u2013$6,500/month depending on indication and site of care; covered under Part D formularies (Express Scripts, CVS/Caremark standard tier or specialty tier)",
+        "source": "CMS Part D spending data, PBM formulary publications",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "ICER has not conducted formal cost-effectiveness assessment for everolimus in TSC (approved pre-routine ICER assessment era, ~2009); no published NICE TA on TSC-specific mTOR inhibition",
+        "source": "ICER report archive, NICE technology appraisals",
+        "tier": "T2",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "flag": "KNOWN_UNKNOWN",
+        "value": "TSC2-specific restoration or gene-therapy approaches lack established payer precedent; cost-effectiveness vs. standard mTOR inhibition uncharted",
+        "source": "Market access landscape",
+        "tier": "T3",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "flag": "KNOWN_UNKNOWN",
+        "value": "Reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus (combination-product coverage precedent thin in TSC)",
+        "source": "Payer formulary and combination-product rules",
+        "tier": "T3",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Corpus check: TSC2 / tuberous sclerosis has ZERO coverage in the local financial-investor corpus (index.jsonl: 6 cards, all schizophrenia/bipolar/MDD). Explicit gap #5 in manifest: 'neurodegeneration/rare-CNS deal intel thin'.",
+        "source": "sapphire-orchestrator/corpus/financial-investor/ (manifest.md \u00a7Known gaps)",
+        "tier": "T4",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "Gap-search procedure: The Financial-Investor agent would live-search SEC EDGAR (10-K/10-Q/8-K/S-1 XBRL filings, Form 4 insider trades), BioPharma Catalyst calendar (trial events/readouts), ClinicalTrials.gov (TSC2-targeted programs), company IR press releases, and deal databases (Crunchbase/PitchBook) for: (1) public company TSC2 programs by name/CAS/dev code; (2) licensing/partnership deal structures (upfront/milestone splits encoding implied PoS); (3) candid 10-K risk-factor language on mTOR/rare-neuro class; (4) private-company TSC2 funding / pre-clinical programs with thin disclosure. This pass would classify findings as T1 (SEC primary), T2 (IR/press), or T4 (known-unknown if private/undisclosed).",
+        "source": "financial-investor.md \u00a7Procedure Step 3 ('Search the gap only')",
+        "tier": "T4",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "TSC2 / tuberous sclerosis context (scientific, not financial): rare autosomal-dominant neurodevelopmental disorder; mTORC1 hyperactivation is the core pathology; mTOR inhibitors (e.g. sirolimus/everolimus) are standard-of-care for seizures and benign tumors but CNS penetration is limited and side-effect profile remains rough for long-term pediatric use. A next-gen TSC-targeting molecule would compete with generic mTOR inhibitors + trial-stage selective GATOR/DEPDC5 inhibitors. Financial viability depends on: (a) clinical differentiation over generic sirolimus; (b) rare-disease reimbursement (EU ODD, US Orphan Drug); (c) company runway / VC/pharma backing for expensive rare-disease development.",
+        "source": "domain knowledge (not in corpus; scientific context for E2 assessment)",
+        "tier": "T4",
+        "flag": "KNOWN_UNKNOWN",
+        "provenance": "semantic-web",
+        "plane": "external"
+      },
+      {
+        "value": "TSC2 gnomAD constraint: pLI 1.00, LOEUF 0.20, missense Z -0.08 (loss-of-function intolerant)",
+        "source": "gnomAD v4 constraint (GraphQL)",
+        "tier": "T1",
+        "provenance": "gnomad",
+        "plane": "external"
+      },
+      {
+        "value": "TSC2 GTEx tissue expression (gtex_v8, median TPM): top brain region Brain Cerebellum 133.2; highest-expressing of 54 tissues (CNS-enriched)",
+        "source": "GTEx Portal v2 (gtex_v8 medianGeneExpression)",
+        "tier": "T1",
+        "provenance": "gtex",
+        "plane": "external"
+      },
+      {
+        "value": "TSC2 (UniProt P49815) InterPro: 8 entries \u2014 domains: Rap/Ran-GAP domain (IPR000331), Tuberin-type domain (IPR018515), Tuberin, N-terminal (IPR024584); families: Tuberin (IPR003913), Tuberin/Ral GTPase-activating protein subunit alpha (IPR027107)",
+        "source": "InterPro (EBI)",
+        "tier": "T1",
+        "provenance": "interpro",
+        "plane": "external"
+      },
+      {
+        "value": "g:Profiler enrichment for TSC2 (hsapiens): 6 significant terms; top \u2014 TSC1-TSC2 complex (GO:0033596, p=3.0e-02); Inhibition of TSC complex formation by PKB (REAC:R-HSA-165181, p=3.7e-02); TSC1-TSC2 complex (CORUM:75, p=5.0e-02); TSC2-HERC1 complex (CORUM:6532, p=5.0e-02); TSC1-TSC2 complex (CORUM:7157, p=5.0e-02)",
+        "source": "g:Profiler g:GOSt (hsapiens)",
+        "tier": "T2",
+        "provenance": "gprofiler",
+        "plane": "external"
+      }
+    ],
+    "flags": {
+      "VETO": [],
+      "DIVERGENCE": [
+        "FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.",
+        "NCT03082833 (AZD2014 in TSC1/2-mutated gastric cancer): Phase II trial terminated for lack of efficacy (2019-05). Note: TSC1/2 mutation in oncology context (gastric cancer), not primary CNS TSC indication; relevance to CNS target unclear.",
+        "FAERS disproportionality data (live) and PMR/PMC commitments not accessed; live EMET/FAERS pull required for full real-time signal landscape"
+      ],
+      "KNOWN_UNKNOWNS": []
+    },
+    "status": "complete",
+    "agents": [
+      {
+        "id": "internal-science-lead",
+        "status": "ok",
+        "provenance": "moat-real"
+      },
+      {
+        "id": "emet-runner",
+        "status": "ok",
+        "provenance": "emet-live"
+      },
+      {
+        "id": "q-models-runner",
+        "status": "ok",
+        "provenance": "qmodels"
+      },
+      {
+        "id": "fda-institutional-memory",
+        "status": "ok",
+        "provenance": "fda-primary"
+      },
+      {
+        "id": "patent-ip",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "global-regulatory-divergence",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "clinical-trial-registry",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "post-market-safety",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "payer",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "financial",
+        "status": "ok",
+        "provenance": "semantic-web"
+      },
+      {
+        "id": "aso-tox",
+        "status": "ok",
+        "provenance": "aso-tox"
+      },
+      {
+        "id": "gnomad-constraint",
+        "status": "ok",
+        "provenance": "gnomad"
+      },
+      {
+        "id": "gtex-expression",
+        "status": "ok",
+        "provenance": "gtex"
+      },
+      {
+        "id": "interpro-domains",
+        "status": "ok",
+        "provenance": "interpro"
+      },
+      {
+        "id": "geneset-enrichment",
+        "status": "ok",
+        "provenance": "gprofiler"
+      }
+    ]
+  },
+  "consult": {
+    "round1": [
+      {
+        "persona": "Dr. Ryan Watts, CSO, Denali Therapeutics",
+        "stance": "conditional",
+        "conviction": 4,
+        "rationale": "The rescue cosine scores\u2014Isorhamnetin 0.25, Momelotinib 0.328\u2014are non-zero but modest; translational biology rarely yields perfect phenotypic matches. The TSC1-TSC2 heterodimer mechanism as a GAP for Rheb is well-characterized, and Everolimus FDA approval for TSC-associated seizures anchors target credibility. However, EXIST-3 data cutoff (2015) predates modern sequencing and validation toolsets. Critical gap: BBB penetration is the rate-limiting gate in CNS\u2014CNS kinetics must be transparent before IND, regardless of rescue scores.",
+        "top_risk": "Modest phenotypic rescue signals (cos 0.25\u20130.328) plus aging efficacy data (2015) may not sustain phase 2 power if enrolling TSC2-driven epilepsy refractory to everolimus.",
+        "ask": "What is the lead compound's brain-to-plasma ratio (Kp) and CNS exposure in GLP studies?",
+        "fact_claims": [],
+        "fact_requests": [
+          "Momelotinib CLogP, TPSA, CNS MPO, and mouse/rat Kp from published or internal GLP studies",
+          "Isorhamnetin oral bioavailability in primates and proposed formulation strategy",
+          "EMA/PMDA regulatory meeting records on TSC2-as-indication precedent for small-molecule rescue",
+          "Payer bundle constraints (CMS, Aetna, UnitedHealth) for adjunctive therapy if everolimus remains background therapy"
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Pharma BD Lead \u2014 Rare Disease (BioMarin)",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "The dossier shows Isorhamnetin and Momelotinib opposing the TSC2 KO EP-signature with meaningful potency. However, Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures already owns clinical access. The dossier flags reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus\u2014that kills margin. Since TSC2-specific restoration or gene-therapy approaches lack established payer precedent, we pioneer market access from scratch: high upside, but execution-dependent.",
+        "fact_claims": [
+          {
+            "claim": "Isorhamnetin opposes TSC2 KO signature in vitro",
+            "cite": "Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.25"
+          },
+          {
+            "claim": "Momelotinib opposes TSC2 KO signature in vitro",
+            "cite": "Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328"
+          },
+          {
+            "claim": "Everolimus has FDA approval for TSC-associated seizures",
+            "cite": "Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures, subependym"
+          },
+          {
+            "claim": "Reimbursement complexity arises if positioned adjunctively",
+            "cite": "Reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus "
+          },
+          {
+            "claim": "TSC2-specific restoration approaches lack payer precedent",
+            "cite": "TSC2-specific restoration or gene-therapy approaches lack established payer prec"
+          }
+        ],
+        "ask": "What is clinical efficacy and tolerability versus Everolimus in seizure control and durability?",
+        "top_risk": "Adjunctive positioning collapses economics; monotherapy differentiation claim doesn't survive Phase 2 scrutiny.",
+        "fact_requests": [
+          "Phase 2 efficacy and safety data versus Everolimus",
+          "Payer coverage precedent for adjunctive mTOR inhibitor combinations",
+          "Manufacturing cost structure to support differentiated competitive pricing"
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Venture GP \u2014 neuro (Third Rock)",
+        "lens": "investability",
+        "stance": "hold",
+        "conviction": 0,
+        "rationale": "abstained (guardrail-violation)",
+        "fact_claims": [],
+        "provenance": "persona-judgment",
+        "status": "abstained"
+      },
+      {
+        "persona": "Pharma Neuro SVP, ex-FDA (Takeda Neuro)",
+        "stance": "conditional",
+        "conviction": 3,
+        "rationale": "TSC2 restoration sits on a well-characterized mechanism (TSC1-TSC2 GAP function for Rheb), and everolimus's FDA approval for TSC-associated seizures establishes regulatory precedent for TSC-focused interventions. The absence of FDA/EMA/PMDA/MHRA/TGA regulatory divergence is a clean signal. However, adjunctive positioning to everolimus triggers reimbursement complexity, and TSC2-specific restoration approaches lack established payer precedent\u2014both require explicit strategy before IND.",
+        "top_risk": "Payer reluctance to reimburse as adjunctive if unable to demonstrate superiority or meaningful differentiation from everolimus in the same indication.",
+        "fact_claims": [
+          {
+            "claim": "Everolimus (mTOR inhibitor) is FDA-approved for TSC-associated seizures, establishing regulatory precedent for TSC-focused interventions",
+            "cite": "Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures, subependym"
+          },
+          {
+            "claim": "The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb, and loss of function drives TSC pathology",
+            "cite": "The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb; loss of"
+          },
+          {
+            "claim": "No FDA vs. EMA/MHRA/PMDA/NMPA/TGA/Health Canada/Swissmedic regulatory divergence exists for TSC therapies",
+            "cite": "No FDA vs. EMA/MHRA/PMDA/NMPA/TGA/Health Canada/Swissmedic regulatory divergence"
+          },
+          {
+            "claim": "Adjunctive positioning to everolimus creates reimbursement complexity for TSC2-specific therapies",
+            "cite": "Reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus "
+          },
+          {
+            "claim": "TSC2-specific restoration or gene-therapy approaches lack established payer precedent",
+            "cite": "TSC2-specific restoration or gene-therapy approaches lack established payer prec"
+          }
+        ],
+        "fact_requests": [
+          "Comparative efficacy data (TSC2-restoration candidates vs. everolimus) in target population",
+          "Breakthrough designation strategy if applicable",
+          "CMC and manufacturability risk assessment for scale"
+        ],
+        "provenance": "persona-judgment",
+        "status": "ok"
+      },
+      {
+        "persona": "Adversarial Red-Team (always seated)",
+        "lens": "adversarial",
+        "stance": "hold",
+        "conviction": 0,
+        "rationale": "abstained (guardrail-violation)",
+        "fact_claims": [],
+        "provenance": "persona-judgment",
+        "status": "abstained"
+      }
+    ]
+  },
+  "synthesize": {
+    "recommendation": "Conditional advance \u2014 3 conditional verdict(s). Address open items before IND filing.",
+    "confidence": "medium",
+    "proposed_experiment": "Run orthogonal in vivo validation for TSC2 in disease-relevant model.",
+    "entities": {
+      "genes": [
+        "TSC2"
+      ],
+      "smiles": [],
+      "diseases": [],
+      "drugs": []
+    }
+  },
+  "engagement_id": "eng_6444d0e8",
+  "reflection": {
+    "engagement_id": "eng_6444d0e8",
+    "written": 65,
+    "records": [
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.795154+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_2df7c9c2"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.795593+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_6dab859d"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.795729+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_3fe6eb6c"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.795851+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_b1022eea"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.795975+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_a5451847"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.796094+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ad1bfb91"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.796210+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ab9807a6"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "moat-real",
+        "tier": "T2",
+        "payload": {
+          "value": "Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)",
+          "source": "Quiver moat (CNS_DFP, real)"
+        },
+        "ts": "2026-06-25T06:14:31.796324+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_d47648b1"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "Tuberous sclerosis complex is an autosomal dominant disorder caused by inactivating mutations in TSC1 (hamartin) or TSC2 (tuberin).",
+          "source": "EMET (PubMed) \u2014 TSC genetics review [PMID:27226234]"
+        },
+        "ts": "2026-06-25T06:14:31.796437+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_6f902a87"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb; loss of TSC2 de-represses Rheb -> mTORC1 signaling.",
+          "source": "EMET (PubMed) \u2014 TSC1/TSC2 GAP mechanism [PMID:21329690]"
+        },
+        "ts": "2026-06-25T06:14:31.796573+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ab8a92cb"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "Alesi et al. (2024) provided a mechanistic refinement of TSC2/mTORC1 with therapeutic implications in TSC2-driven mouse models.",
+          "source": "EMET (PubMed) \u2014 Alesi et al. 2024 [PMID:38195686]"
+        },
+        "ts": "2026-06-25T06:14:31.796722+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_5b5f7199"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "mTORC1 drives anabolic programs (protein synthesis via S6K1/4E-BP1, lipid biosynthesis, ribosome biogenesis).",
+          "source": "EMET (PubMed) \u2014 mTORC1 anabolic programs [PMID:26060906]"
+        },
+        "ts": "2026-06-25T06:14:31.796847+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_f5723d1f"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "EXIST-1 phase III (n=117, TSC-associated SEGA): everolimus objective response 35% vs 0% placebo (p<0.0001).",
+          "source": "EMET (PubMed) \u2014 EXIST-1 phase III [PMID:22136276]"
+        },
+        "ts": "2026-06-25T06:14:31.796987+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_a0cf9415"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "EXIST-2 (Cochrane meta-analysis, 235 pts): everolimus significantly increased >=50% renal AML volume reduction (RR 24.69) vs placebo.",
+          "source": "EMET (PubMed) \u2014 EXIST-2 / Cochrane 2016 [PMID:27409709]"
+        },
+        "ts": "2026-06-25T06:14:31.797107+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_5e00017e"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "EXIST-3 phase III: adjunctive everolimus gave a significant dose-dependent reduction in drug-resistant focal seizures in TSC.",
+          "source": "EMET (PubMed) \u2014 EXIST-3 phase III [PMID:29338461]"
+        },
+        "ts": "2026-06-25T06:14:31.797231+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_bfbd6944"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "emet-live",
+        "tier": "T2",
+        "payload": {
+          "value": "Everolimus is FDA/EMA-approved for TSC-associated SEGA and renal AML (and EU-approved for TSC-related seizures).",
+          "source": "EMET (PubMed) \u2014 everolimus TSC approvals [PMID:30069763]"
+        },
+        "ts": "2026-06-25T06:14:31.797351+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_70895212"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "qmodels",
+        "tier": "T2",
+        "payload": {
+          "value": "",
+          "source": "Q-Models"
+        },
+        "ts": "2026-06-25T06:14:31.797474+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_823ce86d"
+      },
+      {
+        "type": "divergence",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "fda-primary",
+        "tier": "T2",
+        "payload": {
+          "value": "FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.",
+          "source": "BrainStorm Cell Therapeutics press release; FDA CRL Nov 2022"
+        },
+        "ts": "2026-06-25T06:14:31.797576+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_8d3fd4a7"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "fda-primary",
+        "tier": "T1",
+        "payload": {
+          "value": "FDA ALS drug-development guidance (Sept 2019): trial designs should minimize placebo-only exposure and target core motor aspects (weakness/survival).",
+          "source": "FDA / Federal Register 2019-20629"
+        },
+        "ts": "2026-06-25T06:14:31.797721+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_bab5b953"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "fda-primary",
+        "tier": "T3",
+        "payload": {
+          "value": "No TSC2-specific FDA precedent found in corpus. Gap areas: mTOR inhibitor history in tuberous sclerosis, TS-specific endpoint guidance, pediatric CNS seizure development precedent.",
+          "source": "Corpus gap analysis"
+        },
+        "ts": "2026-06-25T06:14:31.797841+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_be563ac5"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Foundational TSC2 gene patent US6207374B1 ('Tuberous sclerosis 2 gene and uses thereof') is expired as of 2015; no blocking IP on basic TSC2 identification/diagnostics.",
+          "source": "US6207374B1, Google Patents"
+        },
+        "ts": "2026-06-25T06:14:31.797966+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_f3a99909"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Cold Spring Harbor Laboratory / Massachusetts General Hospital holds WO2018213618A1 ('Gene therapy for tuberous sclerosis'), covering AAV-mediated TSC2 replacement with condensed tuberin (cTuberin) to overcome ~5.4 kb packaging constraint. US grant US11958887B2. Estimated expiry 2038-2040.",
+          "source": "WO2018213618A1, US11958887B2, Google Patents"
+        },
+        "ts": "2026-06-25T06:14:31.798087+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_8ce4d066"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "BridgeBio Gene Therapy Research has pending patents (Canada 2022, US 2024) on recombinant AAV with engineered condensed tuberin (cTuberin/micro-Tuberin) for TSC2 gene therapy. Most advanced gene therapy IP in this space. Estimated expiry 2042-2044 if granted.",
+          "source": "BridgeBio patent filings, PatSnap, Pharmaceutical Technology"
+        },
+        "ts": "2026-06-25T06:14:31.798227+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_29d6f7e0"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Everolimus (Afinitor, Novartis rapalog) is FDA-approved for TSC-related subependymal giant cell astrocytomas (SEGAs, 2009) and renal angiomyolipomas. Orange Book listed. Composition/method patents US11406623B2, US12102619B2, US11160795B2. Estimated expiry 2032-2034.",
+          "source": "US11406623B2, US12102619B2, Orange Book listings, Google Patents"
+        },
+        "ts": "2026-06-25T06:14:31.798359+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_bf429bae"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Multiple independent assignees (Anaclia/Janssen, Delos Pharmaceuticals, Eobian Pharmaceuticals) are developing next-generation rapalogues with mTORC1/mTORC2 selectivity for TSC, focal cortical dysplasia, and LAM. Patents pending/granted 2022-2024. No single blocking patent identified.",
+          "source": "PatSnap, Google Patents, Pharmaceutical Technology"
+        },
+        "ts": "2026-06-25T06:14:31.798492+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_edb76dbf"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "ASO approach targeting TSC2 pre-mRNA splicing / haploinsufficiency was pursued by Cold Spring Harbor Laboratory (Canada 2017, EP 2018 patent marked inactive). Suggests prosecution challenges; US patent status unclear. No active competitor ASO patents on TSC2 identified.",
+          "source": "PatSnap, search results on ASO patent considerations"
+        },
+        "ts": "2026-06-25T06:14:31.798649+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0d66be70"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "No dispositive blocking patents identified. TSC2 landscape is crowded (foundational gene patents expired; multiple modalities in flight) but clearable. Small-molecule mTOR inhibition broadly clearable; AAV gene therapy requires design-around or licensing of condensed tuberin IP (BridgeBio/Cold Spring Harbor); ASO path less mature.",
+          "source": "Integrated analysis of USPTO, Google Patents, PatSnap, Lens.org sources"
+        },
+        "ts": "2026-06-25T06:14:31.798783+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_02965ba4"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "BridgeBio TSC2 gene therapy patents are pending (2024 US filings, 2022 Canada filing). Grant status and prosecution timeline not yet detailed. Requires monitoring of USPTO PAIR / Espacenet status.",
+          "source": "BridgeBio patent filings, Pharmaceutical Technology patent activity reports"
+        },
+        "ts": "2026-06-25T06:14:31.798927+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0e159005"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "Specific freedom-to-operate depth for condensed tuberin designs unclear: whether existing general AAV capsid patents or other viral vector IP creates additional clearance burdens beyond BridgeBio/Cold Spring Harbor molecule-specific patents requires FTO legal counsel assessment.",
+          "source": "Patent landscape analysis, patent considerations in gene therapy literature"
+        },
+        "ts": "2026-06-25T06:14:31.799055+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_a00cbd4a"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "TSC2/tuberous sclerosis regulatory divergence not in local corpus (therapeutic-breadth gap: corpus covers Alzheimer's + DMD only, retrieval window 2026-06-24)",
+          "source": "sapphire-orchestrator/corpus/global-regulatory-divergence/manifest.md"
+        },
+        "ts": "2026-06-25T06:14:31.799191+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_cd5b1207"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "No FDA vs. EMA/MHRA/PMDA/NMPA/TGA/Health Canada/Swissmedic regulatory divergences on TSC2 inhibitors in tuberous sclerosis identified from the pilot corpus",
+          "source": "sapphire-orchestrator/corpus/global-regulatory-divergence/index.jsonl"
+        },
+        "ts": "2026-06-25T06:14:31.799313+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_5276124d"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "EXIST-3 (NCT01713946) Phase III trial: 366 patients randomized across 99 centers in 25 countries; primary endpoint met\u2014everolimus (mTOR inhibitor downstream of TSC2) reduced seizure frequency 31.7% at week 18, 46.7% at 1 year, 56.9% at 2 years vs placebo in TSC-associated refractory seizures.",
+          "source": "ClinicalTrials.gov + The Lancet published primary results"
+        },
+        "ts": "2026-06-25T06:14:31.799439+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_fd0a3873"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "EXIST-3 adverse events: 40.2% grade 3/4 AE rate; 13% discontinued due to AEs. Most common serious AEs: pneumonia (10.5%), seizure (5.0%), status epilepticus (4.2%); 2 deaths suspected treatment-related (pneumonia, septic shock).",
+          "source": "The Lancet EXIST-3 main results + Epilepsia extension results"
+        },
+        "ts": "2026-06-25T06:14:31.799600+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0be5f978"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "NCT05104983 (STOP-TSC2B): Phase II FDA-funded (OOPD) randomized, double-blind, placebo-controlled trial of sirolimus (mTOR inhibitor) to prevent/delay seizure onset in TSC infants (0\u20136 months). Status: active but not recruiting. Mechanism-based disease prevention approach.",
+          "source": "ClinicalTrials.gov NCT05104983"
+        },
+        "ts": "2026-06-25T06:14:31.799731+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0b492ca8"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "TSC2 genetic testing confirms diagnosis in 85\u201390% of clinically diagnosed TSC patients; pathogenic TSC2 variant alone is sufficient diagnostic criterion since 2012 (per clinical standards).",
+          "source": "European Journal of Human Genetics; NCBI GTR"
+        },
+        "ts": "2026-06-25T06:14:31.799862+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0acea397"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "EXIST-3 protocol amendment timeline: primary analysis data cutoff 2015-10-02 (efficacy bar met); Amendment 3 issued 2016-03-25 extending trial post-positive interim; 279/366 patients continued to extension phase.",
+          "source": "ClinicalTrials.gov amendment records + Lancet/Epilepsia publications"
+        },
+        "ts": "2026-06-25T06:14:31.799992+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_27390c54"
+      },
+      {
+        "type": "divergence",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "NCT03082833 (AZD2014 in TSC1/2-mutated gastric cancer): Phase II trial terminated for lack of efficacy (2019-05). Note: TSC1/2 mutation in oncology context (gastric cancer), not primary CNS TSC indication; relevance to CNS target unclear.",
+          "source": "ClinicalTrials.gov NCT03082833"
+        },
+        "ts": "2026-06-25T06:14:31.800116+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_b2d980e3"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Paxalisib (PI3K/mTOR dual inhibitor with BBB penetration) licensed by Kazia/Sovargen for intractable seizures in TSC; Phase 2 clinical trial anticipated in latter half of 2024, addressing CNS-specific TSC phenotype.",
+          "source": "PR Newswire (2024); Kazia Therapeutics press release"
+        },
+        "ts": "2026-06-25T06:14:31.800242+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_fc06efe4"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "PROTECT study (ongoing Phase IIb): randomized, observer-blind trial of pre-emptive mTOR inhibitor treatment in TSC infants <4 months of age; endpoints include long-term neuropsychologic outcomes. Signals early-intervention hypothesis; results not yet published.",
+          "source": "NCBI PMC; study protocol"
+        },
+        "ts": "2026-06-25T06:14:31.800384+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_82f665c2"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "No published clinical trials directly target TSC2 restoration or reconstitution; all clinical development targets mTOR pathway downstream. TSC2 loss-of-function is the genetic driver, but TSC2 gene/protein restoration has not entered clinical development.",
+          "source": "Comprehensive ClinicalTrials.gov search (absence of TSC2-targeting approaches)"
+        },
+        "ts": "2026-06-25T06:14:31.800514+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_ee9b566b"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "Published EXIST-3 and other TSC trials do not report TSC2 pathway engagement biomarkers (pTSC2, TSC complex activity, mTORC1 inhibition in CSF/brain tissue); efficacy inferred from seizure-frequency reduction only, not mechanistic confirmation in target tissue.",
+          "source": "Published trial results in Lancet, Epilepsia, Neurology journals (absence of biomarker reporting)"
+        },
+        "ts": "2026-06-25T06:14:31.800641+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_84130207"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "EXIST-3 and NCT05104983 enroll unselected on TSC1 or TSC2 mutation but do not stratify efficacy by TSC2 mutation subclass (haploinsufficiency, dominant-negative, frameshift); response heterogeneity possible but unpublished.",
+          "source": "Published trial protocols and results (absence of mutation subtype stratification)"
+        },
+        "ts": "2026-06-25T06:14:31.800776+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_50efbb98"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "Long-term CNS outcomes (cognitive/developmental decline, brain atrophy, behavioral comorbidities) in TSC2 patients not addressed in published mTOR-inhibitor trials; prevention trials (STOP-TSC2B, PROTECT) may yield data, but results remain unpublished.",
+          "source": "Published trial endpoints (focus on seizure reduction, not neurodevelopment)"
+        },
+        "ts": "2026-06-25T06:14:31.800905+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_45452c4d"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "TSC2 is supported as a viable CNS target: class-effect efficacy of mTOR inhibition downstream of TSC2 demonstrated in large Phase III trial (EXIST-3, 366 patients, 99 centers, 25 countries); FDA-funded prevention trial (NCT05104983) ongoing; emerging PI3K/mTOR dual inhibitors in development. Safety profile meaningful but tolerable.",
+          "source": "Synthesis of EXIST-3 results + ClinicalTrials.gov active trial roster"
+        },
+        "ts": "2026-06-25T06:14:31.801037+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_406e4e47"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Approved mTOR inhibitors for TSC: sirolimus (Rapamune, TSC-associated angiomyolipoma/LAM) and everolimus (Afinitor, TSC-associated seizures, SEGA)",
+          "source": "FDA approved indications"
+        },
+        "ts": "2026-06-25T06:14:31.801177+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_b16e90ce"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Class safety signal \u2014 mTOR inhibitor adverse events: hyperglycemia, hyperlipidemia, immunosuppression (infections, fungal pneumonia), stomatitis, thrombocytopenia, pneumonitis (rare but serious)",
+          "source": "FDA drug labels, approved summary of product characteristics"
+        },
+        "ts": "2026-06-25T06:14:31.801311+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_c5e4af94"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Trial-to-real-world gap: immunosuppression-related infections emerge as dominant signal post-approval in immunocompromised or high-risk subgroups; rates exceed trial expectations in transplant/immunosuppressed cohorts",
+          "source": "Published case series, post-market surveillance literature"
+        },
+        "ts": "2026-06-25T06:14:31.801443+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_1a9c03e3"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Pulmonary complications (pneumonitis, pulmonary hypertension) rare but reportable in TSC cohorts; LAM-mTOR inhibitor interaction not fully characterized (LAM prevalence 30\u201350% females with TSC)",
+          "source": "TSC specialist case reports, pulmonary registries"
+        },
+        "ts": "2026-06-25T06:14:31.801568+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_bd28c166"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Known unknowns: long-term renal function trajectory in pediatric TSC (sirolimus/everolimus approved off-label in children); cumulative metabolic derangement (glucose/lipid) in extended therapy",
+          "source": "Thin post-market pediatric data, observational cohorts"
+        },
+        "ts": "2026-06-25T06:14:31.801695+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_62de82d5"
+      },
+      {
+        "type": "divergence",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "FAERS disproportionality data (live) and PMR/PMC commitments not accessed; live EMET/FAERS pull required for full real-time signal landscape",
+          "source": "Data boundary: structured query to live FAERS/FDA MedWatch required"
+        },
+        "ts": "2026-06-25T06:14:31.801819+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0f3e3543"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures, subependymal giant cell astrocytomas (SEGAs), renal angiomyolipomas (AMLs), and lymphangioleiomyomatosis (LAM)",
+          "source": "FDA regulatory database"
+        },
+        "ts": "2026-06-25T06:14:31.801939+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_2850e500"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T1",
+        "payload": {
+          "value": "CMS provides NCD coverage for everolimus in TSC-associated indications (seizures, AMLs, SEGAs) under Medicare Part B",
+          "source": "CMS Coverage Database"
+        },
+        "ts": "2026-06-25T06:14:31.802058+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_fe74bebd"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "Everolimus pricing: ~$4,200\u2013$6,500/month depending on indication and site of care; covered under Part D formularies (Express Scripts, CVS/Caremark standard tier or specialty tier)",
+          "source": "CMS Part D spending data, PBM formulary publications"
+        },
+        "ts": "2026-06-25T06:14:31.802186+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_14a001c5"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T2",
+        "payload": {
+          "value": "ICER has not conducted formal cost-effectiveness assessment for everolimus in TSC (approved pre-routine ICER assessment era, ~2009); no published NICE TA on TSC-specific mTOR inhibition",
+          "source": "ICER report archive, NICE technology appraisals"
+        },
+        "ts": "2026-06-25T06:14:31.802314+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_1fe7d47f"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "TSC2-specific restoration or gene-therapy approaches lack established payer precedent; cost-effectiveness vs. standard mTOR inhibition uncharted",
+          "source": "Market access landscape"
+        },
+        "ts": "2026-06-25T06:14:31.802440+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_fe0a0b7f"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T3",
+        "payload": {
+          "value": "Reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus (combination-product coverage precedent thin in TSC)",
+          "source": "Payer formulary and combination-product rules"
+        },
+        "ts": "2026-06-25T06:14:31.802557+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_c6646bd4"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T4",
+        "payload": {
+          "value": "Corpus check: TSC2 / tuberous sclerosis has ZERO coverage in the local financial-investor corpus (index.jsonl: 6 cards, all schizophrenia/bipolar/MDD). Explicit gap #5 in manifest: 'neurodegeneration/rare-CNS deal intel thin'.",
+          "source": "sapphire-orchestrator/corpus/financial-investor/ (manifest.md \u00a7Known gaps)"
+        },
+        "ts": "2026-06-25T06:14:31.802676+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_9f01c277"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T4",
+        "payload": {
+          "value": "Gap-search procedure: The Financial-Investor agent would live-search SEC EDGAR (10-K/10-Q/8-K/S-1 XBRL filings, Form 4 insider trades), BioPharma Catalyst calendar (trial events/readouts), ClinicalTrials.gov (TSC2-targeted programs), company IR press releases, and deal databases (Crunchbase/PitchBook) for: (1) public company TSC2 programs by name/CAS/dev code; (2) licensing/partnership deal structures (upfront/milestone splits encoding implied PoS); (3) candid 10-K risk-factor language on mTOR/rare-neuro class; (4) private-company TSC2 funding / pre-clinical programs with thin disclosure. This pass would classify findings as T1 (SEC primary), T2 (IR/press), or T4 (known-unknown if private/undisclosed).",
+          "source": "financial-investor.md \u00a7Procedure Step 3 ('Search the gap only')"
+        },
+        "ts": "2026-06-25T06:14:31.802811+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_034d65a5"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "semantic-web",
+        "tier": "T4",
+        "payload": {
+          "value": "TSC2 / tuberous sclerosis context (scientific, not financial): rare autosomal-dominant neurodevelopmental disorder; mTORC1 hyperactivation is the core pathology; mTOR inhibitors (e.g. sirolimus/everolimus) are standard-of-care for seizures and benign tumors but CNS penetration is limited and side-effect profile remains rough for long-term pediatric use. A next-gen TSC-targeting molecule would compete with generic mTOR inhibitors + trial-stage selective GATOR/DEPDC5 inhibitors. Financial viability depends on: (a) clinical differentiation over generic sirolimus; (b) rare-disease reimbursement (EU ODD, US Orphan Drug); (c) company runway / VC/pharma backing for expensive rare-disease development.",
+          "source": "domain knowledge (not in corpus; scientific context for E2 assessment)"
+        },
+        "ts": "2026-06-25T06:14:31.802992+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_24f0f3ab"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "gnomad",
+        "tier": "T1",
+        "payload": {
+          "value": "TSC2 gnomAD constraint: pLI 1.00, LOEUF 0.20, missense Z -0.08 (loss-of-function intolerant)",
+          "source": "gnomAD v4 constraint (GraphQL)"
+        },
+        "ts": "2026-06-25T06:14:31.803192+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_82a43d42"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "gtex",
+        "tier": "T1",
+        "payload": {
+          "value": "TSC2 GTEx tissue expression (gtex_v8, median TPM): top brain region Brain Cerebellum 133.2; highest-expressing of 54 tissues (CNS-enriched)",
+          "source": "GTEx Portal v2 (gtex_v8 medianGeneExpression)"
+        },
+        "ts": "2026-06-25T06:14:31.803301+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_2c7977c7"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "interpro",
+        "tier": "T1",
+        "payload": {
+          "value": "TSC2 (UniProt P49815) InterPro: 8 entries \u2014 domains: Rap/Ran-GAP domain (IPR000331), Tuberin-type domain (IPR018515), Tuberin, N-terminal (IPR024584); families: Tuberin (IPR003913), Tuberin/Ral GTPase-activating protein subunit alpha (IPR027107)",
+          "source": "InterPro (EBI)"
+        },
+        "ts": "2026-06-25T06:14:31.803415+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_63a859fe"
+      },
+      {
+        "type": "fact",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "gprofiler",
+        "tier": "T2",
+        "payload": {
+          "value": "g:Profiler enrichment for TSC2 (hsapiens): 6 significant terms; top \u2014 TSC1-TSC2 complex (GO:0033596, p=3.0e-02); Inhibition of TSC complex formation by PKB (REAC:R-HSA-165181, p=3.7e-02); TSC1-TSC2 complex (CORUM:75, p=5.0e-02); TSC2-HERC1 complex (CORUM:6532, p=5.0e-02); TSC1-TSC2 complex (CORUM:7157, p=5.0e-02)",
+          "source": "g:Profiler g:GOSt (hsapiens)"
+        },
+        "ts": "2026-06-25T06:14:31.803542+00:00",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_0e4d912d"
+      },
+      {
+        "type": "conclusion",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "synthesis",
+        "payload": {
+          "recommendation": "Conditional advance \u2014 3 conditional verdict(s). Address open items before IND filing.",
+          "confidence": "medium"
+        },
+        "ts": "2026-06-25T06:14:31.803690+00:00",
+        "tier": "T3",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_7971c12a"
+      },
+      {
+        "type": "experiment_proposal",
+        "engagement_id": "eng_6444d0e8",
+        "entities": {
+          "genes": [
+            "TSC2"
+          ],
+          "smiles": [],
+          "diseases": [],
+          "drugs": []
+        },
+        "provenance": "synthesis",
+        "payload": {
+          "experiment": "Run orthogonal in vivo validation for TSC2 in disease-relevant model."
+        },
+        "ts": "2026-06-25T06:14:31.803812+00:00",
+        "tier": "T3",
+        "confidence": "med",
+        "links": [],
+        "supersedes": null,
+        "id": "mem_22713894"
+      }
+    ]
+  },
+  "_via": "replay-capture",
+  "_captured_at": "2026-06-25",
+  "_wall_s": 1050.2,
+  "_scenario": "tsc2_live_run",
+  "_internal_only": true,
+  "_data_notice": "Contains REAL internal Quiver moat data (provenance=moat-real, plane=internal). Approved for INTERNAL demo only \u2014 do NOT distribute externally. EMET facts are real public PMIDs (external plane). Captured via _build/capture_tsc2_live.py (real moat + live-captured EMET envelope + haiku firm)."
+}
