@@ -15,3 +15,8 @@ RohanOnly/moat/
 # Chainlit runtime artifacts (local data layer session storage, generated chainlit.md cache)
 frontend/.files/
 .files/
+
+# Private local-only dir: moat DB, engagements, EMET tester creds + authenticated profile. NEVER commit.
+RohanOnly/
+**/emet_creds.env
+**/emet_profile/
