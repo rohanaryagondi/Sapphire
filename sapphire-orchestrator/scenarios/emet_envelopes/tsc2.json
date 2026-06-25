@@ -3,18 +3,129 @@
   "emet_workflow": "Target Validation",
   "verdict": "pass",
   "evidence": [
-    {"claim": "TSC1/TSC2 (hamartin-tuberin) is the GAP for Rheb; loss -> constitutive Rheb-GTP -> persistent mTORC1 activation; CNS-specific roles shaping neural connectivity.", "source": "Han & Sahin, FEBS Lett 2011", "id_or_url": "PMID:21329690"},
-    {"claim": "mTORC1 drives S6K1/4E-BP1 phosphorylation + GABAergic interneuron dysfunction -> hyperexcitable, structurally abnormal neurons (epileptogenesis).", "source": "Aronica et al., Brain 2023", "id_or_url": "PMID:36806388"},
-    {"claim": ">2,000 inactivating TSC1/TSC2 variants all cause constitutive mTOR; mTOR inhibitors (rapamycin/everolimus) reduce SEGA + AML burden and seizure frequency.", "source": "Hasbani & Crino 2018", "id_or_url": "PMID:29478616"},
-    {"claim": "TSC2 mutations (~75% of cases) associate with MORE SEVERE neurological phenotype than TSC1 (more tubers, higher seizure frequency, more intellectual disability) - 224-patient cohort.", "source": "Dabora et al. 2001", "id_or_url": "PMID:11112665"},
-    {"claim": "~85% of children/adolescents with TSC develop CNS complications (dominant source of morbidity/mortality).", "source": "Curatolo & Maria 2013", "id_or_url": "PMID:23622183"},
-    {"claim": "Cortical tubers arise from biallelic TSC2 loss with mTORC1 molecular footprints; their burden determines seizure/cognitive outcome (Lancet Neurology review).", "source": "Curatolo et al., Lancet Neurol 2022", "id_or_url": "PMID:35963265"},
-    {"claim": "SEGAs arise via two-hit biallelic TSC1/TSC2 inactivation; long-term mTOR inhibition (everolimus) reduces SEGA volume and prevents hydrocephalus.", "source": "Ichikawa & Niida 2022", "id_or_url": "PMID:35169091"},
-    {"claim": "Epilepsy affects 75-90% of individuals with TSC, the most common neurological presentation; often refractory despite polypharmacy.", "source": "Saxena & Sampson 2015", "id_or_url": "PMID:26060906"},
-    {"claim": "TSC-associated neuropsychiatric disorders (TAND): ASD, intellectual disability, ADHD - core care component per updated international consensus.", "source": "Northrup et al. 2021", "id_or_url": "PMID:34399110"}
+    {
+      "claim": "The mechanistic linchpin was established by Inoki et al. in 2002: TSC2 is directly phosphorylated and inactivated by Akt, coupling growth-factor signaling to mTORC1 activity [PMID 12172553 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:12172553"
+    },
+    {
+      "claim": "Loss of functional tuberin therefore constitutively activates mTORC1-dependent anabolic programs \u2014 increased protein synthesis, cell growth, and impaired autophagy \u2014 in all TSC lesions [PMID 27226234 , 29478616 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:27226234"
+    },
+    {
+      "claim": "TSC2 variants account for ~70% of genetically confirmed TSC cases and are associated with a more severe neurological phenotype than TSC1 variants [PMID 41820375 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:41820375"
+    },
+    {
+      "claim": "Isolated focal cortical dysplasia type II also scores 0.875 for genetic association, reflecting the growing recognition that somatic TSC2 mosaicism underlies a significant fraction of non-TSC focal cortical dysplasia [PMID 35963265 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:35963265"
+    },
+    {
+      "claim": "The inheritance pattern is autosomal dominant with high penetrance for brain lesions (cortical tubers present in ~90% of patients) and near-complete penetrance for epilepsy (~85\u201390% lifetime risk) [PMID 23622183 , 38137462 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:23622183"
+    },
+    {
+      "claim": "This ubiquitous CNS expression is consistent with TSC2's fundamental role in neuronal and glial mTOR regulation \u2014 cortical tubers, subependymal nodules, and subependymal giant cell astrocytomas (SEGAs) all arise from cells constitutively expressing TSC2, and mTORC1 dysregulation in neurons drives aberrant axonal development, synaptogenesis, and network excitability [PMID 38212374 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:38212374"
+    },
+    {
+      "claim": "A separate mechanistic line of evidence from Parkinson's disease research showed that pathologic \u03b1-synuclein destabilizes the TSC1-TSC2 complex, activating mTORC1 and driving neurodegeneration, and that TSC2 overexpression was neuroprotective in fly models \u2014 supporting the idea that TSC2 functions as a broader neuronal survival regulator beyond TSC itself [PMID 38019930 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:38019930"
+    },
+    {
+      "claim": "Everolimus ( CHEMBL1908360 , MW 958 Da, approved 2009) has received FDA and EMA approval for three TSC-related indications: renal angiomyolipoma, SEGA, and refractory seizures; sirolimus is approved for lymphangioleiomyomatosis [PMID 32222129 , 41820375 ].",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:32222129"
+    },
+    {
+      "claim": "PMID 38137462",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:38137462"
+    },
+    {
+      "claim": "PMID: 29165669).",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:29165669"
+    },
+    {
+      "claim": "PMID: 36399499.",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:36399499"
+    },
+    {
+      "claim": "PMID: 32913098.",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:32913098"
+    },
+    {
+      "claim": "PMID: 37933841.",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:37933841"
+    },
+    {
+      "claim": "I'll conduct a multi-source investigation across genetic, mechanistic, expression, and therapeutic evidence layers simultaneously.",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "PMID:29478616"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1038/ncb839"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1038/nrdp.2016.35"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1016/B978-0-444-64076-5.00052-1"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1038/s41572-026-00688-9"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1016/S1474-4422(22)00213-7"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1016/B978-0-444-52891-9.00038-5"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.3390/biomedicines11123241"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1038/s41380-023-02402-7"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.1126/scitranslmed.add0499"
+    },
+    {
+      "claim": "EMET source for TSC2",
+      "source": "EMET (BenchSci)",
+      "id_or_url": "10.3906/sag-2002-133"
+    }
   ],
-  "notes": "Open Targets genetic association TSC2-TSC = 0.951 (one of the highest in the platform); cortical tubers 0.716; ASD 0.566. Everolimus FDA-approved for SEGA (2010) + refractory partial-onset seizures (2018). Citation verification in progress at capture time.",
-  "chat_url": "https://emet.benchsci.com/chat/c4a1031a-be93-4ca4-8cdd-db5439b4fb50",
-  "captured_at": "2026-06-25T17:12:00Z",
+  "notes": "",
+  "chat_url": "https://emet.benchsci.com/chat/29e9a848-7b59-48cd-a7fb-09a39750a499",
+  "captured_at": "2026-06-25T17:55:15.731407+00:00",
   "provenance": "emet-live"
 }

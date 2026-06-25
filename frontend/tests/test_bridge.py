@@ -204,7 +204,7 @@ class TestBridgeEmetSession(unittest.TestCase):
         envs = bridge._resolve_emet_envelopes("Is TSC2 a viable target?", None)
         self.assertIn("TSC2", envs)
         self.assertEqual(envs["TSC2"]["provenance"], "emet-live")
-        self.assertEqual(len(envs["TSC2"]["evidence"]), 9)   # the 9 shipped PMIDs
+        self.assertEqual(len(envs["TSC2"]["evidence"]), 24)  # the 24 shipped citations (14 PMIDs + 10 DOIs)
 
     def test_auto_load_uncovered_candidate_resolves_empty(self):
         self.assertEqual(bridge._resolve_emet_envelopes("Is KCNT1 a target?", None), {})
