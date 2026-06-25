@@ -129,7 +129,11 @@ def _simulate_claude(contract, inputs) -> dict:
 
 
 def dispatch_claude(contract, inputs, runner=None) -> dict:
-    if _simulate_models_on():
+    # simulate_exempt agents (the scientific-core reasoners whose output IS the deliverable, e.g.
+    # rescue-mechanism) do REAL reasoning even under SAPPHIRE_SIMULATE_MODELS — so a fast demo can
+    # stub the personas/semantic agents while the science still runs for real. In CI a mock runner
+    # is injected via ctx, so an exempt agent never shells a live `claude -p`.
+    if _simulate_models_on() and not getattr(contract, "simulate_exempt", False):
         return _simulate_claude(contract, inputs)
     cmd = [
         CLAUDE_BIN, "-p", build_prompt(contract, inputs),
@@ -197,7 +201,13 @@ def dispatch_claude_batch(items, runner=None) -> dict:
     if not items:
         return {}
     if _simulate_models_on():
-        return {c.id: _simulate_claude(c, inp) for c, inp in items}
+        # simulate_exempt agents still reason for real even in batch mode (consistency with
+        # dispatch_claude). In practice the scientific-core reasoners are dispatched per-agent,
+        # not batched, so this branch is belt-and-suspenders.
+        return {c.id: (_simulate_claude(c, inp)
+                       if not getattr(c, "simulate_exempt", False)
+                       else dispatch_claude(c, inp, runner=runner))
+                for c, inp in items}
     cmd = [
         CLAUDE_BIN, "-p", build_batch_prompt(items),
         "--output-format", "json",

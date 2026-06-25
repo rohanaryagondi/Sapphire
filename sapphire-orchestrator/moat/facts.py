@@ -59,6 +59,26 @@ def moat_facts(
             "provenance": _PROV,
         })
 
+    # ---- rescue genes (opposite EP-signature genes) -------------------------
+    # Genes whose EP-signature OPPOSES the perturbation KO — i.e. modulating them
+    # reverses the KO phenotype. THESE are the answer to "rank genes that rescue the
+    # <gene>-KO phenotype": ranked by EP-signature reversal (cosine, ascending rank).
+    rg_rows = client.neighbors(perturbation, effect="opposite", ref_type="gene", k=k)
+    for row in rg_rows:
+        cos = round(float(row["cosine"]), 3)
+        ref = row["ref"]
+        value = (
+            f"Rescue gene: {ref} (gene) opposes {perturbation.upper()} KO "
+            f"EP-signature (cos {cos})"
+        )
+        facts.append({
+            "field":      "moat rescue (gene)",
+            "value":      value,
+            "source":     _SOURCE,
+            "tier":       _TIER,
+            "provenance": _PROV,
+        })
+
     # ---- rescue compounds (opposite EP-signature) ---------------------------
     cpd_rows = client.neighbors(perturbation, effect="opposite", ref_type="compound", k=k)
     for row in cpd_rows:
@@ -77,3 +97,47 @@ def moat_facts(
         })
 
     return facts
+
+
+def rescue_genes(
+    perturbation: str,
+    client: MoatClient | None = None,
+    k: int = 10,
+) -> list[dict]:
+    """Ranked GENES that rescue the `perturbation` KO phenotype — structured rows.
+
+    A "rescue gene" is one whose EP-signature is OPPOSITE to the perturbation KO
+    (cosine-ranked): modulating it reverses the KO phenotype. This is the structured
+    feed the ranked-synthesis consumes (the dossier-text view is `moat_facts`' "moat
+    rescue (gene)" rows). The connectivity-map logic — opposite signature = rescue —
+    is the same one `moat_facts` uses for rescue compounds, applied to genes.
+
+    Args:
+        perturbation: gene symbol (case-insensitive), e.g. "TSC2".
+        client: a MoatClient; if None a default MoatClient() is used.
+        k: max rescue genes to return (ranked best-first).
+
+    Returns:
+        A list of dicts, rank-ordered (best rescuer first), each:
+            {rank, gene, cosine, euclidean, perturbation, source, tier, provenance}.
+        Returns [] if the client is unavailable or no opposite genes exist — never raises.
+    """
+    if client is None:
+        client = MoatClient()
+    if not client.available():
+        return []
+
+    rows = client.neighbors(perturbation, effect="opposite", ref_type="gene", k=k)
+    out: list[dict] = []
+    for row in rows:
+        out.append({
+            "rank":         row["rank"],
+            "gene":         row["ref"],
+            "cosine":       round(float(row["cosine"]), 3),
+            "euclidean":    row["euclidean"],
+            "perturbation": perturbation.upper(),
+            "source":       _SOURCE,
+            "tier":         _TIER,
+            "provenance":   _PROV,
+        })
+    return out

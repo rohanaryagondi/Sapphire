@@ -23,7 +23,7 @@ if _HERE not in sys.path:
 
 from orchestrator import Orchestrator
 from engagement import extract_entities, _eid
-from moat.facts import moat_facts
+from moat.facts import moat_facts, rescue_genes
 from memory import recall
 from harness import trace
 import harness
@@ -144,6 +144,32 @@ def _extract_structure_inputs(query: str) -> dict:
             out["target_sequence"] = tok
             break
     return out
+
+
+_RESCUE_RE = re.compile(r"\brescue", re.I)
+
+
+def _is_rescue_ranking_query(query: str) -> bool:
+    """True for a "rank/identify GENES that RESCUE the <TARGET>-KO phenotype" question — the
+    trigger for the ranked-rescue-gene deliverable (structured rescue_genes + mechanism reasoning
+    + ranked synthesis).
+
+    Conservative by design: requires "rescue" AND a gene/ranking cue AND a KO/phenotype/signature
+    cue, so an ordinary viability question ("Is TSC2 a viable target?") does NOT match and keeps the
+    existing IND-style synthesis untouched.
+    """
+    q = query or ""
+    if not _RESCUE_RE.search(q):
+        return False
+    # Require an explicit GENE cue (the deliverable ranks GENES) — a bare "rank"/"identify" is too
+    # loose. And exclude compound/drug/molecule ranking questions, which are a different deliverable
+    # (the moat's rescue COMPOUNDS), so "rank the rescue compound candidates for TSC2 KO" does NOT
+    # trigger the gene path. Conservative by design: a miss falls back to IND synthesis (no harm).
+    has_gene_cue = re.search(r"\bgenes?\b", q, re.I) is not None
+    is_compound_q = re.search(r"\bcompounds?\b|\bdrugs?\b|\bmolecules?\b|\bsmall[- ]molecules?\b",
+                              q, re.I) is not None
+    has_ko_cue = re.search(r"\bK/?O\b|knock-?out|knock-?down|phenotype|signature", q, re.I) is not None
+    return has_gene_cue and has_ko_cue and not is_compound_q
 
 
 def _known_agent_ids(registry) -> set:
@@ -556,6 +582,79 @@ def run_live(
                 "facts": [f["value"][:120] for f in corpus_facts],
             })
 
+    # -----------------------------------------------------------------------
+    # 4b. Scientific mechanism reasoning (rescue-ranking queries only)
+    # -----------------------------------------------------------------------
+    # For a "rank genes that rescue the <TARGET>-KO phenotype" question, run the scientific-core
+    # reasoner over the moat's ranked rescue-gene candidates + the literature already gathered, to
+    # produce a plausible, CITED mechanism per gene. The rescue-mechanism agent is simulate_exempt →
+    # it does REAL reasoning even when the rest of the firm is stubbed (the science IS the
+    # deliverable). DATA BOUNDARY: only PUBLIC identifiers cross to it — gene symbols + ORDINAL rank,
+    # never the raw moat cosines (those stay here, for the ranked view). Non-rescue queries skip this
+    # entirely (rescue_ranked/gene_mechanisms stay empty → the existing IND synthesis runs unchanged).
+    rescue_ranked: list[dict] = []
+    gene_mechanisms: list[dict] = []
+    if _is_rescue_ranking_query(query) and target and "rescue-mechanism" in known_ids:
+        # Top-K rescuers. K=6 bounds the real claude mechanism call (~35s/gene observed) under the
+        # agent timeout while still giving a substantive ranked list. cosine is kept LOCAL (the view),
+        # never sent to the agent.
+        rescue_ranked = rescue_genes(target, k=6)
+        if rescue_ranked:
+            # The cited public literature already in the dossier (EMET / corpus) is the grounding set.
+            evidence = [
+                {"claim": f.get("value", "")[:300],
+                 "source": f.get("source", "") or f.get("url", "")}
+                for f in all_dossier_facts
+                if f.get("provenance") in ("emet-live", "emet-mcp", "corpus") and f.get("value")
+            ][:12]
+            mech_inputs = {
+                "target": target,
+                "disease": tri.get("disease_label", ""),
+                # PUBLIC ONLY: gene symbol + ordinal rank — no cosine / no internal score crosses.
+                "candidates": [{"gene": r["gene"], "rank": r["rank"]} for r in rescue_ranked],
+                "evidence": evidence,
+            }
+            _emit(on_progress, eid, {"stage": "bucket1", "agent_id": "rescue-mechanism",
+                                     "phase": "start"})
+            _t0 = time.monotonic()
+            mres = harness.run("rescue-mechanism", mech_inputs,
+                               engagement_id=eid, ctx=ctx, registry=registry)
+            _elapsed = round(time.monotonic() - _t0, 2)
+            if mres.ok and mres.output:
+                gene_mechanisms = mres.output.get("gene_mechanisms", []) or []
+            # Enforce "cite or hedge" MECHANICALLY (defense in depth — the JSON schema cannot): an
+            # uncited high/medium claim is downgraded to low, so a confident-but-unsupported mechanism
+            # can never be presented as well-grounded. The agent is instructed to do this; this makes
+            # it a guarantee regardless of what the model returns.
+            for gm in gene_mechanisms:
+                if gm.get("confidence") in ("high", "medium") and not (gm.get("citations") or []):
+                    gm["confidence"] = "low"
+            # Surface each cited mechanism as a dossier fact (provenance scientific-reasoning).
+            for gm in gene_mechanisms:
+                cites = ", ".join(gm.get("citations", []) or [])
+                val = f"Rescue mechanism — {gm.get('gene', '')}: {gm.get('mechanism', '')}"
+                if cites:
+                    val += f" [{cites}]"
+                all_dossier_facts.append({
+                    "value": val,
+                    "source": "Sapphire scientific reasoning (cites EMET/corpus literature)",
+                    "tier": "T3",
+                    "provenance": "scientific-reasoning",
+                    "plane": plane_for("scientific-reasoning"),
+                    "field": "rescue mechanism",
+                })
+            agent_statuses.append({
+                "id": "rescue-mechanism", "status": mres.status, "provenance": mres.provenance,
+            })
+            if not mres.ok:
+                abstained_agents.append("rescue-mechanism")
+            _emit(on_progress, eid, {
+                "stage": "bucket1", "agent_id": "rescue-mechanism", "phase": "done",
+                "status": mres.status, "provenance": mres.provenance,
+                "n_facts": len(gene_mechanisms), "elapsed_s": _elapsed,
+                "error": mres.error if not mres.ok else None,
+            })
+
     known_unknowns = [f"abstained: {aid}" for aid in abstained_agents]
 
     status = "complete" if not abstained_agents else "complete-with-known-unknowns"
@@ -678,12 +777,45 @@ def run_live(
         else "Define experimental paradigm for primary target."
     )
 
+    # Rescue-ranking deliverable: when the query asked to RANK genes that rescue the KO, the
+    # synthesis IS a ranked gene table — merge the moat rank/cosine (internal, shown as the
+    # evidence basis) with each gene's cited mechanism. This OVERRIDES the IND-style recommendation
+    # computed above. Empty rescue_ranked (any non-rescue query) ⇒ this block is skipped entirely.
+    ranked_genes: list[dict] = []
+    if rescue_ranked:
+        mech_by_gene = {gm.get("gene", "").upper(): gm for gm in gene_mechanisms}
+        for r in rescue_ranked:
+            gm = mech_by_gene.get(r["gene"].upper(), {})
+            ranked_genes.append({
+                "rank": r["rank"],
+                "gene": r["gene"],
+                "cosine": r["cosine"],            # Quiver EP-signature reversal strength (internal)
+                "mechanism": gm.get("mechanism", ""),
+                "citations": gm.get("citations", []) or [],
+                "confidence": gm.get("confidence", "low"),
+                "source": r.get("source", ""),
+            })
+        grounded = [g for g in ranked_genes if g["citations"]]
+        top = ranked_genes[:5]
+        top_str = "; ".join(f"{g['rank']}. {g['gene']}" for g in top)
+        recommendation = (
+            f"Top rescue-gene candidates for {target}-KO, ranked by Quiver EP-signature reversal "
+            f"with literature-grounded mechanism: {top_str}."
+        )
+        confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
+        proposed_experiment = (
+            f"Validate the top rescue-gene candidate(s) ({', '.join(g['gene'] for g in top[:3])}) "
+            f"against the {target}-KO phenotype in a disease-relevant CNS model."
+        )
+
     syn = {
         "recommendation": recommendation,
         "confidence": confidence,
         "proposed_experiment": proposed_experiment,
         "entities": ents,
     }
+    if ranked_genes:
+        syn["ranked_genes"] = ranked_genes
 
     # Live progress: synthesis done — the recommendation + confidence.
     _emit(on_progress, eid, {

@@ -41,6 +41,9 @@ def _make_fixture_db() -> str:
     rows = [
         ("TSC2", "gene", "TSC1",      "gene",     None,   "similar",  1, 0.97,  0.18),
         ("TSC2", "gene", "RHEB",      "gene",     None,   "similar",  2, 0.89,  0.31),
+        # rescue GENES (opposite EP-signature genes) — the rescuers, rank-ordered.
+        ("TSC2", "gene", "DCTN6",     "gene",     None,   "opposite", 1, 0.163, 0.50),
+        ("TSC2", "gene", "FZD7",      "gene",     None,   "opposite", 2, 0.204, 0.55),
         ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 0.823, 0.44),
     ]
     cur.executemany("INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?)", rows)
@@ -145,6 +148,92 @@ class TestMoatFactsHappyPath(unittest.TestCase):
         facts_lower = self.moat_facts("tsc2", client=self.client)
         facts_upper = self.moat_facts("TSC2", client=self.client)
         self.assertEqual(len(facts_lower), len(facts_upper))
+
+
+    def test_includes_rescue_gene_row(self):
+        facts = self.moat_facts("TSC2", client=self.client)
+        gene_rows = [f for f in facts if f["field"] == "moat rescue (gene)"]
+        self.assertGreater(len(gene_rows), 0, "expected at least one rescue-gene fact")
+        refs = [f["value"] for f in gene_rows]
+        self.assertTrue(any("DCTN6" in v for v in refs), f"DCTN6 not found in {refs}")
+
+    def test_rescue_gene_row_value_format(self):
+        facts = self.moat_facts("TSC2", client=self.client)
+        gene_rows = [f for f in facts if f["field"] == "moat rescue (gene)"]
+        for f in gene_rows:
+            self.assertTrue(
+                f["value"].startswith("Rescue gene:"),
+                f"Unexpected rescue-gene fact value: {f['value']}"
+            )
+
+    def test_rescue_genes_distinct_from_similar_genes(self):
+        # The rescuers (opposite genes) must NOT be confused with the similar genes.
+        facts = self.moat_facts("TSC2", client=self.client)
+        rescue = {f["value"] for f in facts if f["field"] == "moat rescue (gene)"}
+        similar = {f["value"] for f in facts if f["field"] == "moat similar (gene)"}
+        self.assertTrue(any("DCTN6" in v for v in rescue))
+        self.assertFalse(any("DCTN6" in v for v in similar))
+        self.assertTrue(any("TSC1" in v for v in similar))
+        self.assertFalse(any("TSC1" in v for v in rescue))
+
+
+class TestRescueGenes(unittest.TestCase):
+    """Structured rescue_genes() feed (the ranked-synthesis input)."""
+
+    def setUp(self):
+        self._db_path = _make_fixture_db()
+        from moat.client import MoatClient
+        from moat.facts import rescue_genes
+        self.client = MoatClient(db_path=self._db_path)
+        self.rescue_genes = rescue_genes
+
+    def tearDown(self):
+        os.unlink(self._db_path)
+
+    def test_returns_opposite_genes_only(self):
+        rows = self.rescue_genes("TSC2", client=self.client)
+        self.assertGreater(len(rows), 0)
+        genes = [r["gene"] for r in rows]
+        self.assertIn("DCTN6", genes)
+        self.assertIn("FZD7", genes)
+        # similar genes and compounds must NOT appear
+        self.assertNotIn("TSC1", genes)
+        self.assertNotIn("RAPAMYCIN", genes)
+
+    def test_rank_ordered_best_first(self):
+        rows = self.rescue_genes("TSC2", client=self.client)
+        ranks = [r["rank"] for r in rows]
+        self.assertEqual(ranks, sorted(ranks))
+        self.assertEqual(rows[0]["gene"], "DCTN6")  # rank 1
+
+    def test_structured_keys(self):
+        rows = self.rescue_genes("TSC2", client=self.client)
+        required = {"rank", "gene", "cosine", "euclidean", "perturbation",
+                    "source", "tier", "provenance"}
+        for r in rows:
+            self.assertTrue(required.issubset(r.keys()), f"missing keys in {r}")
+            self.assertEqual(r["provenance"], "moat-real")
+            self.assertEqual(r["perturbation"], "TSC2")
+
+    def test_cosine_rounded(self):
+        rows = self.rescue_genes("TSC2", client=self.client)
+        self.assertAlmostEqual(rows[0]["cosine"], 0.163, places=3)
+
+    def test_k_limits(self):
+        rows = self.rescue_genes("TSC2", client=self.client, k=1)
+        self.assertEqual(len(rows), 1)
+
+    def test_case_insensitive(self):
+        self.assertEqual(
+            len(self.rescue_genes("tsc2", client=self.client)),
+            len(self.rescue_genes("TSC2", client=self.client)),
+        )
+
+    def test_unavailable_client_returns_empty(self):
+        from moat.client import MoatClient
+        from moat.facts import rescue_genes
+        bad = MoatClient(db_path="/tmp/__no_such_moat_rescue_genes__.sqlite")
+        self.assertEqual(rescue_genes("TSC2", client=bad), [])
 
 
 class TestMoatFactsUnavailableClient(unittest.TestCase):
