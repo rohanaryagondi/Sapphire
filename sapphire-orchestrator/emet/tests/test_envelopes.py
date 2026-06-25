@@ -29,9 +29,9 @@ class TestEnvelopeStore(unittest.TestCase):
         self.assertIn("TSC2", envs)
         env = envs["TSC2"]
         self.assertEqual(env["provenance"], "emet-live")
-        pmids = {e["id_or_url"] for e in env["evidence"]}
-        self.assertEqual(len(pmids), 9)                     # 9 real captured PMIDs
-        self.assertIn("PMID:21329690", pmids)               # a real captured PMID (Han & Sahin)
+        ids = {e["id_or_url"] for e in env["evidence"]}
+        self.assertEqual(len(ids), 24)                      # 24 real captured citations (14 PMIDs + 10 DOIs)
+        self.assertIn("PMID:12172553", ids)                 # a real captured PMID (Inoki et al. 2002, Akt→TSC2)
 
     def test_load_envelope_for_is_case_tolerant(self):
         self.assertIsNotNone(load_envelope_for("TSC2", _SHIPPED))
@@ -82,7 +82,7 @@ class TestAutoLoadedEnvelopeThroughRunLive(unittest.TestCase):
         os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
         os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
 
-    def test_shipped_envelope_lands_nine_real_pmids(self):
+    def test_shipped_envelope_lands_real_pmids(self):
         from test_live_engine import _build_ctx
         from live_engine import run_live
         env = load_envelope_for("TSC2", _SHIPPED)
@@ -92,7 +92,7 @@ class TestAutoLoadedEnvelopeThroughRunLive(unittest.TestCase):
         emet = [f for f in result["discover"]["dossier"]
                 if f.get("provenance") == "emet-live"]
         pmids = sorted({m for f in emet for m in re.findall(r"PMID:\d+", f.get("source", ""))})
-        self.assertEqual(len(pmids), 9)                     # all 9 real captured PMIDs land
+        self.assertEqual(len(pmids), 14)                    # all 14 real captured PMIDs land
         self.assertTrue(all(f.get("plane") == "external" for f in emet))
         agents = {a["id"]: a["status"] for a in result["discover"]["agents"]}
         self.assertEqual(agents.get("emet-runner"), "ok")
