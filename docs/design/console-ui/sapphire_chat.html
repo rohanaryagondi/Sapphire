@@ -121,6 +121,8 @@ body {
 .toggle-btn svg { flex-shrink: 0; }
 
 .brand {
+  display: inline-flex;
+  align-items: center;
   font-size: 19px;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -513,6 +515,44 @@ body {
   .generating .nav::after, .generating .input-wrap { animation: none; }
 }
 
+/* ── Gemstone logo ─────────────────────────────────────────────────────────
+   One faceted SVG gem (180°-rotationally symmetric so a 540° spin lands clean),
+   used small in the header, large on the hero, and as the in-chat loading gem. */
+.gem { display: inline-flex; align-items: center; justify-content: center; line-height: 0; }
+.gemstone { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 1px 4px rgba(77,124,254,0.45)); }
+.gem-rotor { transform-box: fill-box; transform-origin: 50% 50%; }
+.gem-glint { transform-box: fill-box; transform-origin: 50% 50%; opacity: 0; }
+.gem-sm { width: 23px; height: 23px; margin-right: 8px; flex-shrink: 0; }
+.gem-lg { width: 78px; height: 78px; margin: 0 auto 16px; }
+.gem-loading { width: 38px; height: 38px; }
+
+@keyframes gem-spin { from { transform: rotate(0deg); } to { transform: rotate(540deg); } }
+@keyframes gem-glint {
+  0%   { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  60%  { opacity: 0; }
+  74%  { opacity: 0.95; transform: scale(1) rotate(8deg); }
+  100% { opacity: 0; transform: scale(0.55) rotate(0deg); }
+}
+/* a little extra sheen while it spins */
+@keyframes gem-shine {
+  0%, 100% { filter: drop-shadow(0 1px 4px rgba(77,124,254,0.45)); }
+  50%      { filter: drop-shadow(0 0 9px rgba(134,173,255,0.85)); }
+}
+
+/* the header logo spins while a response generates; the in-chat loading gem always spins */
+body.generating #brandGem .gem-rotor,
+.gem-loading .gem-rotor { animation: gem-spin 1.2s cubic-bezier(0.25,0.85,0.35,1) both; }
+body.generating #brandGem .gem-glint,
+.gem-loading .gem-glint { animation: gem-glint 0.85s ease-out 1.05s both; }
+body.generating #brandGem .gemstone,
+.gem-loading .gemstone { animation: gem-shine 1.2s ease-in-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.generating #brandGem .gem-rotor, .gem-loading .gem-rotor,
+  body.generating #brandGem .gem-glint, .gem-loading .gem-glint,
+  body.generating #brandGem .gemstone, .gem-loading .gemstone { animation: none; }
+}
+
 textarea.chat-input {
   flex: 1;
   min-height: 24px;
@@ -659,7 +699,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       </button>
     </div>
 
-    <a class="brand" href="#"><span class="brand-pre">Quiver's</span> Sapphire</a>
+    <a class="brand" href="#"><span class="gem gem-sm" id="brandGem"></span><span class="brand-pre">Quiver's</span> Sapphire</a>
 
     <div class="nav-group right">
       <div class="live-badge">
@@ -698,6 +738,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 
           <!-- Empty state -->
           <div class="empty" id="emptyState">
+            <div class="gem gem-lg" id="heroGem"></div>
             <div class="empty-heading">Ask Sapphire Anything</div>
             <div class="empty-sub">CNS drug discovery, cited and deliberated.</div>
           </div>
@@ -812,6 +853,16 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
          + text + '<span class="finding-tip">' + label + '</span></span>';
   }
 
+  /* Faceted sapphire — geometric, 180°-rotationally symmetric (so a 540° spin lands
+     clean), blue facets with purple-tinted-blue shadow planes + a white glint. */
+  var GEM_SVG = '<svg class="gemstone" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="sg-a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86adff"/><stop offset="1" stop-color="#4f7dfe"/></linearGradient><linearGradient id="sg-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f7dfe"/><stop offset="1" stop-color="#3a5bd0"/></linearGradient><linearGradient id="sg-c" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4257c4"/><stop offset="1" stop-color="#6b49c6"/></linearGradient><radialGradient id="sg-t" cx="0.5" cy="0.5" r="0.62"><stop offset="0" stop-color="#aecaff"/><stop offset="1" stop-color="#5d88fe"/></radialGradient></defs><g class="gem-rotor"><polygon points="50,7 83,31 64,40 50,29" fill="url(#sg-a)"/><polygon points="50,93 17,69 36,60 50,71" fill="url(#sg-a)"/><polygon points="83,31 83,69 64,60 64,40" fill="url(#sg-b)"/><polygon points="17,69 17,31 36,40 36,60" fill="url(#sg-b)"/><polygon points="83,69 50,93 50,71 64,60" fill="url(#sg-c)"/><polygon points="17,31 50,7 50,29 36,40" fill="url(#sg-c)"/><polygon points="50,29 64,40 64,60 50,71 36,60 36,40" fill="url(#sg-t)"/><g fill="none" stroke="#c3d6ff" stroke-width="0.7" opacity="0.45" stroke-linejoin="round"><polygon points="50,29 64,40 64,60 50,71 36,60 36,40"/><path d="M50,7 50,29M83,31 64,40M83,69 64,60M50,93 50,71M17,69 36,60M17,31 36,40"/></g><polygon points="50,7 83,31 83,69 50,93 17,69 17,31" fill="none" stroke="#2c41a3" stroke-width="1.7" stroke-linejoin="round"/></g><g class="gem-glint"><path d="M65,19 L67.5,25.5 L74,28 L67.5,30.5 L65,37 L62.5,30.5 L56,28 L62.5,25.5 Z" fill="#ffffff"/></g></svg>';
+
+  /* Plant the gem in the header + hero */
+  (function () {
+    var b = document.getElementById('brandGem'); if (b) b.innerHTML = GEM_SVG;
+    var h = document.getElementById('heroGem');  if (h) h.innerHTML = GEM_SVG;
+  }());
+
   /* Demo response — shown for any query in this prototype */
   var DEMO_HTML = [
     '<div class="ai-body">',
@@ -875,7 +926,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     /* Typing indicator */
     var loadEl = document.createElement('div');
     loadEl.className = 'msg-ai';
-    loadEl.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    loadEl.innerHTML = '<div class="gem gem-loading">' + GEM_SVG + '</div>';
     msgList.appendChild(loadEl);
 
     thread.scrollTop = thread.scrollHeight;
@@ -893,7 +944,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
         leftToggle.classList.add('active');
         leftToggle.setAttribute('aria-pressed', 'true');
       }
-    }, 1700);
+    }, 2000);
   }
 
   sendBtn.addEventListener('click', send);
