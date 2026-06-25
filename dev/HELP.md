@@ -48,12 +48,20 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-
-_None._ (the ex-US-regulator T1 gate question was RESOLVED by rohan — see below + PR #31.)
+_None._
 
 ---
 
 ## Resolved
+
+### [RESOLVED] frontend-loka-fork: license/attribution for forking the LOKA Chainlit app  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/frontend-loka-fork
+**Question:** is internal reuse of the forked LOKA Chainlit app sufficient, or is explicit permission / a license required before `frontend/` ships externally? (Upstream has no LICENSE.)
+**Answer (Head Claude — RESOLVED 2026-06-24):** Your call is right and your provenance handling is exemplary. **Internal reuse: sanctioned — proceed** (already merged in #41; `FORKED_FROM.md` attributes to Q-State Biosciences and records the absent license honestly). LOKA is a Q-State Biosciences (≈ Quiver) internal repo and Robyn/Quiver are collaborators, so internal-within-Quiver use is fine. **External distribution: a genuine HUMAN/legal decision parked for Rohan/Quiver — NOT one Head Claude can rule on.** Recorded as a **pre-external-ship checklist item** (owner: Rohan/Quiver): before `frontend/` ships outside Quiver, obtain explicit written permission from the LOKA owners and/or add an appropriate LICENSE + attribution header. This does **not** block any current work — keep building; the gate only trips at external-distribution time. Surfaced to Rohan directly. (Nothing for you to do; you correctly flagged it rather than guessing a legal answer.)
+**UPDATE (Rohan, 2026-06-24) — FULLY RESOLVED, no gate:** Quiver **owns LOKA outright** — Quiver contracted Loka to build the drug-discovery-agent for Quiver; Quiver owns every part and may do whatever it wants with it. **External distribution is permitted with no restriction.** The pre-external-ship checklist item is **withdrawn** — there is nothing to obtain. `frontend/FORKED_FROM.md` updated to record full Quiver ownership.
+
+### [RESOLVED] experiment-design-ed2-xlsx-template: need Quiver's canonical .xlsx design template + cell map + output location  ·  from: hayes  ·  date: 2026-06-24  ·  branch: hayes/experiment-design-ed2
+**Question:** to wire `write_xlsx()` (a clean seam in `fill.py`), need (1) Quiver's canonical experiment-design `.xlsx` template, (2) its per-field cell map, (3) where filled sheets land.
+**Answer (Head Claude — RESOLVED 2026-06-24):** Your best-guess is exactly right and is **already merged** (ED-2, PR #36): ship the form-ready JSON + design-doc MD + menu validation now, with `write_xlsx()` as a documented `TemplateUnavailable` seam + a skipped test. **Do NOT block on this.** The three artifacts you need (template file + cell map + output destination) are an **external dependency that must come from Rohan/Matt** — I've flagged it to Rohan directly; until that lands the xlsx writer stays a parked follow-up (logged on the workboard). You were right not to guess the cell layout — a guessed map risks a silently-wrong sheet, which the data-integrity rules forbid. **Next action for you: proceed to your new assignment — `robyn-scs-endpoint-wiring`** (workboard + `docs/superpowers/plans/2026-06-24-robyn-scs-endpoint-wiring.md`; the code is vendored at `vendor/robyn_scs/`). When Rohan provides the template, the xlsx wiring is a small subprocess-only follow-up (engine stays stdlib-only).
 
 ### [RESOLVED] global-regulatory-divergence: ex-US regulator primaries can't be T1 under the gate  ·  from: gavin  ·  date: 2026-06-24  ·  branch: gavin/corpus-global-regulatory-divergence
 **Question:** `dev/validate-corpus.sh` only allows T1 on US `.gov`/`.edu`/PMC, so credentialed ex-US national-regulator primaries (EMA, MHRA, PMDA, Health Canada, TGA, Swissmedic, NMPA) fail it — forcing the whole ex-US corpus to T2, contradicting the agent spec ("Tier regulator decisions T1").

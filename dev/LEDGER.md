@@ -11,6 +11,68 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — robyn_scs endpoint wiring — tools/robyn_scs/  (`main`, PR #44)
+- Built-By: `hayes` (reviewed/gated/merged by Head Claude).
+- What: `tools/robyn_scs/` exposes the vendored SCS/STA connectivity pipeline (`vendor/robyn_scs/`) as 10
+  correctly-wired callable endpoints (detect_events · run_scs · run_sta · merge_and_classify · visualize ·
+  run_fov · run_batch · discover_fov_quartets · load_stim_metadata · stim_mask_from_sidecar) — thin wrappers
+  that import + delegate to the vendored `utils/`, docstrings naming each `module.func :line`. `vendor/` NOT
+  modified; the full pipeline is NOT run (MATLAB splitter documented as a manual upstream step). Heavy deps
+  (numpy/scipy/pandas/matplotlib) imported LAZILY inside the endpoints + isolated to `tools/robyn_scs/
+  requirements.txt`; the Sapphire engine stays stdlib-only (enforced by a subprocess meta_path-blocker test).
+- Gates: Gate 2 review = Approved; Gate 5 verification = "Works as claimed" (signature alignment proven via a
+  FileNotFoundError-not-TypeError forward probe; `detect_events` synthetic call detects planted APs; vendor
+  untouched). Suite **478 green** (15 wiring tests).
+- Fast-follows (non-blocking, fold into next robyn touch): add a signature probe for `neuron_types_from_merged`;
+  one-line comment on `run_fov`'s P1 trace-roster forwarding. Next step (separate task): a live_engine seam so
+  the firm can call these endpoints as a Bucket-1 tool (once an ASO/SCS query path needs it).
+
+## 2026-06-24 — Transparent front end (LOKA-fork → run_live) — feature work-stream B  (`main`, PR #41)
+- Built-By: `rohan` (built by Rohan Claude worker session; reviewed/gated/merged by Head Claude — separation of powers).
+- What: forks LOKA's Chainlit app into `frontend/` (real `q-state-biosciences/drug-discovery-agent` clone untouched;
+  `FORKED_FROM.md` records upstream `8685382` + escalates the no-LICENSE question to a human) and re-points it from
+  AWS Bedrock to **in-process `live_engine.run_live`** via `bridge.py`. `render.py` (chainlit-free, stdlib, unit-
+  tested) maps the run_live contract to a **transparent firm view**: plan → per-agent (id·status·provenance,
+  abstain shown) → dossier split into the **two distinct data planes** (internal moat vs external) → Bucket-2
+  roundtable **spread** (per-persona, no consensus collapse, round1→round2) → synthesis → partial-run banner. Two
+  profiles: Demo (mock ctx, $0) + Live (real firm). Engine stays stdlib-only (chainlit/pandas confined to
+  `frontend/requirements.txt`); `site/` Console marked superseded.
+- Gates: Gate 2 review (Approved-with-nits → fix-looped: non-vacuous spread test, CORS→localhost, status banner,
+  sequences forwarding) + Gate 5 functional verification (PASS — bridge calls the real engine in-process, planes
+  render with zero cross-contamination, degraded runs honest, app launches). Suite **463 green** (29 frontend tests).
+- This + work-stream A complete the `frontend-and-data-planes` feature: the backend is now reachable through a
+  transparent, honest control surface. Follow-ups: real (non-mock) Live-profile runs need the `claude` CLI;
+  per-agent timing is aspirational (no contract field — render refuses to fabricate it); LOKA license sign-off
+  before any EXTERNAL ship (internal reuse OK).
+
+## 2026-06-24 — Two enforced data planes (internal vs external) — feature work-stream A  (`main`, PR #37)
+- Built-By: `rohan`. Tier: Feature (work-stream A of `frontend-and-data-planes`; B = the LOKA-fork front end, next).
+- What: the data-boundary call ("separate web/external from Quiver internal, + visible") made concrete.
+  `contracts/provenance.py`: `plane_for(provenance) → internal|external` (only `moat-real` is internal;
+  EMET·web·Q-Models·seams·corpus·qmodels:* are external) with a **bidirectional** import-time totality guard;
+  `is_boundary_violation()` (fail-safe — internal fact + unidentifiable target → block) as the classification-
+  level rule. `live_engine.py`: every dossier fact carries a **derived, unconditional** `plane` (additive in
+  `run_live_schema.{md,py}`). Honest 2-layer documentation: the runtime enforcer is `harness/guardrails.py`
+  `data_boundary()` (internal keys + identifier patterns; shared with the public-only memory subsystem, so it
+  keys on raw internal data, not provenance labels); the plane map is the complementary classification layer
+  (dossier tagging + UI), not a 2nd runtime gate.
+- Gates: Gate 2 independent review (Approved-with-nits → fix-looped: unconditional plane, symmetric guard,
+  fail-safe rule, honest docs after a runtime provenance-block proved too broad — it refused legit moat facts
+  in the memory flow). Gate 5 functional verification (core: PASS — plane totality real, boundary blocks every
+  realistic vector incl. nested/embedded, facts carry correct plane, contract conformant). Suite **434 green**.
+- Follow-ups: work-stream B (front end) renders the planes distinctly; the UI plane visualization lands there.
+
+## 2026-06-24 — global-regulatory-divergence corpus — Gavin's first Bucket-1 corpus  (`main`, PR #30)
+- Built-By: `gavin` (reviewed/approved/merged by rohan).
+- What: First contributor knowledge corpus, built dual-source (browser + EMET) per the locked METHOD. 9 cards
+  (T1×2 MHRA/gov.uk regulator primaries, T2×7 HTA/secondary), themed notes, manifest with honest known-gaps,
+  QUERIES.md, + the agent skill doc upgraded to corpus-first → search-the-gap. Lands at run time via K2.
+- Gates: suite **381 green** · `validate-corpus.sh` **CLEAN** (all URLs resolve) · content audited CLEAN
+  last pass (0 fabricated, all 3 EMET PMIDs real) · scope clean (no secrets/binaries). Branch carried the #31
+  gate fix + #32 test fix (merged main before re-tier).
+- Follow-ups: Gavin's remaining 5 corpora (financial-investor · kol-social-signal · patient-advocacy ·
+  policy-legislative · reputational-institutional).
+
 ## 2026-06-24 — Fix: make the corpus-retrieval test corpus-agnostic (unblocks all multi-corpus PRs)  (`main`, PR #32)
 - Built-By: `rohan` (engine/test fix — latent brittleness in the K2 keystone, surfaced by Gavin's PR #30 audit).
 - What: `tests/test_corpus_retrieval.py::test_corpus_fact_lands_in_dossier` asserted EVERY corpus fact carried

@@ -11,3 +11,7 @@ SemanticAgents/
 # isolated venv for the vendored Q-Models Explorer (local-cpu endpoint)
 .qm-venv/
 RohanOnly/moat/
+
+# Chainlit runtime artifacts (local data layer session storage, generated chainlit.md cache)
+frontend/.files/
+.files/

@@ -1,3 +1,8 @@
+> **⚠ Superseded (2026-06-24).** `frontend/` — the LOKA-fork Chainlit **control surface** over the
+> live firm (`live_engine.run_live`) — is now the intended front face. `site/` is **retained** as the
+> canned-scenario demo + JS planner mirror until `frontend/` covers that ground; it is not deleted.
+> See [`frontend/README.md`](../frontend/README.md) and [`frontend/FORKED_FROM.md`](../frontend/FORKED_FROM.md).
+
 # Sapphire site
 
 Two pages:

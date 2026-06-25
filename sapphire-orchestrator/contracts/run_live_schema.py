@@ -16,6 +16,9 @@ from . import jsonschema_min
 
 # A dossier fact: the minimum every run_live fact carries. Sources may add
 # `field` / `confidence` / `flag` — allowed (no additionalProperties:false).
+# A3 (additive): `plane` is stamped by live_engine from contracts.provenance.plane_for(provenance).
+# Values: "internal" (moat-real) or "external" (all other sources). Always present in run_live
+# output; absent only in very old canned scenarios (treat missing plane as "external").
 _FACT = {
     "type": "object",
     "required": ["value", "source", "tier", "provenance"],
@@ -24,6 +27,7 @@ _FACT = {
         "source": {"type": "string"},
         "tier": {"type": "string"},
         "provenance": {"type": "string"},
+        "plane": {"type": "string", "enum": ["internal", "external"]},
         "field": {"type": "string"},
         "confidence": {"type": "string"},
         "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},

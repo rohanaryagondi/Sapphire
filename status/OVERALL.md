@@ -18,6 +18,7 @@ time** (corpus-first → search-the-gap, K2). Remaining front-end piece: the LOK
 | Fact tools | ✅ mostly real | EMET live · personas live · Q-Models real · moat **real** · ASO-tox **real** | [tools.md](tools.md) |
 | Dev/build harness | ✅ done | 3-contributor, PR-gated, local enforcement | [dev-harness.md](dev-harness.md) |
 | Front door (serve.py `/api/run`) | ✅ live firm (K1) | `run_live` default (`via=engine-live`); graceful canned fallback on static hosting | [engine.md](engine.md) |
+| **Transparent front end (`frontend/`)** | ✅ **live (PR #41)** | LOKA-fork Chainlit UI → in-process `run_live`; renders the full firm process + two distinct data planes; Demo + Live profiles | [frontend-loka.md](frontend-loka.md) |
 
 ## Phases (done)
 - **P1–P3:** control agents + Bucket-1 fact agents + Bucket-2 partners; orchestrator runs end-to-end (triage→
