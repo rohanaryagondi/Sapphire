@@ -11,6 +11,14 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — robyn_scs firm seam (fire-when-relevant Bucket-1 tool) — Track E  (`main`, PR #62)
+- Built-By: `rohan` (reviewed + Gate-5-verified + merged by Head Claude).
+- What: `tools/robyn_scs_seam.py` wires the vendored robyn_scs SCS/STA pipeline into the firm as a Bucket-1 tool seam — fires only with a real imaging `input_dir`; honest KNOWN_UNKNOWN on empty/absent plate (no fabricated connectivity); stdlib engine (heavy deps in the tool); internal plane; traced + provenance-stamped (`robyn-scs`). Fix-loop: empty-plate honesty + drop data_boundary from the internal-plane agent + non-mocked test.
+- Gates: review Approved + Gate-5 PASS; suite **527 green**.
+- **OVERNIGHT COMPLETE:** Tracks A (#57) + B (#56) + D (#61) + E (#62) all shipped. TSC2 demo runs live + replays. Report: dev/reports/overnight-2026-06-25-demo.md.
+
+---
+
 ## 2026-06-25 — TSC2 demo scenario captured ($0 deterministic replay) — Track D / DEMO COMPLETE  (`main`, PR #61)
 - Built-By: `rohan` (Rohan Claude; reviewed + Gate-5-verified + merged by Head Claude).
 - What: `scenarios/tsc2_live_run.json` — a REAL captured `run_live` run (wall 1050s; real moat internal-plane facts + 8 live EMET PMIDs external-plane + 5-persona spread + DIVERGENCE + synthesis), replayed by the front end instantly $0/offline. Reproducible capture script (`_build/capture_tsc2_live.py` emits `_internal_only`/`_data_notice`), internal-only tagged, honest demo doc (`frontend/DEMO_TSC2.md`; guardrail-abstentions shown honestly, not as deliberate holds).
