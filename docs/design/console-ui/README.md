@@ -10,6 +10,37 @@ two-bucket firm. It is **design iteration only**: it does **not** change the run
 `frontend/`. The chosen direction (`sapphire_loka.html`) is meant to fold into `frontend/` later,
 once the design is signed off.
 
+## Baseline — the real LOKA-built frontend
+
+These mockups are the proposed **3-pane (side-panel) evolution of the actual running app** — they are
+**not** a greenfield design. The real app is the **LOKA Chainlit fork at `frontend/`**, re-pointed to
+the in-process live firm via **`bridge.run → live_engine.run_live`** (so the same Console reasoning
+runs the real two-bucket firm in-process).
+
+**Gavin should run + study that real app first, as the baseline,** before refining the mockups:
+
+```sh
+cd frontend && chainlit run main.py --port 8000
+# then open http://localhost:8000
+```
+
+It ships three chat profiles to study:
+
+- **Demo (mock backends)** — instant, deterministic, $0; the real firm logic over an offline ctx.
+- **Live (cheap · haiku)** — the real firm against live backends (real moat · real EMET · real
+  seams/Q-Models), with every Claude agent on **haiku** so it doesn't burn default-model tokens.
+- **Replay (captured TSC2)** — a frozen REAL TSC2 engagement replayed verbatim ($0, no model/network).
+
+> **Note:** the **real internal-moat facts require `RohanOnly/moat/moat.sqlite`** to be present
+> locally (it is gitignored). Without it, the moat **degrades to empty/mock honestly** — it never
+> fabricates and never crashes — so a live run on a machine without the SQLite shows fewer/no internal
+> facts rather than failing.
+
+The design task is to **evolve that frontend into the agreed 3-pane layout** (left = agent output
+cards · center = the response · right = the live trace), **staying within LOKA/Chainlit's design
+tokens** — **not** to replace it with a new app. The fold-in to `frontend/` happens **only when Gavin
+signs off**.
+
 ## The 3-pane vision
 
 The console renders the *whole firm process* in one screen — facts on the left, the firm's answer in

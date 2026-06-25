@@ -17,6 +17,26 @@ Chainlit's exact shadcn tokens, Quiver purple as `--primary`, the Sapphire gem m
 *same product*, not a new aesthetic. Three earlier explorations (`variant_a` Mission Control, `variant_c` The Firm,
 `variant_b` Exec Brief — light) are kept for range, **not** to ship as-is.
 
+## Baseline — the real LOKA-built frontend
+The mockups in `docs/design/console-ui/` are the proposed **3-pane (side-panel) evolution** of the **actual running
+app** — the **LOKA Chainlit fork at `frontend/`**, re-pointed to the in-process live firm via **`bridge.run →
+live_engine.run_live`**. **Run + study that real app first, as the baseline**, before refining the mockups:
+
+```sh
+cd frontend && chainlit run main.py --port 8000
+# then open http://localhost:8000
+```
+
+Three profiles to study: **Demo (mock, instant)** ($0, deterministic — the full process offline), **Live (cheap ·
+haiku) (real firm)** (live backends — real moat · real EMET · real seams/Q-Models — with every Claude agent on haiku
+so it doesn't burn default-model tokens), and **Replay (captured TSC2)** (a frozen REAL TSC2 run replayed verbatim,
+$0, no model/network). **Note:** the **real internal-moat facts require `RohanOnly/moat/moat.sqlite`** present locally
+(gitignored) — without it the moat **degrades to empty/mock honestly** (never fabricated, never a crash).
+
+The task is to **evolve that frontend into the agreed 3-pane layout** (left = output cards · center = response · right
+= live trace), **staying within LOKA/Chainlit's design tokens** — **not** to replace it with a new app. The fold-in to
+`frontend/` happens **only when Gavin signs off**.
+
 ## Goal
 Iterate the **LOKA-native 3-pane console** **with Gavin** into the agreed design. This is **collaborative design
 work**, not a spec to execute blind: **present options, get Gavin's calls, refine** — loop until Gavin signs off.
