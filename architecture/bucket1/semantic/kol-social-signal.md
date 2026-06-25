@@ -10,14 +10,22 @@ on why a trial design will fail, carries forward-looking signal that doesn't exi
 ## Inputs
 - The prompt + scoped dossier field **F2**, plus target / mechanism, key investigators, and competitors.
 
-## Procedure
+## Procedure — corpus-first, then harvest the gap live
 1. Identify the field's KOLs and high-signal analyst voices for this target/class.
-2. Harvest pre-publication signal: conference abstracts/posters, researcher posts, expert newsletters,
-   podcast/interview commentary, preprint *discussion* (EMET owns the preprints themselves).
-3. Separate **signal** (a credentialed expert's reasoned take) from noise; attribute every item and tier
-   it low (T4) unless it's a named expert on the record (then T3).
+2. **Query the local corpus FIRST.** Search
+   [`sapphire-orchestrator/corpus/kol-social-signal/`](../../../sapphire-orchestrator/corpus/kol-social-signal/)
+   — `index.jsonl` (one card per line: who · venue · claim · target_drug · position · attribution · date ·
+   source · url · quote · tier) and the themed `notes/`. This holds **durable named-expert-on-record
+   positions** (journal editorials/viewpoints, society voices) already attributed + dated, with the
+   optimist↔skeptic **divergence** mapped. See its `manifest.md` + `QUERIES.md`.
+3. **Harvest the gap live — this is the agent's core job.** Ephemeral social signal (X.com, Substack,
+   podcasts, conference posters, LinkedIn, preprint *discussion*) is **NOT pre-ingested** (unstable, not
+   verbatim-citable). Harvest it live, separate **signal** (a credentialed expert's reasoned take) from
+   noise, attribute every item, and tier it **T4** (anonymous/social) — or **T3** for a named expert on
+   record (in the durable corpus, T3 is stored as **T2** per the gate's T1/T2 scheme; see manifest).
 4. Note where informal expert consensus diverges from the published record — a forward indicator.
-5. Route formal-evidence sub-questions through the **EMET Analyst interface**.
+5. **Validate any load-bearing claim against the EMET Analyst interface** before it's treated as fact
+   (the corpus's card #6 is a worked example).
 
 ## Output (contract)
 ```
@@ -28,10 +36,18 @@ KNOWN UNKNOWNS: low-coverage subfields
 ```
 
 ## Sources / tools
-Per Hayes' draft: X.com API (targeted high-signal accounts), Substack RSS (biotech/pharma newsletters),
-YouTube Data API (conference/investor-day transcripts), conference abstract portals (ACNP, APA, ADAA,
-domain-specific), BioSpace/Fierce/STAT conference coverage, ResearchGate profiles, podcast RSS,
-LinkedIn public posts, preprint discussion threads. Tier named-expert-on-record **T3**; anonymous/social **T4**.
+**Local corpus (first):** [`sapphire-orchestrator/corpus/kol-social-signal/`](../../../sapphire-orchestrator/corpus/kol-social-signal/)
+— pre-ingested, attributed named-KOL on-record positions (`index.jsonl` + themed `notes/`, each card with
+who/venue/date/url/quote/tier). Hit this before any live harvest.
+
+**Live (the gap — the agent's core job):** Per Hayes' draft — X.com API (targeted high-signal accounts),
+Substack RSS (biotech/pharma newsletters), YouTube Data API (conference/investor-day transcripts),
+conference abstract portals (ACNP, APA, ADAA), BioSpace/Fierce/STAT coverage, ResearchGate, podcast RSS,
+LinkedIn public posts, preprint discussion threads.
+
+**Tiering:** named-expert-on-record **T3**; anonymous/social **T4**. *Corpus mapping:* the gate is two-tier
+(T1/T2), so durable named-expert positions are stored **T2**; T4 social chatter is **live-only**, never
+pre-ingested (unstable/uncitable). Public posts only; attribute, don't impersonate.
 
 ## Rules
 - **Facts only** — report who said what; the *claim's* validity is checked against EMET, not asserted here.
