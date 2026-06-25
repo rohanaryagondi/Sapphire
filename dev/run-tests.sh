@@ -41,6 +41,19 @@ if [ -d frontend/tests ]; then
   fi
 fi
 
+# frontend2 suite (custom stdlib-only 3-pane console). Like the frontend suite, it lives at
+# the repo root and is stdlib-only (offline demo profile over a real socket — NO chainlit). The
+# SSE-streaming tests run the real firm through the mock ctx, so they are a touch slower.
+if [ -d frontend2/tests ]; then
+  out="$(python -m unittest discover -s frontend2/tests -t frontend2 2>&1)"
+  n="$(printf '%s' "$out" | grep -oE 'Ran [0-9]+' | grep -oE '[0-9]+' | head -1)"
+  if printf '%s' "$out" | grep -qE '^OK'; then
+    echo "  ✓ frontend2 (${n:-0})"; total=$((total + ${n:-0}))
+  else
+    echo "  ✗ frontend2 FAILED"; printf '%s\n' "$out" | tail -8; fail=1
+  fi
+fi
+
 if [ "$fail" -eq 0 ]; then
   echo "Gate 1 GREEN — $total tests."
 else
