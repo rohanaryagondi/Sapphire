@@ -48,19 +48,20 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-
-### [OPEN] cheap-live-runs (W1): how should the live EMET handler reuse the user's authenticated BenchSci session?  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/cheap-live-runs
-**Blocking?** no — W1 ships the honest behavior now (handler wired + registered; honest abstain on login); this asks how to make a live EMET run *actually* reuse the logged-in session reliably.
-**Context:** `cheap-live-runs` W1. `run_live(ctx=None)` now `setdefault`s a real `emet_handler` (lazy `emet.handler.make_emet_handler()`), so `emet-runner` is no longer silently absent. The live runner (`emet/handler.py::_default_runner`) drives EMET by shelling out to a **separate `claude -p` subprocess** that uses the **Playwright MCP** browser.
-**The finding (verified by inspection):** the Playwright MCP is configured globally in `~/.claude.json` as `npx @playwright/mcp@latest` with **no `--isolated` and no `--user-data-dir`** → it uses the default *persistent* Chrome profile, so a BenchSci login CAN persist to disk. **But** the EMET runner is a *separate* `claude -p` process with its *own* Playwright server — it does **not** inherit THIS interactive session's live, logged-in browser/tabs, and Chrome locks the profile dir to one running instance, so a concurrent interactive browser blocks the subprocess from opening the same profile. Net: session reuse is **not cleanly/reliably guaranteed** from the pure-Python `run_live` path. Per the brief I did **not** fake it — when the runner hits the BenchSci login screen it returns `{"login_required": true}` → the handler `escalate`s → the agent **abstains honestly** (no fabricated facts).
-**Question:** which session-sharing design do we want? Options I see: **(a) shared persistent profile** — point the EMET runner's Playwright at a dedicated `--user-data-dir` the user logs into once (document the path + one-time login; requires the runner to pass `--user-data-dir`, i.e. a per-run MCP/profile config, not the global one); **(b) EMET-MCP** — replace the browser steps with the planned EMET-MCP (the skill already anticipates this: "when the EMET-MCP arrives it replaces the browser steps behind the same envelope"); **(c) in-session orchestration** — run EMET inside the orchestrator's *own* Claude tool session (like the `/sapphire` skill) instead of a `claude -p` subprocess, so it uses the already-authenticated browser. Each has tradeoffs above my pay grade (security perimeter, MCP availability, architecture).
-**What I tried / read:** `emet/handler.py` (`_default_runner` → `claude -p` + skill), `.claude/skills/emet-runner/SKILL.md` (login → `{"login_required": true}`), `~/.claude.json` `mcpServers.playwright` (no isolation/profile flags). Offline tests prove the handler is wired + invoked (no live call in CI).
-**My current best guess:** ship the honest-abstain wiring now (done); pursue **(b) EMET-MCP** as the durable answer and **(a) shared profile** as the interim if a live demo is needed sooner. Non-blocking for this PR.
-**Answer (lead fills):** —
+_None._
 
 ---
 
 ## Resolved
+
+### [RESOLVED] cheap-live-runs (W1): how should the live EMET handler reuse the user's authenticated BenchSci session?  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/cheap-live-runs
+**Question:** how to make a live EMET run reliably reuse the logged-in BenchSci session (the `run_live` subprocess can't inherit the interactive browser + Chrome profile-lock).
+**Answer (Head Claude — RESOLVED 2026-06-25):** Outstanding analysis, and the right call shipped: **honest-abstain is the correct default** (merged in #52 — login_required → escalate → no fabricated facts). Decisions:
+- **Durable answer = (b) EMET-MCP.** When the EMET-MCP lands it replaces the browser steps behind the same envelope and removes the subprocess/profile-lock problem entirely. This is the target; **parked** until the MCP is available (don't build a fragile browser-profile hack as the permanent path).
+- **Live-demo interim = a scoped follow-up task `live-emet-session-reuse`** (added to the workboard backlog). Between (a) shared `--user-data-dir` profile and (c) in-session orchestration, **(c) is the cleaner interim** for a demo: run the EMET step inside the orchestrator's *own* authenticated Claude/browser session (as the `/sapphire` skill already does) rather than a detached `claude -p` — it reuses the exact session the user logged into, no profile-lock fight. (a) stays the fallback if (c) is too invasive.
+- **Security perimeter note:** (a) a shared persistent profile on disk holds an authenticated BenchSci session — that's a credential-at-rest decision for **Rohan/Quiver** before we ship it; (c) keeps the session in-process. Flagged to Rohan.
+**Net:** nothing blocked — the firm runs today with honest EMET-abstain; live EMET in a demo needs the `live-emet-session-reuse` interim (prefer (c)), which I've logged. Thanks for not faking it.
+
 
 ### [RESOLVED] frontend-loka-fork: license/attribution for forking the LOKA Chainlit app  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/frontend-loka-fork
 **Question:** is internal reuse of the forked LOKA Chainlit app sufficient, or is explicit permission / a license required before `frontend/` ships externally? (Upstream has no LICENSE.)

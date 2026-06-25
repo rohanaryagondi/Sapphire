@@ -19,8 +19,8 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `cheap-live-runs` | **🔨 assigned → Rohan Claude** | **Standard.** Make a live run usable + cheap: (1) wire `emet_handler` into `run_live`'s live ctx (lazy) so a logged-in EMET session is actually used — or abstain honestly + HELP if session-reuse needs a design call; (2) `CLAUDE_MODEL`→`--model` pass-through in `dispatch_claude` + a **"Live (cheap)"** front-end profile (haiku and/or mock personas, real facts). Engine stays stdlib; data boundary intact. | `rohan/cheap-live-runs` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-cheap-live-runs.md) |
-| `dispatch-optimization` | **assigned → Rohan Claude (after cheap-live-runs)** | **Standard→Feature.** Keep Claude agents warm + stop re-reading context: spike+baseline (token/latency) → Opt1 sub-agents stop loading CLAUDE.md (cache-friendly prefix) → Opt2 batch-per-bucket (flagged) → Opt3 warm stream-json worker (per-agent context reset, cold fallback). All behind `dispatch_claude`; outputs/guards/provenance unchanged; subscription, no API. | `rohan/dispatch-optimization` | [runtime-harness](runtime-harness.md) · [**brief**](../docs/superpowers/plans/2026-06-24-dispatch-optimization.md) |
+| `cheap-live-runs` | ✅ **merged (#52)** | **Standard.** Make a live run usable + cheap: (1) wire `emet_handler` into `run_live`'s live ctx (lazy) so a logged-in EMET session is actually used — or abstain honestly + HELP if session-reuse needs a design call; (2) `CLAUDE_MODEL`→`--model` pass-through in `dispatch_claude` + a **"Live (cheap)"** front-end profile (haiku and/or mock personas, real facts). Engine stays stdlib; data boundary intact. | `rohan/cheap-live-runs` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-cheap-live-runs.md) |
+| `dispatch-optimization` | **🔨 NOW (cheap-live-runs ✅ merged)** | **Standard→Feature.** Keep Claude agents warm + stop re-reading context: spike+baseline (token/latency) → Opt1 sub-agents stop loading CLAUDE.md (cache-friendly prefix) → Opt2 batch-per-bucket (flagged) → Opt3 warm stream-json worker (per-agent context reset, cold fallback). All behind `dispatch_claude`; outputs/guards/provenance unchanged; subscription, no API. | `rohan/dispatch-optimization` | [runtime-harness](runtime-harness.md) · [**brief**](../docs/superpowers/plans/2026-06-24-dispatch-optimization.md) |
 | `frontend-and-data-planes` | ✅ **COMPLETE (A #37 + B #41)** | **Feature DONE.** A: two enforced data planes (`plane_for`, fail-safe boundary rule, derived `plane` on every fact). B: **transparent front end** — `frontend/` forks LOKA's Chainlit app (real repo untouched), re-points to in-process `live_engine.run_live`, renders the full firm process (plan→per-agent→dossier split by **two distinct planes**→roundtable **spread**→synthesis→partial-run banner); Demo + Live profiles; engine stays stdlib. Gate 2 ✅ + Gate 5 ✅ (PASS — bridge hits real engine, planes zero cross-contamination, app launches). Suite **463**. `site/` superseded. | — | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-sapphire-frontend-and-data-planes.md) |
 | `loka-integration-plan` | ✅ merged (#34) | Analyzed LOKA source (read-only), wrote plan + `/api/run` wire contract + open questions; data-boundary ruled (separate planes). | — | [frontend-loka](frontend-loka.md) |
 | `crossplatform-test-hardening` | ✅ merged (#22) | Fixed 3 cross-platform test fails (moat dir-name, cp1252). Suite 343 green. | — | [dev-harness](dev-harness.md) |
@@ -72,6 +72,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 
 | Task id | Suggested owner | Goal | Area |
 |---|---|---|---|
+| `live-emet-session-reuse` | rohan | Live-EMET demo interim: run EMET in the orchestrator's own authenticated session (prefer in-session orchestration over a shared --user-data-dir profile) so a logged-in BenchSci session is actually reused; durable answer = EMET-MCP. Credential-at-rest call for Rohan if the profile route is chosen. (HELP-resolved 2026-06-25) | [runtime-harness](runtime-harness.md) |
 | ~~`frontdoor-wire-run-live`~~ | rohan | ✅ Folded into `frontend-and-data-planes` (active above) — the new `frontend/` connects directly to `run_live`; `serve.py /api/run` already serves it (K1). | [frontend-loka](frontend-loka.md) |
 | `aso-design-tool` | hayes | Build the ASO Design tool; feed designed sequences into the `aso-tox` `sequences=` channel | [tools](tools.md) |
 | `scenario-coverage` | gavin | Broaden captured scenario coverage across the 10-axis variety matrix | [engine](engine.md) |
@@ -82,6 +83,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `cheap-live-runs` (live-EMET wiring + haiku profile) | rohan | 2026-06-25 | PR #52 |
 | `semantic-corpora` (policy-legislative — Gavin's 3rd corpus) | gavin | 2026-06-24 | PR #48 |
 | `semantic-corpora` (financial-investor — Gavin's 2nd corpus) | gavin | 2026-06-24 | PR #38 |
 | `robyn-scs-endpoint-wiring` (tools/robyn_scs) | hayes | 2026-06-24 | PR #44 |

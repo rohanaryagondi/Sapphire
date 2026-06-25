@@ -11,6 +11,14 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — cheap-live runs (live-EMET wiring + model lever + haiku profile)  (`main`, PR #52)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude).
+- What: W1 — `run_live` now lazily wires a real `emet_handler` into the live ctx (`setdefault`; engine import graph stays stdlib); EMET on `login_required` **abstains honestly** (escalate → no fabricated facts), session-reuse design parked to EMET-MCP / a `live-emet-session-reuse` interim. W2 — `CLAUDE_MODEL`/`SAPPHIRE_MODEL` → `--model` in BOTH `dispatch_claude` and the EMET subprocess; a 3rd Chainlit profile **"Live (cheap · haiku)"** (real backends, haiku reasoning, nothing mocked/relabeled). Demo/Live profiles unchanged; run_live contract additive.
+- Gates: Gate 2 review = Approved; Gate 5 = "Works as claimed" — CRITICAL no-fabrication check passes (login_required → 0 EMET facts, agent `escalated`); lazy/stdlib boundary proven; `--model` argv present/absent verified; env set+restore leak-free. One fix-loop (thread `--model` into the EMET subprocess for honesty + cost). Suite **490 green**.
+- Follow-ups: `live-emet-session-reuse` (interim for live-EMET demos; prefer in-session orchestration) + EMET-MCP (durable).
+
+---
+
 ## 2026-06-24 — policy-legislative corpus — Gavin's 3rd Bucket-1 corpus  (`main`, PR #48)
 - Built-By: `gavin` (reviewed/gated/merged by Head Claude).
 - What: dual-source corpus, 6 cards — US CNS policy/pricing: CMS anti-amyloid CED coverage (2022), IRA Medicare price-negotiation cycle-2 (15 drugs, 2025), FDA/FDORA accelerated-approval reform (cms.gov/fda.gov T1); IRA small-molecule pill-penalty (KFF T2); 2 EMET cards on real PMIDs (36449413 lecanemab CLARITY-AD, 40225240 CDR-SB MCID).
