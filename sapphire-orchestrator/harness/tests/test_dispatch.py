@@ -90,16 +90,40 @@ class TestDispatch(unittest.TestCase):
         self.assertIn("--model", argv)
         self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
 
+    def test_dispatch_claude_falls_back_to_sapphire_model(self):
+        # serve.py pins via SAPPHIRE_MODEL; dispatch must honor it too so both levers work.
+        c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
+        env = json.dumps({"structured_output": {"ok": True}})
+        captured = []
+        prev_c = os.environ.pop("CLAUDE_MODEL", None)
+        prev_s = os.environ.get("SAPPHIRE_MODEL")
+        os.environ["SAPPHIRE_MODEL"] = "claude-haiku-4-5"
+        try:
+            D.dispatch_claude(c, {"q": 1}, runner=capturing_runner(captured, env))
+        finally:
+            if prev_c is not None:
+                os.environ["CLAUDE_MODEL"] = prev_c
+            if prev_s is None:
+                os.environ.pop("SAPPHIRE_MODEL", None)
+            else:
+                os.environ["SAPPHIRE_MODEL"] = prev_s
+        argv = captured[0]
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
+
     def test_dispatch_claude_no_model_when_env_unset(self):
         c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
         env = json.dumps({"structured_output": {"ok": True}})
         captured = []
-        prev = os.environ.pop("CLAUDE_MODEL", None)
+        prev_c = os.environ.pop("CLAUDE_MODEL", None)
+        prev_s = os.environ.pop("SAPPHIRE_MODEL", None)
         try:
             D.dispatch_claude(c, {"q": 1}, runner=capturing_runner(captured, env))
         finally:
-            if prev is not None:
-                os.environ["CLAUDE_MODEL"] = prev
+            if prev_c is not None:
+                os.environ["CLAUDE_MODEL"] = prev_c
+            if prev_s is not None:
+                os.environ["SAPPHIRE_MODEL"] = prev_s
         self.assertNotIn("--model", captured[0])
 
 if __name__ == "__main__":

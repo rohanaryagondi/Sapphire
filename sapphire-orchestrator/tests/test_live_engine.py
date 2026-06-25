@@ -1430,7 +1430,10 @@ class TestEmetHandlerWiring(unittest.TestCase):
         self.assertIs(ctx["emet_handler"], sentinel)
 
     def test_injected_mock_handler_lands_an_emet_fact(self):
-        # With a mock emet_handler, the emet-runner agent fires and its fact reaches the dossier.
+        # The brief's "injected mock emet_handler → the agent fires and lands a fact" check.
+        # This exercises the emet-runner DISPATCH path (handler supplied via _build_ctx);
+        # the NEW W1 wiring (registering a handler on ctx=None) is covered by
+        # test_wire_registers_a_callable_emet_handler + test_emet_runner_not_silently_absent_on_ctx_none.
         result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
         dossier = result["discover"]["dossier"]
         emet_facts = [f for f in dossier if f.get("provenance") == "emet-live"]

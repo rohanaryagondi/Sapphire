@@ -59,7 +59,8 @@ open design question — see `dev/HELP.md`.)*
 ### Live (cheap · haiku) — real firm, cheap reasoning
 Same live backends as **Live** (real moat · real EMET · real seams/corpora · real Q-Models), but every
 `claude` agent (Bucket-1 fact agents + Bucket-2 personas) runs on **haiku** — pinned via `CLAUDE_MODEL`
-through the bridge → `dispatch_claude --model` — so a real run doesn't burn default-model tokens.
+(the bridge's lever; `dispatch_claude` also honors `SAPPHIRE_MODEL`, serve.py's lever) →
+`dispatch_claude --model` — so a real run doesn't burn default-model tokens.
 **Honest:** the facts are real; only the model is cheaper (nothing is mocked or relabeled). Needs the
 `claude` CLI + a logged-in EMET session.
 
