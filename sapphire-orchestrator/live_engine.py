@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 import sys
 import os
+import time
 
 # Ensure the sapphire-orchestrator package root is on sys.path when called from tests CWD.
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -177,6 +178,30 @@ def _batch_bucket1(known_ids, bucket1_inputs, ctx, registry) -> dict:
         return {}
 
 
+def _emit(on_progress, eid, event: dict) -> None:
+    """Fire one live-progress milestone (live-run-visibility, additive side channel).
+
+    Two effects, both best-effort so they can NEVER break the engagement:
+      1. record a `{"type": "progress", ...}` event to the harness trace → the run is observable
+         by tailing `trace.jsonl` mid-run (incremental flush);
+      2. invoke the optional `on_progress(event)` callback (the front end's live step tree).
+
+    A bad callback or a trace-write failure is swallowed — progress is a side channel, never a
+    gate. `on_progress=None` ⇒ only the trace record (the trace was already written per agent;
+    these add the staged milestones), and the returned dict is byte-identical either way.
+    """
+    ev = dict(event)
+    try:
+        trace.record(eid, {"type": "progress", **ev})
+    except Exception:
+        pass
+    if on_progress is not None:
+        try:
+            on_progress(ev)
+        except Exception:
+            pass
+
+
 def _build_moat_agent():
     """Return the real moat backend closure."""
     def _moat_agent(inputs: dict) -> dict:
@@ -197,6 +222,7 @@ def run_live(
     ctx: dict | None = None,
     registry=None,
     engine: Orchestrator | None = None,
+    on_progress=None,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
@@ -262,6 +288,18 @@ def run_live(
     # Open the engagement trace (plan dict minus internal _ keys).
     public_plan = {k: v for k, v in plan.items() if not k.startswith("_")}
     trace.open_engagement(eid, public_plan)
+
+    # Live progress: the plan is ready (fires immediately after triage, before any agent runs).
+    _emit(on_progress, eid, {
+        "stage": "plan", "phase": "done",
+        "deliverable": public_plan.get("deliverable", ""),
+        "disease": public_plan.get("disease", ""),
+        "modality": public_plan.get("modality", ""),
+        "agents": [a.get("name", a) if isinstance(a, dict) else a
+                   for a in public_plan.get("agents", [])],
+        "panel": [p.get("persona", p) if isinstance(p, dict) else p
+                  for p in public_plan.get("panel", [])],
+    })
 
     # -----------------------------------------------------------------------
     # 3. Wire the REAL moat backend (only if caller didn't supply one already)
@@ -363,6 +401,10 @@ def run_live(
             # claude call can; bad batched output → honest abstain, not a fix-up.
             disp_fn = lambda contract, inputs, ctx, _o=_o: _o  # noqa: E731
 
+        # Live progress: this Bucket-1 agent is starting.
+        _emit(on_progress, eid, {"stage": "bucket1", "agent_id": agent_id, "phase": "start"})
+        _t0 = time.monotonic()
+
         res = harness.run(
             agent_id,
             agent_inputs,
@@ -371,6 +413,18 @@ def run_live(
             registry=registry,
             dispatch_fn=disp_fn,
         )
+
+        _elapsed = round(time.monotonic() - _t0, 2)
+        # Live progress: this Bucket-1 agent is done — real status/provenance/fact-count + timing
+        # (honest: an abstain reports its status, never a "✓"). The corpus facts surfaced below
+        # are independent of the live agent, so they're folded into n_facts here.
+        _n_facts = (len(res.output.get("facts", [])) if (res.ok and res.output) else 0) + len(corpus_cards)
+        _emit(on_progress, eid, {
+            "stage": "bucket1", "agent_id": agent_id, "phase": "done",
+            "status": res.status, "provenance": res.provenance,
+            "n_facts": _n_facts, "elapsed_s": _elapsed,
+            "error": res.error if not res.ok else None,
+        })
 
         agent_statuses.append({
             "id": agent_id,
@@ -435,6 +489,13 @@ def run_live(
         "agents": agent_statuses,
     }
 
+    # Live progress: Bucket-1 flags computed (VETO ⛔ / DIVERGENCE ⚠ / known-unknowns).
+    _emit(on_progress, eid, {
+        "stage": "flags", "phase": "done",
+        "n_veto": len(veto_flags), "n_divergence": len(divergence_flags),
+        "n_known_unknowns": len(known_unknowns), "n_facts": len(all_dossier_facts),
+    })
+
     # -----------------------------------------------------------------------
     # 5. Bucket 2 — persona partners (one harness.run per seated persona)
     # -----------------------------------------------------------------------
@@ -452,6 +513,11 @@ def run_live(
         if "company-partner" not in known_ids:
             continue
 
+        # Live progress: this persona is deliberating (round 1).
+        _emit(on_progress, eid, {"stage": "roundtable", "agent_id": persona_name,
+                                 "phase": "start", "round": 1})
+        _t0 = time.monotonic()
+
         res = harness.run(
             "company-partner",
             {
@@ -464,13 +530,14 @@ def run_live(
             registry=registry,
         )
 
+        _elapsed = round(time.monotonic() - _t0, 2)
         if res.ok and res.output:
             verdict = dict(res.output)
             verdict.setdefault("provenance", res.provenance)
             verdict["status"] = res.status
             round1.append(verdict)
         else:
-            round1.append({
+            verdict = {
                 "persona": persona_name,
                 "lens": lens,
                 "stance": "hold",
@@ -479,11 +546,21 @@ def run_live(
                 "fact_claims": [],
                 "provenance": res.provenance,
                 "status": res.status,
-            })
+            }
+            round1.append(verdict)
+
+        # Live progress: this persona's verdict landed — stance·conviction, or honest abstention.
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name, "phase": "done", "round": 1,
+            "status": verdict.get("status", res.status),
+            "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
+            "elapsed_s": _elapsed,
+        })
 
     # -----------------------------------------------------------------------
     # 6. Synthesis — deterministic assembly
     # -----------------------------------------------------------------------
+    _emit(on_progress, eid, {"stage": "synthesis", "phase": "start"})
     stances = [v.get("stance", "hold") for v in round1 if isinstance(v, dict)]
     pass_count = stances.count("pass")
     no_go_count = stances.count("no_go")
@@ -525,6 +602,12 @@ def run_live(
         "proposed_experiment": proposed_experiment,
         "entities": ents,
     }
+
+    # Live progress: synthesis done — the recommendation + confidence.
+    _emit(on_progress, eid, {
+        "stage": "synthesis", "phase": "done",
+        "recommendation": recommendation, "confidence": confidence,
+    })
 
     # Close the trace and run the self-improvement reflection loop.
     trace.close_engagement(eid, syn)

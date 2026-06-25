@@ -13,6 +13,7 @@ Run from the repo root:
 """
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -25,6 +26,7 @@ if str(_HERE) not in sys.path:
 import bridge          # noqa: E402  in-process run_live seam
 import render          # noqa: E402  pure run_live dict → specs
 import elements        # noqa: E402  specs → chainlit messages (imports chainlit+pandas)
+import progress        # noqa: E402  pure progress-event → step-label formatting
 from starters import STARTERS  # noqa: E402
 
 DEMO_PROFILE = "Demo (mock backends)"
@@ -104,30 +106,100 @@ def _profile_run_kwargs(profile: str) -> dict:
     return {"mock": True, "model": None}
 
 
+class _StepTree:
+    """Builds the live step tree from streamed run_live progress events. Top-level steps for
+    plan/flags/synthesis; parent groups for bucket1/roundtable, with a child step per agent/
+    persona that flips pending→done in place. Honest labels via progress.py (abstain ⇒ ⚠)."""
+
+    def __init__(self):
+        self._parents = {}   # stage -> cl.Step
+        self._children = {}  # (stage, agent_id) -> cl.Step
+        self._top = {}       # stage -> cl.Step (plan/flags/synthesis)
+
+    async def _parent(self, stage):
+        if stage not in self._parents:
+            p = cl.Step(name=progress.parent_name(stage), type="tool")
+            await p.send()
+            self._parents[stage] = p
+        return self._parents[stage]
+
+    async def handle(self, ev):
+        stage = ev.get("stage")
+        done = progress.is_done(ev)
+        if stage in ("plan", "flags", "synthesis"):
+            st = self._top.get(stage)
+            if st is None:
+                st = cl.Step(name=progress.step_name(ev), type="tool")
+                await st.send()
+                self._top[stage] = st
+            if done:
+                st.output = progress.step_output(ev)
+                await st.update()
+            return
+        # bucket1 / roundtable → child step under a parent group
+        parent = await self._parent(stage)
+        key = (stage, ev.get("agent_id"))
+        st = self._children.get(key)
+        if st is None:
+            st = cl.Step(name=progress.step_name(ev), type="tool", parent_id=parent.id)
+            await st.send()
+            self._children[key] = st
+        if done:
+            st.output = progress.step_output(ev)
+            await st.update()
+
+
+async def _run_with_live_steps(query: str, kwargs: dict) -> dict:
+    """Sync→async bridge: run `bridge.run` (which calls the synchronous `run_live`) in a worker
+    thread; its `on_progress` callback marshals each event back to THIS event loop via a
+    thread-safe queue, which we drain to update `cl.Step`s LIVE — steps appear DURING the run,
+    not after. Returns the final result dict (sentinel-terminated)."""
+    loop = asyncio.get_running_loop()
+    q: asyncio.Queue = asyncio.Queue()
+
+    def _on_progress(ev):                      # called on the worker thread
+        loop.call_soon_threadsafe(q.put_nowait, {"__event__": ev})
+
+    async def _runner():
+        res = await asyncio.to_thread(bridge.run, query, on_progress=_on_progress, **kwargs)
+        loop.call_soon_threadsafe(q.put_nowait, {"__result__": res})
+        return res
+
+    task = asyncio.create_task(_runner())
+    tree = _StepTree()
+    result = None
+    while True:
+        item = await q.get()
+        if "__result__" in item:
+            result = item["__result__"]
+            break
+        await tree.handle(item["__event__"])
+    await task                                 # propagate any (already-defensively-handled) state
+    return result
+
+
+async def _render_final(result: dict) -> None:
+    """The rich final view (dossier/planes/roundtable/synthesis) — unchanged from before."""
+    for msg in elements.to_messages(render.render_run(result)):
+        await cl.Message(content=msg["content"], elements=msg["elements"]).send()
+
+
 @cl.on_message
 async def on_message(message: cl.Message):
     profile = cl.user_session.get("chat_profile") or DEMO_PROFILE
-    kwargs = _profile_run_kwargs(profile)
     query = (message.content or "").strip()
     if not query:
         await cl.Message(content="_Please enter a question._").send()
         return
 
-    async with cl.Step(name="Convening the firm…", type="run") as step:
-        step.input = query
-        if profile == REPLAY_PROFILE:
-            # $0 deterministic replay of a frozen REAL capture — no model, no network.
+    if profile == REPLAY_PROFILE:
+        # $0 deterministic replay of a frozen REAL capture — no model, no network, no live steps.
+        async with cl.Step(name="Replaying captured TSC2 run…", type="run") as step:
             result = await cl.make_async(bridge.replay)(REPLAY_SCENARIO)
-            step.output = (f"via=replay · captured {result.get('_captured_at','')} · "
-                           f"$0 (frozen real run)")
-        else:
-            # bridge.run never raises; it runs the firm in-process (mock or live).
-            result = await cl.make_async(bridge.run)(query, **kwargs)
-            backend = "mock" if result.get("_mock") else "live"
-            model = result.get("_model") or "default"
-            step.output = (f"via={result.get('_via')} · {result.get('_elapsed_s')}s · "
-                           f"{backend} backends · model={model}")
+            step.output = f"via=replay · captured {result.get('_captured_at', '')} · $0 (frozen real run)"
+        await _render_final(result)
+        return
 
-    # Map the run_live dict → render specs → chainlit messages; send each in order.
-    for msg in elements.to_messages(render.render_run(result)):
-        await cl.Message(content=msg["content"], elements=msg["elements"]).send()
+    # Live / Cheap / Demo: stream the firm convening as a live step tree, then the rich final view.
+    result = await _run_with_live_steps(query, _profile_run_kwargs(profile))
+    await _render_final(result)

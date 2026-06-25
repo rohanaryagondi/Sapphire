@@ -80,8 +80,14 @@ def _error_envelope(query: str, exc: Exception) -> dict:
 
 
 def run(query: str, *, mock: bool = True, sequences: list | None = None,
-        model: str | None = None) -> dict:
+        model: str | None = None, on_progress=None) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
+
+    `on_progress(event)` is forwarded to `run_live` (live-run-visibility): it fires per
+    milestone (plan, each Bucket-1 agent start/done, flags, each persona start/done, synthesis)
+    so the caller can stream a live step tree. It runs on the worker thread that executes
+    `run_live`; the UI handler is responsible for marshalling events back to its event loop.
+    `None` ⇒ no progress (existing behavior).
 
     `sequences` is forwarded to `run_live` (the documented ASO-Design handoff: when ASO
     candidates are present they reach the aso-tox agent; `None` lets run_live extract any
@@ -103,7 +109,8 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
         if model:
             os.environ["CLAUDE_MODEL"] = model
         from live_engine import run_live
-        result = run_live(query, sequences=sequences, ctx=build_ctx(mock))
+        result = run_live(query, sequences=sequences, ctx=build_ctx(mock),
+                          on_progress=on_progress)
     except Exception as exc:  # defensive — run_live is designed not to raise
         result = _error_envelope(query, exc)
     finally:

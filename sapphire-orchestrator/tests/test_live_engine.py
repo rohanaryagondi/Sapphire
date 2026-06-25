@@ -1547,5 +1547,89 @@ class TestEmetHandlerWiring(unittest.TestCase):
         self.assertEqual(agents.get("emet-runner"), "ok")  # fired, not abstained
 
 
+class TestLiveProgress(unittest.TestCase):
+    """live-run-visibility W1 — run_live(on_progress=…) streams ordered milestones, additive."""
+
+    def setUp(self):
+        self._eng = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _run(self, **kw):
+        return run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx(), **kw)
+
+    def test_events_fire_in_stage_order(self):
+        events = []
+        self._run(on_progress=events.append)
+        self.assertTrue(events)
+        self.assertEqual(events[0]["stage"], "plan")
+        self.assertEqual(events[-1], {"stage": "synthesis", "phase": "done",
+                                      "recommendation": events[-1]["recommendation"],
+                                      "confidence": events[-1]["confidence"]})
+        stages = [e["stage"] for e in events]
+        # bucket1 (and its flags) precede roundtable precede synthesis
+        self.assertLess(stages.index("bucket1"), stages.index("roundtable"))
+        self.assertLess(stages.index("flags"), stages.index("roundtable"))
+        self.assertLess(stages.index("roundtable"), stages.index("synthesis"))
+
+    def test_bucket1_done_events_carry_real_result(self):
+        events = []
+        self._run(on_progress=events.append)
+        done = [e for e in events if e["stage"] == "bucket1" and e["phase"] == "done"]
+        self.assertTrue(done)
+        for e in done:
+            self.assertIn("status", e)
+            self.assertIn("provenance", e)
+            self.assertIn("n_facts", e)
+            self.assertIn("elapsed_s", e)
+        # the internal moat agent reports its real provenance + fact count (not a fake "ok")
+        moat = [e for e in done if e["agent_id"] == "internal-science-lead"]
+        self.assertTrue(moat)
+        self.assertEqual(moat[0]["provenance"], "moat-real")
+
+    def test_roundtable_done_events_carry_stance(self):
+        events = []
+        self._run(on_progress=events.append)
+        rt = [e for e in events if e["stage"] == "roundtable" and e["phase"] == "done"]
+        self.assertTrue(rt)
+        for e in rt:
+            self.assertIn("stance", e)
+            self.assertEqual(e["round"], 1)
+
+    def test_additive_output_identical_with_and_without_callback(self):
+        r0 = self._run()
+        r1 = self._run(on_progress=lambda e: None)
+        self.assertEqual(len(r0["discover"]["dossier"]), len(r1["discover"]["dossier"]))
+        self.assertEqual(r0["consult"]["round1"], r1["consult"]["round1"])
+        self.assertEqual(r0["synthesize"]["recommendation"], r1["synthesize"]["recommendation"])
+
+    def test_raising_callback_never_breaks_the_run(self):
+        def _boom(e):
+            raise RuntimeError("ui blew up")
+        result = self._run(on_progress=_boom)   # must NOT raise
+        self.assertIn("discover", result)
+        self.assertTrue(result["consult"]["round1"])
+
+    def test_progress_flushed_to_trace_incrementally(self):
+        import json as _json
+        result = self._run(on_progress=lambda e: None)
+        eid = result["engagement_id"]
+        trace_path = os.path.join(self._eng, eid, "trace.jsonl")
+        with open(trace_path, encoding="utf-8") as fh:
+            evts = [_json.loads(l) for l in fh if l.strip()]
+        prog = [e for e in evts if e.get("type") == "progress"]
+        self.assertTrue(prog, "progress milestones must be recorded to trace.jsonl (tail-able)")
+        # plan progress appears BEFORE the engagement_close record (i.e. mid-run, not only at close)
+        kinds = [e.get("type") for e in evts]
+        self.assertIn("engagement_close", kinds)
+        first_progress = next(i for i, e in enumerate(evts) if e.get("type") == "progress")
+        close_idx = kinds.index("engagement_close")
+        self.assertLess(first_progress, close_idx)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
