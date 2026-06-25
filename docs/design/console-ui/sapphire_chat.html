@@ -130,6 +130,8 @@ body {
   transition: text-shadow 0.2s;
 }
 .brand:hover { text-shadow: 0 0 24px rgba(77,124,254,0.7); }
+/* "Quiver's" prefix — clean white, no blue glow; "Sapphire" keeps the brand blue+glow */
+.brand-pre { color: var(--ink); font-weight: 500; text-shadow: none; }
 
 .live-badge {
   display: flex;
@@ -487,9 +489,29 @@ body {
   border: 1px solid var(--edge-2);
   border-radius: 14px;
   padding: 8px 8px 8px 16px;
-  transition: border-color 0.18s;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  /* soft blue→violet glow on the composer border (mirrors the header glow) */
+  box-shadow: 0 0 18px -5px rgba(77,124,254,0.30), 0 0 1px rgba(160,124,255,0.30);
 }
-.input-wrap:focus-within { border-color: rgba(77,124,254,0.3); }
+.input-wrap:focus-within {
+  border-color: rgba(77,124,254,0.4);
+  box-shadow: 0 0 22px -3px rgba(77,124,254,0.45), 0 0 2px rgba(160,124,255,0.5);
+}
+
+/* ── Generation pulse — header glow + composer glow breathe while a response streams ── */
+@keyframes sa-pulse-header {
+  0%, 100% { box-shadow: 0 0 12px 1px rgba(77,124,254,0.22); opacity: 0.85; }
+  50%      { box-shadow: 0 0 22px 4px rgba(77,124,254,0.55); opacity: 1; }
+}
+@keyframes sa-pulse-input {
+  0%, 100% { box-shadow: 0 0 18px -5px rgba(77,124,254,0.30), 0 0 1px rgba(160,124,255,0.30); }
+  50%      { box-shadow: 0 0 30px 1px rgba(77,124,254,0.55), 0 0 3px rgba(160,124,255,0.6); }
+}
+.generating .nav::after { animation: sa-pulse-header 1.5s ease-in-out infinite; }
+.generating .input-wrap { animation: sa-pulse-input 1.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .generating .nav::after, .generating .input-wrap { animation: none; }
+}
 
 textarea.chat-input {
   flex: 1;
@@ -637,15 +659,15 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       </button>
     </div>
 
-    <a class="brand" href="#">Sapphire</a>
+    <a class="brand" href="#"><span class="brand-pre">Quiver's</span> Sapphire</a>
 
     <div class="nav-group right">
       <div class="live-badge">
         <span class="live-dot"></span>
         Live
       </div>
-      <button class="toggle-btn" id="rightToggle" aria-pressed="false" aria-label="Toggle Sources panel">
-        Sources
+      <button class="toggle-btn" id="rightToggle" aria-pressed="false" aria-label="Toggle Trace panel">
+        Trace
         <!-- right panel icon -->
         <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
           <rect x="1" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
@@ -676,7 +698,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 
           <!-- Empty state -->
           <div class="empty" id="emptyState">
-            <div class="empty-heading">Ask Sapphire</div>
+            <div class="empty-heading">Ask Sapphire Anything</div>
             <div class="empty-sub">CNS drug discovery, cited and deliberated.</div>
           </div>
 
@@ -708,43 +730,12 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     </div>
 
     <!-- RIGHT PANEL: SOURCES + CHAIN OF THOUGHT -->
-    <div class="panel right" id="rightPanel" role="complementary" aria-label="Sources">
+    <div class="panel right" id="rightPanel" role="complementary" aria-label="Trace">
       <div class="panel-inner">
-        <div class="panel-head">Sources &amp; Trace</div>
+        <div class="panel-head">Trace</div>
         <div class="panel-scroll">
 
-          <div class="src-section">Evidence</div>
-
-          <div class="src-row">
-            <div class="src-text">Neumora raised $399M Series C; navacaprant received FDA Fast Track designation Dec 2024.</div>
-            <div class="src-meta">
-              <span class="src-tier">T1</span>
-              <span class="src-ref">sec.gov EDGAR 8-K 2025-01-02</span>
-            </div>
-          </div>
-          <div class="src-row">
-            <div class="src-text">κ-opioid antagonism reduces anhedonia in TRD models; 3× lower off-target binding vs prior KOR candidates.</div>
-            <div class="src-meta">
-              <span class="src-tier">T2</span>
-              <span class="src-ref">PMID 38472831 · emet-live</span>
-            </div>
-          </div>
-          <div class="src-row">
-            <div class="src-text">KOASTAL-1 Phase 2b missed MADRS primary; proceeding to Phase 3 on anhedonia secondary signal.</div>
-            <div class="src-meta">
-              <span class="src-tier">T2</span>
-              <span class="src-ref">psychiatrictimes.com · browser</span>
-            </div>
-          </div>
-          <div class="src-row">
-            <div class="src-text">KOL Knopman skeptical; Javitt positive on κ-opioid class differentiation from existing TRD agents.</div>
-            <div class="src-meta">
-              <span class="src-tier">T2</span>
-              <span class="src-ref">PMID 41352683 · emet-live</span>
-            </div>
-          </div>
-
-          <div class="src-section" style="margin-top:4px">Chain of Thought</div>
+          <div class="src-section">Chain of Thought</div>
 
           <div class="trace-row">
             <span class="trace-n">1</span>
@@ -860,6 +851,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     var text = chatInput.value.trim();
     if (!text || waiting) return;
     waiting = true;
+    document.body.classList.add('generating');   // pulse the header + composer glow while generating
 
     /* First send: reveal chat, hide empty state + suggestions */
     if (!activated) {
@@ -893,6 +885,14 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       loadEl.innerHTML = DEMO_HTML;
       thread.scrollTop = thread.scrollHeight;
       waiting = false;
+      document.body.classList.remove('generating');   // stop the pulse
+      /* On response, auto-open the Agents wing — the ONLY wing that auto-toggles.
+         The Trace (right) panel is never auto-opened. */
+      if (!leftPanel.classList.contains('open')) {
+        leftPanel.classList.add('open');
+        leftToggle.classList.add('active');
+        leftToggle.setAttribute('aria-pressed', 'true');
+      }
     }, 1700);
   }
 
