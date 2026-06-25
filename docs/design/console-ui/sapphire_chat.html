@@ -80,20 +80,21 @@ body {
 .toggle-btn {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  border-radius: 7px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ink-3);
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 9px;
+  border: 1px solid var(--edge-2);
+  background: rgba(255,255,255,0.045);
+  color: var(--ink-2);
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
   white-space: nowrap;
   line-height: 1;
 }
-.toggle-btn:hover { background: var(--bubble); color: var(--ink-2); }
+.toggle-btn:hover { background: var(--bubble); color: var(--ink); border-color: rgba(255,255,255,0.16); }
 .toggle-btn.active {
   background: var(--blue-bg);
   border-color: var(--blue-bd);
@@ -497,6 +498,75 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 .send:active { transform: scale(0.95); }
 .send:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
+/* ── AGENT TREE (categorized, expandable) ───────────────────────── */
+.cat { border-bottom: 1px solid var(--edge); }
+.cat-head {
+  display: flex; align-items: center; gap: 9px;
+  padding: 11px 16px; cursor: pointer; user-select: none;
+  transition: background 0.12s;
+}
+.cat-head:hover { background: var(--bubble); }
+.cat-chev {
+  flex-shrink: 0; width: 9px; color: var(--ink-3);
+  transition: transform 0.18s ease;
+}
+.cat.open .cat-chev { transform: rotate(90deg); color: var(--ink-2); }
+.cat-name { flex: 1; font-size: 13px; font-weight: 600; color: var(--ink); letter-spacing: 0.01em; }
+.cat-count { font-family: var(--mono); font-size: 10px; color: var(--ink-3); }
+.cat-body { display: none; padding: 2px 0 8px; }
+.cat.open .cat-body { display: block; }
+
+/* agent card */
+.agent-card {
+  margin: 5px 10px; border: 1px solid var(--edge); border-radius: var(--r-sm);
+  background: var(--surface); overflow: hidden;
+  transition: border-color 0.14s, box-shadow 0.14s;
+}
+.agent-card:hover { border-color: var(--edge-2); }
+.agent-card.target { border-color: var(--blue-bd); box-shadow: 0 0 0 1px var(--blue-bd); }
+.ac-head { display: flex; align-items: center; gap: 8px; padding: 9px 11px; cursor: pointer; }
+.ac-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+.ac-dot.active { background: var(--teal); box-shadow: 0 0 0 3px var(--teal-bg); }
+.ac-dot.queued { background: var(--ink-3); }
+.ac-title { flex: 1; font-size: 12.5px; font-weight: 500; color: var(--ink); line-height: 1.3; }
+.ac-chev { flex-shrink: 0; width: 9px; color: var(--ink-3); transition: transform 0.18s; }
+.agent-card.open .ac-chev { transform: rotate(90deg); }
+.ac-detail { display: none; padding: 0 12px 12px; }
+.agent-card.open .ac-detail { display: block; }
+.ac-task {
+  font-size: 11.5px; color: var(--ink-2); font-style: italic;
+  padding: 0 0 9px; border-bottom: 1px solid var(--edge); margin-bottom: 9px;
+}
+.ac-brief p { font-size: 12px; color: var(--ink-2); line-height: 1.6; margin-bottom: 8px; }
+.ac-brief p:last-child { margin-bottom: 0; }
+.ac-srch {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-3); margin: 11px 0 6px;
+}
+.ac-src { display: flex; gap: 7px; font-size: 11px; color: var(--ink-2); line-height: 1.45; margin-bottom: 6px; }
+.ac-src:last-child { margin-bottom: 0; }
+.ac-src-tier { font-family: var(--mono); font-size: 9px; color: var(--teal); flex-shrink: 0; margin-top: 2px; }
+
+/* ── BLUE FINDINGS (agent-attributed, in the brief) ─────────────── */
+.finding {
+  position: relative; color: var(--blue); cursor: pointer;
+  border-bottom: 1px dotted var(--blue-bd); transition: background 0.12s;
+}
+.finding:hover { background: var(--blue-bg); }
+.finding-tip {
+  position: absolute; bottom: 100%; left: 50%;
+  transform: translateX(-50%) translateY(-5px);
+  background: #0a0a0a; border: 1px solid var(--blue-bd); color: var(--ink);
+  font-size: 11px; font-weight: 500; font-style: normal; white-space: nowrap;
+  padding: 4px 9px; border-radius: 6px; opacity: 0; pointer-events: none;
+  transition: opacity 0.13s; z-index: 60; box-shadow: 0 4px 16px rgba(0,0,0,0.45);
+}
+.finding-tip::after {
+  content: ""; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 4px solid transparent; border-top-color: var(--blue-bd);
+}
+.finding:hover .finding-tip { opacity: 1; }
+
 /* ── ANIMATIONS ─────────────────────────────────────────────────── */
 @keyframes fadeup {
   from { opacity: 0; transform: translateY(8px); }
@@ -557,66 +627,8 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     <div class="panel" id="leftPanel" role="complementary" aria-label="Agents">
       <div class="panel-inner">
         <div class="panel-head">Agents</div>
-        <div class="panel-scroll">
-
-          <div class="agent-row">
-            <span class="a-dot done"></span>
-            <div>
-              <div class="a-name">Financial &amp; Investor</div>
-              <div class="a-note">$399M Series C; Fast Track granted Dec 2024</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot done"></span>
-            <div>
-              <div class="a-name">KOL &amp; Social Signal</div>
-              <div class="a-note">Knopman skeptical; Javitt positive on κ-opioid class</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot done"></span>
-            <div>
-              <div class="a-name">Global Regulatory</div>
-              <div class="a-note">FDA Fast Track; no ex-US flags</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot done"></span>
-            <div>
-              <div class="a-name">Patient Advocacy</div>
-              <div class="a-note">Strong TRD community; anhedonia is priority endpoint</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot done"></span>
-            <div>
-              <div class="a-name">EMET Analyst</div>
-              <div class="a-note">4 PMIDs returned; 2 passed T2 threshold</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot active"></span>
-            <div>
-              <div class="a-name">Reputational</div>
-              <div class="a-note">Running…</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot"></span>
-            <div>
-              <div class="a-name queued">Policy &amp; Legislative</div>
-              <div class="a-note">Queued</div>
-            </div>
-          </div>
-          <div class="agent-row">
-            <span class="a-dot"></span>
-            <div>
-              <div class="a-name queued">Patent &amp; IP</div>
-              <div class="a-note">Queued</div>
-            </div>
-          </div>
-
-        </div>
+        <!-- Populated by renderAgentTree() — category sections → stacked agent cards -->
+        <div class="panel-scroll" id="agentTree"></div>
       </div>
     </div>
 
@@ -766,11 +778,19 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 
+  /* A finding = a fact a specific agent surfaced. Rendered blue; hover shows the
+     responsible agent; click opens the Agents wing + expands that agent's card. */
+  function fnd(agent, label, text) {
+    return '<span class="finding" data-agent="' + agent + '" tabindex="0" role="button">'
+         + text + '<span class="finding-tip">' + label + '</span></span>';
+  }
+
   /* Demo response — shown for any query in this prototype */
   var DEMO_HTML = [
     '<div class="ai-body">',
-    '<p>Navacaprant (NMRA-140) is Neumora\'s selective κ-opioid receptor antagonist for treatment-resistant depression.',
-    ' The firm reached a <strong>conditional advance</strong> verdict — compelling mechanism and strong capital position,',
+    '<p>Navacaprant (NMRA-140) is Neumora\'s ',
+    fnd('emet', 'EMET Analyst', 'selective κ-opioid receptor antagonist'),
+    ' for treatment-resistant depression. The firm reached a <strong>conditional advance</strong> verdict — compelling mechanism and strong capital position,',
     ' but the Phase 3 readout is the decisive gate before any position recommendation.</p>',
     '<div class="verdict">',
     '<div class="verdict-lbl">Verdict — Conditional Advance</div>',
@@ -778,8 +798,15 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
     ' Phase 3 KOASTAL-3 readout. Dissent (Adversarial): Phase 2b MADRS miss is a mechanism signal, not sampling noise —',
     ' proceeding on the secondary anhedonia finding is a fundable thesis, not a demonstrated one.</div>',
     '</div>',
-    '<p>Neumora closed a $399M Series C and received FDA Fast Track designation in December 2024. KOASTAL-1 missed its',
-    ' primary MADRS endpoint but showed a significant anhedonia signal, which Phase 3 is powered to confirm as the primary outcome.</p>',
+    '<p>Neumora closed a ',
+    fnd('financial', 'Financial &amp; Investor', '$399M Series C'),
+    ' and received ',
+    fnd('global-regulatory', 'Global Regulatory', 'FDA Fast Track designation in December 2024'),
+    '. ',
+    fnd('clinical-trial-registry', 'Clinical-Trial Registry', 'KOASTAL-1 missed its primary MADRS endpoint'),
+    ' but showed a ',
+    fnd('patient-advocacy', 'Patient Advocacy', 'significant anhedonia signal'),
+    ', which Phase 3 is powered to confirm as the primary outcome.</p>',
     '<div class="src-chips">',
     '<span class="chip emet">✓ EMET · PMID 38472831</span>',
     '<span class="chip emet">✓ EMET · PMID 36449413</span>',
@@ -846,6 +873,250 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
   chatInput.addEventListener('input', function () {
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+  });
+
+  /* ════════════════════════════════════════════════════════════════
+     AGENTS WING — category sections → stacked agent cards
+     Each agent: id (matches data-agent on blue findings), name, task,
+     status (done|active|queued), a 1–5 paragraph brief, and main sources.
+     ════════════════════════════════════════════════════════════════ */
+  var AGENT_TREE = [
+    { cat: 'Internal Science & Moat', agents: [
+      { id: 'internal-moat', name: 'Internal Moat (EP-CRISPR)', status: 'done',
+        task: 'Probe the Quiver atlas for a KOR-pathway signal',
+        brief: [
+          'Queried the EP-CRISPR functional-genomics atlas for any perturbation signal on the κ-opioid receptor (OPRK1) pathway. No internal hit cleared threshold — the target sits outside Quiver\'s currently screened space.',
+          'Reported as abstention, not contradiction: absence of an internal signal does not weigh against the external evidence, so no DIVERGENCE was raised to the roundtable.'
+        ],
+        sources: [{ tier: '—', text: 'Quiver EP-CRISPR atlas (internal) — OPRK1 pathway, no signal above threshold' }] }
+    ] },
+    { cat: 'Biomedical Evidence (EMET)', agents: [
+      { id: 'emet', name: 'EMET Analyst', status: 'done',
+        task: 'Retrieve mechanism & target-validation literature',
+        brief: [
+          'Navacaprant (NMRA-140) is a selective κ-opioid receptor (KOR) antagonist. The KOR / dynorphin system is an established modulator of dysphoria, anhedonia and stress reactivity — a mechanistically distinct lever from the monoaminergic standard of care in treatment-resistant depression.',
+          'Four PMIDs were returned; two cleared the T2 evidence threshold — a KOR-antagonist mechanism review and a Phase 2 anhedonia-endpoint report — both corroborating the anhedonia thesis that Phase 3 is powered to confirm as its primary outcome.'
+        ],
+        sources: [
+          { tier: 'T2', text: 'PMID 38472831 — KOR antagonism in mood disorders (mechanism review)' },
+          { tier: 'T2', text: 'PMID 36449413 — anhedonia endpoint in a KOR-antagonist Phase 2 trial' }
+        ] }
+    ] },
+    { cat: 'Quantitative Models', agents: [
+      { id: 'quant-scs', name: 'Quantitative Models (SCS / STA)', status: 'done',
+        task: 'Score the candidate against the comparator base rate',
+        brief: [
+          'The SCS / STA model places navacaprant against the historical base rate for first-in-class CNS mechanisms entering Phase 3 after a Phase 2 primary miss with a positive secondary. The conditional probability favours advancing only when the Phase 3 endpoint is realigned to the surviving secondary — which KOASTAL-3 has done.',
+          'Confidence on the synthesis verdict scored 72%, bounded by the single-readout dependency rather than by mechanism risk.'
+        ],
+        sources: [{ tier: '—', text: 'Sapphire SCS/STA model — CNS first-in-class Phase 3 base-rate panel' }] }
+    ] },
+    { cat: 'Genetics & Constraint', agents: [
+      { id: 'genetics', name: 'Genetics & Constraint (gnomAD / GTEx)', status: 'done',
+        task: 'Check target tolerance to loss-of-function & expression',
+        brief: [
+          'OPRK1 is loss-of-function tolerant in gnomAD (no strong constraint signal), consistent with an antagonist being pharmacologically tractable without an obvious haploinsufficiency liability. GTEx shows expression concentrated in CNS tissues, supporting on-target central activity with limited peripheral exposure.'
+        ],
+        sources: [
+          { tier: 'T1', text: 'gnomAD v4 — OPRK1 constraint metrics (LoF-tolerant)' },
+          { tier: 'T1', text: 'GTEx — OPRK1 tissue expression (CNS-weighted)' }
+        ] }
+    ] },
+    { cat: 'Regulatory Memory', agents: [
+      { id: 'fda-memory', name: 'FDA Institutional Memory', status: 'done',
+        task: 'Surface precedent for the proposed endpoint strategy',
+        brief: [
+          'Institutional-memory recall finds precedent for an anhedonia / symptom-domain primary in depression programs, and for Fast Track changing the review cadence but not the evidentiary bar. The agent flagged that a single pivotal positive on a realigned endpoint historically invites an advisory-committee discussion rather than a clean approval.'
+        ],
+        sources: [{ tier: 'T1', text: 'FDA institutional-memory corpus — CNS endpoint precedent (claim-cards)' }] }
+    ] },
+    { cat: 'Global Regulatory', agents: [
+      { id: 'global-regulatory', name: 'Global Regulatory', status: 'done',
+        task: 'Map FDA + ex-US designations and obligations',
+        brief: [
+          'Navacaprant received FDA Fast Track designation in December 2024. No conflicting ex-US regulatory flags surfaced (EMA / PMDA / MHRA); the program has not yet filed an EU equivalent, so no ex-US post-market obligations attach at this stage.'
+        ],
+        sources: [
+          { tier: 'T1', text: 'FDA Fast Track designation — navacaprant, Dec 2024' },
+          { tier: '—', text: 'No conflicting EMA / PMDA / MHRA designations on record' }
+        ] }
+    ] },
+    { cat: 'Post-Market Safety', agents: [
+      { id: 'post-market-safety', name: 'Post-Market Safety', status: 'active',
+        task: 'Read the class adverse-event record (label + FAERS)',
+        brief: [
+          'No approved KOR-antagonist comparator exists, so the class record is read by adjacency. CNS-active antidepressants carry the class suicidality boxed warning (pediatric / young-adult); the agent is checking openFDA label + FAERS for any KOR-adjacent dissociative or mood-destabilisation signal.',
+          'Running — the FAERS disproportionality pass is in progress; no boxed-warning-level liability identified for the mechanism so far.'
+        ],
+        sources: [{ tier: 'T1', text: 'openFDA api.fda.gov — antidepressant class boxed warning (label)' }] }
+    ] },
+    { cat: 'Clinical Trials', agents: [
+      { id: 'clinical-trial-registry', name: 'Clinical-Trial Registry', status: 'done',
+        task: 'Reconcile the registered trial record',
+        brief: [
+          'KOASTAL-1 (the Phase 2 pivotal) missed its primary MADRS endpoint but showed a significant pre-specified anhedonia signal. The Phase 3 KOASTAL-3 trial is registered with that anhedonia domain promoted to the primary outcome, with a Q3 2025 readout — the decisive gate the firm conditioned its verdict on.'
+        ],
+        sources: [
+          { tier: 'T1', text: 'ClinicalTrials.gov — KOASTAL-1 (Phase 2, MADRS primary missed)' },
+          { tier: 'T1', text: 'ClinicalTrials.gov — KOASTAL-3 (Phase 3, anhedonia primary, Q3 2025)' }
+        ] }
+    ] },
+    { cat: 'Patent & IP', agents: [
+      { id: 'patent-ip', name: 'Patent & IP', status: 'done',
+        task: 'Establish composition-of-matter coverage & runway',
+        brief: [
+          'Composition-of-matter coverage for the navacaprant scaffold runs into the mid-2030s, with method-of-use filings around the depression indication extending the practical exclusivity window beyond the anticipated launch. No blocking third-party art surfaced on the core KOR-antagonist claims.'
+        ],
+        sources: [{ tier: 'T1', text: 'USPTO / Google Patents — composition-of-matter family (KOR antagonist scaffold)' }] }
+    ] },
+    { cat: 'Payer & Market Access', agents: [
+      { id: 'payer-market-access', name: 'Payer & Market Access', status: 'queued',
+        task: 'Model coverage posture vs. the TRD standard of care',
+        brief: [
+          'Queued. Will model the likely payer posture for a novel-mechanism TRD agent against generic SSRIs/SNRIs and esketamine — step-edit and prior-authorisation exposure are the expected access frictions.'
+        ],
+        sources: [{ tier: '—', text: 'Queued — CMS / coverage-policy probe pending' }] }
+    ] },
+    { cat: 'Financial & Investor', agents: [
+      { id: 'financial', name: 'Financial & Investor', status: 'done',
+        task: 'Verify capital position & runway to the readout',
+        brief: [
+          'Neumora closed a $399M Series C, giving the program a strong capital position with runway through the Q3 2025 Phase 3 readout. The 8-K filing was confirmed directly against the SEC record (T1), removing reliance on the secondary IR summary.'
+        ],
+        sources: [
+          { tier: 'T1', text: 'SEC 8-K — Neumora Series C close ($399M)' },
+          { tier: '—', text: 'Neumora investor relations release, 2025-01-02 (corroborating)' }
+        ] }
+    ] },
+    { cat: 'KOL & Social Signal', agents: [
+      { id: 'kol', name: 'KOL & Social Signal', status: 'done',
+        task: 'Gauge key-opinion-leader sentiment on the mechanism',
+        brief: [
+          'KOL sentiment splits: Knopman is skeptical pending the Phase 3 primary, while Javitt is positive on κ-opioid-class differentiation from existing TRD agents. The divergence is itself informative — the mechanism is credible to the field, but the endpoint realignment is the contested point.'
+        ],
+        sources: [{ tier: 'T2', text: 'PMID 41352683 · emet-live — KOR-class commentary (KOL positions)' }] }
+    ] },
+    { cat: 'Patient Advocacy', agents: [
+      { id: 'patient-advocacy', name: 'Patient Advocacy', status: 'done',
+        task: 'Weight the patient-relevant endpoint',
+        brief: [
+          'The TRD patient community is large and underserved, and anhedonia is consistently ranked a priority, quality-of-life-defining symptom rather than a secondary measure. That patient framing strengthens the case for the realigned anhedonia primary the Phase 3 trial now carries.'
+        ],
+        sources: [{ tier: '—', text: 'TRD advocacy-community priority survey (anhedonia ranked top-tier)' }] }
+    ] },
+    { cat: 'Roundtable Partners', agents: [
+      { id: 'denali-cso', name: 'Denali CSO (persona)', status: 'done',
+        task: 'Round 1 — scientific advance vote',
+        brief: ['Voted advance. The mechanism is differentiated and the anhedonia biology is coherent; worth IND-enabling diligence contingent on the readout.'],
+        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+      { id: 'third-rock', name: 'Third Rock (persona)', status: 'done',
+        task: 'Round 1 — venture-build vote',
+        brief: ['Voted advance. Strong capital position and Fast Track de-risk the path to the readout; fundable thesis.'],
+        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+      { id: 'ex-fda', name: 'Ex-FDA Reviewer (persona)', status: 'done',
+        task: 'Round 1 — regulatory-path vote',
+        brief: ['Voted advance, with the caveat that a single pivotal positive on a realigned endpoint likely draws an advisory-committee discussion.'],
+        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+      { id: 'takeda-bd', name: 'Takeda BD (persona)', status: 'done',
+        task: 'Round 1 — partnering vote',
+        brief: ['Voted advance. CNS-asset appetite is high; a positive Phase 3 would make this a competitive BD target.'],
+        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+      { id: 'adversarial', name: 'Adversarial Partner (persona)', status: 'done',
+        task: 'Round 2 — dissent (held)',
+        brief: [
+          'Dissented, and the dissent held through rebuttal. The Phase 2b MADRS miss is read as a mechanism signal, not sampling noise — proceeding on the secondary anhedonia finding is a fundable thesis, not a demonstrated one.',
+          'The moderator logged the 4–1 split with no forced consensus; the dissent is what makes the verdict conditional rather than a clean advance.'
+        ],
+        sources: [{ tier: '—', text: 'Roundtable Round 2 — logged dissent (4–1, no forced consensus)' }] }
+    ] }
+  ];
+
+  /* id → {agent, catIndex} so a finding click can find its card */
+  var AGENT_INDEX = {};
+  AGENT_TREE.forEach(function (c, ci) {
+    c.agents.forEach(function (a) { AGENT_INDEX[a.id] = { agent: a, ci: ci }; });
+  });
+
+  function dotClass(s) {
+    return s === 'active' ? ' active' : (s === 'queued' ? ' queued' : '');
+  }
+
+  var agentTree = document.getElementById('agentTree');
+
+  function renderAgentTree() {
+    agentTree.innerHTML = AGENT_TREE.map(function (c, ci) {
+      var cards = c.agents.map(function (a) {
+        var srcs = a.sources.map(function (s) {
+          return '<div class="ac-src"><span class="ac-src-tier">' + esc(s.tier) + '</span>'
+               + '<span>' + esc(s.text) + '</span></div>';
+        }).join('');
+        var paras = a.brief.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('');
+        return '<div class="agent-card" data-agent="' + a.id + '">'
+          +   '<div class="ac-head">'
+          +     '<span class="ac-dot' + dotClass(a.status) + '"></span>'
+          +     '<span class="ac-title">' + esc(a.name) + '</span>'
+          +     '<span class="ac-chev">›</span>'
+          +   '</div>'
+          +   '<div class="ac-detail">'
+          +     '<div class="ac-task">' + esc(a.task) + '</div>'
+          +     '<div class="ac-brief">' + paras + '</div>'
+          +     (srcs ? '<div class="ac-srch">' + srcs + '</div>' : '')
+          +   '</div>'
+          + '</div>';
+      }).join('');
+      return '<div class="cat" data-cat="' + ci + '">'
+        +   '<div class="cat-head">'
+        +     '<span class="cat-chev">›</span>'
+        +     '<span class="cat-name">' + esc(c.cat) + '</span>'
+        +     '<span class="cat-count">' + c.agents.length + '</span>'
+        +   '</div>'
+        +   '<div class="cat-body">' + cards + '</div>'
+        + '</div>';
+    }).join('');
+  }
+  renderAgentTree();
+
+  /* Expand / collapse: category headers and agent cards */
+  agentTree.addEventListener('click', function (e) {
+    var catHead = e.target.closest('.cat-head');
+    if (catHead) { catHead.parentNode.classList.toggle('open'); return; }
+    var acHead = e.target.closest('.ac-head');
+    if (acHead) { acHead.parentNode.classList.toggle('open'); }
+  });
+
+  /* Open a specific agent: reveal the wing, expand its category + card, highlight it */
+  function openAgent(id) {
+    var rec = AGENT_INDEX[id];
+    if (!rec) return;
+
+    if (!leftPanel.classList.contains('open')) {
+      leftPanel.classList.add('open');
+      leftToggle.classList.add('active');
+      leftToggle.setAttribute('aria-pressed', 'true');
+    }
+
+    var cat = agentTree.querySelector('.cat[data-cat="' + rec.ci + '"]');
+    if (cat) cat.classList.add('open');
+
+    var prev = agentTree.querySelector('.agent-card.target');
+    if (prev) prev.classList.remove('target');
+
+    var card = agentTree.querySelector('.agent-card[data-agent="' + id + '"]');
+    if (card) {
+      card.classList.add('open', 'target');
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  /* Blue findings in the brief → open the responsible agent */
+  msgList.addEventListener('click', function (e) {
+    var f = e.target.closest('.finding');
+    if (f && f.dataset.agent) openAgent(f.dataset.agent);
+  });
+  msgList.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var f = e.target.closest('.finding');
+    if (f && f.dataset.agent) { e.preventDefault(); openAgent(f.dataset.agent); }
   });
 
   /* ── Suggestion chips ── */
