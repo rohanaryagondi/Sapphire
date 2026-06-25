@@ -290,3 +290,20 @@ def safe_delete_bucket(bucket: str, aws=None) -> dict:
     aws("s3api", "delete-bucket", "--bucket", bucket)
     _ledger_append({"event": "delete", "resource": "bucket", "id": bucket})
     return {"bucket": bucket, "deleted": True}
+
+
+# ---------------- presigned URLs (Gap 4b: stage inputs/code via GET, upload results via PUT) ----------------
+def _presign(bucket: str, key: str, method: str = "get_object", expires: int = 3600, s3=None) -> str:
+    """A presigned S3 URL — GET to stage inputs/code onto the GPU box, PUT to upload its results.
+
+    Avoids an instance IAM role (plan Gap-4 option b): the URL is signed LAUNCH-SIDE and curl'd from
+    userdata. Uses **boto3 lazily** — only here in the live-launch path, never at engine import time
+    (client.py imports the launcher lazily, so the stdlib engine import graph is unaffected — same
+    boundary discipline as aso-tox's sklearn-in-subprocess). `s3` is injectable for offline tests.
+    """
+    if s3 is None:
+        import boto3  # lazy: operational AWS tooling only
+        from botocore.config import Config
+        s3 = boto3.Session(profile_name=PROFILE).client(
+            "s3", region_name=REGION, config=Config(signature_version="s3v4"))  # SigV4 (curl PUT)
+    return s3.generate_presigned_url(method, Params={"Bucket": bucket, "Key": key}, ExpiresIn=expires)

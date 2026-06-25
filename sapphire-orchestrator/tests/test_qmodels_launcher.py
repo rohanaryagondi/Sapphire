@@ -85,5 +85,28 @@ class TestScratchBucket(unittest.TestCase):
         self.assertTrue(any(e["event"] == "delete" and e["id"] == name for e in events))
 
 
+class TestPresign(unittest.TestCase):
+    """Presigned URL generation (Gap 4b) — boto3 signs locally (no network), offline-safe."""
+
+    def _client(self):
+        import boto3  # available; presigning is pure local signing (no creds round-trip)
+        from botocore.config import Config
+        return boto3.client("s3", region_name=L.REGION, config=Config(signature_version="s3v4"),
+                            aws_access_key_id="testkey", aws_secret_access_key="testsecret")
+
+    def test_presigned_put_is_a_put_url_for_the_key(self):
+        url = L._presign("sapphire-qmodels-scratch-x", "job-1/result.json",
+                         method="put_object", s3=self._client())
+        self.assertIn("sapphire-qmodels-scratch-x", url)
+        self.assertIn("job-1/result.json", url)
+        self.assertIn("X-Amz-Signature", url)        # SigV4 presigned
+
+    def test_presigned_get_for_input_staging(self):
+        url = L._presign("sapphire-qmodels-scratch-x", "job-1/inputs.json",
+                         method="get_object", s3=self._client())
+        self.assertIn("inputs.json", url)
+        self.assertIn("X-Amz-Signature", url)
+
+
 if __name__ == "__main__":
     unittest.main()
