@@ -1771,10 +1771,15 @@ class TestSimulateModelsRunLive(unittest.TestCase):
         provs = [v.get("provenance") for v in r["consult"]["round1"]]
         self.assertTrue(provs and all(p == "simulated" for p in provs), provs)
         self.assertTrue(all("🧪 simulated" in v.get("rationale", "") for v in r["consult"]["round1"]))
-        # Real moat facts are untouched (internal plane, real provenance).
-        moat = [f for f in r["discover"]["dossier"] if f.get("provenance") == "moat-real"]
-        self.assertTrue(moat, "real moat facts must remain in a simulated run")
-        self.assertTrue(all(f.get("plane") == "internal" for f in moat))
+        # Real moat facts are untouched (internal plane, real provenance) — but only assertable
+        # when the moat DB is present. Without RohanOnly/moat/moat.sqlite the moat degrades to
+        # empty/mock HONESTLY (product-correct), so guard the moat-real check on availability —
+        # mirroring test_moat_real_provenance above. The simulated-persona checks above run always.
+        from moat.client import MoatClient
+        if MoatClient().available():
+            moat = [f for f in r["discover"]["dossier"] if f.get("provenance") == "moat-real"]
+            self.assertTrue(moat, "real moat facts must remain in a simulated run")
+            self.assertTrue(all(f.get("plane") == "internal" for f in moat))
 
 
 class TestLiveProgress(unittest.TestCase):
