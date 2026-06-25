@@ -35,6 +35,7 @@
   //    the wing exactly as Hayes's mock does. Drives both the wing cards and finding labels.
   const AGENT_META = {
     "internal-science-lead":        { name: "Internal Science Lead (Quiver moat)", cat: "Internal Science & Moat" },
+    "rescue-mechanism":             { name: "Rescue-mechanism reasoner (cited)",    cat: "Internal Science & Moat" },
     "robyn-scs":                    { name: "robyn_scs connectivity",              cat: "Internal Science & Moat" },
     "emet-runner":                  { name: "EMET Analyst — live BenchSci",        cat: "Biomedical Evidence (EMET)" },
     "q-models-runner":              { name: "Q-Models launchpad",                  cat: "Quantitative Models" },
@@ -526,6 +527,34 @@
       (synth.proposed_experiment
         ? `<div class="experiment"><div class="ex-lbl">Proposed experiment</div>${esc(synth.proposed_experiment)}</div>` : "");
     block.appendChild(synthEl);
+
+    // RANKED RESCUE GENES — the headline deliverable for a rescue-ranking query:
+    // the moat's ranked rescuers × the scientific reasoner's cited, per-gene mechanism.
+    const ranked = synth.ranked_genes;
+    if (Array.isArray(ranked) && ranked.length) {
+      const rows = ranked.map((g) => {
+        const conf = String(g.confidence || "low").toLowerCase();
+        const cites = (g.citations || [])
+          .map((c) => `<span class="rg-cite">${esc(c)}</span>`).join(" ");
+        return (
+          `<tr class="rg-row">` +
+          `<td class="rg-rank">${esc(g.rank)}</td>` +
+          `<td class="rg-gene">${esc(g.gene)}</td>` +
+          `<td class="rg-mech">${esc(g.mechanism || "—")}` +
+            (cites ? `<div class="rg-cites">${cites}</div>` : "") + `</td>` +
+          `<td class="rg-conf"><span class="conf conf-${esc(conf)}">${esc(conf)}</span></td>` +
+          `</tr>`
+        );
+      }).join("");
+      const rg = el("div", "ranked-genes");
+      rg.innerHTML =
+        `<div class="rg-lbl">⬩ Ranked rescue-gene candidates ` +
+        `<span class="rg-sub">Quiver moat ranking × literature-grounded mechanism</span></div>` +
+        `<table class="rg-table"><thead><tr>` +
+        `<th>#</th><th>gene</th><th>plausible mechanism (cited)</th><th>conf</th>` +
+        `</tr></thead><tbody>${rows}</tbody></table>`;
+      block.appendChild(rg);
+    }
 
     const findingsRow = buildFindingsRow(result);
     if (findingsRow) block.appendChild(findingsRow);

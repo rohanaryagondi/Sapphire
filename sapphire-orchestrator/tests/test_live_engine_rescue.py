@@ -216,5 +216,37 @@ class TestIntentDetection(unittest.TestCase):
             "which small-molecule rescue drugs reverse the TSC2 KO phenotype?"))
 
 
+class TestRescueEvidenceEnvelope(unittest.TestCase):
+    """_load_rescue_evidence: a dedicated gene-specific rescue envelope feeds the reasoner;
+    its absence degrades to [] (the caller then falls back to the general dossier facts)."""
+
+    def test_loads_and_normalizes_rescue_envelope(self):
+        from unittest import mock
+        import live_engine
+        fake = {"candidate": "TSC2_rescue", "evidence": [
+            {"claim": "DCTN6 modulates dynein-mediated mTORC1 lysosomal positioning.", "id_or_url": "PMID:111"},
+            {"claim": "FZD7/Wnt cross-talks with mTORC1.", "source": "PMID:222"},
+            {"value": "", "id_or_url": "PMID:333"},  # empty claim dropped
+        ]}
+        with mock.patch("emet.envelopes.load_envelope_for", return_value=fake):
+            ev = live_engine._load_rescue_evidence("TSC2")
+        self.assertEqual(len(ev), 2)  # the empty-claim row is dropped
+        self.assertEqual(ev[0], {"claim": "DCTN6 modulates dynein-mediated mTORC1 lysosomal positioning.",
+                                 "source": "PMID:111"})
+        self.assertEqual(ev[1]["source"], "PMID:222")
+
+    def test_absent_envelope_returns_empty(self):
+        from unittest import mock
+        import live_engine
+        with mock.patch("emet.envelopes.load_envelope_for", return_value=None):
+            self.assertEqual(live_engine._load_rescue_evidence("TSC2"), [])
+
+    def test_never_raises(self):
+        from unittest import mock
+        import live_engine
+        with mock.patch("emet.envelopes.load_envelope_for", side_effect=RuntimeError("boom")):
+            self.assertEqual(live_engine._load_rescue_evidence("TSC2"), [])
+
+
 if __name__ == "__main__":
     unittest.main()

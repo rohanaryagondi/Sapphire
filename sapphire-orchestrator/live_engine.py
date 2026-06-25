@@ -172,6 +172,31 @@ def _is_rescue_ranking_query(query: str) -> bool:
     return has_gene_cue and has_ko_cue and not is_compound_q
 
 
+def _load_rescue_evidence(target: str) -> list[dict]:
+    """Gene-specific rescue literature for the mechanism reasoner, if it has been captured.
+
+    Reads a dedicated rescue-gene EMET envelope (candidate ``<TARGET>_rescue`` — literature on the
+    candidate RESCUE GENES themselves, captured via the moat→EMET flow), distinct from the general
+    ``<TARGET>`` viability envelope. Returns ``[{claim, source}]`` for the agent's ``evidence``; ``[]``
+    when no rescue envelope exists ⇒ the caller falls back to the general dossier EMET facts (the basic
+    demo still works, just less gene-specific). Public identifiers only; never raises.
+    """
+    try:
+        from emet.envelopes import load_envelope_for
+        env = load_envelope_for(f"{target}_rescue")
+        if not env:
+            return []
+        out: list[dict] = []
+        for e in env.get("evidence", []) or []:
+            claim = e.get("claim") or e.get("value") or ""
+            src = e.get("id_or_url") or e.get("source") or ""
+            if claim:
+                out.append({"claim": str(claim)[:300], "source": str(src)})
+        return out
+    except Exception:
+        return []
+
+
 def _known_agent_ids(registry) -> set:
     """Return the set of agent ids present in the registry dict."""
     if registry is None:
@@ -600,13 +625,17 @@ def run_live(
         # never sent to the agent.
         rescue_ranked = rescue_genes(target, k=6)
         if rescue_ranked:
-            # The cited public literature already in the dossier (EMET / corpus) is the grounding set.
-            evidence = [
-                {"claim": f.get("value", "")[:300],
-                 "source": f.get("source", "") or f.get("url", "")}
-                for f in all_dossier_facts
-                if f.get("provenance") in ("emet-live", "emet-mcp", "corpus") and f.get("value")
-            ][:12]
+            # Grounding literature for the mechanism reasoner. PREFER a dedicated gene-specific rescue
+            # envelope (captured via the moat→EMET flow: literature on the rescue GENES themselves);
+            # fall back to the general dossier EMET/corpus facts so the basic demo works without it.
+            evidence = _load_rescue_evidence(target)
+            if not evidence:
+                evidence = [
+                    {"claim": f.get("value", "")[:300],
+                     "source": f.get("source", "") or f.get("url", "")}
+                    for f in all_dossier_facts
+                    if f.get("provenance") in ("emet-live", "emet-mcp", "corpus") and f.get("value")
+                ][:12]
             mech_inputs = {
                 "target": target,
                 "disease": tri.get("disease_label", ""),

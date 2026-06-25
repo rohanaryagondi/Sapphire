@@ -326,6 +326,25 @@ body {
 .experiment { margin-top: 11px; padding-top: 11px; border-top: 1px solid var(--purple-bd); font-size: 13px; color: var(--ink-2); line-height: 1.6; }
 .ex-lbl { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 4px; }
 
+/* Ranked rescue-gene table — the headline deliverable for a rescue-ranking query */
+.ranked-genes { margin-top: 12px; border: 1px solid var(--purple-bd); border-radius: var(--r-sm); background: var(--purple-bg); overflow: hidden; }
+.rg-lbl { padding: 10px 13px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--purple); border-bottom: 1px solid var(--purple-bd); }
+.rg-sub { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--ink-3); margin-left: 6px; }
+.rg-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rg-table thead th { text-align: left; padding: 7px 11px; font-size: 9.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); border-bottom: 1px solid var(--edge); }
+.rg-row td { padding: 9px 11px; vertical-align: top; border-bottom: 1px solid var(--edge); }
+.rg-row:last-child td { border-bottom: none; }
+.rg-rank { font-family: var(--mono); font-size: 12px; color: var(--ink-3); width: 26px; }
+.rg-gene { font-family: var(--mono); font-weight: 600; color: var(--purple); white-space: nowrap; }
+.rg-mech { color: var(--ink); line-height: 1.55; }
+.rg-cites { margin-top: 5px; }
+.rg-cite { font-family: var(--mono); font-size: 10px; color: var(--teal); background: var(--teal-bg); border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
+.rg-conf { width: 64px; text-align: right; }
+.rg-conf .conf { font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
+.conf-high { color: var(--green); background: var(--green-bg); }
+.conf-medium { color: var(--amber); background: var(--amber-bg); }
+.conf-low { color: var(--ink-3); background: rgba(255,255,255,0.05); }
+
 /* Attributed findings (in the synthesis/spread prose) */
 .finding {
   position: relative; color: var(--blue); cursor: pointer;
