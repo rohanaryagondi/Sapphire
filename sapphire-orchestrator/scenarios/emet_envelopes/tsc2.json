@@ -1,0 +1,20 @@
+{
+  "candidate": "TSC2",
+  "emet_workflow": "Target Validation",
+  "verdict": "pass",
+  "evidence": [
+    {"claim": "TSC1/TSC2 (hamartin-tuberin) is the GAP for Rheb; loss -> constitutive Rheb-GTP -> persistent mTORC1 activation; CNS-specific roles shaping neural connectivity.", "source": "Han & Sahin, FEBS Lett 2011", "id_or_url": "PMID:21329690"},
+    {"claim": "mTORC1 drives S6K1/4E-BP1 phosphorylation + GABAergic interneuron dysfunction -> hyperexcitable, structurally abnormal neurons (epileptogenesis).", "source": "Aronica et al., Brain 2023", "id_or_url": "PMID:36806388"},
+    {"claim": ">2,000 inactivating TSC1/TSC2 variants all cause constitutive mTOR; mTOR inhibitors (rapamycin/everolimus) reduce SEGA + AML burden and seizure frequency.", "source": "Hasbani & Crino 2018", "id_or_url": "PMID:29478616"},
+    {"claim": "TSC2 mutations (~75% of cases) associate with MORE SEVERE neurological phenotype than TSC1 (more tubers, higher seizure frequency, more intellectual disability) - 224-patient cohort.", "source": "Dabora et al. 2001", "id_or_url": "PMID:11112665"},
+    {"claim": "~85% of children/adolescents with TSC develop CNS complications (dominant source of morbidity/mortality).", "source": "Curatolo & Maria 2013", "id_or_url": "PMID:23622183"},
+    {"claim": "Cortical tubers arise from biallelic TSC2 loss with mTORC1 molecular footprints; their burden determines seizure/cognitive outcome (Lancet Neurology review).", "source": "Curatolo et al., Lancet Neurol 2022", "id_or_url": "PMID:35963265"},
+    {"claim": "SEGAs arise via two-hit biallelic TSC1/TSC2 inactivation; long-term mTOR inhibition (everolimus) reduces SEGA volume and prevents hydrocephalus.", "source": "Ichikawa & Niida 2022", "id_or_url": "PMID:35169091"},
+    {"claim": "Epilepsy affects 75-90% of individuals with TSC, the most common neurological presentation; often refractory despite polypharmacy.", "source": "Saxena & Sampson 2015", "id_or_url": "PMID:26060906"},
+    {"claim": "TSC-associated neuropsychiatric disorders (TAND): ASD, intellectual disability, ADHD - core care component per updated international consensus.", "source": "Northrup et al. 2021", "id_or_url": "PMID:34399110"}
+  ],
+  "notes": "Open Targets genetic association TSC2-TSC = 0.951 (one of the highest in the platform); cortical tubers 0.716; ASD 0.566. Everolimus FDA-approved for SEGA (2010) + refractory partial-onset seizures (2018). Citation verification in progress at capture time.",
+  "chat_url": "https://emet.benchsci.com/chat/c4a1031a-be93-4ca4-8cdd-db5439b4fb50",
+  "captured_at": "2026-06-25T17:12:00Z",
+  "provenance": "emet-live"
+}

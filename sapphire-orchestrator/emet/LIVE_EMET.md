@@ -1,9 +1,41 @@
 # Live EMET from the front end — real PMIDs (+ simulated-models demo mode)
 
-A front-end **Live** run drives the EMET agent through a detached `claude -p` subprocess. By
-default that subprocess's Playwright opens a **fresh, unauthenticated** browser that can't reach
-your BenchSci session → `⚠ tool-failure`, no real PMIDs. To get **real** EMET PMIDs, point the
-runner at a **dedicated authenticated browser**, set up once by the login helper.
+## The real-EMET path: the session-bridge (default for covered candidates)
+
+The front end's real-EMET path is the **session-bridge** (`emet/session_bridge.py` +
+`emet/envelopes.py`). The orchestrator drives EMET **live in its own authenticated BenchSci
+session**, captures the resulting envelope (the `emet_protocol.md §7` shape — public PMIDs/DOIs
+only), and injects it into `run_live` through the existing `make_emet_handler(runner=...)` seam.
+No subprocess, no profile-lock fight, no fabrication.
+
+A captured envelope is frozen to `sapphire-orchestrator/scenarios/emet_envelopes/<candidate>.json`.
+`frontend/bridge.py::run(...)` then:
+- **auto-loads** the envelope for the run's candidate (e.g. `tsc2.json` for a TSC2 query), or
+  takes an explicit `emet_envelopes={...}` dict, and
+- wires `ctx={"emet_handler": make_session_emet_handler(envelopes)}` — which **wins** over
+  `run_live`'s default handler (that one is only `setdefault`-ed). `run_live` still `setdefault`s
+  the rest of the ctx, so the real moat / seams / Q-Models load as usual.
+
+Result: a **covered** candidate (TSC2) lands real `emet-live` PMIDs in the dossier; an **uncovered**
+candidate **abstains honestly** (the session handler returns `login_required` → the agent escalates
+→ abstains) — never a fabricated fact. The run echoes `_emet_session: [<covered candidates>]` for
+honest labeling. To capture a covered TSC2 envelope live, drive EMET per the `emet-runner` skill in
+your authenticated session and save the envelope to `scenarios/emet_envelopes/tsc2.json`; the frozen
+`$0` replay is `_build/capture_tsc2_emet_session.py` → `scenarios/tsc2_emet_session.json` (selectable
+as the **"Replay (TSC2 · session-bridge EMET · $0)"** front-end profile).
+
+## The `claude -p` runner (SHELVED fallback — NON-default)
+
+> **Shelved (not deleted).** Gate-5 verified the detached `claude -p` EMET runner across three
+> iterations (headless `#77`, CDP `#84`, CDP+sonnet) and found it **tool-fails / is too slow even on
+> sonnet** — so the session/captured envelope above wins for covered candidates. The runner stays as
+> a documented fallback for candidates with no captured envelope.
+
+A front-end **Live** run with no captured envelope falls back to the EMET agent driving a detached
+`claude -p` subprocess. By default that subprocess's Playwright opens a **fresh, unauthenticated**
+browser that can't reach your BenchSci session → `⚠ tool-failure`, no real PMIDs. To get **real**
+EMET PMIDs via this path, point the runner at a **dedicated authenticated browser**, set up once by
+the login helper.
 
 ## One-time login (creds in the gitignored `RohanOnly/emet_creds.env`)
 ```bash
@@ -58,5 +90,6 @@ for claude-subagents in this mode; non-claude agents keep their genuine label.)
   claude timeouts are capped by `SAPPHIRE_AGENT_TIMEOUT_S` (`harness/dispatch.py`) — a stuck agent
   abstains visibly instead of hanging the firm.
 
-The in-session capture path (`_build/capture_tsc2_live.py`) and the `$0` replay are unaffected — they
-inject the envelope directly and don't use this live runner.
+The in-session capture path (`_build/capture_tsc2_live.py`, `_build/capture_tsc2_emet_session.py`)
+and the `$0` replays are unaffected — they inject the captured envelope directly (the session-bridge
+above) and don't use this `claude -p` runner.

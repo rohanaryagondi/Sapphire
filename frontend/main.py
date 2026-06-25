@@ -35,6 +35,11 @@ CHEAP_PROFILE = "Live (cheap · haiku)"
 SIMULATE_PROFILE = "Live (demo · simulated models)"
 REPLAY_PROFILE = "Replay (captured TSC2 · $0)"
 REPLAY_SCENARIO = "tsc2_live_run"
+# Session-bridge capture: a frozen REAL run_live whose EMET came from the in-session capture path
+# (the front end's real-EMET path) — the captured envelope (9 real TSC2 PMIDs, chat c4a1031a)
+# injected via make_session_emet_handler. Real moat + 9 real EMET PMIDs + the spread, frozen.
+REPLAY_SESSION_PROFILE = "Replay (TSC2 · session-bridge EMET · $0)"
+REPLAY_SESSION_SCENARIO = "tsc2_emet_session"
 
 # 🧪 simulated-models banner — shown on every simulated run so the labeling is unmistakable.
 SIMULATE_BANNER = (
@@ -93,6 +98,16 @@ async def chat_profiles(current_user=None):
                                   "persona spread · real DIVERGENCEs), captured once and replayed "
                                   "deterministically — no model, no network. Provenance/tiers/flags "
                                   "verbatim. ⚠ Contains internal moat data — internal demo only."),
+        ),
+        cl.ChatProfile(
+            name=REPLAY_SESSION_PROFILE,
+            markdown_description=("**Captured TSC2 run via the session-bridge — $0 instant replay.** "
+                                  "A frozen REAL engagement whose EMET came from the front end's "
+                                  "real-EMET path (the in-session capture): real Quiver moat · **9 "
+                                  "real EMET PMIDs** (driven live in the authenticated BenchSci "
+                                  "session, chat c4a1031a, injected via the session-bridge) · the "
+                                  "persona spread. Replayed deterministically — no model, no network. "
+                                  "⚠ Contains internal moat data — internal demo only."),
         ),
     ]
 
@@ -211,11 +226,15 @@ async def on_message(message: cl.Message):
         await cl.Message(content="_Please enter a question._").send()
         return
 
-    if profile == REPLAY_PROFILE:
+    if profile in (REPLAY_PROFILE, REPLAY_SESSION_PROFILE):
         # $0 deterministic replay of a frozen REAL capture — no model, no network, no live steps.
+        scenario = (REPLAY_SESSION_SCENARIO if profile == REPLAY_SESSION_PROFILE
+                    else REPLAY_SCENARIO)
         async with cl.Step(name="Replaying captured TSC2 run…", type="run") as step:
-            result = await cl.make_async(bridge.replay)(REPLAY_SCENARIO)
-            step.output = f"via=replay · captured {result.get('_captured_at', '')} · $0 (frozen real run)"
+            result = await cl.make_async(bridge.replay)(scenario)
+            via = "session-bridge EMET" if profile == REPLAY_SESSION_PROFILE else "replay"
+            step.output = (f"via={via} · scenario={scenario} · captured "
+                           f"{result.get('_captured_at', '')} · $0 (frozen real run)")
         await _render_final(result)
         return
 

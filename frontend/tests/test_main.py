@@ -33,5 +33,28 @@ class TestProfileKwargs(unittest.TestCase):
         self.assertIn("SIMULATED", main.SIMULATE_BANNER)
 
 
+class TestReplayProfiles(unittest.TestCase):
+    """The session-bridge replay profile is registered and points at the captured session scenario."""
+
+    def test_session_replay_scenario_constant(self):
+        self.assertEqual(main.REPLAY_SESSION_SCENARIO, "tsc2_emet_session")
+
+    def test_session_replay_profile_listed_in_chat_profiles(self):
+        import asyncio
+        profiles = {p.name for p in asyncio.run(main.chat_profiles())}
+        self.assertIn(main.REPLAY_SESSION_PROFILE, profiles)
+        self.assertIn(main.REPLAY_PROFILE, profiles)
+
+    def test_session_scenario_is_an_available_replay(self):
+        import bridge  # noqa
+        from pathlib import Path
+        scenario = (Path(__file__).resolve().parents[2] / "sapphire-orchestrator" /
+                    "scenarios" / f"{main.REPLAY_SESSION_SCENARIO}.json")
+        if not scenario.is_file():
+            self.skipTest(f"{main.REPLAY_SESSION_SCENARIO}.json not captured yet "
+                          "(run _build/capture_tsc2_emet_session.py)")
+        self.assertIn(main.REPLAY_SESSION_SCENARIO, bridge.available_replays())
+
+
 if __name__ == "__main__":
     unittest.main()
