@@ -11,6 +11,13 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — kol-social-signal corpus — Gavin's 4th Bucket-1 corpus  (`main`, PR #66)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude; auto-gated by the post-shift reactive net).
+- What: dual-source corpus, 6 KOL-sentiment cards — named experts' public stances on lecanemab/aducanumab/Cobenfy (Kurkinen, Knopman, Bauchner+Alexander, Javitt), all PubMed-cited + correctly T2; EMET card (PMID 41352683) validates the lead KOL-skeptic claim.
+- Gates: corpus gate CLEAN (all URLs resolve) · suite green · content audited clean (real PMIDs, 0 fabrication, quotes <=60w).
+
+---
+
 ## 2026-06-25 — robyn_scs firm seam (fire-when-relevant Bucket-1 tool) — Track E  (`main`, PR #62)
 - Built-By: `rohan` (reviewed + Gate-5-verified + merged by Head Claude).
 - What: `tools/robyn_scs_seam.py` wires the vendored robyn_scs SCS/STA pipeline into the firm as a Bucket-1 tool seam — fires only with a real imaging `input_dir`; honest KNOWN_UNKNOWN on empty/absent plate (no fabricated connectivity); stdlib engine (heavy deps in the tool); internal plane; traced + provenance-stamped (`robyn-scs`). Fix-loop: empty-plate honesty + drop data_boundary from the internal-plane agent + non-mocked test.

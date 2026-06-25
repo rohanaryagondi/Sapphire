@@ -56,7 +56,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## gavin  (`@GavinWongYF`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `semantic-corpora` (6) | **3/6 ✅ (#30, #38, #48); 3 to go** | ~~global-regulatory-divergence ✅~~ · ~~financial-investor ✅~~ · ** · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method. First corpus reviewed + merged (gate CLEAN, suite 381) — **method proven; batch the remaining 5.** Self-auth BenchSci for the EMET pass. | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
+| `semantic-corpora` (6) | **4/6 ✅ (#30, #38, #48, #66); 2 to go** | ~~global-regulatory-divergence ✅~~ · ~~financial-investor ✅~~ · ** · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method. First corpus reviewed + merged (gate CLEAN, suite 381) — **method proven; batch the remaining 5.** Self-auth BenchSci for the EMET pass. | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **Gavin — first corpus ✅ merged (#30); now batch the remaining 5.** The method is proven end-to-end (your
 > dual-source build passed the gate + content audit clean). Keep the watcher running
@@ -87,6 +87,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `semantic-corpora` (kol-social-signal — Gavin's 4th) | gavin | 2026-06-25 | PR #66 |
 | `robyn-scs-firm-seam` (Track E) | rohan | 2026-06-25 | PR #62 |
 | `tsc2-demo-scenario` (DEMO COMPLETE) | rohan | 2026-06-25 | PR #61 |
 | `dispatch-optimization` | rohan | 2026-06-25 | PR #56 |
