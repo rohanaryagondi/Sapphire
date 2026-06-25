@@ -11,6 +11,13 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — Q-Models→AWS wiring scope/plan doc  (`main`, PR #78)
+- Built-By: `rohan` (docs-only; reviewed/gated/merged by Head Claude's delegate). Adds one planning doc `docs/superpowers/plans/2026-06-25-qmodels-aws-wiring.md` (+215/-0) scoping how to wire external/GPU Q-Models tracks to predict live on AWS: per-track current state, the four concrete dry-run→real-prediction gaps, an ordered step plan (~4-5 days + $1-3 to a first Boltz-2 live proof), safety guards, and ETA. No code/engine/contracts/tests touched.
+- Gates: lightweight (docs-only) — diff docs-only ✓ · zero secret-list hits ✓ · no binaries ✓ · `Built-By: rohan` + Claude `Co-Authored-By` trailers ✓. (AWS account id `255493511886` in the doc is the already-disclosed shared-account safety gate, present in 9+ files on main; not a secret.)
+- Gaps/Follow-ups: scope only — the implementation (the 4 gaps) is the next task.
+
+---
+
 ## 2026-06-25 — patent-ip corpus — Hayes's 1st Bucket-1 corpus (1st of 6)  (`main`, PR #76)
 - Built-By: `hayes` (reviewed/gated/merged by Head Claude's delegate). The patent-ip veto-class Bucket-1 corpus (dossier field E1, freedom-to-operate), **Pass A**: 7 verified patent claim-cards anchored on the SMA franchise (the one disease spanning all three modalities the agent reasons over — ASO · small molecule · AAV gene therapy). 5 veto-candidate + 2 landscape; nusinersen SMN2 family (US8361977B2, US8980853B2), risdiplam composition (US9969754B2, →2035), Genzyme AAV9-SMA method (US10821154B2, →2033), UPenn AAV9 capsid (US7906111B2, lapsing 2026), AveXis/Zolgensma PCT (WO2019094253A1, ceased), Ionis gapmer platform (US9550988B2, →2028). Auto-discovered by `corpus/reader.py` (live_engine already lists `patent-ip`); engine untouched, stdlib boundary intact, provenance `corpus`.
 - Gates: corpus gate **CLEAN** (`validate-corpus.sh`: 7 cards, schema+tier ok, all 7 URLs live — re-run on macOS by the delegate; the `/tmp` failure is Windows-only as the PR honestly flagged) · full suite **GREEN 540** (`dev/run-tests.sh`) · no secrets/binaries · `Built-By: hayes` + Claude `Co-Authored-By` trailers present · anti-fabrication **independently spot-verified**: 4/7 verbatim quotes confirmed against the live patent primaries (US8361977, US9969754, US8980853, US10821154 — incl. the US10821154 card where Hayes caught + replaced a wrong secondary-mirror quote, now verified correct against claim 1). Reference shape matches Gavin's merged corpora.
