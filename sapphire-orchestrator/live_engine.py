@@ -197,6 +197,28 @@ def _load_rescue_evidence(target: str) -> list[dict]:
         return []
 
 
+def _load_rescue_candidates(target: str) -> list[dict]:
+    """Quiver's curated rescue-gene predictions for <target>, if captured.
+
+    Reads the `candidates` list from the dedicated rescue envelope (candidate ``<TARGET>_rescue``):
+    each {gene, moat_rank} — the genes Quiver's screen flagged as rescuers, each with its moat
+    rescue-direction rank (None if outside the moat top-50). When present these REPLACE the moat's
+    raw top-N as the candidate set to rank (the deliverable is "rank THESE by plausibility");
+    [] ⇒ the caller falls back to the moat top-N. Public identifiers only; never raises.
+    """
+    try:
+        from emet.envelopes import load_envelope_for
+        env = load_envelope_for(f"{target}_rescue")
+        out: list[dict] = []
+        for c in (env or {}).get("candidates", []) or []:
+            g = c.get("gene")
+            if g:
+                out.append({"gene": g, "moat_rank": c.get("moat_rank")})
+        return out
+    except Exception:
+        return []
+
+
 def _known_agent_ids(registry) -> set:
     """Return the set of agent ids present in the registry dict."""
     if registry is None:
@@ -631,10 +653,17 @@ def run_live(
     rescue_ranked: list[dict] = []
     gene_mechanisms: list[dict] = []
     if _is_rescue_ranking_query(query) and target and "rescue-mechanism" in known_ids:
-        # Top-K rescuers. K=6 bounds the real claude mechanism call (~35s/gene observed) under the
-        # agent timeout while still giving a substantive ranked list. cosine is kept LOCAL (the view),
-        # never sent to the agent.
-        rescue_ranked = rescue_genes(target, k=20)
+        # Candidates: PREFER Quiver's curated predictions from the rescue envelope (each carrying its
+        # moat rescue-direction rank); fall back to the moat's top-20 opposite genes. The deliverable
+        # is to rank THESE by biological plausibility. cosine stays LOCAL (the view), never sent to
+        # the agent (only gene symbol + ordinal rank cross the boundary).
+        _quiver = _load_rescue_candidates(target)
+        if _quiver:
+            rescue_ranked = [{"gene": c["gene"], "rank": c.get("moat_rank"),
+                              "moat_rank": c.get("moat_rank"), "cosine": None,
+                              "source": "Quiver prediction"} for c in _quiver]
+        else:
+            rescue_ranked = rescue_genes(target, k=20)
         if rescue_ranked:
             # Grounding literature for the mechanism reasoner. PREFER a dedicated gene-specific rescue
             # envelope (captured via the moat→EMET flow: literature on the rescue GENES themselves);
@@ -827,28 +856,32 @@ def run_live(
         for r in rescue_ranked:
             gm = mech_by_gene.get(r["gene"].upper(), {})
             ranked_genes.append({
-                "rank": r["rank"],
                 "gene": r["gene"],
-                "cosine": r["cosine"],            # Quiver EP-signature reversal strength (internal)
+                # the moat rescue-direction rank — the Quiver signal (None = outside the moat top-50)
+                "moat_rank": r.get("moat_rank", r.get("rank")),
+                "cosine": r.get("cosine"),
                 "mechanism": gm.get("mechanism", ""),
                 "citations": gm.get("citations", []) or [],
                 "confidence": gm.get("confidence", "low"),
                 "source": r.get("source", ""),
             })
-        # INTEGRATED ranking: the moat surfaces the candidates (EP-signature reversal); the
-        # literature RE-ORDERS them by mechanistic plausibility. Sort by confidence (high>medium>low)
-        # then by the moat rank — so literature-validated rescuers lead while each row still shows its
-        # moat rank. This is the "rank by Quiver data AND mechanism" deliverable: a strong-signature
-        # gene with thin literature (DCTN6) falls below a lower-signature gene with a proven mechanism
-        # (MCRS1/RALA/INO80).
+        # Rank by BIOLOGICAL PLAUSIBILITY (the mechanism reasoner's confidence), tie-broken by the
+        # moat rescue-direction rank (uncovered genes sort last within a tier). Each row still shows
+        # its moat rank, so the literature re-prioritisation vs the moat is visible — a strong moat
+        # signal with thin literature falls below a weaker-moat gene with a proven mechanism.
         _conf_order = {"high": 0, "medium": 1, "low": 2}
-        ranked_genes.sort(key=lambda g: (_conf_order.get(g["confidence"], 3), g["rank"]))
+        _BIG = 9999
+        ranked_genes.sort(key=lambda g: (_conf_order.get(g["confidence"], 3),
+                                         g["moat_rank"] if g["moat_rank"] is not None else _BIG))
+        for _i, g in enumerate(ranked_genes, 1):
+            g["rank"] = _i   # plausibility rank — the deliverable order
         grounded = [g for g in ranked_genes if g["citations"]]
         top = ranked_genes[:5]
-        top_str = "; ".join(f"{g['gene']} (moat #{g['rank']}, {g['confidence']})" for g in top)
+        _mtag = lambda g: (f"moat #{g['moat_rank']}" if g["moat_rank"] is not None else "moat: uncovered")
+        top_str = "; ".join(f"{g['gene']} ({_mtag(g)}, {g['confidence']})" for g in top)
         recommendation = (
-            f"Ranked rescue-gene candidates for {target}-KO — the moat surfaced {len(ranked_genes)} "
-            f"signature-reversers; the literature re-prioritises by mechanism: {top_str}."
+            f"Most biologically plausible rescue genes for {target}-KO (of {len(ranked_genes)} "
+            f"candidates), ranked by literature mechanism: {top_str}."
         )
         confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
         proposed_experiment = (

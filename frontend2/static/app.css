@@ -339,6 +339,8 @@ body {
 .rg-mech { color: var(--ink); line-height: 1.55; }
 .rg-cites { margin-top: 5px; }
 .rg-cite { font-family: var(--mono); font-size: 10px; color: var(--teal); background: var(--teal-bg); border-radius: 4px; padding: 1px 5px; margin-right: 4px; }
+.rg-moat { font-family: var(--mono); font-size: 12px; color: var(--blue); white-space: nowrap; }
+.rg-uncov { color: var(--ink-3); }
 .rg-conf { width: 64px; text-align: right; }
 .rg-conf .conf { font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
 .conf-high { color: var(--green); background: var(--green-bg); }

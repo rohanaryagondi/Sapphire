@@ -570,10 +570,15 @@
         const conf = String(g.confidence || "low").toLowerCase();
         const cites = (g.citations || [])
           .map((c) => `<span class="rg-cite">${esc(c)}</span>`).join(" ");
+        // the Quiver moat rescue-direction rank, or "—" when the moat doesn't cover the gene
+        const moat = (g.moat_rank === null || g.moat_rank === undefined)
+          ? `<span class="rg-uncov" title="not in the moat top-50">—</span>`
+          : `#${esc(g.moat_rank)}`;
         return (
           `<tr class="rg-row">` +
           `<td class="rg-rank">${esc(g.rank)}</td>` +
           `<td class="rg-gene">${esc(g.gene)}</td>` +
+          `<td class="rg-moat">${moat}</td>` +
           `<td class="rg-mech">${esc(g.mechanism || "—")}` +
             (cites ? `<div class="rg-cites">${cites}</div>` : "") + `</td>` +
           `<td class="rg-conf"><span class="conf conf-${esc(conf)}">${esc(conf)}</span></td>` +
@@ -582,10 +587,10 @@
       }).join("");
       const rg = el("div", "ranked-genes");
       rg.innerHTML =
-        `<div class="rg-lbl">⬩ Ranked rescue-gene candidates ` +
-        `<span class="rg-sub">Quiver moat ranking × literature-grounded mechanism</span></div>` +
+        `<div class="rg-lbl">⬩ Ranked rescue genes — most biologically plausible first ` +
+        `<span class="rg-sub">ranked by literature mechanism · moat = Quiver EP-signature rank</span></div>` +
         `<table class="rg-table"><thead><tr>` +
-        `<th>#</th><th>gene</th><th>plausible mechanism (cited)</th><th>conf</th>` +
+        `<th>#</th><th>gene</th><th>moat</th><th>plausible mechanism (cited)</th><th>conf</th>` +
         `</tr></thead><tbody>${rows}</tbody></table>`;
       block.appendChild(rg);
     }
