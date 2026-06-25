@@ -11,6 +11,14 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — TSC2 demo scenario captured ($0 deterministic replay) — Track D / DEMO COMPLETE  (`main`, PR #61)
+- Built-By: `rohan` (Rohan Claude; reviewed + Gate-5-verified + merged by Head Claude).
+- What: `scenarios/tsc2_live_run.json` — a REAL captured `run_live` run (wall 1050s; real moat internal-plane facts + 8 live EMET PMIDs external-plane + 5-persona spread + DIVERGENCE + synthesis), replayed by the front end instantly $0/offline. Reproducible capture script (`_build/capture_tsc2_live.py` emits `_internal_only`/`_data_notice`), internal-only tagged, honest demo doc (`frontend/DEMO_TSC2.md`; guardrail-abstentions shown honestly, not as deliberate holds).
+- Gates: review Approved + Gate-5 "Works as claimed" (verified REAL — not a dressed-up mock — and replays the full firm with the network blocked); 3-fix loop (reproducible tags, honest persona wording, TSC-relevant DIVERGENCE assertion). Suite **497 green**.
+- **MILESTONE: the overnight demo goal is met.** Tracks A (live-EMET keystone #57) + B (dispatch-opt #56) + D (#61) complete — the TSC2 demo runs live (real PMIDs land via run_live) AND replays from the captured scenario. Track E (robyn firm seam #62, BONUS) is in a fix loop; corpora ongoing.
+
+---
+
 ## 2026-06-25 — dispatch optimization (Opt-1 cache-stable + Opt-2 batch, flagged)  (`main`, PR #56)
 - Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude). Transport/cost only — agent outputs/guards/provenance byte-identical.
 - What: Opt-1 — `dispatch_claude` adds `--setting-sources user` + `--exclude-dynamic-system-prompt-sections` (drops redundant project CLAUDE.md per sub-agent, keeps the cacheable preamble first → cache-stable shared prefix); guards stay harness-enforced regardless; `SAPPHIRE_DISPATCH_FULL_CONTEXT=1` escape hatch. Opt-2 — `dispatch_claude_batch` (flagged, opt-in) one call per bucket, forwards the UNION of agents' `--allowedTools`, per-item provenance/guards preserved. Opt-3 (warm worker) parked → Claude Agent SDK is the durable path (HELP-resolved).
