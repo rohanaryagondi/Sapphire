@@ -38,6 +38,24 @@ class TestBridge(unittest.TestCase):
         self.assertTrue(r["_mock"])
         self.assertEqual(r["_via"], "harness-live")
 
+    def test_simulate_models_labels_personas_keeps_facts_real(self):
+        r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True, simulate=True)
+        self.assertEqual(validate_run_live(r), [])           # still a valid run
+        self.assertTrue(r["_simulated"])
+        # personas are SIMULATED + clearly labeled (provenance + 🧪 marker)
+        verdicts = r["consult"]["round1"]
+        self.assertTrue(verdicts)
+        self.assertEqual(verdicts[0]["provenance"], "simulated")
+        self.assertIn("🧪", verdicts[0]["rationale"])
+        # real backends (mock ctx here) still carry their REAL provenance — moat stays moat-real
+        provs = {f.get("provenance") for f in r["discover"]["dossier"]}
+        self.assertIn("moat-real", provs)
+
+    def test_no_simulate_by_default_and_env_restored(self):
+        r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True)
+        self.assertFalse(r.get("_simulated"))
+        self.assertNotIn("SAPPHIRE_SIMULATE_MODELS", os.environ)   # env restored — no leak
+
     def test_on_progress_forwarded_to_run_live(self):
         events = []
         r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True,
