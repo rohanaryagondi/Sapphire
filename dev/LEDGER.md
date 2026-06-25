@@ -11,6 +11,13 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — dispatch optimization (Opt-1 cache-stable + Opt-2 batch, flagged)  (`main`, PR #56)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude). Transport/cost only — agent outputs/guards/provenance byte-identical.
+- What: Opt-1 — `dispatch_claude` adds `--setting-sources user` + `--exclude-dynamic-system-prompt-sections` (drops redundant project CLAUDE.md per sub-agent, keeps the cacheable preamble first → cache-stable shared prefix); guards stay harness-enforced regardless; `SAPPHIRE_DISPATCH_FULL_CONTEXT=1` escape hatch. Opt-2 — `dispatch_claude_batch` (flagged, opt-in) one call per bucket, forwards the UNION of agents' `--allowedTools`, per-item provenance/guards preserved. Opt-3 (warm worker) parked → Claude Agent SDK is the durable path (HELP-resolved).
+- Gates: review Approved (no behavior change — guards independent of CLAUDE.md) + Gate-5 PASS; suite **505 green**.
+
+---
+
 ## 2026-06-25 — KEYSTONE: in-session EMET orchestration — real PMIDs land via run_live  (`main`, PR #57)
 - Built-By: `rohan` (Rohan Claude; reviewed/gated/merged + LIVE-acceptance-tested by Head Claude).
 - What: `emet/session_bridge.py::make_session_emet_handler(envelopes)` injects EMET envelopes captured from
