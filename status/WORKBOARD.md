@@ -59,6 +59,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `console-ui-design-refinement` | **🎨 assigned → Gavin** | **Standard.** Iterate the **★ LOKA-native 3-pane console** WITH Gavin into the agreed design (collaborative: present options → get Gavin's calls → refine). LEFT = agent cards by the two data planes · CENTER = synthesis + roundtable spread + DIVERGENCE · RIGHT = live trace. Stay strictly inside LOKA/Chainlit tokens (no new aesthetic); **do NOT touch the runtime `frontend/`** — design iteration only, in `docs/design/console-ui/`. DoD: a refined `sapphire_loka.html` Gavin signs off + a short decisions note. Keep binary-free + self-contained; preserve honesty markers; real TSC2 data stays internal-only. | `gavin/console-ui-design-refinement` | [**brief**](../docs/superpowers/plans/2026-06-25-console-ui-design-refinement.md) · [`docs/design/console-ui/`](../docs/design/console-ui/README.md) |
+| `site-console-redesign` | ✅ **merged (#79)** | **Side task (not the assigned one).** Visual polish of the **static** `site/` Console (depth/elevation tokens, animated hero, faceted CSS gem brand mark, gradient Send button, inline-SVG gem favicon). Pure CSS/HTML — no JS/engine/data, every hook preserved; binary-free. Restyles the legacy `site/` surface (superseded by `frontend/`); distinct from `console-ui-design-refinement` and does not touch `frontend/`. | `gavin/site-console-redesign` | [tools](tools.md) |
 | `semantic-corpora` (6) | **✅ 6/6 COMPLETE (#30,#38,#48,#66,#68,#72)** | ~~global-regulatory-divergence ✅~~ · ~~financial-investor ✅~~ · ** · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method. First corpus reviewed + merged (gate CLEAN, suite 381) — **method proven; batch the remaining 5.** Self-auth BenchSci for the EMET pass. | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
 > **🎨 Gavin — NEW: `console-ui-design-refinement` (assigned).** Refine the LOKA-native 3-pane console WITH Gavin
@@ -100,6 +101,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `site-console-redesign` (static `site/` visual polish) | gavin | 2026-06-25 | PR #79 |
 | `semantic-corpora` (patent-ip — Hayes's 1st corpus) | hayes | 2026-06-25 | PR #76 |
 | `semantic-corpora` (patient-advocacy — Gavin 5th) | gavin | 2026-06-25 | PR #68 |
 | `semantic-corpora` (kol-social-signal — Gavin's 4th) | gavin | 2026-06-25 | PR #66 |
