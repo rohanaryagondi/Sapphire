@@ -100,6 +100,11 @@
     const p = String(ev.provenance || "").toLowerCase();
     if (_PLACEHOLDER_PROV.has(p)) return false;                    // simulated stub — did not run
     if ((ev.n_facts || 0) === 0 && _DORMANT_PROV.has(p)) return false; // dormant — not applicable
+    // Roundtable personas carry no provenance on the progress event; in the simulate/demo profiles
+    // they are 🧪 placeholders (no real model call) → not shown. When personas are wired real they
+    // run in the "live" profile and DO appear.
+    if (ev.stage === "roundtable" && !p &&
+        (profileSel.value === "simulate" || profileSel.value === "demo")) return false;
     return true;
   }
   function tierClass(tier) {
@@ -758,12 +763,15 @@
     return steps;
   }
   function renderPlanSteps(loadEl, planEv) {
-    if (!loadEl || loadEl.querySelector(".plan-steps")) return; // render once
+    if (!loadEl || loadEl.dataset.planned) return; // render once per run
+    loadEl.dataset.planned = "1";
     const steps = planStepsFor(planEv, lastQuery);
     const box = el("div", "plan-steps",
       `<div class="ps-lbl">To answer this, I will:</div><ol class="ps-list">` +
       steps.map((s) => `<li>${esc(s)}</li>`).join("") + `</ol>`);
-    loadEl.insertBefore(box, loadEl.firstChild);
+    // Insert as a SIBLING before the loading/answer block (in msgList), so it PERSISTS above the
+    // final answer instead of being wiped when renderAnswer clears loadEl.
+    msgList.insertBefore(box, loadEl);
     scrollThread();
   }
   function typingLabel(ev) {
