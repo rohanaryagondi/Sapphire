@@ -27,7 +27,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
 
@@ -61,6 +61,9 @@ _BUCKET1_AGENTS = [
     # g:Profiler functional enrichment (top GO / pathway terms) over the gene set —
     # quantitative fact source. Fires when a gene set / target is present; honest-empty otherwise.
     "geneset-enrichment",
+    # robyn_scs SCS/STA neuronal-connectivity (internal, imaging-derived). Fires only when
+    # imaging data (a v17_traces plate dir) is present in inputs; honest-empty otherwise.
+    "robyn-scs",
 ]
 
 
@@ -286,6 +289,10 @@ def run_live(
     # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
     if "geneset-enrichment" not in ctx["python_fns"]:
         ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
+    # Wire the robyn_scs connectivity seam (stdlib orchestrator; numpy/scipy/pandas in the
+    # subprocess). Fires only when imaging data is present in inputs — honest-empty otherwise.
+    if "robyn-scs" not in ctx["python_fns"]:
+        ctx["python_fns"]["robyn-scs"] = robyn_scs_seam.findings
 
     # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
     # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
