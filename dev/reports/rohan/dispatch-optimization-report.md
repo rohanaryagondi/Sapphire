@@ -83,13 +83,17 @@ user prefix); `dispatch_claude` appends `--setting-sources user --exclude-dynami
   in **8.4 s** — outputs unchanged, no regression.
 
 ### Opt-2 — batch-per-bucket (SHIPPED, opt-in `ctx["batch_buckets"]`)
-`dispatch_claude_batch(items)` = ONE `claude` call for the **6 corpus-less claude-subagent Bucket-1
-agents** (patent-ip, global-regulatory-divergence, clinical-trial-registry, post-market-safety, payer,
-financial) → `{id: output}`; each output flows through the **unchanged** per-agent harness path
-(validate + guardrails + provenance + trace) via `dispatch_fn`. On ANY batch failure → honest
-per-agent fallback (tested). Corpus / python / qmodels / emet agents stay per-agent.
-- **6 cold boots → 1** for that bucket; the ~24k cache-stable system prefix is paid **once**, not 6×
-  (projected ≈ 5 × 24k ≈ **120k cache-read tokens saved** + 5 fewer boots/run, on top of Opt-1).
+`dispatch_claude_batch(items)` = ONE `claude` call for the **corpus-less claude-subagent Bucket-1
+agents** — currently **5**: patent-ip, clinical-trial-registry, post-market-safety, payer, financial.
+(The set is computed at runtime: `claude-subagent` kind AND **no** `corpus/<id>/` dir.
+`global-regulatory-divergence` is now corpus-backed (Gavin's merge) so it is *excluded* automatically
+and stays per-agent — the eligible set shrinks as more agents grow corpora.) Each batched output flows
+through the **unchanged** per-agent harness path (validate + guardrails + provenance + trace) via
+`dispatch_fn`. On ANY batch failure → honest per-agent fallback (tested). Corpus / python / qmodels /
+emet agents stay per-agent.
+- **N cold boots → 1** for that bucket (N=5 today); the ~24k cache-stable system prefix is paid **once**,
+  not N× (projected ≈ (N−1) × 24k ≈ **~96k cache-read tokens saved** + N−1 fewer boots/run, on top of
+  Opt-1).
 - **Tradeoff (documented, why it's opt-in):** the 6 specs share one generation context, so the *model
   output* may differ from isolated per-agent runs — guards/provenance/schemas are identical, but the
   text isn't byte-guaranteed; hence flagged, default-off. *(A live 1-call-vs-6 measurement is

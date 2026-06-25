@@ -106,6 +106,20 @@ class TestDispatch(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             D.dispatch_claude_batch([(a, {})], runner=fake_runner("", returncode=1, stderr="boom"))
 
+    def test_batch_includes_context_flags(self):
+        # The batch call must also carry the Opt-1 cache flags (regression guard).
+        a = Contract(id="patent-ip", role="", kind="claude-subagent", output_schema={"type": "object"})
+        captured = []
+        env = json.dumps({"structured_output": {"patent-ip": {"facts": []}}})
+        prev = os.environ.pop("SAPPHIRE_DISPATCH_FULL_CONTEXT", None)
+        try:
+            D.dispatch_claude_batch([(a, {})], runner=capturing_runner(captured, env))
+        finally:
+            if prev is not None:
+                os.environ["SAPPHIRE_DISPATCH_FULL_CONTEXT"] = prev
+        self.assertIn("--setting-sources", captured[0])
+        self.assertIn("--exclude-dynamic-system-prompt-sections", captured[0])
+
     def test_dispatch_emet_without_handler_errors(self):
         c = Contract(id="emet-runner", role="", kind="emet-playwright")
         with self.assertRaises(RuntimeError):

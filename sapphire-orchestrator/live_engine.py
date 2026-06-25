@@ -349,6 +349,11 @@ def run_live(
         disp_fn = None
         if agent_id in batched_outputs:
             _o = batched_outputs[agent_id]
+            # Const dispatch_fn: returns the batched output verbatim. It IGNORES the harness
+            # repair prompt — so a batched output that fails schema/guard validation is retried
+            # with the same value and (correctly) abstains after max_repair, never accepted. The
+            # tradeoff: a batched agent cannot self-correct via prompt-repair the way a per-agent
+            # claude call can; bad batched output → honest abstain, not a fix-up.
             disp_fn = lambda contract, inputs, ctx, _o=_o: _o  # noqa: E731
 
         res = harness.run(
