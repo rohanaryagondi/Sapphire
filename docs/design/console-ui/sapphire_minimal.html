@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — Console</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='%234a7dff'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.28'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS — ground truth, derived from subject
+   Ground:   void → surface → panel (3 elevations, same hue bias)
+   Ink:      ink → dim → faint (3 text weights)
+   Accent:   sapphire blue (one) + teal for live/signal states only
+═══════════════════════════════════════════════════════════════ */
+:root {
+  /* Grounds */
+  --void:     #08080f;
+  --surface:  #0d0d1b;
+  --panel:    #111122;
+
+  /* Hairlines */
+  --edge:     rgba(255,255,255,0.06);
+  --edge-2:   rgba(255,255,255,0.10);
+
+  /* Ink */
+  --ink:      #ededf5;
+  --dim:      #7878a0;
+  --faint:    #3d3d58;
+
+  /* Accent — used with extreme restraint */
+  --blue:     #4a7dff;
+  --blue-bg:  rgba(74,125,255,0.12);
+
+  /* Signal — live / active states only */
+  --teal:     #2dd4bf;
+  --teal-bg:  rgba(45,212,191,0.10);
+
+  /* Type */
+  --sans:  "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --mono:  "IBM Plex Mono", "SF Mono", "Fira Code", Consolas, monospace;
+
+  /* Scale — 6 deliberate steps */
+  --xs:   11px;
+  --sm:   13px;
+  --base: 15px;
+  --md:   17px;
+  --hero: 44px;
+
+  /* Radii */
+  --r:    10px;
+  --r-sm: 6px;
+  --pill: 100px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--sans);
+  font-size: var(--base);
+  line-height: 1.65;
+  background: var(--void);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--edge-2); border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   APP SHELL
+   Two rows: nav (48px) | main (remaining height)
+═══════════════════════════════════════════════════════════════ */
+.app {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   NAV BAR
+   Deliberate minimal: brand name, mode label, live indicator, one link.
+   Nothing else. Chrome should not compete with the conversation.
+═══════════════════════════════════════════════════════════════ */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--edge);
+  position: relative;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+}
+.brand:focus-visible { outline: 1px solid var(--blue); outline-offset: 3px; border-radius: 2px; }
+
+.brand-name {
+  font-size: var(--sm);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.brand-rule {
+  width: 1px;
+  height: 13px;
+  background: var(--edge-2);
+  flex-shrink: 0;
+}
+.brand-sub {
+  font-size: var(--xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--xs);
+  font-weight: 500;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 2px var(--teal-bg);
+  flex-shrink: 0;
+}
+
+.nav-link {
+  font-size: var(--sm);
+  color: var(--faint);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-link:hover { color: var(--dim); }
+.nav-link:focus-visible { outline: 1px solid var(--blue); outline-offset: 2px; border-radius: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN — chat column + inspector
+   At rest: 1fr | 0px (inspector invisible)
+   After response: 1fr | 320px (inspector slides in)
+═══════════════════════════════════════════════════════════════ */
+.main {
+  display: grid;
+  grid-template-columns: 1fr 0px;
+  height: 100%;
+  overflow: hidden;
+  transition: grid-template-columns 0.36s cubic-bezier(0.22,1,0.36,1);
+}
+.main.has-panel {
+  grid-template-columns: 1fr 320px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHAT COLUMN
+═══════════════════════════════════════════════════════════════ */
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--edge);
+}
+
+.thread {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 48px 24px;
+}
+
+/* Content column — centered, max 680px wide */
+.thread-inner {
+  max-width: 680px;
+  margin: 0 auto;
+  height: 100%;
+}
+
+/* ─── EMPTY STATE ───────────────────────────────────────────────
+   The invitation. Just the name and one line of context.
+   Jobs principle: one thing, done with complete confidence.
+─────────────────────────────────────────────────────────────── */
+.empty {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding-bottom: 56px; /* visual gravity offset for input bar */
+}
+
+.empty-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: var(--hero);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 16px;
+  text-wrap: balance;
+}
+
+.empty-desc {
+  font-size: var(--base);
+  color: var(--dim);
+  line-height: 1.7;
+  max-width: 400px;
+}
+
+/* ─── MESSAGES ─────────────────────────────────────────────────
+   Roles are small, uppercase, letterspaced — structural labels,
+   not visual noise. The message body IS the design.
+─────────────────────────────────────────────────────────────── */
+.msg {
+  margin-bottom: 40px;
+  animation: appear 0.22s ease both;
+}
+
+.msg-role {
+  font-size: var(--xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.msg-role.you      { color: var(--blue); }
+.msg-role.sapphire { color: var(--faint); }
+
+.msg-body {
+  font-size: var(--base);
+  line-height: 1.75;
+  color: var(--ink);
+}
+.msg-body.you { color: var(--dim); }
+
+.msg-body p { margin-bottom: 12px; }
+.msg-body p:last-child { margin-bottom: 0; }
+
+/* Verdict — the main output block. Left-border accent is the
+   only decoration; everything else is information. */
+.verdict {
+  margin: 20px 0 22px;
+  padding: 16px 20px;
+  background: var(--panel);
+  border: 1px solid var(--edge-2);
+  border-left: 3px solid var(--blue);
+  border-radius: var(--r);
+}
+.verdict-label {
+  font-size: var(--xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 8px;
+}
+.verdict-text {
+  font-size: var(--sm);
+  color: var(--dim);
+  line-height: 1.7;
+}
+
+/* Provenance tags — monospaced, data-like, secondary */
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+.src {
+  font-family: var(--mono);
+  font-size: var(--xs);
+  padding: 3px 8px;
+  background: var(--panel);
+  border-radius: var(--r-sm);
+  color: var(--faint);
+}
+.src.emet   { color: var(--teal); }
+.src.claude { color: var(--blue); }
+
+/* Typing indicator */
+.typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+}
+.typing span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--faint);
+  animation: pulse 1.3s ease-in-out infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INPUT BAR
+   Pinned to bottom. Never scrolls away.
+   The input is the only CTA. The button is the one blue element.
+═══════════════════════════════════════════════════════════════ */
+.inputbar {
+  flex-shrink: 0;
+  padding: 14px 48px 28px;
+  border-top: 1px solid var(--edge);
+  background: var(--void);
+}
+
+.inputbar-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Preset chips — subtle, secondary. They orient, they don't shout. */
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.chip {
+  font-family: var(--sans);
+  font-size: var(--xs);
+  color: var(--faint);
+  padding: 4px 12px;
+  border: 1px solid var(--edge-2);
+  border-radius: var(--pill);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color 0.14s, color 0.14s;
+  white-space: nowrap;
+}
+.chip:hover { border-color: rgba(255,255,255,0.18); color: var(--dim); }
+.chip:focus-visible { outline: 1px solid var(--blue); outline-offset: 1px; border-radius: 2px; }
+
+/* Input + send */
+.input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+textarea.input {
+  flex: 1;
+  min-height: 46px;
+  max-height: 180px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--edge-2);
+  border-radius: var(--r);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: var(--base);
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  transition: border-color 0.18s;
+}
+textarea.input::placeholder { color: var(--faint); }
+textarea.input:focus { border-color: rgba(74,125,255,0.32); }
+
+button.send {
+  height: 46px;
+  padding: 0 22px;
+  background: var(--blue);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: var(--sm);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--r);
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: opacity 0.14s, transform 0.1s;
+}
+button.send:hover  { opacity: 0.88; }
+button.send:active { transform: scale(0.97); }
+button.send:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ═══════════════════════════════════════════════════════════════
+   INSPECTOR PANEL
+   Slides in from the right when there's a response.
+   Secondary information — available when wanted, not prominent.
+═══════════════════════════════════════════════════════════════ */
+.inspector {
+  width: 320px;
+  background: var(--surface);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  /* clip so that during the grid transition, content doesn't bleed */
+  clip-path: inset(0);
+}
+
+.insp-section {}
+
+.insp-label {
+  font-size: var(--xs);
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--faint);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--edge);
+  margin-bottom: 16px;
+}
+
+/* Agent rows */
+.agent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--edge);
+}
+.agent-row:first-of-type { padding-top: 0; }
+.agent-row:last-of-type  { border-bottom: none; }
+
+.agent-name {
+  font-size: var(--sm);
+  color: var(--dim);
+}
+.agent-badge {
+  font-family: var(--mono);
+  font-size: var(--xs);
+  color: var(--faint);
+}
+.agent-badge.done   { color: var(--blue); opacity: 0.7; }
+.agent-badge.active { color: var(--teal); }
+
+/* Fact rows */
+.fact {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--edge);
+}
+.fact:first-of-type { padding-top: 0; }
+.fact:last-of-type  { border-bottom: none; }
+
+.fact-text {
+  font-size: var(--sm);
+  color: var(--dim);
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.fact-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.fact-tier {
+  font-family: var(--mono);
+  font-size: var(--xs);
+  color: var(--teal);
+  flex-shrink: 0;
+}
+.fact-src {
+  font-family: var(--mono);
+  font-size: var(--xs);
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATION
+═══════════════════════════════════════════════════════════════ */
+@keyframes appear {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .msg { animation: none; }
+  .typing span { animation: none; opacity: 0.5; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- NAV -->
+  <header class="nav">
+    <a class="brand" href="#">
+      <span class="brand-name">Sapphire</span>
+      <span class="brand-rule"></span>
+      <span class="brand-sub">Orchestrator</span>
+    </a>
+    <nav class="nav-right">
+      <div class="live">
+        <span class="live-dot"></span>
+        Live
+      </div>
+      <a href="explainer.html" class="nav-link">Full flow</a>
+    </nav>
+  </header>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+
+    <!-- ─── CHAT COLUMN ─── -->
+    <section class="chat" aria-label="Conversation">
+
+      <div class="thread" id="thread">
+        <div class="thread-inner">
+
+          <!-- EMPTY STATE: the invitation -->
+          <div class="empty" id="emptyState">
+            <h1 class="empty-title">Ask Sapphire.</h1>
+            <p class="empty-desc">A CNS discovery firm. Junior analysts gather a cited fact dossier, partners deliberate. The moat reasons first — external tools gate, then boost.</p>
+          </div>
+
+          <!-- CONVERSATION -->
+          <div id="convo" style="display:none; padding-top:48px">
+
+            <div class="msg">
+              <div class="msg-role you">You</div>
+              <div class="msg-body you">Is navacaprant a fundable CNS candidate for treatment-resistant depression?</div>
+            </div>
+
+            <div class="msg" id="loadingMsg">
+              <div class="msg-role sapphire">Sapphire</div>
+              <div class="msg-body">
+                <div class="typing">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="msg" id="responseMsg" style="display:none">
+              <div class="msg-role sapphire">Sapphire</div>
+              <div class="msg-body">
+                <p>Navacaprant (NMRA-140) is Neumora Therapeutics' selective κ-opioid receptor antagonist for treatment-resistant depression. The firm reached a <strong>conditional advance</strong> verdict — compelling mechanism and strong capitalization, but the Phase 3 readout is the decisive gate before any position recommendation.</p>
+
+                <div class="verdict">
+                  <div class="verdict-label">Verdict — Conditional Advance</div>
+                  <div class="verdict-text">Partners split 4–1 in favor of advancing to IND-enabling diligence, contingent on the Q3 2025 Phase 3 KOASTAL-3 readout. The dissent — filed by the Adversarial partner — flagged the Phase 2b MADRS miss as a mechanism signal, not sampling noise. Neumora's decision to proceed on the secondary anhedonia finding is a fundable thesis, not a demonstrated one.</div>
+                </div>
+
+                <p>The financial position is strong: Neumora closed a $399M Series C and received FDA Fast Track designation in December 2024. KOASTAL-1 missed its primary MADRS endpoint but showed a statistically significant anhedonia signal, which the Phase 3 program is powered to confirm as the primary outcome.</p>
+
+                <div class="sources">
+                  <span class="src emet">✓ EMET · PMID 38472831</span>
+                  <span class="src emet">✓ EMET · PMID 36449413</span>
+                  <span class="src claude">◇ Claude · Neumora IR 2025-01-02</span>
+                  <span class="src">◍ Internal moat</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="inputbar">
+        <div class="inputbar-inner">
+          <div class="presets">
+            <button class="chip" data-q="Nav1.8 pain targets — worth prioritizing?">Nav1.8 pain targets →</button>
+            <button class="chip" data-q="Is RHEB fundable for TSC?">RHEB fundable for TSC?</button>
+            <button class="chip" data-q="Is navacaprant a fundable CNS candidate for treatment-resistant depression?">Navacaprant TRD →</button>
+            <button class="chip" data-q="KOL perspective on the muscarinic drug class">KOL view on muscarinics</button>
+          </div>
+          <div class="input-row">
+            <textarea class="input" id="chatInput" rows="1" placeholder="Ask Sapphire — a compound, a mechanism, a CNS question…"></textarea>
+            <button class="send" id="sendBtn">Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── INSPECTOR PANEL ─── -->
+    <!-- Lives in the DOM always. Occupies 0px at rest; slides to 320px on .has-panel. -->
+    <aside class="inspector" aria-label="Inspector">
+
+      <div class="insp-section">
+        <div class="insp-label">Agents</div>
+        <div class="agent-row">
+          <span class="agent-name">Financial &amp; Investor</span>
+          <span class="agent-badge done">done</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">KOL &amp; Social Signal</span>
+          <span class="agent-badge done">done</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Global Regulatory</span>
+          <span class="agent-badge done">done</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Patient Advocacy</span>
+          <span class="agent-badge done">done</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Reputational</span>
+          <span class="agent-badge active">active</span>
+        </div>
+        <div class="agent-row">
+          <span class="agent-name">Policy &amp; Legislative</span>
+          <span class="agent-badge">queued</span>
+        </div>
+      </div>
+
+      <div class="insp-section">
+        <div class="insp-label">Top Facts</div>
+        <div class="fact">
+          <div class="fact-text">Neumora raised $399M Series C. Navacaprant received FDA Fast Track designation December 2024.</div>
+          <div class="fact-meta">
+            <span class="fact-tier">T1</span>
+            <span class="fact-src">sec.gov EDGAR 8-K 2025-01-02</span>
+          </div>
+        </div>
+        <div class="fact">
+          <div class="fact-text">κ-opioid antagonism reduces anhedonia in TRD animal models; 3× lower off-target binding vs prior KOR candidates.</div>
+          <div class="fact-meta">
+            <span class="fact-tier">T2</span>
+            <span class="fact-src">PMID 38472831 · emet-live</span>
+          </div>
+        </div>
+        <div class="fact">
+          <div class="fact-text">KOASTAL-1 Phase 2b missed MADRS primary; Neumora proceeding to Phase 3 on secondary anhedonia signal.</div>
+          <div class="fact-meta">
+            <span class="fact-tier">T2</span>
+            <span class="fact-src">psychiatrictimes.com · browser</span>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const main       = document.getElementById('main');
+  const emptyState = document.getElementById('emptyState');
+  const convo      = document.getElementById('convo');
+  const loadMsg    = document.getElementById('loadingMsg');
+  const respMsg    = document.getElementById('responseMsg');
+  const input      = document.getElementById('chatInput');
+  const sendBtn    = document.getElementById('sendBtn');
+  const thread     = document.getElementById('thread');
+
+  let triggered = false;
+
+  function triggerDemo() {
+    if (triggered) return;
+    triggered = true;
+
+    // Hide empty state, show conversation
+    emptyState.style.display = 'none';
+    convo.style.display = 'block';
+
+    // Inspector slides in after 450ms
+    setTimeout(() => {
+      main.classList.add('has-panel');
+    }, 450);
+
+    // Loading → response after 1.8s
+    setTimeout(() => {
+      loadMsg.style.display = 'none';
+      respMsg.style.display = 'block';
+      thread.scrollTop = thread.scrollHeight;
+    }, 1800);
+  }
+
+  sendBtn.addEventListener('click', triggerDemo);
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      triggerDemo();
+    }
+  });
+
+  // Auto-resize textarea
+  input.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 180) + 'px';
+  });
+
+  // Preset chips fill input
+  document.querySelectorAll('.chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      input.value = chip.dataset.q;
+      input.focus();
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 180) + 'px';
+    });
+  });
+}());
+</script>
+
+</body>
+</html>
