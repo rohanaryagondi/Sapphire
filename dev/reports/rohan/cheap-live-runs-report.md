@@ -39,10 +39,14 @@ with LLM reasoning on **haiku** so it doesn't burn default-model tokens.
   nothing mocked or relabeled, **zero engine/harness change beyond W2(a)**. Mock-personas-only would
   need a per-agent runner seam — noted as a possible follow-up. Existing **Demo/Live profiles
   unchanged**.
+- **EMET honors the lever too:** `emet/handler.py::_default_runner` threads `["--model", …]` (same
+  `CLAUDE_MODEL`/`SAPPHIRE_MODEL` precedence) into the EMET `claude -p` subprocess, so the cheap
+  profile's "every claude agent on haiku" is accurate and EMET's own claude cost is capped, not left
+  on the default model (Head Claude Gate-2 finding). Tested by capturing the subprocess argv.
 
 ## Gate evidence
-- **Gate 1 — full suite:** `bash dev/run-tests.sh` → **486 GREEN** (harness 70 · tests 206 ·
-  frontend 31 · …). +8 new tests. (One transient slow-suite RED re-ran green.)
+- **Gate 1 — full suite:** `bash dev/run-tests.sh` → **490 GREEN** (harness 71 · emet 21 · tests 206 ·
+  frontend 31 · …). +12 new tests. (One transient slow-suite RED, under concurrent load, re-ran green.)
 - **Gate 3 — provenance/secrets:** no secrets/binaries; data boundary intact (EMET = `emet-live` →
   external plane, public identifiers only; the skill rejects internal IDs). No new provenance labels.
 - **Gate 4 — stdlib runtime:** importing `live_engine` pulls **no** third-party and does not import

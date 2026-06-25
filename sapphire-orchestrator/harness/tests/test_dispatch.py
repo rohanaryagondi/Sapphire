@@ -16,6 +16,7 @@ def capturing_runner(captured, stdout):
         return SimpleNamespace(stdout=stdout, returncode=0, stderr="")
     return _run
 
+
 class TestDispatch(unittest.TestCase):
     def test_build_prompt_includes_inputs(self):
         c = Contract(id="x", role="", kind="claude-subagent", spec=None)
