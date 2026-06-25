@@ -158,7 +158,7 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
     mode='live' launches a real tagged instance (passes every guard first)."""
     job_id = f"{NAME_PREFIX}-{kind}-{uuid.uuid4().hex[:8]}"
     itype = instance_type or (SMOKE_INSTANCE_TYPE if kind == "smoke" else tool.get("invoke", {}).get("instance_type", "g5.xlarge") if tool else "g5.xlarge")
-    bucket = f"{NAME_PREFIX}-scratch"  # resolved/created in live mode
+    bucket = _bucket_name()  # account-scoped scratch bucket; created (idempotent) in live mode
     job = {
         "job_id": job_id, "kind": kind, "mode": mode, "status": "created",
         "tool_id": (tool or {}).get("id"), "eval_script": (tool or {}).get("invoke", {}).get("eval_script") or (tool or {}).get("eval_script"),
@@ -193,8 +193,7 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
 
 def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
     _assert_identity()  # account gate
-    # (bucket + SG creation would happen here, ledgered; for the smoke test the userdata uploads to
-    #  the scratch bucket which is created on first use. Kept minimal + ledgered.)
+    ensure_bucket()     # idempotent, ledgered: the GPU job's userdata uploads result.json here
     ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value")
     tag_spec = "ResourceType=instance,Tags=[" + ",".join(
         [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
@@ -241,3 +240,53 @@ def safe_terminate(instance_id: str) -> dict:
     st = _aws("ec2", "describe-instances", "--instance-ids", instance_id,
               "--query", "Reservations[].Instances[].State.Name")
     return {"instance_id": instance_id, "terminated_state": (st[0] if st else None)}
+
+
+# ---------------- scratch bucket (Gap 4a: GPU jobs write result.json here) ----------------
+def _bucket_name() -> str:
+    """The account-scoped scratch bucket (globally-unique). One bucket, reused across all jobs."""
+    return f"{NAME_PREFIX}-scratch-{EXPECTED_ACCOUNT}"
+
+
+def _ledger_created_buckets() -> set:
+    names = set()
+    if _LEDGER.exists():
+        for line in _LEDGER.read_text().splitlines():
+            try:
+                e = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if e.get("event") == "create" and e.get("resource") == "bucket" and e.get("id"):
+                names.add(e["id"])
+    return names
+
+
+def ensure_bucket(aws=None) -> str:
+    """Idempotently create the ledgered scratch bucket (CREATE-ONLY, account-gated). Returns its
+    name. Safe to call repeatedly — no-ops if it already exists. `aws` is injectable for tests."""
+    aws = aws or _aws
+    name = _bucket_name()
+    try:
+        aws("s3api", "head-bucket", "--bucket", name)
+        return name                                   # already exists → no-op
+    except RuntimeError:
+        pass
+    _assert_identity()                                # gate before the create mutation
+    aws("s3api", "create-bucket", "--bucket", name)   # us-east-1: no LocationConstraint
+    _ledger_append({"event": "create", "resource": "bucket", "id": name,
+                    "purpose": "qmodels GPU job scratch (result.json)"})
+    return name
+
+
+def safe_delete_bucket(bucket: str, aws=None) -> dict:
+    """Delete a scratch bucket — ONLY if it is in our ledger AND matches our scratch naming (mirrors
+    safe_terminate). Empties it first. Never deletes a bucket we did not create."""
+    aws = aws or _aws
+    if bucket not in _ledger_created_buckets():
+        raise SafetyRefusal(f"REFUSE delete bucket {bucket}: not in our ledger (we did not create it).")
+    if not bucket.startswith(f"{NAME_PREFIX}-scratch"):
+        raise SafetyRefusal(f"REFUSE delete bucket {bucket}: not a sapphire-qmodels scratch bucket.")
+    aws("s3", "rm", f"s3://{bucket}", "--recursive", parse=False, check=False)   # empty
+    aws("s3api", "delete-bucket", "--bucket", bucket)
+    _ledger_append({"event": "delete", "resource": "bucket", "id": bucket})
+    return {"bucket": bucket, "deleted": True}
