@@ -571,13 +571,15 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 }
 .ac-brief p { font-size: 12px; color: var(--ink-2); line-height: 1.6; margin-bottom: 8px; }
 .ac-brief p:last-child { margin-bottom: 0; }
-.ac-srch {
-  font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-3); margin: 11px 0 6px;
+.ac-srch {   /* "Sources" heading — sentence case, NOT all-caps */
+  font-size: 10px; font-weight: 600; letter-spacing: 0.02em;
+  color: var(--ink-2); margin: 11px 0 7px;
+  padding-top: 10px; border-top: 1px solid var(--edge);
 }
-.ac-src { display: flex; gap: 7px; font-size: 11px; color: var(--ink-2); line-height: 1.45; margin-bottom: 6px; }
-.ac-src:last-child { margin-bottom: 0; }
-.ac-src-tier { font-family: var(--mono); font-size: 9px; color: var(--teal); flex-shrink: 0; margin-top: 2px; }
+.ac-srcs { display: flex; flex-direction: column; gap: 5px; }
+/* source lines: small, italic, bright teal-green */
+.ac-src { display: flex; gap: 7px; font-size: 10px; font-style: italic; color: var(--teal); line-height: 1.5; }
+.ac-src-tier { font-family: var(--mono); font-style: normal; font-size: 8.5px; color: var(--teal); flex-shrink: 0; margin-top: 2px; opacity: 0.8; }
 
 /* ── BLUE FINDINGS (agent-attributed, in the brief) ─────────────── */
 .finding {
@@ -922,25 +924,43 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
           'Queried the EP-CRISPR functional-genomics atlas for any perturbation signal on the κ-opioid receptor (OPRK1) pathway. No internal hit cleared threshold — the target sits outside Quiver\'s currently screened space.',
           'Reported as abstention, not contradiction: absence of an internal signal does not weigh against the external evidence, so no DIVERGENCE was raised.'
         ],
-        sources: [{ tier: '—', text: 'Quiver EP-CRISPR atlas (internal) — OPRK1 pathway, no signal above threshold' }] },
+        sources: [
+          { tier: '—', text: 'Quiver EP-CRISPR atlas — OPRK1 pathway, no signal above threshold' },
+          { tier: '—', text: 'Quiver EP-CRISPR atlas — dynorphin (PDYN) node, no hit' },
+          { tier: '—', text: 'Internal screen index — KOR pathway not in the current panel' }
+        ] },
       { id: 'moat-dossier', name: 'Internal Target Dossier', status: 'done',
         task: 'Assemble the internal view of KOR biology',
         brief: ['No prior Quiver program or internal dossier covers κ-opioid antagonism; this is a net-new mechanism for the atlas, with no proprietary structure-activity to leverage or contradict.'],
-        sources: [{ tier: '—', text: 'Quiver internal program registry — no OPRK1 program on record' }] }
+        sources: [
+          { tier: '—', text: 'Quiver internal program registry — no OPRK1 program on record' },
+          { tier: '—', text: 'Internal target-dossier store — no κ-opioid entry' }
+        ] }
     ] },
     { cat: 'Biomedical Evidence (EMET)', agents: [
       { id: 'emet-mech', name: 'EMET Mechanism Analyst', status: 'done',
         task: 'Retrieve mechanism evidence',
         brief: ['Navacaprant (NMRA-140) is a selective κ-opioid receptor (KOR) antagonist. The KOR / dynorphin system is an established modulator of dysphoria, anhedonia and stress reactivity — a lever mechanistically distinct from the monoaminergic standard of care in treatment-resistant depression.'],
-        sources: [{ tier: 'T2', text: 'PMID 38472831 — KOR antagonism in mood disorders (mechanism review)' }] },
+        sources: [
+          { tier: 'T2', text: 'PMID 38472831 — KOR antagonism in mood disorders (mechanism review)' },
+          { tier: 'T2', text: 'EMET — dynorphin / KOR system in dysphoria & stress reactivity (review)' },
+          { tier: 'T1', text: 'DrugBank — navacaprant (NMRA-140) mechanism record' }
+        ] },
       { id: 'emet-target', name: 'EMET Target-Validation Analyst', status: 'done',
         task: 'Assess target-validation strength',
         brief: ['Target validation is anchored by a Phase 2 anhedonia-endpoint report: KOR antagonism produced a significant, pre-specified anhedonia signal — the result Phase 3 is built to confirm.'],
-        sources: [{ tier: 'T2', text: 'PMID 36449413 — anhedonia endpoint in a KOR-antagonist Phase 2 trial' }] },
+        sources: [
+          { tier: 'T2', text: 'PMID 36449413 — anhedonia endpoint in a KOR-antagonist Phase 2 trial' },
+          { tier: 'T2', text: 'EMET — anhedonia as a KOR-sensitive reward-circuitry construct (review)' },
+          { tier: 'T2', text: 'EMET — reward / effort processing & KOR signalling (target validation)' }
+        ] },
       { id: 'emet-lit', name: 'Literature Meta-Synthesis', status: 'active',
         task: 'Synthesize the broader KOR literature',
         brief: ['Running — aggregating the KOR-antagonist mood-disorder literature. Four PMIDs returned; two cleared the T2 threshold so far, both consistent with the anhedonia thesis.'],
-        sources: [{ tier: 'T2', text: 'EMET live query — KOR antagonist · depression · anhedonia' }] }
+        sources: [
+          { tier: 'T2', text: 'EMET live query — KOR antagonist · depression · anhedonia' },
+          { tier: 'T2', text: 'EMET live — 4 PMIDs returned, 2 cleared the T2 threshold' }
+        ] }
     ] },
     { cat: 'Quantitative Models', agents: [
       { id: 'quant-scs', name: 'SCS / STA Comparator Model', status: 'done',
@@ -949,53 +969,89 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
           'Against the base rate for first-in-class CNS mechanisms entering Phase 3 after a Phase 2 primary miss with a positive secondary, the model favours advancing only when Phase 3 realigns to the surviving secondary — which KOASTAL-3 has done.',
           'Synthesis confidence scored 72%, bounded by the single-readout dependency rather than by mechanism risk.'
         ],
-        sources: [{ tier: '—', text: 'Sapphire SCS/STA model — CNS first-in-class Phase 3 base-rate panel' }] },
+        sources: [
+          { tier: '—', text: 'Sapphire SCS/STA model — CNS first-in-class Phase 3 base-rate panel' },
+          { tier: '—', text: 'SCS comparator set — Phase 2 primary-miss / positive-secondary precedents' },
+          { tier: '—', text: 'STA calibration — synthesis confidence 72%' }
+        ] },
       { id: 'quant-boltz', name: 'Boltz-2 Structure / Affinity', status: 'done',
         task: 'Predict binding pose & affinity (public structure only)',
         brief: ['Boltz-2 returns a plausible KOR-binding pose for the scaffold with an affinity estimate consistent with an antagonist profile. Compute-plane only — public structure inputs, no internal identifiers crossed the boundary.'],
-        sources: [{ tier: '—', text: 'Boltz-2 compute (compute plane) — OPRK1 pose + affinity estimate' }] },
+        sources: [
+          { tier: '—', text: 'Boltz-2 compute (compute plane) — OPRK1 pose + affinity estimate' },
+          { tier: 'T1', text: 'RCSB PDB — active-state κ-opioid receptor (structural template)' }
+        ] },
       { id: 'quant-qmodels', name: 'Q-Models Selectivity', status: 'queued',
         task: 'Predict off-target selectivity across the opioid family',
         brief: ['Queued — a μ / δ / κ selectivity panel to check for μ-driven liabilities that would complicate a chronic-dosing depression indication.'],
-        sources: [{ tier: '—', text: 'Queued — Q-Models selectivity panel (GPU)' }] }
+        sources: [
+          { tier: '—', text: 'Queued — Q-Models selectivity panel (GPU)' },
+          { tier: '—', text: 'Queued — μ / δ / κ off-target matrix' }
+        ] }
     ] },
     { cat: 'Genetics & Constraint', agents: [
       { id: 'gen-gnomad', name: 'gnomAD Constraint', status: 'done',
         task: 'Check target tolerance to loss-of-function',
         brief: ['OPRK1 is loss-of-function tolerant in gnomAD — no strong constraint signal — consistent with an antagonist being pharmacologically tractable without an obvious haploinsufficiency liability.'],
-        sources: [{ tier: 'T1', text: 'gnomAD v4 — OPRK1 constraint metrics (LoF-tolerant)' }] },
+        sources: [
+          { tier: 'T1', text: 'gnomAD v4 — OPRK1 constraint metrics (LoF-tolerant)' },
+          { tier: 'T1', text: 'gnomAD v4 — OPRK1 pLI / LOEUF (no constraint signal)' }
+        ] },
       { id: 'gen-gtex', name: 'GTEx Expression', status: 'done',
         task: 'Map target tissue expression',
         brief: ['GTEx shows OPRK1 expression concentrated in CNS tissue, supporting central on-target activity with limited peripheral exposure.'],
-        sources: [{ tier: 'T1', text: 'GTEx — OPRK1 tissue expression (CNS-weighted)' }] },
+        sources: [
+          { tier: 'T1', text: 'GTEx v8 — OPRK1 tissue expression (CNS-weighted)' },
+          { tier: 'T1', text: 'GTEx v8 — OPRK1 brain-region expression breakdown' }
+        ] },
       { id: 'gen-interpro', name: 'InterPro Domain', status: 'done',
         task: 'Confirm domain architecture & druggability',
         brief: ['OPRK1 carries the canonical seven-transmembrane GPCR fold (InterPro) — a well-precedented, druggable architecture for small-molecule antagonism.'],
-        sources: [{ tier: 'T1', text: 'InterPro — OPRK1 7TM GPCR domain signature' }] },
+        sources: [
+          { tier: 'T1', text: 'InterPro — OPRK1 seven-transmembrane GPCR domain signature' },
+          { tier: 'T1', text: 'Pfam — 7tm_1 (rhodopsin-like GPCR) family membership' }
+        ] },
       { id: 'gen-gprofiler', name: 'g:Profiler Enrichment', status: 'done',
         task: 'Pathway enrichment of target partners',
         brief: ['KOR pathway partners enrich for opioid-signaling and GPCR cascades (g:Profiler), with no unexpected enrichment that would flag an off-pathway liability.'],
-        sources: [{ tier: 'T2', text: 'g:Profiler — OPRK1 interactor enrichment (opioid / GPCR signaling)' }] }
+        sources: [
+          { tier: 'T2', text: 'g:Profiler — OPRK1 interactor enrichment (opioid / GPCR signaling)' },
+          { tier: 'T2', text: 'g:Profiler — GO:BP GPCR signalling pathway, enriched' }
+        ] }
     ] },
     { cat: 'Regulatory Memory', agents: [
       { id: 'reg-fda-mem', name: 'FDA Institutional Memory', status: 'done',
         task: 'Surface precedent for the endpoint strategy',
         brief: ['Institutional-memory recall finds precedent for a symptom-domain (anhedonia) primary in depression programs, and confirms Fast Track changes the review cadence but not the evidentiary bar.'],
-        sources: [{ tier: 'T1', text: 'FDA institutional-memory corpus — CNS endpoint precedent (claim-cards)' }] },
+        sources: [
+          { tier: 'T1', text: 'FDA institutional-memory corpus — CNS endpoint precedent (claim-cards)' },
+          { tier: 'T1', text: 'FDA guidance — Major Depressive Disorder: Developing Drugs for Treatment' },
+          { tier: 'T1', text: 'Precedent — symptom-domain primary in a depression program' }
+        ] },
       { id: 'reg-adcom', name: 'Advisory-Committee History', status: 'done',
         task: 'Check AdComm precedent for a single pivotal',
         brief: ['A single pivotal positive on a realigned endpoint has historically invited an advisory-committee discussion rather than a clean approval — a procedural risk priced into the conditional verdict.'],
-        sources: [{ tier: 'T1', text: 'FDA AdComm transcripts corpus — single-pivotal CNS precedent' }] }
+        sources: [
+          { tier: 'T1', text: 'FDA AdComm transcripts corpus — single-pivotal CNS precedent' },
+          { tier: 'T1', text: 'Psychopharmacologic Drugs AdComm — realigned-endpoint discussion precedent' }
+        ] }
     ] },
     { cat: 'Global Regulatory', agents: [
       { id: 'greg-fda', name: 'FDA Designations', status: 'done',
         task: 'Map US designations',
         brief: ['Navacaprant received FDA Fast Track designation in December 2024, signaling regulatory engagement and a faster review cadence into the Phase 3 readout.'],
-        sources: [{ tier: 'T1', text: 'FDA Fast Track designation — navacaprant, Dec 2024' }] },
+        sources: [
+          { tier: 'T1', text: 'FDA Fast Track designation — navacaprant, Dec 2024' },
+          { tier: 'T1', text: 'FDA CDER — Fast Track program designation criteria' },
+          { tier: '—', text: 'Neumora press release — Fast Track grant (corroborating)' }
+        ] },
       { id: 'greg-ema', name: 'EMA / EU', status: 'done',
         task: 'Check EU filings & designations',
         brief: ['No EU / EMA filing or designation is on record; the program has not pursued an EU equivalent, so no ex-US post-market obligation attaches at this stage.'],
-        sources: [{ tier: '—', text: 'EMA register — no navacaprant entry' }] },
+        sources: [
+          { tier: '—', text: 'EMA register — no navacaprant entry' },
+          { tier: '—', text: 'EU Clinical Trials Register — no EU navacaprant trial' }
+        ] },
       { id: 'greg-pmda', name: 'PMDA / Japan', status: 'queued',
         task: 'Check Japan status',
         brief: ['Queued — no PMDA activity expected before the Phase 3 readout.'],
@@ -1009,39 +1065,67 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       { id: 'pms-label', name: 'openFDA Label (boxed warnings)', status: 'done',
         task: 'Read class boxed warnings by adjacency',
         brief: ['No approved KOR-antagonist comparator exists, so the class record is read by adjacency. CNS-active antidepressants carry the class suicidality boxed warning (pediatric / young-adult), byte-verified against the openFDA label field.'],
-        sources: [{ tier: 'T1', text: 'openFDA api.fda.gov /drug/label — antidepressant class boxed warning' }] },
+        sources: [
+          { tier: 'T1', text: 'openFDA api.fda.gov /drug/label — antidepressant class boxed warning' },
+          { tier: 'T1', text: 'FDA label — SSRI / SNRI suicidality boxed warning (pediatric / young-adult)' },
+          { tier: '—', text: 'No approved KOR-antagonist comparator label on file' }
+        ] },
       { id: 'pms-faers', name: 'FAERS Disproportionality', status: 'active',
         task: 'Scan the real-world adverse-event signal',
         brief: ['Running — a FAERS disproportionality pass for KOR-adjacent dissociative or mood-destabilisation signals. Nothing boxed-warning-level for the mechanism has surfaced so far.'],
-        sources: [{ tier: 'T2', text: 'openFDA api.fda.gov /drug/event (FAERS) — spontaneous reports' }] },
+        sources: [
+          { tier: 'T2', text: 'openFDA api.fda.gov /drug/event (FAERS) — spontaneous reports' },
+          { tier: 'T2', text: 'FAERS disproportionality — KOR-adjacent dissociative terms (running)' }
+        ] },
       { id: 'pms-class', name: 'Class-Liability Analyst', status: 'done',
         task: 'Synthesize the label-vs-FAERS read',
         brief: ['Key caveat carried to the roundtable: FAERS under-captures insidious, lab-detected harms. For a known class liability, the trial / label record — not spontaneous-report frequency — is the truth.'],
-        sources: [{ tier: '—', text: 'post-market-safety corpus — FAERS-under-captures-insidious-harms finding' }] }
+        sources: [
+          { tier: '—', text: 'post-market-safety corpus — FAERS-under-captures-insidious-harms finding' },
+          { tier: 'T1', text: 'openFDA — class boxed-warning vs FAERS reconciliation' }
+        ] }
     ] },
     { cat: 'Clinical Trials', agents: [
       { id: 'ct-reg', name: 'ClinicalTrials.gov Registry', status: 'done',
         task: 'Reconcile the registered trial record',
         brief: ['KOASTAL-1 (Phase 2) missed its primary MADRS endpoint. KOASTAL-3 (Phase 3) is registered with the anhedonia domain promoted to the primary outcome and a Q3 2025 readout — the decisive gate the firm conditioned its verdict on.'],
-        sources: [{ tier: 'T1', text: 'ClinicalTrials.gov v2 API — KOASTAL-1 / KOASTAL-3 records' }] },
+        sources: [
+          { tier: 'T1', text: 'ClinicalTrials.gov v2 API — KOASTAL-1 (Phase 2, MADRS primary missed)' },
+          { tier: 'T1', text: 'ClinicalTrials.gov v2 API — KOASTAL-3 (Phase 3, anhedonia primary, Q3 2025)' },
+          { tier: 'T1', text: 'ClinicalTrials.gov — KOASTAL program registration history' }
+        ] },
       { id: 'ct-endpoint', name: 'Endpoint & Powering Analyst', status: 'done',
         task: 'Assess the endpoint realignment & power',
         brief: ['KOASTAL-1 showed a significant, pre-specified anhedonia signal despite the MADRS miss; KOASTAL-3 is powered to confirm that anhedonia domain as the primary outcome — converting a surviving secondary into a testable primary.'],
-        sources: [{ tier: 'T1', text: 'ClinicalTrials.gov — KOASTAL-3 statistical-analysis plan (anhedonia primary)' }] },
+        sources: [
+          { tier: 'T1', text: 'ClinicalTrials.gov — KOASTAL-3 statistical-analysis plan (anhedonia primary)' },
+          { tier: 'T2', text: 'PMID 36449413 — KOASTAL-1 anhedonia secondary signal' },
+          { tier: '—', text: 'Powering note — anhedonia domain converted to a testable primary' }
+        ] },
       { id: 'ct-landscape', name: 'Competitive-Trials Landscape', status: 'done',
         task: 'Map the competitor trial landscape',
         brief: ['No other late-stage selective KOR antagonist is in TRD development — the mechanism lane is uncrowded, part of the firm\'s differentiation thesis.'],
-        sources: [{ tier: 'T1', text: 'ClinicalTrials.gov v2 API — KOR-antagonist TRD landscape scan' }] }
+        sources: [
+          { tier: 'T1', text: 'ClinicalTrials.gov v2 API — KOR-antagonist TRD landscape scan' },
+          { tier: 'T1', text: 'ClinicalTrials.gov — no other late-stage selective KOR antagonist in TRD' }
+        ] }
     ] },
     { cat: 'Patent & IP', agents: [
       { id: 'ip-com', name: 'Composition-of-Matter', status: 'done',
         task: 'Establish composition-of-matter coverage',
         brief: ['Composition-of-matter coverage for the navacaprant scaffold runs into the mid-2030s. No blocking third-party art surfaced on the core KOR-antagonist claims.'],
-        sources: [{ tier: 'T1', text: 'USPTO / Google Patents — composition-of-matter family (KOR scaffold)' }] },
+        sources: [
+          { tier: 'T1', text: 'USPTO / Google Patents — composition-of-matter family (KOR scaffold)' },
+          { tier: 'T1', text: 'Patent term estimate — COM coverage into the mid-2030s' },
+          { tier: '—', text: 'Prior-art scan — no blocking third-party art on the core claims' }
+        ] },
       { id: 'ip-mou', name: 'Method-of-Use', status: 'done',
         task: 'Check method-of-use filings',
         brief: ['Method-of-use filings around the depression indication extend the practical exclusivity window beyond the anticipated launch date.'],
-        sources: [{ tier: 'T1', text: 'USPTO — method-of-use filings (depression indication)' }] },
+        sources: [
+          { tier: 'T1', text: 'USPTO — method-of-use filings (depression indication)' },
+          { tier: '—', text: 'Exclusivity window — method-of-use extends beyond launch' }
+        ] },
       { id: 'ip-fto', name: 'Freedom-to-Operate', status: 'queued',
         task: 'Full FTO across formulation & process',
         brief: ['Queued — a full freedom-to-operate sweep across formulation and process patent families.'],
@@ -1051,7 +1135,10 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       { id: 'pay-coverage', name: 'Coverage-Policy Analyst', status: 'queued',
         task: 'Model coverage posture vs. standard of care',
         brief: ['Queued — modelling payer posture for a novel-mechanism TRD agent against generic SSRIs / SNRIs and esketamine. Step-edit and prior-authorisation exposure are the expected access frictions. (CMS HTML is fetch-blocked; a CMS data-API path is pending.)'],
-        sources: [{ tier: '—', text: 'Queued — CMS coverage-policy probe (cms.gov 403; data API pending)' }] },
+        sources: [
+          { tier: '—', text: 'Queued — CMS coverage-policy probe (cms.gov 403; data API pending)' },
+          { tier: '—', text: 'Queued — commercial formulary step-edit / prior-auth modelling' }
+        ] },
       { id: 'pay-pricing', name: 'Pricing & Rebate', status: 'queued',
         task: 'Model price & rebate scenarios',
         brief: ['Queued — net-price and rebate scenario modelling once a coverage posture is established.'],
@@ -1061,25 +1148,42 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       { id: 'fin-sec', name: 'SEC Filings', status: 'done',
         task: 'Verify capital position against filings',
         brief: ['Neumora\'s $399M Series C was confirmed directly against the SEC 8-K record — primary-source verified rather than relying on the secondary IR summary.'],
-        sources: [{ tier: 'T1', text: 'SEC EDGAR 8-K — Neumora Series C close ($399M)' }] },
+        sources: [
+          { tier: 'T1', text: 'SEC EDGAR 8-K — Neumora Series C close ($399M)' },
+          { tier: 'T1', text: 'SEC EDGAR — Neumora offering / financing filings' },
+          { tier: '—', text: 'Neumora IR release, 2025-01-02 (corroborating)' }
+        ] },
       { id: 'fin-runway', name: 'Capital & Runway', status: 'done',
         task: 'Assess runway to the readout',
         brief: ['The raise gives the program runway through the Q3 2025 Phase 3 readout — Neumora is funded to its decisive gate without an intervening financing need.'],
-        sources: [{ tier: 'T1', text: 'SEC EDGAR 10-Q — cash position & runway' }] },
+        sources: [
+          { tier: 'T1', text: 'SEC EDGAR 10-Q — cash position & runway' },
+          { tier: 'T1', text: 'SEC EDGAR 10-K — MD&A liquidity disclosure' }
+        ] },
       { id: 'fin-comps', name: 'Deal-Comparables', status: 'done',
         task: 'Benchmark BD / M&A comparables',
         brief: ['CNS-asset deal comparables suggest a positive Phase 3 would make navacaprant a competitive partnering or acquisition target.'],
-        sources: [{ tier: 'T2', text: 'Deal-comparables database — CNS BD / M&A multiples' }] }
+        sources: [
+          { tier: 'T2', text: 'Deal-comparables database — CNS BD / M&A multiples' },
+          { tier: 'T2', text: 'Recent CNS acquisitions — comparable Phase 3 valuations' }
+        ] }
     ] },
     { cat: 'KOL & Social Signal', agents: [
       { id: 'kol-sentiment', name: 'KOL Sentiment', status: 'done',
         task: 'Gauge key-opinion-leader sentiment',
         brief: ['KOLs split: Knopman is skeptical pending the Phase 3 primary; Javitt is positive on κ-opioid-class differentiation from existing TRD agents. The divergence is itself informative — the mechanism is credible, the endpoint realignment contested.'],
-        sources: [{ tier: 'T2', text: 'PMID 41352683 · emet-live — KOR-class commentary (KOL positions)' }] },
+        sources: [
+          { tier: 'T2', text: 'PMID 41352683 · emet-live — KOR-class commentary (KOL positions)' },
+          { tier: '—', text: 'Knopman — skeptical pending the Phase 3 primary' },
+          { tier: '—', text: 'Javitt — positive on κ-opioid-class differentiation' }
+        ] },
       { id: 'kol-conf', name: 'Conference / Abstract Signal', status: 'done',
         task: 'Scan congress & abstract signal',
         brief: ['Recent psychiatry-congress abstracts increasingly feature KOR antagonism as an emerging anhedonia lever, consistent with rising field interest in the mechanism.'],
-        sources: [{ tier: 'T2', text: 'Psychiatry-congress abstract index — KOR antagonism' }] },
+        sources: [
+          { tier: 'T2', text: 'Psychiatry-congress abstract index — KOR antagonism' },
+          { tier: '—', text: 'ACNP / SOBP recent sessions — anhedonia mechanisms' }
+        ] },
       { id: 'kol-social', name: 'Social / Forum Signal', status: 'queued',
         task: 'Scan clinician & patient social signal',
         brief: ['Queued — clinician-forum and patient-social signal scan.'],
@@ -1089,36 +1193,57 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
       { id: 'pa-priority', name: 'Community Priority', status: 'done',
         task: 'Weight the patient-relevant endpoint',
         brief: ['The TRD community is large and underserved, and anhedonia is consistently ranked a priority, quality-of-life-defining symptom rather than a secondary measure — strengthening the case for the realigned anhedonia primary.'],
-        sources: [{ tier: '—', text: 'TRD advocacy-community priority survey (anhedonia ranked top-tier)' }] },
+        sources: [
+          { tier: '—', text: 'TRD advocacy-community priority survey (anhedonia ranked top-tier)' },
+          { tier: '—', text: 'Patient-voice reports — anhedonia as quality-of-life-defining' }
+        ] },
       { id: 'pa-burden', name: 'Access & Burden', status: 'done',
         task: 'Assess treatment burden vs. comparators',
         brief: ['An oral, once-daily KOR antagonist would materially lower treatment burden versus in-clinic esketamine administration — a patient-experience advantage independent of the efficacy readout.'],
-        sources: [{ tier: '—', text: 'Patient-burden analysis — oral vs in-clinic TRD options' }] }
+        sources: [
+          { tier: '—', text: 'Patient-burden analysis — oral vs in-clinic TRD options' },
+          { tier: '—', text: 'Esketamine REMS in-clinic administration burden (comparator)' }
+        ] }
     ] },
     { cat: 'Roundtable Partners', agents: [
       { id: 'rt-denali', name: 'Denali CSO (persona)', status: 'done',
         task: 'Round 1 — scientific advance vote',
         brief: ['Voted advance. The mechanism is differentiated and the anhedonia biology is coherent; worth IND-enabling diligence contingent on the readout.'],
-        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+        sources: [
+          { tier: '—', text: 'Roundtable Round 1 — Denali CSO persona vote' },
+          { tier: '—', text: 'Roundtable transcript — scientific-advance rationale' }
+        ] },
       { id: 'rt-thirdrock', name: 'Third Rock (persona)', status: 'done',
         task: 'Round 1 — venture-build vote',
         brief: ['Voted advance. Strong capital position and Fast Track de-risk the path to the readout; a fundable thesis.'],
-        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+        sources: [
+          { tier: '—', text: 'Roundtable Round 1 — Third Rock persona vote' },
+          { tier: '—', text: 'Roundtable transcript — venture-build rationale' }
+        ] },
       { id: 'rt-exfda', name: 'Ex-FDA Reviewer (persona)', status: 'done',
         task: 'Round 1 — regulatory-path vote',
         brief: ['Voted advance, with the caveat that a single pivotal positive on a realigned endpoint likely draws an advisory-committee discussion.'],
-        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+        sources: [
+          { tier: '—', text: 'Roundtable Round 1 — Ex-FDA reviewer persona vote' },
+          { tier: '—', text: 'Roundtable transcript — AdComm caveat' }
+        ] },
       { id: 'rt-takeda', name: 'Takeda BD (persona)', status: 'done',
         task: 'Round 1 — partnering vote',
         brief: ['Voted advance. CNS-asset appetite is high; a positive Phase 3 would make this a competitive BD target.'],
-        sources: [{ tier: '—', text: 'Roundtable Round 1 — persona vote' }] },
+        sources: [
+          { tier: '—', text: 'Roundtable Round 1 — Takeda BD persona vote' },
+          { tier: '—', text: 'Roundtable transcript — partnering rationale' }
+        ] },
       { id: 'rt-adversarial', name: 'Adversarial Partner (persona)', status: 'done',
         task: 'Round 2 — dissent (held)',
         brief: [
           'Dissented, and the dissent held through rebuttal. The Phase 2b MADRS miss reads as a mechanism signal, not sampling noise — proceeding on the secondary anhedonia finding is a fundable thesis, not a demonstrated one.',
           'The moderator logged the 4–1 split with no forced consensus; the dissent is what makes the verdict conditional rather than a clean advance.'
         ],
-        sources: [{ tier: '—', text: 'Roundtable Round 2 — logged dissent (4–1, no forced consensus)' }] }
+        sources: [
+          { tier: '—', text: 'Roundtable Round 2 — logged dissent (4–1, no forced consensus)' },
+          { tier: '—', text: 'Roundtable transcript — mechanism-signal rebuttal' }
+        ] }
     ] }
   ];
 
@@ -1151,7 +1276,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
           +   '<div class="ac-detail">'
           +     '<div class="ac-task">' + esc(a.task) + '</div>'
           +     '<div class="ac-brief">' + paras + '</div>'
-          +     (srcs ? '<div class="ac-srch">' + srcs + '</div>' : '')
+          +     (srcs ? '<div class="ac-srch">Sources</div><div class="ac-srcs">' + srcs + '</div>' : '')
           +   '</div>'
           + '</div>';
       }).join('');
