@@ -307,3 +307,41 @@ def _presign(bucket: str, key: str, method: str = "get_object", expires: int = 3
         s3 = boto3.Session(profile_name=PROFILE).client(
             "s3", region_name=REGION, config=Config(signature_version="s3v4"))  # SigV4 (curl PUT)
     return s3.generate_presigned_url(method, Params={"Bucket": bucket, "Key": key}, ExpiresIn=expires)
+
+
+# ---------------- per-tool GPU recipes (Gap 2: registry inputs → a real eval run) ----------------
+def _boltz_complexes(inputs: dict) -> list:
+    """Map registry inputs {target_seq, smiles} → boltz_runner.py's `complexes` list
+    ([{name, protein_seq, smiles}], the validation_panel format). Raises on missing inputs."""
+    seq = inputs.get("target_seq") or inputs.get("protein_seq") or inputs.get("seq")
+    smi = inputs.get("smiles") or inputs.get("smi")
+    if not (seq and smi):
+        raise ValueError("boltz2 requires target_seq + smiles")
+    return [{"name": inputs.get("name", "complex_1"),
+             "target": inputs.get("target"), "drug": inputs.get("drug"),
+             "protein_seq": seq, "smiles": smi}]
+
+
+# tool_id → recipe. `code`: local repo files staged onto the box (presigned GET); `inputs_fn`
+# builds the JSON the eval reads (staged as `inputs_name`); `deps`: pip installs; `out_env`: the
+# env var the eval writes its outputs under; `run`: the in-cwd command; `result`: file under
+# out_env to upload (presigned PUT). One entry per `gpu-launch` tool — Boltz-2 first (the proof).
+_GPU_TOOLS = {
+    "boltz2": {
+        "code": {"boltz_runner.py": "q-models/aws/boltz_runner.py"},
+        "inputs_name": "complexes.json",
+        "inputs_fn": _boltz_complexes,
+        "deps": ["boltz"],
+        "out_env": "BOLTZ_OUT",
+        "run": "python boltz_runner.py complexes.json",
+        "result": "results.json",
+    },
+}
+
+
+def _gpu_recipe(tool_id: str) -> dict:
+    """The per-tool GPU recipe, or raise SafetyRefusal for an unwired tool (never guess a run)."""
+    r = _GPU_TOOLS.get(tool_id)
+    if r is None:
+        raise SafetyRefusal(f"no GPU recipe for tool '{tool_id}' — refuse to launch an unwired eval.")
+    return r

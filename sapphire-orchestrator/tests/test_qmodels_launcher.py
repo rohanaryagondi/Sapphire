@@ -108,5 +108,33 @@ class TestPresign(unittest.TestCase):
         self.assertIn("X-Amz-Signature", url)
 
 
+class TestGpuRecipes(unittest.TestCase):
+    """Per-tool GPU recipes (Gap 2) — Boltz-2 input mapping + unwired-tool refusal."""
+
+    def test_boltz_complexes_maps_registry_inputs(self):
+        cx = L._boltz_complexes({"target_seq": "MKVLA", "smiles": "CCO", "name": "tsc2_x"})
+        self.assertEqual(len(cx), 1)
+        self.assertEqual(cx[0]["protein_seq"], "MKVLA")     # boltz_runner reads protein_seq
+        self.assertEqual(cx[0]["smiles"], "CCO")
+        self.assertEqual(cx[0]["name"], "tsc2_x")
+
+    def test_boltz_complexes_requires_seq_and_smiles(self):
+        with self.assertRaises(ValueError):
+            L._boltz_complexes({"target_seq": "MKVLA"})     # no smiles
+        with self.assertRaises(ValueError):
+            L._boltz_complexes({"smiles": "CCO"})           # no seq
+
+    def test_boltz_recipe_shape(self):
+        r = L._gpu_recipe("boltz2")
+        self.assertEqual(r["deps"], ["boltz"])
+        self.assertIn("boltz_runner.py", r["code"])
+        self.assertEqual(r["result"], "results.json")
+        self.assertTrue(callable(r["inputs_fn"]))
+
+    def test_unwired_tool_refused(self):
+        with self.assertRaises(L.SafetyRefusal):
+            L._gpu_recipe("not-a-real-tool")
+
+
 if __name__ == "__main__":
     unittest.main()
