@@ -2270,5 +2270,5 @@
   "_wall_s": 1050.2,
   "_scenario": "tsc2_live_run",
   "_internal_only": true,
-  "_data_notice": "Contains REAL internal Quiver moat data (provenance=moat-real, plane=internal). Approved for INTERNAL demo only \u2014 do NOT distribute externally. EMET facts are real public PMIDs (external plane). Captured 2026-06-25 via _build/capture_tsc2_live.py (real moat + live-captured EMET envelope + haiku firm)."
+  "_data_notice": "Contains REAL internal Quiver moat data (provenance=moat-real, plane=internal). Approved for INTERNAL demo only \u2014 do NOT distribute externally. EMET facts are real public PMIDs (external plane). Captured via _build/capture_tsc2_live.py (real moat + live-captured EMET envelope + haiku firm)."
 }

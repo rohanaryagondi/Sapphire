@@ -23,13 +23,16 @@ target in tuberous sclerosis?"*), and the captured run renders instantly.
    - **External plane (real EMET PMIDs):** TSC1/TSC2→Rheb→mTORC1 mechanism (PMID:21329690), and the
      **EXIST-1/2/3** phase III everolimus trials (PMID:22136276 SEGA, PMID:27409709 renal AML,
      PMID:29338461 epilepsy) — captured live from BenchSci EMET, **real PMIDs, not fabricated**.
-3. **The spread (no forced consensus):** Denali CSO *conditional·4*, BioMarin BD *conditional·3*,
-   Takeda ex-FDA *conditional·3*, Third Rock GP *hold·0*, Adversarial Red-Team *hold·0* — the
-   disagreement is the product.
-4. **DIVERGENCE (surfaced, not reconciled):** the firm flags real tensions — the NurOwn ALS CRL
-   precedent, and **AZD2014 in TSC1/2 gastric cancer (NCT03082833) Phase II *terminated for lack of
-   efficacy*** — with an honest note that it's an oncology context whose CNS relevance is unclear.
-   This is the "what the room sees that the headline misses" moment.
+3. **The spread (no forced consensus):** the real spread is the **3 conditional verdicts** — Denali
+   CSO *conditional·4*, BioMarin BD *conditional·3*, Takeda ex-FDA *conditional·3*. The Third Rock GP
+   and the Adversarial Red-Team **abstained on the harness guardrail check** (`status: abstained`,
+   guardrail-violation — rendered as *hold·0*); that's the guard working — it refuses an ungrounded
+   verdict — **not** a deliberate "no." Present those two as **abstentions, not holds.**
+4. **DIVERGENCE (surfaced, not reconciled):** the headline, CNS-relevant one is **AZD2014 in TSC1/2
+   gastric cancer (NCT03082833) Phase II *terminated for lack of efficacy*** — flagged with an honest
+   note that it's an oncology context whose CNS relevance is unclear. *(Two other DIVERGENCE entries
+   in the capture are lower-signal — a NurOwn/ALS corpus-bleed precedent and a "FAERS not accessed"
+   gap; lead with the AZD2014 one.)* This is the "what the room sees that the headline misses" moment.
 5. **Synthesis:** *Conditional advance · medium confidence* — the facts + how each player reacted,
    not a single verdict.
 

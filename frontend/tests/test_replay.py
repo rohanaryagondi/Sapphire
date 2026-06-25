@@ -45,7 +45,13 @@ class TestReplay(unittest.TestCase):
         self.assertTrue(self.r.get("_internal_only"))  # tagged internal-only
 
     def test_divergence_present(self):
-        self.assertTrue(self.r["discover"]["flags"]["DIVERGENCE"])
+        divs = self.r["discover"]["flags"]["DIVERGENCE"]
+        self.assertTrue(divs)
+        # Assert the CNS-RELEVANT divergence is captured (not just any non-empty list — two of the
+        # three entries are lower-signal: a NurOwn/ALS corpus bleed and a FAERS-not-accessed gap).
+        blob = " ".join(divs).lower()
+        self.assertTrue(("tsc" in blob) or ("tuberous" in blob),
+                        f"no TSC-relevant DIVERGENCE found in: {divs}")
 
     def test_the_spread_is_preserved(self):
         round1 = self.r["consult"]["round1"]

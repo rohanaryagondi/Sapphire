@@ -20,6 +20,17 @@ t0 = time.monotonic()
 result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
 result["_captured_at"] = "2026-06-25"
 result["_wall_s"] = round(time.monotonic() - t0, 1)
+# Stamp the scenario metadata from the TOOL (not a manual edit) so a re-run reproduces the
+# committed JSON — including the internal-only safeguard.
+result["_scenario"] = "tsc2_live_run"
+result["_via"] = "replay-capture"
+result["_internal_only"] = True
+result["_data_notice"] = (
+    "Contains REAL internal Quiver moat data (provenance=moat-real, plane=internal). Approved for "
+    "INTERNAL demo only — do NOT distribute externally. EMET facts are real public PMIDs (external "
+    "plane). Captured via _build/capture_tsc2_live.py (real moat + live-captured EMET envelope + "
+    "haiku firm)."
+)
 out = os.path.join(ENG, "scenarios", "tsc2_live_run.json")
 json.dump(result, open(out, "w"), indent=2)
 d = result["discover"]
