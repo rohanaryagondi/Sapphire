@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='%234d7cfe'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.28'/%3E%3C/svg%3E">
+<style>
+
+/* ── TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  --bg:       #171717;
+  --surface:  #1f1f1f;
+  --bubble:   #2a2a2a;
+  --panel-bg: #111111;
+
+  --edge:     rgba(255,255,255,0.07);
+  --edge-2:   rgba(255,255,255,0.11);
+
+  --ink:      #ececec;
+  --ink-2:    #909090;
+  --ink-3:    #4f4f4f;
+
+  --blue:     #4d7cfe;
+  --blue-bg:  rgba(77,124,254,0.10);
+  --blue-bd:  rgba(77,124,254,0.22);
+  --teal:     #2dd4bf;
+  --teal-bg:  rgba(45,212,191,0.12);
+
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+
+  --r: 12px;
+  --r-sm: 7px;
+}
+
+/* ── RESET ──────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--edge-2); border-radius: 2px; }
+
+/* ── APP SHELL ──────────────────────────────────────────────────── */
+.app {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── NAV ────────────────────────────────────────────────────────── */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--edge);
+  position: relative;
+  z-index: 20;
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 160px;
+}
+.nav-group.right { justify-content: flex-end; }
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-3);
+  font-family: var(--font);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+  line-height: 1;
+}
+.toggle-btn:hover { background: var(--bubble); color: var(--ink-2); }
+.toggle-btn.active {
+  background: var(--blue-bg);
+  border-color: var(--blue-bd);
+  color: var(--blue);
+}
+.toggle-btn:focus-visible { outline: 1px solid var(--blue); outline-offset: 2px; }
+
+/* panel SVG icons inside toggles */
+.toggle-btn svg { flex-shrink: 0; }
+
+.brand {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: 0 6px;
+}
+.live-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+/* ── WORKSPACE ──────────────────────────────────────────────────── */
+.workspace {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── SIDE PANELS ────────────────────────────────────────────────── */
+.panel {
+  width: 0;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--panel-bg);
+  border-right: 1px solid var(--edge);
+  display: flex;
+  flex-direction: column;
+  transition: width 0.26s cubic-bezier(0.22,1,0.36,1);
+}
+.panel.right {
+  border-right: none;
+  border-left: 1px solid var(--edge);
+}
+.panel.open { width: 280px; }
+.panel.right.open { width: 310px; }
+
+/* Panel content — inside overflow:hidden wrapper so it doesn't bleed during animation */
+.panel-inner {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+.panel.right .panel-inner { width: 310px; }
+
+.panel-head {
+  padding: 16px 16px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--edge);
+  flex-shrink: 0;
+}
+
+.panel-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Agent rows */
+.agent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--edge);
+}
+.agent-row:last-child { border-bottom: none; }
+
+.a-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.a-dot.done   { background: var(--blue); }
+.a-dot.active { background: var(--teal); box-shadow: 0 0 0 3px var(--teal-bg); }
+
+.a-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1.35;
+}
+.a-name.queued { color: var(--ink-3); }
+
+.a-note {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-top: 2px;
+}
+
+/* Source items */
+.src-section {
+  padding: 12px 16px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.src-row {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--edge);
+}
+.src-row:last-child { border-bottom: none; }
+
+.src-text {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+.src-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.src-tier {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--teal);
+  flex-shrink: 0;
+}
+.src-ref {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Trace steps */
+.trace-row {
+  display: flex;
+  gap: 10px;
+  padding: 9px 16px;
+  border-bottom: 1px solid var(--edge);
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.trace-row:last-child { border-bottom: none; }
+.trace-n {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── CHAT COLUMN ────────────────────────────────────────────────── */
+.chat-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.thread {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.thread-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 16px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Empty state */
+.empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding-bottom: 96px;
+}
+.empty-heading {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.empty-sub {
+  font-size: 14px;
+  color: var(--ink-2);
+  max-width: 320px;
+  line-height: 1.6;
+}
+
+/* Message list */
+.msg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding-bottom: 16px;
+}
+
+/* User bubble */
+.msg-user {
+  display: flex;
+  justify-content: flex-end;
+  animation: fadeup 0.2s ease both;
+}
+.user-bubble {
+  max-width: 78%;
+  background: var(--bubble);
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+/* Assistant message */
+.msg-ai {
+  animation: fadeup 0.2s ease both;
+}
+
+.ai-body {
+  font-size: 15px;
+  color: var(--ink);
+  line-height: 1.75;
+}
+.ai-body p { margin-bottom: 12px; }
+.ai-body p:last-child { margin-bottom: 0; }
+
+/* Verdict callout */
+.verdict {
+  margin: 16px 0 18px;
+  padding: 14px 18px;
+  background: var(--blue-bg);
+  border: 1px solid var(--blue-bd);
+  border-radius: var(--r);
+}
+.verdict-lbl {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.verdict-body {
+  font-size: 14px;
+  color: var(--ink-2);
+  line-height: 1.65;
+}
+
+/* Inline source chips */
+.src-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 14px;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 2px 7px;
+  background: var(--bubble);
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
+}
+.chip.emet   { color: var(--teal); }
+.chip.claude { color: var(--blue); }
+
+/* Typing dots */
+.typing {
+  display: flex;
+  gap: 4px;
+  padding: 6px 0;
+}
+.typing span {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  animation: dot 1.3s ease-in-out infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.16s; }
+.typing span:nth-child(3) { animation-delay: 0.32s; }
+
+/* ── INPUT BAR ──────────────────────────────────────────────────── */
+.inputbar {
+  padding: 10px 24px 22px;
+  flex-shrink: 0;
+}
+.inputbar-inner {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Preset suggestion pills — only shown in empty state */
+.suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  justify-content: center;
+}
+.chat-col.active .suggestions { display: none; }
+
+.sug {
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--ink-2);
+  padding: 5px 12px;
+  border: 1px solid var(--edge-2);
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.14s, color 0.14s;
+  white-space: nowrap;
+}
+.sug:hover { background: var(--bubble); color: var(--ink); }
+
+/* Input box — like Claude/ChatGPT */
+.input-wrap {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--edge-2);
+  border-radius: 14px;
+  padding: 8px 8px 8px 16px;
+  transition: border-color 0.18s;
+}
+.input-wrap:focus-within { border-color: rgba(77,124,254,0.3); }
+
+textarea.chat-input {
+  flex: 1;
+  min-height: 24px;
+  max-height: 160px;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.55;
+  padding: 2px 0;
+}
+textarea.chat-input::placeholder { color: var(--ink-3); }
+
+.send {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: var(--blue);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.14s, transform 0.1s;
+}
+.send:hover  { opacity: 0.85; }
+.send:active { transform: scale(0.95); }
+.send:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+/* ── ANIMATIONS ─────────────────────────────────────────────────── */
+@keyframes fadeup {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes dot {
+  0%, 80%, 100% { transform: scale(0.65); opacity: 0.35; }
+  40%           { transform: scale(1); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .msg-user, .msg-ai { animation: none; }
+  .typing span { animation: none; opacity: 0.5; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── NAV ── -->
+  <header class="nav">
+
+    <div class="nav-group">
+      <button class="toggle-btn" id="leftToggle" aria-pressed="false" aria-label="Toggle Agents panel">
+        <!-- left panel icon -->
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+          <rect x="8" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+        </svg>
+        Agents
+      </button>
+    </div>
+
+    <a class="brand" href="#">Sapphire</a>
+
+    <div class="nav-group right">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Live
+      </div>
+      <button class="toggle-btn" id="rightToggle" aria-pressed="false" aria-label="Toggle Sources panel">
+        Sources
+        <!-- right panel icon -->
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+          <rect x="9" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+
+  </header>
+
+  <!-- ── WORKSPACE ── -->
+  <div class="workspace">
+
+    <!-- LEFT PANEL: AGENTS -->
+    <div class="panel" id="leftPanel" role="complementary" aria-label="Agents">
+      <div class="panel-inner">
+        <div class="panel-head">Agents</div>
+        <div class="panel-scroll">
+
+          <div class="agent-row">
+            <span class="a-dot done"></span>
+            <div>
+              <div class="a-name">Financial &amp; Investor</div>
+              <div class="a-note">$399M Series C; Fast Track granted Dec 2024</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot done"></span>
+            <div>
+              <div class="a-name">KOL &amp; Social Signal</div>
+              <div class="a-note">Knopman skeptical; Javitt positive on κ-opioid class</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot done"></span>
+            <div>
+              <div class="a-name">Global Regulatory</div>
+              <div class="a-note">FDA Fast Track; no ex-US flags</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot done"></span>
+            <div>
+              <div class="a-name">Patient Advocacy</div>
+              <div class="a-note">Strong TRD community; anhedonia is priority endpoint</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot done"></span>
+            <div>
+              <div class="a-name">EMET Analyst</div>
+              <div class="a-note">4 PMIDs returned; 2 passed T2 threshold</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot active"></span>
+            <div>
+              <div class="a-name">Reputational</div>
+              <div class="a-note">Running…</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot"></span>
+            <div>
+              <div class="a-name queued">Policy &amp; Legislative</div>
+              <div class="a-note">Queued</div>
+            </div>
+          </div>
+          <div class="agent-row">
+            <span class="a-dot"></span>
+            <div>
+              <div class="a-name queued">Patent &amp; IP</div>
+              <div class="a-note">Queued</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT COLUMN -->
+    <div class="chat-col" id="chatCol">
+
+      <div class="thread" id="thread">
+        <div class="thread-inner" id="threadInner">
+
+          <!-- Empty state -->
+          <div class="empty" id="emptyState">
+            <div class="empty-heading">Ask Sapphire</div>
+            <div class="empty-sub">CNS drug discovery, cited and deliberated.</div>
+          </div>
+
+          <!-- Message list — populated dynamically by JS -->
+          <div class="msg-list" id="msgList" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="inputbar">
+        <div class="inputbar-inner">
+          <div class="suggestions" id="suggestions">
+            <button class="sug" data-q="Nav1.8 pain targets — worth prioritizing?">Nav1.8 pain targets</button>
+            <button class="sug" data-q="Is RHEB fundable for TSC?">RHEB fundable for TSC?</button>
+            <button class="sug" data-q="Is navacaprant a fundable CNS candidate for treatment-resistant depression?">Navacaprant TRD</button>
+            <button class="sug" data-q="KOL perspective on the muscarinic drug class">KOL view on muscarinics</button>
+          </div>
+          <div class="input-wrap">
+            <textarea class="chat-input" id="chatInput" rows="1" placeholder="Message Sapphire…"></textarea>
+            <button class="send" id="sendBtn" aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 13V3M4 7L8 3L12 7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: SOURCES + CHAIN OF THOUGHT -->
+    <div class="panel right" id="rightPanel" role="complementary" aria-label="Sources">
+      <div class="panel-inner">
+        <div class="panel-head">Sources &amp; Trace</div>
+        <div class="panel-scroll">
+
+          <div class="src-section">Evidence</div>
+
+          <div class="src-row">
+            <div class="src-text">Neumora raised $399M Series C; navacaprant received FDA Fast Track designation Dec 2024.</div>
+            <div class="src-meta">
+              <span class="src-tier">T1</span>
+              <span class="src-ref">sec.gov EDGAR 8-K 2025-01-02</span>
+            </div>
+          </div>
+          <div class="src-row">
+            <div class="src-text">κ-opioid antagonism reduces anhedonia in TRD models; 3× lower off-target binding vs prior KOR candidates.</div>
+            <div class="src-meta">
+              <span class="src-tier">T2</span>
+              <span class="src-ref">PMID 38472831 · emet-live</span>
+            </div>
+          </div>
+          <div class="src-row">
+            <div class="src-text">KOASTAL-1 Phase 2b missed MADRS primary; proceeding to Phase 3 on anhedonia secondary signal.</div>
+            <div class="src-meta">
+              <span class="src-tier">T2</span>
+              <span class="src-ref">psychiatrictimes.com · browser</span>
+            </div>
+          </div>
+          <div class="src-row">
+            <div class="src-text">KOL Knopman skeptical; Javitt positive on κ-opioid class differentiation from existing TRD agents.</div>
+            <div class="src-meta">
+              <span class="src-tier">T2</span>
+              <span class="src-ref">PMID 41352683 · emet-live</span>
+            </div>
+          </div>
+
+          <div class="src-section" style="margin-top:4px">Chain of Thought</div>
+
+          <div class="trace-row">
+            <span class="trace-n">1</span>
+            <span>Engagement Lead scoped query: TRD mechanism + fundability. Activated 7 agents.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">2</span>
+            <span>Internal moat: no EP-CRISPR signal on KOR pathway → abstain, no DIVERGENCE.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">3</span>
+            <span>EMET returned 4 PMIDs; 2 passed T2 threshold. Financial agent confirmed 8-K. T1.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">4</span>
+            <span>Research Manager: dossier complete, no flags. Roundtable convened.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">5</span>
+            <span>Round 1: Denali CSO advance · Third Rock advance · ex-FDA advance · Takeda BD advance · Adversarial dissent.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">6</span>
+            <span>Round 2 rebuttal: dissent held. Moderator logged 4–1 split, no forced consensus.</span>
+          </div>
+          <div class="trace-row">
+            <span class="trace-n">7</span>
+            <span>Synthesis: Conditional advance. Confidence 72%. Experiment: await KOASTAL-3.</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  const leftToggle  = document.getElementById('leftToggle');
+  const rightToggle = document.getElementById('rightToggle');
+  const leftPanel   = document.getElementById('leftPanel');
+  const rightPanel  = document.getElementById('rightPanel');
+  const chatCol     = document.getElementById('chatCol');
+  const emptyState  = document.getElementById('emptyState');
+  const msgList     = document.getElementById('msgList');
+  const chatInput   = document.getElementById('chatInput');
+  const sendBtn     = document.getElementById('sendBtn');
+  const thread      = document.getElementById('thread');
+  const threadInner = document.getElementById('threadInner');
+
+  /* ── Panel toggles ── */
+  leftToggle.addEventListener('click', function () {
+    const open = leftPanel.classList.toggle('open');
+    leftToggle.classList.toggle('active', open);
+    leftToggle.setAttribute('aria-pressed', String(open));
+  });
+
+  rightToggle.addEventListener('click', function () {
+    const open = rightPanel.classList.toggle('open');
+    rightToggle.classList.toggle('active', open);
+    rightToggle.setAttribute('aria-pressed', String(open));
+  });
+
+  /* ── Helpers ── */
+  function esc(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  /* Demo response — shown for any query in this prototype */
+  var DEMO_HTML = [
+    '<div class="ai-body">',
+    '<p>Navacaprant (NMRA-140) is Neumora\'s selective κ-opioid receptor antagonist for treatment-resistant depression.',
+    ' The firm reached a <strong>conditional advance</strong> verdict — compelling mechanism and strong capital position,',
+    ' but the Phase 3 readout is the decisive gate before any position recommendation.</p>',
+    '<div class="verdict">',
+    '<div class="verdict-lbl">Verdict — Conditional Advance</div>',
+    '<div class="verdict-body">Partners split 4–1 in favor of advancing to IND-enabling diligence, contingent on the Q3 2025',
+    ' Phase 3 KOASTAL-3 readout. Dissent (Adversarial): Phase 2b MADRS miss is a mechanism signal, not sampling noise —',
+    ' proceeding on the secondary anhedonia finding is a fundable thesis, not a demonstrated one.</div>',
+    '</div>',
+    '<p>Neumora closed a $399M Series C and received FDA Fast Track designation in December 2024. KOASTAL-1 missed its',
+    ' primary MADRS endpoint but showed a significant anhedonia signal, which Phase 3 is powered to confirm as the primary outcome.</p>',
+    '<div class="src-chips">',
+    '<span class="chip emet">✓ EMET · PMID 38472831</span>',
+    '<span class="chip emet">✓ EMET · PMID 36449413</span>',
+    '<span class="chip claude">◇ Claude · Neumora IR 2025-01-02</span>',
+    '<span class="chip">◍ Internal moat</span>',
+    '</div>',
+    '</div>'
+  ].join('');
+
+  /* ── Send ── */
+  var activated = false;
+  var waiting   = false;
+
+  function send() {
+    var text = chatInput.value.trim();
+    if (!text || waiting) return;
+    waiting = true;
+
+    /* First send: reveal chat, hide empty state + suggestions */
+    if (!activated) {
+      emptyState.style.display = 'none';
+      threadInner.style.minHeight = 'unset';
+      msgList.style.display = 'flex';
+      chatCol.classList.add('active');
+      activated = true;
+    }
+
+    /* Clear + reset input */
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+
+    /* User bubble */
+    var userEl = document.createElement('div');
+    userEl.className = 'msg-user';
+    userEl.innerHTML = '<div class="user-bubble">' + esc(text) + '</div>';
+    msgList.appendChild(userEl);
+
+    /* Typing indicator */
+    var loadEl = document.createElement('div');
+    loadEl.className = 'msg-ai';
+    loadEl.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+    msgList.appendChild(loadEl);
+
+    thread.scrollTop = thread.scrollHeight;
+
+    /* Swap typing → response */
+    setTimeout(function () {
+      loadEl.innerHTML = DEMO_HTML;
+      thread.scrollTop = thread.scrollHeight;
+      waiting = false;
+    }, 1700);
+  }
+
+  sendBtn.addEventListener('click', send);
+
+  chatInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      send();
+    }
+  });
+
+  /* ── Textarea auto-resize ── */
+  chatInput.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 160) + 'px';
+  });
+
+  /* ── Suggestion chips ── */
+  document.querySelectorAll('.sug').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      chatInput.value = btn.dataset.q;
+      chatInput.focus();
+    });
+  });
+}());
+</script>
+
+</body>
+</html>
