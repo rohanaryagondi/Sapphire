@@ -73,6 +73,16 @@ body {
   position: relative;
   z-index: 20;
 }
+/* glow dusting just below the header border — blue→violet gradient hairline + soft bloom */
+.nav::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 8%, rgba(77,124,254,0.55) 38%, rgba(160,124,255,0.55) 62%, transparent 92%);
+  box-shadow: 0 0 12px 1px rgba(77,124,254,0.22);
+  pointer-events: none;
+}
 
 .nav-group {
   display: flex;
@@ -111,12 +121,15 @@ body {
 .toggle-btn svg { flex-shrink: 0; }
 
 .brand {
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--ink);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--blue);
   text-decoration: none;
+  text-shadow: 0 0 18px rgba(77,124,254,0.45);
+  transition: text-shadow 0.2s;
 }
+.brand:hover { text-shadow: 0 0 24px rgba(77,124,254,0.7); }
 
 .live-badge {
   display: flex;
@@ -180,6 +193,13 @@ body {
   color: var(--ink-3);
   border-bottom: 1px solid var(--edge);
   flex-shrink: 0;
+  position: relative;
+}
+/* echo the header glow under each panel heading */
+.panel-head::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: linear-gradient(90deg, rgba(77,124,254,0.35), rgba(160,124,255,0.35) 55%, transparent);
+  pointer-events: none;
 }
 
 .panel-scroll {
@@ -525,7 +545,7 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 .agent-card {
   margin: 5px 10px; border: 1px solid var(--edge); border-radius: var(--r-sm);
   background: var(--surface); overflow: hidden;
-  transition: border-color 0.14s, box-shadow 0.14s;
+  transition: border-color 0.14s, box-shadow 0.14s, background 0.14s;
 }
 .agent-card:hover { border-color: var(--edge-2); }
 .agent-card.target { border-color: var(--purple-bd); box-shadow: 0 0 0 1px var(--purple-bd); }
@@ -538,6 +558,13 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
 .agent-card.open .ac-chev { transform: rotate(90deg); }
 .ac-detail { display: none; padding: 0 12px 12px; }
 .agent-card.open .ac-detail { display: block; }
+/* opened card pops: lighter violet-pigmented surface, purple title, soft glow */
+.agent-card.open {
+  background: linear-gradient(180deg, #2a2342 0%, #221d31 100%);
+  border-color: var(--purple-bd);
+  box-shadow: 0 0 0 1px rgba(160,124,255,0.22), 0 10px 30px -10px rgba(160,124,255,0.50);
+}
+.agent-card.open .ac-title { color: var(--purple); }
 .ac-task {
   font-size: 11.5px; color: var(--ink-2); font-style: italic;
   padding: 0 0 9px; border-bottom: 1px solid var(--edge); margin-bottom: 9px;
