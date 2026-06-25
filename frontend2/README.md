@@ -1,9 +1,15 @@
 # frontend2 — Sapphire's custom 3-pane console (stdlib-only)
 
-A thin, **Python-standard-library-only** front end that fully realizes the team's design —
-**Gavin's chat-first 3-pane layout** (`docs/design/console-ui/sapphire_chat.html`) and
-**Hayes's agent-wing + attributed-findings** — wired to the **real firm** via
-`live_engine.run_live`, with the **live trace streamed** over Server-Sent Events.
+A thin, **Python-standard-library-only** front end that realizes **Hayes's adopted console
+design** (`docs/design/console-ui/sapphire_chat.html` on `hayes/console-ui-refine`) — the
+**violet 3-pane** (agent wing · chat · Sources & Trace), the **per-subagent agent-wing cards**,
+and the **attributed findings** — wired to the **real firm** via `live_engine.run_live`, with the
+**live trace streamed** over Server-Sent Events.
+
+The palette is Hayes's verbatim: violet canvas `#1a1722`, accent `--purple #a07cff`, neutral nav,
+Inter. The live-data layers (the profile selector, the honesty markers, the data-plane grouping,
+the VETO/DIVERGENCE callouts, the roundtable spread) extend that token system — no new look was
+invented.
 
 ## Why this exists (and how it differs from `frontend/`)
 
@@ -15,7 +21,7 @@ fidelity, no framework ceiling, **no new dependencies**.
 
 **`frontend/` (Chainlit) remains the supported fallback.** `frontend2/` is additive — it reuses
 `frontend/bridge.py` (the in-process `run_live` seam) so real moat / live EMET / Boltz / the
-auto-loaded EMET envelope all come through exactly as in the Chainlit path. Nothing in
+auto-loaded 14-PMID EMET envelope all come through exactly as in the Chainlit path. Nothing in
 `frontend/` is touched.
 
 ## Run
@@ -32,32 +38,76 @@ run, the engine reads its secrets/data from `RohanOnly/` at runtime (the Boltz k
 
 | Profile | `bridge.run` kwargs | What's real |
 |---|---|---|
-| **Live (simulated models)** | `mock=False, simulate=True` | REAL moat · REAL EMET PMIDs · REAL seams/Q-Models; roundtable + claude-fact reasoning is 🧪 **simulated** (clearly labeled, fast) |
-| **Demo (mock backends)** | `mock=True` | Offline mock ctx — deterministic, $0, no external calls (the verification + test path) |
-| **Live (real models)** | `mock=False` | Real backends; claude subagents shell out to the `claude` CLI (absent ⇒ they abstain honestly) |
-| **Replay (captured TSC2 · $0)** | `bridge.replay(...)` | A frozen REAL capture (real moat + real EMET PMIDs + the spread), $0, no model/network — labeled **CAPTURED** |
+| **Live · simulated models** | `mock=False, simulate=True` | REAL moat · REAL EMET PMIDs · REAL seams/Q-Models; roundtable + claude-fact reasoning is 🧪 **simulated** (clearly labeled, fast) |
+| **Demo · mock backends** | `mock=True` | Offline mock ctx — deterministic, $0, no external calls (the verification + test path) |
+| **Live · real models** | `mock=False` | Real backends; claude subagents shell out to the `claude` CLI (absent ⇒ they abstain honestly) |
+| **Replay · captured TSC2 ($0)** | `bridge.replay(...)` | A frozen REAL capture (real moat + real EMET PMIDs + the spread), $0, no model/network — labeled **CAPTURED** |
 
-## Layout (3-pane + toggleable side panels)
+## Layout — Hayes's 3-pane + toggleable side panels
 
-- **LEFT — Agent Wing + attributed findings.** Agent output grouped by the two **data planes**
-  (🔒 internal moat vs 🌐 external), each finding a click-to-expand card with **tier (T1/T2/T3) +
-  provenance + plane** chips, plus the live **Roster** (every seated agent with its status +
-  provenance). Toggle via the **Agents** button.
+- **LEFT — the Agent Wing.** Categorized, expandable **per-subagent cards** (Internal Science &
+  Moat · Biomedical Evidence (EMET) · Quantitative Models · Genetics & Constraint · Quiver Tools ·
+  the veto-class Regulatory Memory / Patent & IP · Semantic Web · Roundtable Partners). Each card
+  shows its **live status** (queued → spinning → ✓ ok / ⚠ abstain, streamed from the run), what it
+  did, and **its cited sources** (the dossier facts attributed to it). Toggle via **Agents**.
 - **CENTER — the conversation.** Your question → the **synthesis** (recommendation · confidence ·
-  proposed experiment) → the **roundtable SPREAD** (one card per persona verdict — *the spread is
-  the product*, no forced consensus) → **DIVERGENCE / VETO** surfaced as callouts.
-- **RIGHT — the live Trace step-tree.** `plan → each Bucket-1 agent (status · provenance ·
-  timing) → flags → each persona → synthesis`, **streamed live** from the SSE `progress` events
-  (a row spins while `running`, then flips to ✓ / ⚠). Toggle via the **Trace** button.
+  proposed experiment) → an **attributed-findings** row (one finding per contributing agent;
+  **click a finding → the responsible agent's card opens and highlights** in the wing, and the
+  finding turns violet — Hayes's finding↔agent linkage) → **VETO / DIVERGENCE** callouts (surfaced,
+  never reconciled) → the **roundtable SPREAD** (one card per persona verdict — *the spread is the
+  product*, no forced consensus).
+- **RIGHT — Sources & Trace.** Two sections: **Evidence** — every dossier fact as a source row
+  grouped by **data plane** (🔒 internal moat · 🌐 external), with tier + provenance chips, each row
+  click-through to its originating agent card; and **Live Trace** — the step-tree `plan → each
+  Bucket-1 agent (status · provenance · timing) → flags → each persona → synthesis`, **streamed
+  live** from the SSE `progress` events (a row spins while running, then flips to ✓ / ⚠). Toggle via
+  **Sources**.
 
 ### Honesty markers (mandatory, never fabricated)
 
 Every marker is **derived from the engine's verbatim provenance** — never relabeled:
 
-- **● REAL** (green) — `moat-real`, `emet-live`, `aso-tox`, `boltz`, `gnomad`, `gtex`, … seams.
-- **🧪 simulated** — provenance `simulated` (the simulate profile's reasoning stand-in).
-- **◆ CAPTURED** — a replayed frozen run.
+- **● REAL** (teal) — `moat-real`, `emet-live`, `aso-tox`, `boltz`, `gnomad`, `gtex`, … seams.
+- **🧪 simulated** (amber) — provenance `simulated` (the simulate profile's reasoning stand-in).
+- **◆ CAPTURED** (violet) — a replayed frozen run.
 - **tier + provenance + plane** chips on every fact; an **abstention shows as ⚠**, never a false ✓.
+
+## Full backend access for Demo Claudes
+
+This is the load-bearing requirement: **a Demo Claude consumes structured data, never a screenshot
+of the UI.** It runs this server and reads three machine-readable surfaces:
+
+1. **`POST /api/run` (SSE).** The live per-agent `progress` events **and**, in the `result` frame,
+   the **COMPLETE `run_live` dict** — every dossier fact with **all** fields
+   (`value`/`field`/`tier`/`provenance`/`source`/`plane`/`flag`), the flags
+   (`VETO`/`DIVERGENCE`/`KNOWN_UNKNOWNS`), the **full roundtable spread** (every persona's
+   `stance`/`conviction`/`rationale`/`fact_claims`), the `synthesize` block, the `plan`,
+   `engagement_id`, and `_via`. **No truncation, no summarisation.**
+2. **`GET /api/trace/<engagement_id>`.** The **raw append-only trace JSONL** for that run
+   (`RohanOnly/engagements/<id>/trace.jsonl`) — every harness event: `inputs_hash`, `status`,
+   `provenance`, `guardrails_run`, `repairs`, `output`, `elapsed_s`. `Content-Type:
+   application/x-ndjson`; honest **404** if the engagement has no trace on disk.
+3. **`GET /api/runs/<engagement_id>`.** The **last full result dict** for that engagement, from a
+   bounded server-side cache (the exact dict the `result` frame carried). **404** if uncached.
+
+A Demo Claude's loop:
+
+```bash
+python frontend2/server.py --port 8100 &
+# 1. run the firm and capture the complete structured result (no screenshot):
+curl -sN -X POST localhost:8100/api/run \
+     -H 'content-type: application/json' \
+     -d '{"query":"Is TSC2 a viable target in tuberous sclerosis?","profile":"simulate"}'
+#    → SSE: event: progress … ; event: result {<the COMPLETE run_live dict>} ; event: done
+# 2. pull the raw engagement trace for the audit surface:
+curl -s localhost:8100/api/trace/<engagement_id>     # raw JSONL, one harness event per line
+# 3. (optional) re-fetch the complete result dict by id:
+curl -s localhost:8100/api/runs/<engagement_id>      # the full cached result dict
+```
+
+Path-traversal-safe: engagement ids are validated (`[A-Za-z0-9_-]+`) and the resolved trace path
+must stay under the engagements dir. The dir honours `SAPPHIRE_ENGAGEMENTS_DIR` (the same override
+the harness trace writer uses), else the repo's `RohanOnly/engagements/`.
 
 ## The SSE contract (`POST /api/run`)
 
@@ -113,11 +163,11 @@ abstain — never a 500 in the user's face.
 
 | Path | What |
 |---|---|
-| `server.py` | The stdlib-only `ThreadingHTTPServer` + SSE streamer. Reuses `frontend/bridge.py`. |
-| `static/index.html` | The 3-pane shell (nav · left wing · center chat · right trace). |
-| `static/app.css` | Gavin's tokens (sapphire-blue `#4d7cfe`, Inter) + the 3-pane / panel / chip / trace styling. |
-| `static/app.js` | Vanilla JS: POST `/api/run`, read the SSE stream, render the trace live, populate the panes from the final dossier. |
-| `tests/test_server.py` | Offline (demo profile) tests: progress→result streaming, contract conformance, honest-degrade, path-traversal, SSE encoding. |
+| `server.py` | The stdlib-only `ThreadingHTTPServer` + SSE streamer + the full-access endpoints (`/api/trace/<id>`, `/api/runs/<id>`). Reuses `frontend/bridge.py`. |
+| `static/index.html` | The 3-pane shell (nav · left agent wing · center chat · right Sources & Trace). |
+| `static/app.css` | Hayes's tokens (violet `#1a1722` canvas, `--purple #a07cff`, Inter) + the wing / Sources & Trace / chip / spread / finding styling. |
+| `static/app.js` | Vanilla JS: POST `/api/run`, read the SSE stream, build the agent wing + trace live, attribute facts to agents, render the center (synthesis · attributed findings · spread). |
+| `tests/test_server.py` | Offline (demo profile) tests: progress→result streaming, contract conformance, the **full-access surface** (complete result · `/api/trace` raw JSONL · `/api/runs` cache · 404s · traversal), honest-degrade, SSE encoding. |
 
 ## Tests
 

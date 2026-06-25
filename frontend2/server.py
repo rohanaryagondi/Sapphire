@@ -15,10 +15,27 @@ keep the whole front door stdlib so importing it pulls in nothing new. The Chain
 
 ROUTES
 ------
-- ``GET /``              → ``static/index.html``
-- ``GET /static/<path>`` → a file under ``static/`` (css/js/svg/png/…); path-traversal-safe.
-- ``GET /api/replays``   → JSON list of available frozen replay scenarios.
-- ``POST /api/run``      → **Server-Sent Events**. Body JSON ``{query, profile, structure?}``.
+- ``GET /``                       → ``static/index.html``
+- ``GET /static/<path>``          → a file under ``static/`` (css/js/svg/…); path-traversal-safe.
+- ``GET /api/replays``            → JSON list of available frozen replay scenarios.
+- ``POST /api/run``               → **Server-Sent Events**. Body JSON ``{query, profile, structure?}``.
+- ``GET /api/trace/<id>``         → the RAW engagement trace JSONL for engagement ``<id>``
+  (``RohanOnly/engagements/<id>/trace.jsonl``) — every agent's inputs_hash, status,
+  provenance, guardrails_run, repairs, output, elapsed_s. 404 honestly if absent.
+- ``GET /api/runs/<id>``          → the COMPLETE cached ``run_live`` result dict for engagement
+  ``<id>`` (the same dict the ``result`` SSE frame carried), or 404 if not cached.
+
+FULL BACKEND ACCESS (for Demo Claudes — the hard requirement)
+-------------------------------------------------------------
+A Demo Claude consumes structured data, NEVER a screenshot of the UI:
+- ``POST /api/run`` (SSE) gives the live per-agent events AND, in the ``result`` frame, the
+  COMPLETE ``run_live`` dict — every dossier fact with ALL fields
+  (value/field/tier/provenance/source/plane/flag), the flags (VETO/DIVERGENCE/KNOWN_UNKNOWNS),
+  the FULL roundtable spread (every persona's stance/conviction/rationale), synthesis, plan,
+  engagement_id, _via. No truncation, no summarisation.
+- ``GET /api/trace/<engagement_id>`` returns the raw append-only trace JSONL for that run.
+- ``GET /api/runs/<engagement_id>`` returns the last full result dict (server-side cache).
+See ``README.md`` → "Full backend access for Demo Claudes".
 
 THE SSE CONTRACT (also documented in README.md)
 -----------------------------------------------
@@ -87,6 +104,46 @@ _DEFAULT_REPLAY = "tsc2_emet_session"
 # Sentinels on the SSE queue.
 _DONE = object()
 
+# Server-side cache of the last full run_live result per engagement_id (for GET /api/runs/<id>).
+# Bounded so a long-lived server doesn't grow unbounded; the latest runs are what a Demo Claude
+# fetches. Guarded by a lock (the SSE writer thread populates it; GET handlers read it).
+_RESULTS: "dict[str, dict]" = {}
+_RESULTS_ORDER: "list[str]" = []
+_RESULTS_LOCK = threading.Lock()
+_RESULTS_MAX = 64
+
+
+def _cache_result(result: dict) -> None:
+    """Cache a completed run by its engagement_id (bounded LRU-ish). Best-effort: a result
+    without an engagement_id (e.g. a bridge-error envelope) is simply not cached."""
+    eid = (result or {}).get("engagement_id") or ""
+    if not eid:
+        return
+    with _RESULTS_LOCK:
+        if eid in _RESULTS:
+            _RESULTS_ORDER.remove(eid)
+        _RESULTS[eid] = result
+        _RESULTS_ORDER.append(eid)
+        while len(_RESULTS_ORDER) > _RESULTS_MAX:
+            _RESULTS.pop(_RESULTS_ORDER.pop(0), None)
+
+
+def _engagements_dir() -> Path:
+    """Resolve the engagement-trace base dir, honouring the same SAPPHIRE_ENGAGEMENTS_DIR
+    override the harness trace writer uses (so tests + the front end agree), else the repo's
+    canonical `RohanOnly/engagements/`."""
+    import os
+    override = os.environ.get("SAPPHIRE_ENGAGEMENTS_DIR")
+    if override:
+        return Path(override)
+    return _REPO / "RohanOnly" / "engagements"
+
+
+# A valid engagement id is `eng_…` (alnum/_/-): used to reject path traversal on /api/trace + /api/runs.
+import re as _re  # noqa: E402
+
+_EID_RE = _re.compile(r"^[A-Za-z0-9_-]+$")
+
 
 def _profile_kwargs(profile: str) -> dict:
     """Map a UI profile string → bridge.run kwargs. Unknown ⇒ demo (safe, offline, $0)."""
@@ -122,6 +179,10 @@ class Handler(BaseHTTPRequestHandler):
             return self._serve_file(_STATIC / "index.html")
         if path == "/api/replays":
             return self._send_json(200, {"replays": _safe_replays()})
+        if path.startswith("/api/trace/"):
+            return self._serve_trace(path[len("/api/trace/"):])
+        if path.startswith("/api/runs/"):
+            return self._serve_run(path[len("/api/runs/"):])
         if path.startswith("/static/"):
             rel = path[len("/static/"):]
             target = (_STATIC / rel).resolve()
@@ -187,6 +248,7 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = bridge.run(query, on_progress=on_progress,
                                         **_profile_kwargs(profile))
+                _cache_result(result)  # so GET /api/runs/<engagement_id> can return it
                 evq.put(("result", result))
             except Exception as exc:  # bridge.run is contracted not to raise; last-resort net
                 evq.put(("error", {"error": f"{type(exc).__name__}: {exc}",
@@ -231,8 +293,47 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self._write(data)
 
+    def _serve_trace(self, eid: str) -> None:
+        """GET /api/trace/<engagement_id> → the RAW append-only trace JSONL for that run.
+
+        FULL BACKEND ACCESS: returns the bytes of `RohanOnly/engagements/<id>/trace.jsonl`
+        verbatim (Content-Type application/x-ndjson) — every harness event (inputs_hash, status,
+        provenance, guardrails_run, repairs, output, elapsed_s). A Demo Claude parses this; it
+        never screenshots. 404 honestly when the engagement has no trace on disk."""
+        eid = eid.split("?", 1)[0].strip("/")
+        if not eid or not _EID_RE.match(eid):
+            return self._send_json(400, {"error": "invalid engagement id"})
+        path = (_engagements_dir() / eid / "trace.jsonl").resolve()
+        base = _engagements_dir().resolve()
+        # Path-traversal guard: the resolved file must live under the engagements dir.
+        if base not in path.parents:
+            return self._send_json(403, {"error": "forbidden"})
+        if not path.is_file():
+            return self._send_json(404, {"error": f"no trace for engagement {eid}"})
+        data = path.read_bytes()
+        self.send_response(200)
+        self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        self._write(data)
+
+    def _serve_run(self, eid: str) -> None:
+        """GET /api/runs/<engagement_id> → the COMPLETE cached run_live result dict for that run.
+
+        FULL BACKEND ACCESS: the exact dict the `result` SSE frame carried (no truncation),
+        from the in-process bounded cache. 404 if this server hasn't run/cached that id."""
+        eid = eid.split("?", 1)[0].strip("/")
+        if not eid or not _EID_RE.match(eid):
+            return self._send_json(400, {"error": "invalid engagement id"})
+        with _RESULTS_LOCK:
+            result = _RESULTS.get(eid)
+        if result is None:
+            return self._send_json(404, {"error": f"no cached run for engagement {eid}"})
+        return self._send_json(200, result)
+
     def _send_json(self, code: int, obj) -> None:
-        data = json.dumps(obj).encode("utf-8")
+        data = json.dumps(obj, default=str).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))

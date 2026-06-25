@@ -220,6 +220,109 @@ class TestServer(unittest.TestCase):
         self.assertIsInstance(data["replays"], list)
 
 
+class TestFullAccess(unittest.TestCase):
+    """The Demo-Claude full-backend-access surface: the COMPLETE result over SSE,
+    GET /api/trace/<id> (raw JSONL), GET /api/runs/<id> (cached full dict).
+
+    Engagement traces are isolated to a temp dir (SAPPHIRE_ENGAGEMENTS_DIR) so the
+    server's /api/trace resolution and the harness writer agree, and real state is untouched.
+    """
+    def setUp(self):
+        self._eng = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _run_and_get_result(self, h):
+        raw = h.post_run({"query": "Is TSC2 a viable target in tuberous sclerosis?",
+                          "profile": "demo"})
+        events = _parse_sse(raw)
+        results = [d for e, d in events if e == "result"]
+        self.assertEqual(len(results), 1)
+        return results[0]
+
+    def test_result_carries_the_complete_run_live_dict(self):
+        """The hard requirement: the `result` frame is the COMPLETE run_live dict — every
+        documented top-level key + full dossier/flags/spread/synthesis, no truncation."""
+        with _ServerHarness() as h:
+            result = self._run_and_get_result(h)
+        for key in ("query", "plan", "priors", "discover", "consult",
+                    "synthesize", "engagement_id", "reflection", "_via"):
+            self.assertIn(key, result, f"result missing top-level key {key!r}")
+        # every dossier fact carries the full field set (no summarisation)
+        dossier = result["discover"]["dossier"]
+        self.assertTrue(dossier)
+        for f in dossier:
+            for fld in ("value", "tier", "provenance", "plane"):
+                self.assertIn(fld, f)
+        # flags present (all three buckets), the full spread, the synthesis
+        for fl in ("VETO", "DIVERGENCE", "KNOWN_UNKNOWNS"):
+            self.assertIn(fl, result["discover"]["flags"])
+        self.assertTrue(result["consult"]["round1"])
+        for v in result["consult"]["round1"]:
+            self.assertIn("persona", v); self.assertIn("stance", v); self.assertIn("status", v)
+        self.assertTrue(result["engagement_id"])
+
+    def test_trace_endpoint_returns_raw_jsonl(self):
+        """GET /api/trace/<id> returns the raw append-only trace JSONL for that engagement."""
+        with _ServerHarness() as h:
+            result = self._run_and_get_result(h)
+            eid = result["engagement_id"]
+            status, body, headers = h.get("/api/trace/" + eid)
+        self.assertEqual(status, 200)
+        self.assertIn("ndjson", headers.get("Content-Type", ""))
+        lines = [l for l in body.splitlines() if l.strip()]
+        self.assertTrue(lines, "trace JSONL must have at least one event line")
+        # each line is a JSON object carrying the engagement id + a timestamp
+        first = json.loads(lines[0])
+        self.assertEqual(first.get("engagement_id"), eid)
+        self.assertIn("ts", first)
+        # the trace records real harness events (statuses) — the audit surface
+        kinds = {json.loads(l).get("type") for l in lines}
+        self.assertTrue(kinds, "trace events should carry a type")
+
+    def test_trace_404_for_unknown_engagement(self):
+        with _ServerHarness() as h:
+            try:
+                h.get("/api/trace/eng_does_not_exist")
+                self.fail("unknown engagement trace should 404")
+            except urllib.error.HTTPError as e:
+                self.assertEqual(e.code, 404)
+
+    def test_trace_path_traversal_blocked(self):
+        with _ServerHarness() as h:
+            try:
+                h.get("/api/trace/..%2f..%2fetc")  # invalid id chars
+                self.fail("path traversal id should be rejected")
+            except urllib.error.HTTPError as e:
+                self.assertIn(e.code, (400, 403, 404))
+
+    def test_runs_endpoint_returns_cached_full_dict(self):
+        """GET /api/runs/<id> returns the COMPLETE cached result dict from the last run."""
+        with _ServerHarness() as h:
+            result = self._run_and_get_result(h)
+            eid = result["engagement_id"]
+            status, body, headers = h.get("/api/runs/" + eid)
+        self.assertEqual(status, 200)
+        self.assertIn("json", headers.get("Content-Type", ""))
+        cached = json.loads(body)
+        # identical complete dict (same engagement, same dossier size, same synthesis)
+        self.assertEqual(cached["engagement_id"], eid)
+        self.assertEqual(len(cached["discover"]["dossier"]), len(result["discover"]["dossier"]))
+        self.assertEqual(cached["synthesize"]["recommendation"], result["synthesize"]["recommendation"])
+
+    def test_runs_404_for_unknown_engagement(self):
+        with _ServerHarness() as h:
+            try:
+                h.get("/api/runs/eng_never_ran")
+                self.fail("uncached engagement should 404")
+            except urllib.error.HTTPError as e:
+                self.assertEqual(e.code, 404)
+
+
 class TestSSEEncoding(unittest.TestCase):
     """Unit-level checks on the pure SSE encoder + profile mapping (no socket)."""
 
