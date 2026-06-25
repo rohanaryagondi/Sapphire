@@ -49,3 +49,23 @@ scenario). Goal here: make the **front-end Live button** do a genuinely real run
 ## Constraints
 - No fabrication — real PMIDs only from a real session; otherwise abstain. Don't break the captured-scenario replay
   (the demo's reliable path) or the honest-abstain default. Credential artifact stays in gitignored `RohanOnly/`.
+
+---
+
+## UPDATE (Rohan, 2026-06-25) — creds provided, auto-login authorized, + simulate model calls for now
+- **EMET creds are provided** in the **gitignored** file `RohanOnly/emet_creds.env` (`SAPPHIRE_EMET_USER`,
+  `SAPPHIRE_EMET_PASS`, `SAPPHIRE_EMET_PROFILE`). Read them from there (or the env) — **never** read/print/commit
+  the password; never put it in any tracked file, log, report, or commit message. `RohanOnly/` is gitignored.
+- **Auto-login is AUTHORIZED** for the dedicated profile: the emet-login helper may sign into BenchSci using those
+  creds (one-time, into `$SAPPHIRE_EMET_PROFILE`), so **all agents reuse that authenticated session**. (This relaxes
+  the skill's "never auto-login" rule ONLY for this dedicated tester profile, per Rohan.) Honest-abstain still applies
+  if login fails / session expires.
+- **Model calls = SIMULATED for now (clearly labeled).** Per Rohan: the `claude-subagent` model reasoning (personas +
+  any claude fact agents) should run as a **labeled simulated response** for the demo — NOT real `claude -p` (which is
+  slow/hanging). Add a **"simulate model" mode** (e.g. a `Live (demo · simulated models)` profile or a
+  `SAPPHIRE_SIMULATE_MODELS=1` lever) that returns plausible persona/agent outputs with **provenance `simulated`** and a
+  clear UI marker (e.g. "🧪 simulated model — real reasoning pending"). HONESTY IS MANDATORY: simulated content must be
+  unmistakably labeled simulated everywhere it renders; never presented as a real model verdict. Real EMET + real moat +
+  real seams stay REAL; only the model reasoning is simulated. Rohan wires real models in a few hours.
+- **Net demo target:** a Live run shows REAL moat + REAL EMET PMIDs (logged-in) + REAL seams/Q-Models + SIMULATED
+  (labeled) roundtable/synthesis — fully working, fast, honest. The captured replay (real haiku personas) stays as-is.
