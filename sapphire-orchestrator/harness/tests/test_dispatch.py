@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from types import SimpleNamespace
 from harness.contracts import Contract
@@ -6,6 +7,14 @@ from harness import dispatch as D
 
 def fake_runner(stdout, returncode=0, stderr=""):
     return lambda cmd: SimpleNamespace(stdout=stdout, returncode=returncode, stderr=stderr)
+
+
+def capturing_runner(captured, stdout):
+    """A runner that records the argv it was handed, then returns a canned envelope."""
+    def _run(cmd):
+        captured.append(list(cmd))
+        return SimpleNamespace(stdout=stdout, returncode=0, stderr="")
+    return _run
 
 class TestDispatch(unittest.TestCase):
     def test_build_prompt_includes_inputs(self):
@@ -62,6 +71,36 @@ class TestDispatch(unittest.TestCase):
         c = Contract(id="emet-runner", role="", kind="emet-playwright")
         with self.assertRaises(RuntimeError):
             D.dispatch(c, {"candidate": "SCN11A"}, ctx={})
+
+    # ── W2(a) — CLAUDE_MODEL → --model pass-through ──────────────────────────
+    def test_dispatch_claude_adds_model_when_env_set(self):
+        c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
+        env = json.dumps({"structured_output": {"ok": True}})
+        captured = []
+        prev = os.environ.get("CLAUDE_MODEL")
+        os.environ["CLAUDE_MODEL"] = "claude-haiku-4-5"
+        try:
+            D.dispatch_claude(c, {"q": 1}, runner=capturing_runner(captured, env))
+        finally:
+            if prev is None:
+                os.environ.pop("CLAUDE_MODEL", None)
+            else:
+                os.environ["CLAUDE_MODEL"] = prev
+        argv = captured[0]
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
+
+    def test_dispatch_claude_no_model_when_env_unset(self):
+        c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
+        env = json.dumps({"structured_output": {"ok": True}})
+        captured = []
+        prev = os.environ.pop("CLAUDE_MODEL", None)
+        try:
+            D.dispatch_claude(c, {"q": 1}, runner=capturing_runner(captured, env))
+        finally:
+            if prev is not None:
+                os.environ["CLAUDE_MODEL"] = prev
+        self.assertNotIn("--model", captured[0])
 
 if __name__ == "__main__":
     unittest.main()

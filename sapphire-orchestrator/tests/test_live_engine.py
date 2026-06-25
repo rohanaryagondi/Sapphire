@@ -1400,5 +1400,72 @@ class TestDataBoundaryAdversarial(unittest.TestCase):
         self.assertEqual(viols[0].guardrail, "data_boundary")
 
 
+class TestEmetHandlerWiring(unittest.TestCase):
+    """W1 — run_live registers a live EMET handler on ctx=None (lazy, setdefault)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_wire_registers_a_callable_emet_handler(self):
+        # The empty ctx (the ctx=None path) gains a real, callable emet_handler — no longer
+        # silently absent. Lazy import means this also proves emet.handler imports cleanly.
+        from live_engine import _wire_emet_handler
+        ctx = {}
+        _wire_emet_handler(ctx)
+        self.assertIn("emet_handler", ctx)
+        self.assertTrue(callable(ctx["emet_handler"]))
+
+    def test_wire_does_not_override_injected_handler(self):
+        from live_engine import _wire_emet_handler
+        sentinel = lambda contract, inputs: {"facts": []}  # noqa: E731
+        ctx = {"emet_handler": sentinel}
+        _wire_emet_handler(ctx)
+        self.assertIs(ctx["emet_handler"], sentinel)
+
+    def test_injected_mock_handler_lands_an_emet_fact(self):
+        # With a mock emet_handler, the emet-runner agent fires and its fact reaches the dossier.
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
+        dossier = result["discover"]["dossier"]
+        emet_facts = [f for f in dossier if f.get("provenance") == "emet-live"]
+        self.assertTrue(emet_facts, "the mock EMET handler should land >=1 emet-live fact")
+
+    def test_emet_runner_not_silently_absent_on_ctx_none(self):
+        # ctx=None must REGISTER a handler so emet-runner doesn't abstain with
+        # 'handler not registered'. We avoid a live call by mocking the handler the wiring
+        # installs (patch make_emet_handler to a recording mock), plus a mock claude runner.
+        import live_engine
+        calls = {"n": 0}
+
+        def _spy_handler(contract, inputs):
+            calls["n"] += 1
+            return {"candidate": inputs.get("candidate", ""),
+                    "facts": [{"value": "spy emet fact", "source": "PMID:1", "tier": "T2"}],
+                    "provenance": "emet-live"}
+
+        orig = live_engine._wire_emet_handler
+
+        def _patched(ctx):
+            ctx.setdefault("emet_handler", _spy_handler)
+
+        live_engine._wire_emet_handler = _patched
+        try:
+            # ctx provides the OTHER mock backends but NOT an emet_handler, so the wiring fills it.
+            ctx = _build_ctx()
+            ctx.pop("emet_handler", None)
+            result = run_live("Is TSC2 a viable target?", ctx=ctx)
+        finally:
+            live_engine._wire_emet_handler = orig
+        self.assertGreater(calls["n"], 0, "the registered emet handler must actually be invoked")
+        agents = {a["id"]: a["status"] for a in result["discover"]["agents"]}
+        self.assertEqual(agents.get("emet-runner"), "ok")  # fired, not abstained
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

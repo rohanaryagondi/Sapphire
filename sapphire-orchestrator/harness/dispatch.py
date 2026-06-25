@@ -35,6 +35,11 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
         "--output-format", "json",
         "--json-schema", json.dumps(contract.output_schema or {}),
     ]
+    # Cost control: if CLAUDE_MODEL is set, pin the agent's model (e.g. haiku for a cheap
+    # live run). Additive + backward-compatible — unset → the CLI default (mirrors serve.py).
+    model = os.environ.get("CLAUDE_MODEL", "").strip()
+    if model:
+        cmd += ["--model", model]
     if contract.tools_allowed:
         cmd += ["--allowedTools", ",".join(contract.tools_allowed)]
     if runner is None:
