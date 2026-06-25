@@ -29,7 +29,7 @@
   const agentTree = $("agentTree"), wingMeta = $("wingMeta");
   const evidenceBody = $("evidenceBody"), evidenceMeta = $("evidenceMeta"), rightScroll = $("rightScroll");
 
-  let busy = false, activated = false;
+  let busy = false, activated = false, lastQuery = "";
 
   // ── agent metadata: id → {name, cat}. Names from the firm roster; categories group
   //    the wing exactly as Hayes's mock does. Drives both the wing cards and finding labels.
@@ -89,6 +89,18 @@
     if (via === "replay" || p === "captured") return "cap";
     if (p === "mock") return "sim"; // a stand-in — mark it, never as REAL
     return "real";
+  }
+  // HONESTY: the trace + source panels show ONLY what genuinely ran/contributed.
+  // A 🧪 simulated/mock provenance is a placeholder (did not run); a dormant tool with 0 facts
+  // (aso-tox/boltz/robyn when no relevant input) did not contribute. Both are filtered out.
+  const _PLACEHOLDER_PROV = new Set(["simulated", "mock"]);
+  const _DORMANT_PROV = new Set(["aso-tox", "boltz", "robyn-scs", "gpu-disabled", "gpu-async", "stub", "unavailable"]);
+  function isPlaceholderProv(prov) { return _PLACEHOLDER_PROV.has(String(prov || "").toLowerCase()); }
+  function ranForReal(ev) {
+    const p = String(ev.provenance || "").toLowerCase();
+    if (_PLACEHOLDER_PROV.has(p)) return false;                    // simulated stub — did not run
+    if ((ev.n_facts || 0) === 0 && _DORMANT_PROV.has(p)) return false; // dormant — not applicable
+    return true;
   }
   function tierClass(tier) {
     const t = String(tier || "").toUpperCase();
@@ -295,16 +307,30 @@
       trace.rows[key] = row;
     }
     if (phase === "done") {
-      const ok = ev.status === "ok";
-      row.className = "trace-row " + (ok ? "ok" : "abstain");
-      row.querySelector(".tr-status").textContent = ok ? "✓" : "⚠";
-      row.querySelector("[data-detail]").innerHTML = rowDetail(stage, ev);
+      if (!ranForReal(ev)) {
+        // HONESTY: a simulated placeholder or dormant (not-applicable) agent did not really run —
+        // drop it from the trace entirely, so the trace shows ONLY what actually executed.
+        if (row && row.parentNode) row.parentNode.removeChild(row);
+        delete trace.rows[key];
+      } else {
+        const ok = ev.status === "ok";
+        row.className = "trace-row " + (ok ? "ok" : "abstain");
+        row.querySelector(".tr-status").textContent = ok ? "✓" : "⚠";
+        row.querySelector("[data-detail]").innerHTML = rowDetail(stage, ev);
+        // expandable: click a step to open the agent + its sources in the wing
+        if (stage === "bucket1" && ev.agent_id) {
+          row.classList.add("expandable");
+          row.onclick = () => openAgent(ev.agent_id);
+        }
+      }
     }
-    // group meta = running tally
+    // group meta = running tally (recomputed after any honest removal)
     const meta = group.querySelector("[data-meta]");
-    const done = group.querySelectorAll(".trace-row.ok, .trace-row.abstain").length;
-    const all = group.querySelectorAll(".trace-row").length;
-    if (meta) meta.textContent = `${done}/${all}`;
+    const ndone = group.querySelectorAll(".trace-row.ok, .trace-row.abstain").length;
+    const nall = group.querySelectorAll(".trace-row").length;
+    if (meta) meta.textContent = `${ndone}/${nall}`;
+    // a group with nothing real left (e.g. an all-simulated roundtable) is hidden, not shown empty
+    group.style.display = group.querySelector(".trace-row") ? "" : "none";
     scrollRight();
   }
   function topName(stage) {
@@ -415,7 +441,10 @@
 
   function renderEvidence(result) {
     const via = result._via === "replay" || result._replay ? "replay" : "";
-    const dossier = (result.discover && result.discover.dossier) || [];
+    // HONESTY: the Sources panel shows ONLY facts that genuinely ran — simulated/placeholder
+    // facts are filtered out (they did not contribute real evidence).
+    const dossier = ((result.discover && result.discover.dossier) || [])
+      .filter((f) => !isPlaceholderProv(f.provenance));
     evidenceBody.innerHTML = "";
     if (!dossier.length) {
       evidenceBody.appendChild(el("div", "hint", "No cited facts in this run (the firm abstained where it lacked evidence — never fabricated)."));
@@ -633,6 +662,7 @@
   // ============================================================================
   async function send() {
     const text = chatInput.value.trim();
+    lastQuery = text;
     const profile = profileSel.value;
     if ((!text && profile !== "replay") || busy) return;
     busy = true; sendBtn.disabled = true;
@@ -691,6 +721,7 @@
           handleProgress(data);
           const lbl = loadEl.querySelector(".t-label");
           if (lbl) lbl.textContent = typingLabel(data);
+          if (data.stage === "plan" && data.phase === "done") renderPlanSteps(loadEl, data);
         } else if (event === "result") {
           result = data;
           renderEvidence(result);
@@ -705,6 +736,35 @@
       }
     }
     return result;
+  }
+  // "To answer this, I will: …" — the honest upfront plan shown in the center as the run starts.
+  // Steps reflect what will ACTUALLY run (no simulated theater). Rescue-ranking queries get the
+  // real moat→EMET→seams→reasoner→synthesis method; other queries get the generic firm method.
+  function planStepsFor(planEv, query) {
+    const q = (query || "").toLowerCase();
+    const isRescue = /rescue/.test(q) && /\bgene/.test(q);
+    if (isRescue) {
+      return [
+        "Pull the candidate rescue genes from the Quiver moat (internal EP-signature reversal ranking).",
+        "Gather cited literature on each candidate from EMET (BenchSci).",
+        "Run quantitative checks — gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment.",
+        "Reason over each gene's plausible mechanism and re-rank by literature support (scientific reasoner — a real model call).",
+        "Synthesise the ranked rescue-gene recommendation.",
+      ];
+    }
+    const steps = ["Gather the cited fact dossier from the planned agents (moat, EMET, quantitative seams)."];
+    if ((planEv.panel || []).length) steps.push("Convene the persona roundtable on the dossier (the spread is the product).");
+    steps.push("Check VETO / DIVERGENCE flags.", "Synthesise the recommendation.");
+    return steps;
+  }
+  function renderPlanSteps(loadEl, planEv) {
+    if (!loadEl || loadEl.querySelector(".plan-steps")) return; // render once
+    const steps = planStepsFor(planEv, lastQuery);
+    const box = el("div", "plan-steps",
+      `<div class="ps-lbl">To answer this, I will:</div><ol class="ps-list">` +
+      steps.map((s) => `<li>${esc(s)}</li>`).join("") + `</ol>`);
+    loadEl.insertBefore(box, loadEl.firstChild);
+    scrollThread();
   }
   function typingLabel(ev) {
     if (ev.stage === "plan") return "scoping the engagement…";
