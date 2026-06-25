@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sapphire — UI/UX design showcase</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22324%22%20height%3D%22254%22%20viewBox%3D%220%200%20324%20254%22%3E%3Cg%20transform%3D%22translate%280%2C254%29%20scale%280.1%2C-0.1%29%22%20fill%3D%22%23ee2bee%22%3E%3Cpath%20d%3D%22M1040%202528%20c-297%20-63%20-567%20-227%20-749%20-454%20-314%20-390%20-374%20-931%20-151%20-1374%20156%20-311%20421%20-538%20768%20-658%20l107%20-37%20280%20-3%20280%20-3%20-466%20468%20c-257%20257%20-474%20479%20-483%20493%20-38%2058%20-9%20152%2057%20183%2043%2021%2068%2021%20110%203%2018%20-8%20274%20-257%20597%20-580%20l565%20-566%20205%200%20205%200%20-838%20838%20-837%20837%200%2052%20c0%2044%205%2058%2031%2087%2036%2042%2085%2058%20132%2045%2024%20-6%20261%20-238%20957%20-934%20l925%20-925%20229%200%20228%200%20-688%20696%20c-379%20383%20-693%20706%20-697%20718%20-5%2011%20-6%2041%20-4%2066%204%2035%2013%2051%2041%2077%2031%2029%2043%2033%2088%2033%20l52%200%20287%20-286%20287%20-287%209%2049%20c15%2090%209%20362%20-10%20451%20-42%20195%20-123%20374%20-241%20533%20-15%2019%20-66%2075%20-114%20123%20-175%20177%20-401%20300%20-647%20352%20-81%2017%20-440%2019%20-515%203z%22/%3E%3C/g%3E%3C/svg%3E"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --background:240 10% 4%; --foreground:0 0% 98%;
+    --card:240 8% 7%; --border:240 4% 16%; --muted-foreground:240 5% 65%;
+    --primary:300 85% 55%; --primary-foreground:0 0% 100%; --radius:0.5rem;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:hsl(var(--background));color:hsl(var(--foreground));
+    font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+  body{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+  header{flex:0 0 auto;display:flex;align-items:center;gap:18px;padding:10px 18px;
+    border-bottom:1px solid hsl(var(--border));background:hsl(240 10% 5%);}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+  /* Quiver gem mark — masked data: URI (no binary asset), tinted with --primary */
+  .gem{width:22px;height:22px;background:hsl(var(--primary));
+    -webkit-mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22324%22%20height%3D%22254%22%20viewBox%3D%220%200%20324%20254%22%3E%3Cg%20transform%3D%22translate%280%2C254%29%20scale%280.1%2C-0.1%29%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M1040%202528%20c-297%20-63%20-567%20-227%20-749%20-454%20-314%20-390%20-374%20-931%20-151%20-1374%20156%20-311%20421%20-538%20768%20-658%20l107%20-37%20280%20-3%20280%20-3%20-466%20468%20c-257%20257%20-474%20479%20-483%20493%20-38%2058%20-9%20152%2057%20183%2043%2021%2068%2021%20110%203%2018%20-8%20274%20-257%20597%20-580%20l565%20-566%20205%200%20205%200%20-838%20838%20-837%20837%200%2052%20c0%2044%205%2058%2031%2087%2036%2042%2085%2058%20132%2045%2024%20-6%20261%20-238%20957%20-934%20l925%20-925%20229%200%20228%200%20-688%20696%20c-379%20383%20-693%20706%20-697%20718%20-5%2011%20-6%2041%20-4%2066%204%2035%2013%2051%2041%2077%2031%2029%2043%2033%2088%2033%20l52%200%20287%20-286%20287%20-287%209%2049%20c15%2090%209%20362%20-10%20451%20-42%20195%20-123%20374%20-241%20533%20-15%2019%20-66%2075%20-114%20123%20-175%20177%20-401%20300%20-647%20352%20-81%2017%20-440%2019%20-515%203z%22/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22324%22%20height%3D%22254%22%20viewBox%3D%220%200%20324%20254%22%3E%3Cg%20transform%3D%22translate%280%2C254%29%20scale%280.1%2C-0.1%29%22%20fill%3D%22%23000%22%3E%3Cpath%20d%3D%22M1040%202528%20c-297%20-63%20-567%20-227%20-749%20-454%20-314%20-390%20-374%20-931%20-151%20-1374%20156%20-311%20421%20-538%20768%20-658%20l107%20-37%20280%20-3%20280%20-3%20-466%20468%20c-257%20257%20-474%20479%20-483%20493%20-38%2058%20-9%20152%2057%20183%2043%2021%2068%2021%20110%203%2018%20-8%20274%20-257%20597%20-580%20l565%20-566%20205%200%20205%200%20-838%20838%20-837%20837%200%2052%20c0%2044%205%2058%2031%2087%2036%2042%2085%2058%20132%2045%2024%20-6%20261%20-238%20957%20-934%20l925%20-925%20229%200%20228%200%20-688%20696%20c-379%20383%20-693%20706%20-697%20718%20-5%2011%20-6%2041%20-4%2066%204%2035%2013%2051%2041%2077%2031%2029%2043%2033%2088%2033%20l52%200%20287%20-286%20287%20-287%209%2049%20c15%2090%209%20362%20-10%20451%20-42%20195%20-123%20374%20-241%20533%20-15%2019%20-66%2075%20-114%20123%20-175%20177%20-401%20300%20-647%20352%20-81%2017%20-440%2019%20-515%203z%22/%3E%3C/g%3E%3C/svg%3E") center/contain no-repeat;}
+  .sub{color:hsl(var(--muted-foreground));font-weight:500;font-size:13px}
+  nav{display:flex;gap:6px;margin-left:8px;flex-wrap:wrap}
+  .tab{appearance:none;border:1px solid hsl(var(--border));background:hsl(240 8% 9%);
+    color:hsl(var(--foreground));font:inherit;font-size:13px;font-weight:500;
+    padding:7px 13px;border-radius:calc(var(--radius) - 2px);cursor:pointer;display:flex;align-items:center;gap:7px;
+    transition:.14s;}
+  .tab:hover{border-color:hsl(var(--primary)/.6)}
+  .tab[aria-selected="true"]{background:hsl(var(--primary)/.16);border-color:hsl(var(--primary));
+    color:hsl(0 0% 100%);}
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:hsl(var(--muted-foreground))}
+  .tab.star .dot{background:hsl(var(--primary));box-shadow:0 0 8px hsl(var(--primary))}
+  .tab small{color:hsl(var(--muted-foreground));font-weight:400}
+  .spacer{flex:1}
+  .hint{color:hsl(var(--muted-foreground));font-size:12px;display:flex;align-items:center;gap:8px}
+  .pill{border:1px solid hsl(var(--border));border-radius:999px;padding:3px 9px;font-size:11px;
+    color:hsl(var(--muted-foreground))}
+  .pill.live{color:hsl(140 60% 60%);border-color:hsl(140 50% 30%)}
+  main{flex:1;position:relative;min-height:0}
+  iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:hsl(var(--background))}
+  .group-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:hsl(var(--muted-foreground));
+    align-self:center;padding:0 2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="gem"></span>Sapphire<span class="sub">· UI/UX design</span></div>
+  <span class="group-label">Direction</span>
+  <nav id="tabs">
+    <button class="tab star" data-src="sapphire_loka.html" aria-selected="true">
+      <span class="dot"></span>★ LOKA-native console <small>· the design</small></button>
+    <span class="group-label" style="margin-left:6px">Earlier exploration</span>
+    <button class="tab" data-src="variant_a.html"><span class="dot"></span>A · Mission Control</button>
+    <button class="tab" data-src="variant_c.html"><span class="dot"></span>C · The Firm</button>
+    <button class="tab" data-src="variant_b.html"><span class="dot"></span>B · Exec Brief <small>· light</small></button>
+  </nav>
+  <span class="spacer"></span>
+  <span class="hint">
+    <span class="pill live">● real TSC2 run</span>
+    <span class="pill">3-pane · left cards · center response · right traces</span>
+  </span>
+</header>
+<main><iframe id="frame" src="sapphire_loka.html" title="design preview"></iframe></main>
+<script>
+  const tabs=[...document.querySelectorAll('.tab')], frame=document.getElementById('frame');
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.setAttribute('aria-selected', x===t));
+    frame.src=t.dataset.src;
+  }));
+</script>
+</body>
+</html>

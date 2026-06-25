@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — Decision Firm · Mission Control</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Quiver brand */
+    --purple:#9C02FA;
+    --red:#F51D3F;
+    --magenta:#C20CA9;
+    --lilac:#CAA1FF;
+    --hotpink:#FF85FF;
+    --navy:#0D1130;
+
+    /* derived surfaces */
+    --bg:#0D1130;
+    --bg-0:#090C24;
+    --bg-1:#10153A;
+    --bg-2:#161C49;
+    --bg-3:#1C2356;
+    --line:rgba(202,161,255,0.14);
+    --line-strong:rgba(202,161,255,0.28);
+
+    --ink:#EDEBFF;
+    --ink-dim:#A7A9CF;
+    --ink-faint:#6E7199;
+
+    /* planes */
+    --vault:#23E0C8;          /* internal / locked accent (cool) */
+    --vault-soft:rgba(35,224,200,0.12);
+    --open:var(--lilac);      /* external / open */
+
+    /* status */
+    --ok:#37E29A;
+    --warn:#FFC34D;
+    --live:#37E29A;
+    --sim:#FFC34D;
+
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 700px at 12% -8%, rgba(156,2,250,0.16), transparent 55%),
+      radial-gradient(1000px 600px at 100% 0%, rgba(194,12,169,0.12), transparent 50%),
+      radial-gradient(900px 700px at 50% 120%, rgba(35,224,200,0.06), transparent 60%),
+      var(--bg);
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  ::selection{background:rgba(156,2,250,0.4);color:#fff;}
+
+  /* scrollbars */
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:rgba(202,161,255,0.18);border-radius:6px;border:2px solid transparent;background-clip:padding-box;}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(202,161,255,0.34);background-clip:padding-box;}
+
+  /* ===== Top command bar ===== */
+  .topbar{
+    height:54px;
+    display:flex;align-items:center;gap:16px;
+    padding:0 18px;
+    background:linear-gradient(180deg, rgba(22,28,73,0.85), rgba(13,17,48,0.7));
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(10px);
+    position:relative;z-index:30;
+  }
+  .brand{display:flex;align-items:center;gap:11px;min-width:0;}
+  .logo{
+    width:30px;height:30px;border-radius:8px;flex:none;
+    background:conic-gradient(from 220deg, var(--purple), var(--magenta), var(--hotpink), var(--lilac), var(--purple));
+    box-shadow:0 0 0 1px rgba(202,161,255,0.4), 0 6px 18px rgba(156,2,250,0.45);
+    position:relative;
+  }
+  .logo::after{
+    content:"";position:absolute;inset:6px;border-radius:4px;
+    background:var(--bg-0);
+    box-shadow:inset 0 0 8px rgba(202,161,255,0.5);
+  }
+  .logo::before{
+    content:"";position:absolute;inset:0;border-radius:8px;
+    background:radial-gradient(circle at 30% 25%, rgba(255,255,255,0.6), transparent 40%);
+    mix-blend-mode:overlay;
+  }
+  .brand b{font-weight:800;letter-spacing:.4px;font-size:15px;}
+  .brand .sub{font-size:11px;color:var(--ink-faint);font-family:var(--mono);letter-spacing:.5px;}
+  .brand .divider{width:1px;height:22px;background:var(--line-strong);margin:0 2px;}
+
+  .topbar .meta{
+    margin-left:auto;display:flex;align-items:center;gap:18px;
+    font-family:var(--mono);font-size:11px;color:var(--ink-dim);
+  }
+  .topbar .meta .kv{display:flex;align-items:center;gap:6px;}
+  .topbar .meta .kv span{color:var(--ink-faint);}
+  .topbar .meta b{color:var(--lilac);font-weight:600;}
+  .pill-live{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:20px;
+    background:rgba(55,226,154,0.1);border:1px solid rgba(55,226,154,0.32);
+    color:var(--ok);font-weight:600;font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;
+  }
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(55,226,154,0.6);}
+  .dot.pulse{animation:pulse 1.8s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(55,226,154,0.55);}
+    70%{box-shadow:0 0 0 7px rgba(55,226,154,0);}
+    100%{box-shadow:0 0 0 0 rgba(55,226,154,0);}
+  }
+
+  /* ===== 3-pane grid ===== */
+  .stage{
+    height:calc(100vh - 54px);
+    display:grid;
+    grid-template-columns:minmax(330px,1fr) minmax(440px,1.65fr) minmax(360px,1.05fr);
+    gap:0;
+    position:relative;
+  }
+  .pane{
+    height:100%;
+    display:flex;flex-direction:column;
+    min-height:0;min-width:0;
+  }
+  .pane.left{border-right:1px solid var(--line);background:linear-gradient(180deg, rgba(13,17,48,0.4), rgba(9,12,36,0.55));}
+  .pane.right{border-left:1px solid var(--line);background:linear-gradient(180deg, rgba(9,12,36,0.7), rgba(7,9,28,0.85));}
+  .pane.center{background:transparent;}
+
+  .pane-head{
+    flex:none;
+    padding:13px 16px 11px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:9px;
+    background:rgba(9,12,36,0.35);
+  }
+  .pane-head .ix{
+    font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+    border:1px solid var(--line);border-radius:5px;padding:2px 6px;letter-spacing:.5px;
+  }
+  .pane-head h2{
+    margin:0;font-size:12px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink);
+  }
+  .pane-head .tag{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);}
+  .pane-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 40px;}
+
+  /* ===== LEFT: plane sections + cards ===== */
+  .plane{margin-bottom:18px;}
+  .plane-head{
+    display:flex;align-items:center;gap:9px;
+    padding:7px 10px;border-radius:9px;margin-bottom:10px;
+    font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    position:sticky;top:-2px;z-index:5;
+    backdrop-filter:blur(6px);
+  }
+  .plane-head .lk{font-size:13px;line-height:1;}
+  .plane-head .ct{margin-left:auto;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.3px;
+    padding:1px 7px;border-radius:10px;}
+  .plane.internal .plane-head{
+    color:var(--vault);
+    background:linear-gradient(90deg, rgba(35,224,200,0.14), rgba(35,224,200,0.03));
+    border:1px solid rgba(35,224,200,0.3);
+  }
+  .plane.internal .plane-head .ct{background:rgba(35,224,200,0.14);color:var(--vault);}
+  .plane.external .plane-head{
+    color:var(--lilac);
+    background:linear-gradient(90deg, rgba(202,161,255,0.13), rgba(202,161,255,0.02));
+    border:1px solid rgba(202,161,255,0.26);
+  }
+  .plane.external .plane-head .ct{background:rgba(202,161,255,0.13);color:var(--lilac);}
+  .plane-head .desc{font-weight:500;text-transform:none;letter-spacing:0;font-size:10px;color:var(--ink-faint);font-family:var(--mono);}
+
+  .card{
+    position:relative;
+    border-radius:11px;
+    padding:11px 12px 11px 14px;
+    margin-bottom:9px;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:transform .14s ease, border-color .14s ease, box-shadow .14s ease, background .14s ease;
+    opacity:0;transform:translateY(8px);
+  }
+  .card.in{opacity:1;transform:none;}
+  .card:hover{border-color:var(--line-strong);box-shadow:0 8px 26px rgba(0,0,0,0.4);transform:translateY(-1px);}
+  .card::before{
+    content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:3px;
+  }
+  .plane.internal .card::before{background:linear-gradient(180deg,var(--vault),rgba(35,224,200,0.2));}
+  .plane.external .card::before{background:linear-gradient(180deg,var(--lilac),rgba(202,161,255,0.15));}
+  .plane.internal .card{background:linear-gradient(180deg, rgba(20,38,55,0.7), rgba(13,28,43,0.6));border-color:rgba(35,224,200,0.18);}
+  .plane.internal .card:hover{border-color:rgba(35,224,200,0.4);}
+
+  .card-top{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+  .card-src{
+    font-size:11px;font-weight:600;color:var(--ink);
+    display:flex;align-items:center;gap:6px;min-width:0;
+  }
+  .card-src .glyph{font-size:11px;color:var(--vault);flex:none;}
+  .plane.external .card-src .glyph{color:var(--lilac);}
+  .card-src .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chev{margin-left:auto;color:var(--ink-faint);font-size:11px;transition:transform .18s ease;flex:none;}
+  .card.open .chev{transform:rotate(90deg);}
+
+  .card-val{
+    font-size:12px;line-height:1.45;color:var(--ink-dim);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .card.open .card-val{-webkit-line-clamp:unset;color:var(--ink);}
+  .card-val .hl{color:var(--lilac);font-weight:600;}
+  .plane.internal .card-val .hl{color:var(--vault);}
+  .card-val .mono{font-family:var(--mono);font-size:11px;color:var(--vault);background:rgba(35,224,200,0.1);padding:1px 5px;border-radius:4px;}
+
+  .card-foot{
+    margin-top:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  }
+  .card-detail{
+    max-height:0;overflow:hidden;transition:max-height .25s ease,margin .25s ease,opacity .2s ease;opacity:0;
+  }
+  .card.open .card-detail{max-height:200px;margin-top:9px;opacity:1;}
+  .card-detail .row{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);
+    display:flex;gap:8px;padding:3px 0;border-top:1px solid var(--line);
+  }
+  .card-detail .row:first-child{border-top:none;}
+  .card-detail .row b{color:var(--ink-faint);min-width:64px;font-weight:500;}
+  .card-detail .row span{color:var(--lilac);}
+  .plane.internal .card-detail .row span{color:var(--vault);}
+
+  /* chips */
+  .chip{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.3px;
+    padding:2.5px 7px;border-radius:6px;white-space:nowrap;line-height:1;
+    border:1px solid transparent;text-transform:uppercase;
+  }
+  .chip.tier{background:rgba(202,161,255,0.1);border-color:rgba(202,161,255,0.28);color:var(--lilac);}
+  .chip.tier.t1{background:rgba(55,226,154,0.12);border-color:rgba(55,226,154,0.34);color:var(--ok);}
+  .chip.tier.t2{background:rgba(202,161,255,0.1);border-color:rgba(202,161,255,0.3);color:var(--lilac);}
+  .chip.tier.t3{background:rgba(255,195,77,0.1);border-color:rgba(255,195,77,0.34);color:var(--warn);}
+
+  .chip.prov{background:rgba(156,2,250,0.1);border-color:rgba(156,2,250,0.32);color:#D8B7FF;}
+  .chip.prov.moat-real{background:rgba(35,224,200,0.12);border-color:rgba(35,224,200,0.36);color:var(--vault);}
+  .chip.prov.emet-live{background:rgba(55,226,154,0.1);border-color:rgba(55,226,154,0.32);color:var(--ok);}
+  .chip.prov.fda-primary{background:rgba(245,29,63,0.1);border-color:rgba(245,29,63,0.34);color:#FF9AAB;}
+  .chip.prov.qmodels{background:rgba(255,133,255,0.1);border-color:rgba(255,133,255,0.32);color:var(--hotpink);}
+  .chip.prov.semantic-web{background:rgba(156,2,250,0.1);border-color:rgba(156,2,250,0.3);color:#D8B7FF;}
+
+  .chip.live{background:rgba(55,226,154,0.12);border-color:rgba(55,226,154,0.34);color:var(--ok);}
+  .chip.live .d{width:5px;height:5px;border-radius:50%;background:var(--ok);box-shadow:0 0 5px var(--ok);}
+  .chip.sim{background:rgba(255,195,77,0.1);border-color:rgba(255,195,77,0.34);color:var(--warn);text-transform:none;}
+  .chip.flag{background:rgba(245,29,63,0.12);border-color:rgba(245,29,63,0.38);color:#FF9AAB;}
+  .chip.flag.ku{background:rgba(255,195,77,0.1);border-color:rgba(255,195,77,0.34);color:var(--warn);}
+
+  /* ===== CENTER ===== */
+  .center-scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:22px 28px 60px;}
+  .q-block{margin-bottom:22px;}
+  .q-eyebrow{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-faint);
+    display:flex;align-items:center;gap:10px;margin-bottom:12px;
+  }
+  .q-eyebrow .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--line-strong),transparent);}
+  .question{
+    font-size:25px;font-weight:800;line-height:1.22;letter-spacing:-.3px;
+    background:linear-gradient(100deg,#fff 10%, var(--lilac) 90%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    margin:0 0 12px;
+  }
+  .q-tags{display:flex;flex-wrap:wrap;gap:7px;}
+  .q-tag{
+    font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);
+    padding:4px 10px;border-radius:7px;border:1px solid var(--line);background:rgba(22,28,73,0.5);
+  }
+  .q-tag b{color:var(--lilac);font-weight:600;}
+
+  /* synthesis hero */
+  .synth{
+    border-radius:16px;padding:0;margin-bottom:26px;
+    background:linear-gradient(135deg, rgba(156,2,250,0.16), rgba(194,12,169,0.08) 55%, rgba(13,17,48,0.4));
+    border:1px solid rgba(156,2,250,0.32);
+    box-shadow:0 18px 50px rgba(13,3,40,0.6), inset 0 1px 0 rgba(202,161,255,0.18);
+    position:relative;overflow:hidden;
+    opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease;
+  }
+  .synth.in{opacity:1;transform:none;}
+  .synth::before{
+    content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;border-radius:50%;
+    background:radial-gradient(circle, rgba(255,133,255,0.22), transparent 65%);pointer-events:none;
+  }
+  .synth-head{
+    display:flex;align-items:center;gap:10px;padding:14px 20px 0;position:relative;
+  }
+  .synth-head .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:var(--lilac);font-weight:600;}
+  .synth-head .sim-badge{margin-left:auto;}
+  .synth-body{padding:11px 20px 20px;position:relative;}
+  .verdict-line{display:flex;align-items:baseline;gap:13px;flex-wrap:wrap;margin-bottom:13px;}
+  .verdict{
+    font-size:23px;font-weight:800;letter-spacing:-.2px;color:#fff;line-height:1.15;
+  }
+  .verdict .em{color:var(--hotpink);}
+  .conf{
+    display:inline-flex;align-items:center;gap:9px;
+    padding:6px 12px;border-radius:10px;
+    background:rgba(255,195,77,0.1);border:1px solid rgba(255,195,77,0.3);
+  }
+  .conf .lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink-dim);}
+  .conf .meter{display:flex;gap:3px;}
+  .conf .meter i{width:7px;height:13px;border-radius:2px;background:rgba(255,255,255,0.12);}
+  .conf .meter i.on{background:var(--warn);box-shadow:0 0 6px rgba(255,195,77,0.6);}
+  .conf .val{font-size:12px;font-weight:700;color:var(--warn);text-transform:capitalize;}
+
+  .synth-detail{font-size:13px;line-height:1.5;color:var(--ink-dim);margin-bottom:14px;}
+  .synth-detail b{color:var(--ink);font-weight:600;}
+  .synth-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px;}
+  .sg{
+    background:rgba(9,12,36,0.5);border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+  }
+  .sg .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--ink-faint);margin-bottom:5px;}
+  .sg .v{font-size:13px;font-weight:700;color:var(--ink);}
+  .sg .v.big{font-size:20px;background:linear-gradient(90deg,#fff,var(--lilac));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .sg .v small{font-size:11px;color:var(--ink-faint);font-weight:500;}
+  .exp-box{
+    margin-top:13px;padding:11px 13px;border-radius:10px;
+    background:rgba(35,224,200,0.06);border:1px dashed rgba(35,224,200,0.3);
+    font-size:12.5px;color:var(--ink-dim);display:flex;gap:10px;align-items:flex-start;
+  }
+  .exp-box .ic{color:var(--vault);font-size:14px;flex:none;margin-top:1px;}
+  .exp-box b{color:var(--vault);font-weight:600;}
+
+  /* section heading */
+  .sec-h{display:flex;align-items:center;gap:11px;margin:0 0 14px;}
+  .sec-h h3{margin:0;font-size:14px;font-weight:700;letter-spacing:.2px;color:var(--ink);}
+  .sec-h .sub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);}
+  .sec-h .ln{flex:1;height:1px;background:linear-gradient(90deg,var(--line-strong),transparent);}
+  .sec-h .spread-key{
+    display:flex;gap:5px;font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);align-items:center;
+  }
+
+  /* DIVERGENCE — the alpha */
+  .div-block{
+    border-radius:14px;margin-bottom:26px;overflow:hidden;
+    border:1px solid rgba(245,29,63,0.34);
+    background:linear-gradient(135deg, rgba(245,29,63,0.1), rgba(13,17,48,0.4));
+    box-shadow:0 12px 36px rgba(40,4,12,0.4);
+    opacity:0;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease;
+  }
+  .div-block.in{opacity:1;transform:none;}
+  .div-head{
+    display:flex;align-items:center;gap:10px;padding:12px 16px;
+    background:rgba(245,29,63,0.1);border-bottom:1px solid rgba(245,29,63,0.24);
+  }
+  .div-head .ic{
+    width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none;
+    background:rgba(245,29,63,0.16);border:1px solid rgba(245,29,63,0.4);color:#FF9AAB;font-size:13px;
+  }
+  .div-head .t{font-size:13px;font-weight:700;color:#FFB3C0;letter-spacing:.3px;}
+  .div-head .alpha{
+    margin-left:auto;font-family:var(--mono);font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;
+    color:#FF9AAB;border:1px solid rgba(245,29,63,0.34);border-radius:6px;padding:3px 8px;
+  }
+  .div-sub{padding:9px 16px 4px;font-size:11.5px;color:var(--ink-faint);font-style:italic;}
+  .div-list{padding:6px 16px 14px;display:flex;flex-direction:column;gap:9px;}
+  .div-item{
+    display:flex;gap:11px;padding:11px 12px;border-radius:10px;
+    background:rgba(9,12,36,0.5);border:1px solid var(--line);
+  }
+  .div-item .n{
+    font-family:var(--mono);font-size:11px;font-weight:700;color:#FF9AAB;flex:none;
+    width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+    background:rgba(245,29,63,0.12);border:1px solid rgba(245,29,63,0.3);
+  }
+  .div-item .tx{font-size:12px;line-height:1.5;color:var(--ink-dim);}
+  .div-item .tx .mono{font-family:var(--mono);color:var(--hotpink);font-size:11px;}
+
+  /* roundtable spread */
+  .spread{display:flex;flex-direction:column;gap:11px;margin-bottom:14px;}
+  .persona{
+    border-radius:13px;padding:14px 15px;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--line);
+    transition:border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+    opacity:0;transform:translateY(8px);
+    position:relative;overflow:hidden;
+  }
+  .persona.in{opacity:1;transform:none;}
+  .persona:hover{border-color:var(--line-strong);transform:translateY(-1px);box-shadow:0 10px 28px rgba(0,0,0,0.35);}
+  .persona::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .persona.conditional::before{background:var(--warn);}
+  .persona.hold::before{background:var(--ink-faint);}
+  .persona.abstained{opacity:.96;}
+  .persona.abstained{background:linear-gradient(180deg, rgba(20,24,55,0.7), rgba(13,17,48,0.5));border-style:dashed;border-color:rgba(110,113,153,0.3);}
+
+  .p-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:9px;}
+  .p-avatar{
+    width:34px;height:34px;border-radius:9px;flex:none;display:grid;place-items:center;
+    font-family:var(--mono);font-size:12px;font-weight:700;color:var(--ink);
+    background:linear-gradient(135deg, rgba(156,2,250,0.3), rgba(194,12,169,0.18));
+    border:1px solid rgba(202,161,255,0.3);
+  }
+  .persona.abstained .p-avatar{background:rgba(110,113,153,0.16);border-color:rgba(110,113,153,0.3);color:var(--ink-faint);}
+  .p-id{flex:1;min-width:0;}
+  .p-name{font-size:13px;font-weight:700;color:var(--ink);line-height:1.25;}
+  .p-lens{font-family:var(--mono);font-size:10px;color:var(--ink-faint);letter-spacing:.4px;margin-top:2px;text-transform:uppercase;}
+  .p-verdict{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:none;}
+  .stance{
+    font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;
+    padding:4px 9px;border-radius:7px;
+  }
+  .stance.conditional{background:rgba(255,195,77,0.12);border:1px solid rgba(255,195,77,0.36);color:var(--warn);}
+  .stance.hold{background:rgba(110,113,153,0.14);border:1px solid rgba(110,113,153,0.34);color:var(--ink-dim);}
+
+  .conviction{display:flex;align-items:center;gap:6px;}
+  .conviction .lbl{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.4px;}
+  .conviction .pips{display:flex;gap:2.5px;}
+  .conviction .pips i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.12);}
+  .conviction .pips i.on{background:var(--lilac);box-shadow:0 0 5px rgba(202,161,255,0.6);}
+  .persona.conditional .conviction .pips i.on{background:var(--warn);box-shadow:0 0 5px rgba(255,195,77,0.6);}
+
+  .p-rationale{
+    font-size:12px;line-height:1.5;color:var(--ink-dim);
+    border-top:1px solid var(--line);padding-top:9px;
+  }
+  .p-rationale .mono{font-family:var(--mono);font-size:11px;color:var(--lilac);}
+  .abstain-note{
+    display:flex;align-items:center;gap:9px;font-size:12px;color:var(--ink-dim);
+    border-top:1px dashed rgba(110,113,153,0.3);padding-top:9px;font-style:italic;
+  }
+  .abstain-note .ic{
+    font-size:12px;color:var(--warn);flex:none;
+    width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+    background:rgba(255,195,77,0.1);border:1px solid rgba(255,195,77,0.3);font-style:normal;
+  }
+  .abstain-note b{color:var(--warn);font-style:normal;}
+
+  .sim-banner{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 13px;border-radius:10px;margin-bottom:13px;
+    background:rgba(255,195,77,0.07);border:1px dashed rgba(255,195,77,0.34);
+    font-size:11.5px;color:var(--ink-dim);
+  }
+  .sim-banner .ic{font-size:14px;}
+  .sim-banner b{color:var(--warn);}
+
+  /* ===== RIGHT: trace log ===== */
+  .trace-toolbar{
+    flex:none;display:flex;align-items:center;gap:8px;padding:9px 14px;
+    border-bottom:1px solid var(--line);background:rgba(7,9,28,0.4);
+    font-family:var(--mono);font-size:10px;color:var(--ink-faint);
+  }
+  .trace-toolbar .live{display:flex;align-items:center;gap:6px;color:var(--ok);font-weight:600;}
+  .trace-toolbar .eng{margin-left:auto;color:var(--ink-faint);}
+  .trace-toolbar .eng b{color:var(--lilac);}
+  .trace-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 50px;font-family:var(--mono);}
+
+  .tgroup-h{
+    display:flex;align-items:center;gap:8px;padding:9px 14px 6px;
+    font-size:10px;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink-faint);font-weight:600;
+  }
+  .tgroup-h .ln{flex:1;height:1px;background:var(--line);}
+
+  .tline{
+    display:flex;gap:9px;padding:5px 14px;font-size:11px;line-height:1.4;
+    position:relative;align-items:flex-start;
+    opacity:0;transform:translateX(8px);
+    transition:opacity .3s ease, transform .3s ease, background .15s ease;
+  }
+  .tline.in{opacity:1;transform:none;}
+  .tline:hover{background:rgba(202,161,255,0.04);}
+  .tline .ts{color:var(--ink-faint);flex:none;font-size:10px;width:62px;opacity:.85;}
+  .tstat{flex:none;width:9px;height:9px;border-radius:50%;margin-top:3px;position:relative;}
+  .tstat.ok{background:var(--ok);box-shadow:0 0 6px rgba(55,226,154,0.5);}
+  .tstat.run{background:var(--warn);box-shadow:0 0 6px rgba(255,195,77,0.6);animation:blink 1s infinite;}
+  .tstat.info{background:var(--lilac);}
+  .tstat.flag{background:var(--red);box-shadow:0 0 6px rgba(245,29,63,0.55);}
+  .tstat.sim{background:var(--warn);}
+  @keyframes blink{50%{opacity:.35;}}
+  .tbody{flex:1;min-width:0;}
+  .tmsg{color:var(--ink-dim);}
+  .tmsg b{color:var(--ink);font-weight:600;}
+  .tmsg .gene{color:var(--lilac);}
+  .tmeta{display:flex;gap:7px;align-items:center;margin-top:3px;flex-wrap:wrap;}
+  .tprov{font-size:9px;padding:1px 6px;border-radius:5px;letter-spacing:.3px;}
+  .tprov.moat-real{background:rgba(35,224,200,0.12);color:var(--vault);}
+  .tprov.emet-live{background:rgba(55,226,154,0.1);color:var(--ok);}
+  .tprov.qmodels{background:rgba(255,133,255,0.1);color:var(--hotpink);}
+  .tprov.fda-primary{background:rgba(245,29,63,0.1);color:#FF9AAB;}
+  .tprov.semantic-web{background:rgba(156,2,250,0.12);color:#D8B7FF;}
+  .tprov.sim{background:rgba(255,195,77,0.1);color:var(--warn);}
+  .ttime{font-size:9px;color:var(--ink-faint);}
+  .tflag-chip{font-size:9px;color:#FF9AAB;background:rgba(245,29,63,0.12);padding:1px 6px;border-radius:5px;}
+
+  .tline .conn{
+    position:absolute;left:18.5px;top:0;bottom:0;width:1px;background:var(--line);z-index:0;
+  }
+
+  .trace-foot{
+    margin:14px 14px 0;padding:11px 13px;border-radius:10px;
+    background:linear-gradient(135deg, rgba(55,226,154,0.08), rgba(13,17,48,0.4));
+    border:1px solid rgba(55,226,154,0.26);
+    opacity:0;transition:opacity .4s ease;
+  }
+  .trace-foot.in{opacity:1;}
+  .trace-foot .t{font-family:var(--mono);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--ok);font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:7px;}
+  .trace-foot .stats{display:flex;flex-direction:column;gap:4px;font-family:var(--mono);font-size:10.5px;color:var(--ink-dim);}
+  .trace-foot .stats div{display:flex;justify-content:space-between;}
+  .trace-foot .stats b{color:var(--ink);}
+
+  .cursor{display:inline-block;width:7px;height:13px;background:var(--ok);margin-left:3px;vertical-align:middle;animation:blink .9s steps(1) infinite;border-radius:1px;}
+
+  /* responsive */
+  @media (max-width:1180px){
+    .stage{grid-template-columns:1fr;grid-template-rows:auto auto auto;height:auto;overflow:auto;}
+    body{overflow:auto;}
+    .pane{height:auto;max-height:none;}
+    .pane-body,.center-scroll,.trace-body{max-height:560px;}
+    .pane.left{border-right:none;border-bottom:1px solid var(--line);}
+    .pane.right{border-left:none;border-top:1px solid var(--line);}
+    .synth-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== TOP COMMAND BAR ===== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo"></div>
+      <div>
+        <b>SAPPHIRE</b>
+        <div class="sub">DECISION FIRM · CNS</div>
+      </div>
+      <span class="divider"></span>
+      <span class="pill-live"><span class="dot pulse"></span> FIRM CONVENED</span>
+    </div>
+    <div class="meta">
+      <div class="kv"><span>ENGAGEMENT</span> <b id="engId">eng_6444d0e8</b></div>
+      <div class="kv"><span>DELIVERABLE</span> <b>ranked de-risked target list</b></div>
+      <div class="kv"><span>AGENTS</span> <b id="agentCount">15</b></div>
+      <div class="kv"><span>PANEL</span> <b>5</b></div>
+    </div>
+  </header>
+
+  <!-- ===== 3-PANE STAGE ===== -->
+  <div class="stage">
+
+    <!-- ========== LEFT: AGENT OUTPUT CARDS ========== -->
+    <section class="pane left">
+      <div class="pane-head">
+        <span class="ix">B1</span>
+        <h2>Fact Dossier</h2>
+        <span class="tag">cited facts · two planes</span>
+      </div>
+      <div class="pane-body" id="leftBody">
+        <!-- INTERNAL plane -->
+        <div class="plane internal">
+          <div class="plane-head">
+            <span class="lk">🔒</span>
+            INTERNAL · QUIVER MOAT
+            <span class="ct" id="intCt">8</span>
+          </div>
+          <div class="plane-head desc" style="margin-top:-4px;border:none;background:none;padding:0 4px 6px;position:static;">
+            Private CNS_DFP · EP-signature space · never leaves the vault
+          </div>
+          <div id="internalCards"></div>
+        </div>
+
+        <!-- EXTERNAL plane -->
+        <div class="plane external">
+          <div class="plane-head">
+            <span class="lk">🌐</span>
+            EXTERNAL · PUBLIC EVIDENCE
+            <span class="ct" id="extCt">12</span>
+          </div>
+          <div class="plane-head desc" style="margin-top:-4px;border:none;background:none;padding:0 4px 6px;position:static;">
+            Published literature · regulatory · IP · public identifiers only
+          </div>
+          <div id="externalCards"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== CENTER: THE RESPONSE ========== -->
+    <section class="pane center">
+      <div class="pane-head">
+        <span class="ix">RESP</span>
+        <h2>The Decision</h2>
+        <span class="tag">facts + how each player reacted</span>
+      </div>
+      <div class="center-scroll">
+
+        <!-- Question -->
+        <div class="q-block">
+          <div class="q-eyebrow">QUERY · PRIORITIZATION <span class="ln"></span></div>
+          <h1 class="question">Is TSC2 a viable target in tuberous sclerosis?</h1>
+          <div class="q-tags">
+            <span class="q-tag">disease <b>tuberous sclerosis / mTORopathy CNS</b></span>
+            <span class="q-tag">modality <b>small molecule</b></span>
+            <span class="q-tag">scope <b>A·B·C</b> <span style="color:var(--ink-faint)">(skip D·E·F)</span></span>
+          </div>
+        </div>
+
+        <!-- SYNTHESIS HERO -->
+        <div class="synth" id="synthCard">
+          <div class="synth-head">
+            <span class="lbl">◆ Synthesis</span>
+            <span class="chip sim sim-badge">🧪 simulated model — real reasoning pending</span>
+          </div>
+          <div class="synth-body">
+            <div class="verdict-line">
+              <div class="verdict"><span class="em">Conditional advance</span></div>
+              <div class="conf">
+                <span class="lbl">Confidence</span>
+                <span class="meter"><i class="on"></i><i class="on"></i><i></i></span>
+                <span class="val">Medium</span>
+              </div>
+            </div>
+            <div class="synth-detail">
+              <b>3 conditional verdicts</b> across the seated panel · <b>2 abstentions</b> on guardrail checks · <b>0 vetoes</b>. Mechanism is well-characterized and the rescue chemistry is real but modest. Address open items before IND filing.
+            </div>
+            <div class="synth-grid">
+              <div class="sg"><div class="k">Spread</div><div class="v">3 conditional · 2 abstained</div></div>
+              <div class="sg"><div class="k">Vetoes</div><div class="v big">0<small> dispositive</small></div></div>
+              <div class="sg"><div class="k">Divergences</div><div class="v big" style="background:linear-gradient(90deg,#FFB3C0,#FF9AAB);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">3<small> surfaced</small></div></div>
+            </div>
+            <div class="exp-box">
+              <span class="ic">⚗</span>
+              <div><b>Proposed experiment:</b> Run orthogonal in vivo validation for TSC2 in a disease-relevant model.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIVERGENCE — the alpha -->
+        <div class="div-block" id="divBlock">
+          <div class="div-head">
+            <span class="ic">⚡</span>
+            <span class="t">DIVERGENCE — surfaced, not reconciled</span>
+            <span class="alpha">often the alpha</span>
+          </div>
+          <div class="div-sub">Internal ↔ external (and known-unknown) tensions. We surface them; the roundtable adjudicates — we never auto-reconcile.</div>
+          <div class="div-list" id="divList"></div>
+        </div>
+
+        <!-- ROUNDTABLE SPREAD -->
+        <div class="sec-h">
+          <h3>Roundtable — the spread</h3>
+          <span class="sub">Bucket 2 · independent verdicts</span>
+          <span class="ln"></span>
+          <span class="spread-key"><span class="dot" style="background:var(--warn);width:6px;height:6px;"></span>conditional &nbsp; <span class="dot" style="background:var(--ink-faint);width:6px;height:6px;"></span>hold/abstain</span>
+        </div>
+        <div class="sim-banner">
+          <span class="ic">🧪</span>
+          <div><b>Roundtable reasoning is SIMULATED.</b> Persona verdicts below are placeholder model output — real partner reasoning is pending. <b>No forced consensus:</b> the spread is the product, not a single number.</div>
+        </div>
+        <div class="spread" id="spread"></div>
+
+      </div>
+    </section>
+
+    <!-- ========== RIGHT: AGENT TRACES ========== -->
+    <section class="pane right">
+      <div class="pane-head">
+        <span class="ix">TRACE</span>
+        <h2>Firm Activity</h2>
+        <span class="tag" id="traceTag">streaming…</span>
+      </div>
+      <div class="trace-toolbar">
+        <span class="live"><span class="dot pulse"></span> LIVE</span>
+        <span>append-only · trace.jsonl</span>
+        <span class="eng">eng <b>6444d0e8</b></span>
+      </div>
+      <div class="trace-body" id="traceBody"></div>
+    </section>
+
+  </div>
+
+<script>
+/* ============================ REAL DATA (verbatim from demo_data.json) ============================ */
+const DATA = {
+  internal: [
+    {value:"EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"}
+  ],
+  external: [
+    {value:"Tuberous sclerosis complex is an autosomal dominant disorder caused by inactivating mutations in TSC1 (hamartin) or TSC2 (tuberin).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — TSC genetics review [PMID:27226234]"},
+    {value:"The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb; loss of TSC2 de-represses Rheb → mTORC1 signaling.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — TSC1/TSC2 GAP mechanism [PMID:21329690]"},
+    {value:"Alesi et al. (2024) provided a mechanistic refinement of TSC2/mTORC1 with therapeutic implications in TSC2-driven mouse models.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — Alesi et al. 2024 [PMID:38195686]"},
+    {value:"mTORC1 drives anabolic programs (protein synthesis via S6K1/4E-BP1, lipid biosynthesis, ribosome biogenesis).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — mTORC1 anabolic programs [PMID:26060906]"},
+    {value:"EXIST-1 phase III (n=117, TSC-associated SEGA): everolimus objective response 35% vs 0% placebo (p<0.0001).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-1 phase III [PMID:22136276]"},
+    {value:"EXIST-2 (Cochrane meta-analysis, 235 pts): everolimus significantly increased ≥50% renal AML volume reduction (RR 24.69) vs placebo.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-2 / Cochrane 2016 [PMID:27409709]"},
+    {value:"EXIST-3 phase III: adjunctive everolimus gave a significant dose-dependent reduction in drug-resistant focal seizures in TSC.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-3 phase III [PMID:29338461]"},
+    {value:"Everolimus is FDA/EMA-approved for TSC-associated SEGA and renal AML (and EU-approved for TSC-related seizures).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — everolimus TSC approvals [PMID:30069763]"},
+    {value:"Q-Models: binding / selectivity / ADMET quantification on the surfaced candidate (track returned no numeric envelope this run).", tier:"T2", prov:"qmodels", source:"Q-Models"},
+    {value:"FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.", tier:"T2", prov:"fda-primary", source:"BrainStorm Cell Therapeutics press release; FDA CRL Nov 2022", flag:"DIVERGENCE"},
+    {value:"FDA ALS drug-development guidance (Sept 2019): trial designs should minimize placebo-only exposure and target core motor aspects (weakness/survival).", tier:"T1", prov:"fda-primary", source:"FDA / Federal Register 2019-20629"},
+    {value:"No TSC2-specific FDA precedent found in corpus. Gap areas: mTOR inhibitor history in tuberous sclerosis, TS-specific endpoint guidance, pediatric CNS seizure development precedent.", tier:"T3", prov:"fda-primary", source:"Corpus gap analysis", flag:"KNOWN_UNKNOWN"},
+    {value:"Foundational TSC2 gene patent US6207374B1 ('Tuberous sclerosis 2 gene and uses thereof') is expired as of 2015; no blocking IP on basic TSC2 identification/diagnostics.", tier:"T1", prov:"semantic-web", source:"US6207374B1, Google Patents"},
+    {value:"Cold Spring Harbor Laboratory / Massachusetts General Hospital holds WO2018213618A1 ('Gene therapy for tuberous sclerosis'), covering AAV-mediated TSC2 replacement with condensed tuberin (cTuberin) to overcome ~5.4 kb packaging constraint. US grant US11958887B2. Estimated expiry 2038-2040.", tier:"T1", prov:"semantic-web", source:"WO2018213618A1, US11958887B2, Google Patents"},
+    {value:"BridgeBio Gene Therapy Research has pending patents (Canada 2022, US 2024) on recombinant AAV with engineered condensed tuberin (cTuberin/micro-Tuberin) for TSC2 gene therapy. Most advanced gene therapy IP in this space. Estimated expiry 2042-2044 if granted.", tier:"T1", prov:"semantic-web", source:"BridgeBio patent filings, PatSnap, Pharmaceutical Technology"},
+    {value:"Everolimus (Afinitor, Novartis rapalog) is FDA-approved for TSC-related subependymal giant cell astrocytomas (SEGAs, 2009) and renal angiomyolipomas. Orange Book listed. Composition/method patents US11406623B2, US12102619B2, US11160795B2. Estimated expiry 2032-2034.", tier:"T1", prov:"semantic-web", source:"US11406623B2, US12102619B2, Orange Book listings, Google Patents"}
+  ],
+  divergence: [
+    "FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.",
+    "NCT03082833 (AZD2014 in TSC1/2-mutated gastric cancer): Phase II trial terminated for lack of efficacy (2019-05). Note: TSC1/2 mutation in oncology context (gastric cancer), not primary CNS TSC indication; relevance to CNS target unclear.",
+    "FAERS disproportionality data (live) and PMR/PMC commitments not accessed; live EMET/FAERS pull required for full real-time signal landscape"
+  ],
+  round1: [
+    {persona:"Dr. Ryan Watts, CSO, Denali Therapeutics", lens:"scientific", stance:"conditional", conviction:4, status:"ok",
+     rationale:"The rescue cosine scores—Isorhamnetin 0.25, Momelotinib 0.328—are non-zero but modest; translational biology rarely yields perfect phenotypic matches. The TSC1-TSC2 heterodimer mechanism as a GAP for Rheb is well-characterized, and Everolimus FDA approval for TSC-associated seizures anchors target credibility. However, EXIST-3 data cutoff (2015) predates modern sequencing and validation toolsets."},
+    {persona:"Pharma BD Lead — Rare Disease (BioMarin)", lens:"commercial", stance:"conditional", conviction:3, status:"ok",
+     rationale:"The dossier shows Isorhamnetin and Momelotinib opposing the TSC2 KO EP-signature with meaningful potency. However, Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures already owns clinical access. The dossier flags reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus—that kills margin. Since TSC2-specific restoration or gene-therapy approaches lack establ…"},
+    {persona:"Venture GP — neuro (Third Rock)", lens:"investability", stance:"hold", conviction:0, status:"abstained",
+     rationale:"abstained (guardrail-violation)"},
+    {persona:"Pharma Neuro SVP, ex-FDA (Takeda Neuro)", lens:"regulatory", stance:"conditional", conviction:3, status:"ok",
+     rationale:"TSC2 restoration sits on a well-characterized mechanism (TSC1-TSC2 GAP function for Rheb), and everolimus's FDA approval for TSC-associated seizures establishes regulatory precedent for TSC-focused interventions. The absence of FDA/EMA/PMDA/MHRA/TGA regulatory divergence is a clean signal. However, adjunctive positioning to everolimus triggers reimbursement complexity, and TSC2-specific restoratio…"},
+    {persona:"Adversarial Red-Team (always seated)", lens:"adversarial", stance:"hold", conviction:0, status:"abstained",
+     rationale:"abstained (guardrail-violation)"}
+  ]
+};
+
+/* ============================ HELPERS ============================ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// highlight gene symbols / mono tokens inside fact text
+function fmtFact(s){
+  let h = esc(s);
+  // PMIDs / NCT / patent ids / cos values -> mono
+  h = h.replace(/(PMID:\d+|NCT\d+|US\d+[A-Z]\d|WO\d+[A-Z]\d|US\d+[A-Z]?\d*B\d|RR\s?\d+\.?\d*|cos\s?\d\.\d+|p&lt;?0?\.\d+)/g,'<span class="mono">$1</span>');
+  // gene tokens
+  h = h.replace(/\b(TSC1|TSC2|CMIP|DACT1|SOX15|Rheb|mTORC1|S6K1|4E-BP1)\b/g,'<span class="hl">$1</span>');
+  return h;
+}
+function provLabel(p){
+  return {'moat-real':'moat-real','emet-live':'emet-live','qmodels':'qmodels','fda-primary':'fda-primary','semantic-web':'semantic-web'}[p]||p;
+}
+function tierClass(t){return 't'+t.replace('T','');}
+
+const liveProv = {'moat-real':true,'emet-live':true};   // truly live agents
+const initials = n => n.replace(/[^A-Za-z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+/* ============================ BUILD LEFT CARDS ============================ */
+function cardHTML(f, plane){
+  const isLive = !!liveProv[f.prov];
+  const liveChip = isLive
+    ? `<span class="chip live"><span class="d"></span>LIVE</span>`
+    : (f.prov==='qmodels' ? `<span class="chip sim">🧪 stub track</span>` : '');
+  const flagChip = f.flag==='DIVERGENCE' ? `<span class="chip flag">⚡ DIVERGENCE</span>`
+                 : f.flag==='KNOWN_UNKNOWN' ? `<span class="chip flag ku">◇ KNOWN-UNKNOWN</span>` : '';
+  const glyph = plane==='internal' ? '🔒' : '◷';
+  // short source name for the card header
+  const srcShort = f.source;
+  return `
+  <div class="card" data-plane="${plane}">
+    <div class="card-top">
+      <div class="card-src"><span class="glyph">${glyph}</span><span class="nm">${esc(srcShort.split('[')[0].split('(')[0].trim())}</span></div>
+      <span class="chev">▸</span>
+    </div>
+    <div class="card-val">${fmtFact(f.value)}</div>
+    <div class="card-foot">
+      <span class="chip tier ${tierClass(f.tier)}">${f.tier}</span>
+      <span class="chip prov ${f.prov}">${provLabel(f.prov)}</span>
+      ${liveChip}${flagChip}
+    </div>
+    <div class="card-detail">
+      <div class="row"><b>source</b><span>${esc(f.source)}</span></div>
+      <div class="row"><b>tier</b><span>${f.tier}${f.tier==='T1'?' · primary/regulatory':f.tier==='T2'?' · published evidence':' · gap / unverified'}</span></div>
+      <div class="row"><b>provenance</b><span>${provLabel(f.prov)} ${isLive?'· live':'· recorded'}</span></div>
+      ${f.flag?`<div class="row"><b>flag</b><span style="color:#FF9AAB">${esc(f.flag)}</span></div>`:''}
+    </div>
+  </div>`;
+}
+
+const internalEl = document.getElementById('internalCards');
+const externalEl = document.getElementById('externalCards');
+internalEl.innerHTML = DATA.internal.map(f=>cardHTML(f,'internal')).join('');
+externalEl.innerHTML = DATA.external.map(f=>cardHTML(f,'external')).join('');
+document.getElementById('intCt').textContent = DATA.internal.length;
+document.getElementById('extCt').textContent = DATA.external.length;
+document.getElementById('agentCount').textContent = 15;
+
+// expand interaction
+document.querySelectorAll('.card').forEach(c=>{
+  c.addEventListener('click', ()=> c.classList.toggle('open'));
+});
+
+/* ============================ BUILD DIVERGENCE ============================ */
+function fmtDiv(s){
+  let h = esc(s);
+  h = h.replace(/(NCT\d+|PMID:\d+|FAERS|PMR\/PMC|MSC-NTF|AZD2014|CRL|BLA)/g,'<span class="mono">$1</span>');
+  return h;
+}
+document.getElementById('divList').innerHTML = DATA.divergence.map((d,i)=>`
+  <div class="div-item">
+    <div class="n">${i+1}</div>
+    <div class="tx">${fmtDiv(d)}</div>
+  </div>`).join('');
+
+/* ============================ BUILD ROUNDTABLE SPREAD ============================ */
+function personaHTML(p){
+  const abst = p.status==='abstained';
+  const cls = abst ? 'abstained '+p.stance : p.stance;
+  const pips = Array.from({length:5},(_,i)=>`<i class="${i<p.conviction?'on':''}"></i>`).join('');
+  const body = abst
+    ? `<div class="abstain-note"><span class="ic">⚠</span><div><b>Abstained — guardrail check.</b> No verdict filed (${esc(p.rationale)}). Counted as a non-vote, not a position.</div></div>`
+    : `<div class="p-rationale">${fmtFact(p.rationale)}</div>`;
+  const verdictBlock = abst
+    ? `<div class="p-verdict"><span class="stance hold">ABSTAINED</span><span class="chip sim">🧪 sim</span></div>`
+    : `<div class="p-verdict">
+         <span class="stance ${p.stance}">${esc(p.stance)}</span>
+         <div class="conviction"><span class="lbl">CONV</span><div class="pips">${pips}</div></div>
+         <span class="chip sim">🧪 sim</span>
+       </div>`;
+  return `
+  <div class="persona ${cls}">
+    <div class="p-top">
+      <div class="p-avatar">${initials(p.persona)}</div>
+      <div class="p-id">
+        <div class="p-name">${esc(p.persona)}</div>
+        <div class="p-lens">${esc(p.lens)} lens</div>
+      </div>
+      ${verdictBlock}
+    </div>
+    ${body}
+  </div>`;
+}
+document.getElementById('spread').innerHTML = DATA.round1.map(personaHTML).join('');
+
+/* ============================ BUILD TRACE STREAM ============================ */
+/* timestamps grow from a base; status dots; per-agent timing; provenance */
+let T0 = new Date();
+T0.setHours(9,41,7,0);
+let clock = new Date(T0);
+function ts(advSec){ clock = new Date(clock.getTime()+advSec*1000);
+  return clock.toTimeString().slice(0,8); }
+
+const traceSteps = [];
+function push(group, status, msg, prov, ms, flag){ traceSteps.push({group,status,msg,prov,ms,flag}); }
+
+// PLAN
+push('PLAN','info','<b>Engagement Lead</b> · triage → prioritization. Deliverable: <b>ranked de-risked target list</b>.',null,null);
+push('PLAN','info','Scope locked → fields <b>A·B·C</b> · skip D·E·F. Modality default <b>small molecule</b>.',null,null);
+push('PLAN','ok','<b>Research Manager</b> dispatched 15 fact agents + queued 5-persona panel.',null,null);
+
+// BUCKET 1
+push('BUCKET 1 · FACTS','ok','<b>Internal Science Lead</b> — 8 EP-signature mimics + rescue candidates from CNS_DFP. Top mimic <span class="gene">TSC1</span> (cos 0.083).','moat-real',412);
+push('BUCKET 1 · FACTS','ok','<b>EMET Analyst</b> — 8 cited T2 facts: <span class="gene">TSC1/TSC2</span>→<span class="gene">Rheb</span>→<span class="gene">mTORC1</span>, EXIST-1/2/3 everolimus.','emet-live',2380);
+push('BUCKET 1 · FACTS','sim','<b>Q-Models Runner</b> — binding/selectivity/ADMET track returned no numeric envelope this run.','qmodels',640);
+push('BUCKET 1 · FACTS','ok','<b>FDA Institutional Memory ⛔</b> — dispositive-veto check on class. No TSC2-specific precedent in corpus.','fda-primary',1190);
+push('BUCKET 1 · FACTS','ok','<b>Post-Market Safety</b> — class FAERS / label liabilities scan.','semantic-web',880);
+push('BUCKET 1 · FACTS','ok','<b>Patent / IP ⛔</b> — TSC2 base patent expired 2015; CSHL/MGH + BridgeBio gene-therapy IP live to ~2044.','semantic-web',1040);
+push('BUCKET 1 · FACTS','ok','<b>Clinical-Trial Registry + 7 semantic agents</b> — regulatory divergence, payer, financial, advocacy resolved.','semantic-web',1530);
+
+// FLAGS
+push('FLAGS · RESEARCH MGR','flag','<b>DIVERGENCE ×3</b> surfaced — NurOwn ALS CRL · <span class="gene">AZD2014</span> NCT03082833 terminated · FAERS not live-pulled.',null,null,'⚡ DIVERGENCE');
+push('FLAGS · RESEARCH MGR','info','<b>VETO ×0</b> · <b>KNOWN-UNKNOWN ×1</b> (TS-specific endpoint precedent). Dossier passes completeness gate.',null,null);
+
+// BUCKET 2
+push('BUCKET 2 · ROUNDTABLE','sim','🧪 Persona reasoning SIMULATED (real partner models pending). Round-1 independent verdicts:',null,null);
+push('BUCKET 2 · ROUNDTABLE','ok','<b>CSO · Denali</b> (scientific) → <b>conditional</b>, conviction 4/5.',null,820,'🧪 sim');
+push('BUCKET 2 · ROUNDTABLE','ok','<b>BD · BioMarin</b> (commercial) → <b>conditional</b>, conviction 3/5.',null,790,'🧪 sim');
+push('BUCKET 2 · ROUNDTABLE','sim','<b>Venture GP · Third Rock</b> (investability) → <b>abstained</b> (guardrail-violation).',null,210,'⚠ abstain');
+push('BUCKET 2 · ROUNDTABLE','ok','<b>Neuro SVP / ex-FDA · Takeda</b> (regulatory) → <b>conditional</b>, conviction 3/5.',null,805,'🧪 sim');
+push('BUCKET 2 · ROUNDTABLE','sim','<b>Adversarial Red-Team</b> (always seated) → <b>abstained</b> (guardrail-violation).',null,205,'⚠ abstain');
+
+// SYNTH
+push('SYNTHESIS','ok','<b>Roundtable Moderator</b> — no forced consensus. Spread: 3 conditional · 2 abstained · 0 veto.',null,null);
+push('SYNTHESIS','ok','<b>Verdict: Conditional advance</b> · confidence <b>medium</b>. Proposed: orthogonal in vivo validation.',null,null);
+
+const traceBody = document.getElementById('traceBody');
+
+// render with grouping + streaming
+let lastGroup = null;
+const nodes = [];
+traceSteps.forEach((s)=>{
+  if(s.group!==lastGroup){
+    const gh = document.createElement('div');
+    gh.className='tgroup-h';
+    gh.innerHTML = `${esc(s.group)} <span class="ln"></span>`;
+    gh.style.opacity='0'; gh.style.transition='opacity .3s ease';
+    traceBody.appendChild(gh);
+    nodes.push({el:gh, group:true});
+    lastGroup = s.group;
+  }
+  const advance = s.ms ? Math.max(1, Math.round(s.ms/350)) : (Math.random()*2+1);
+  const stamp = ts(advance);
+  const line = document.createElement('div');
+  line.className='tline';
+  line.innerHTML = `
+    <span class="ts">${stamp}</span>
+    <span class="tstat ${s.status}"></span>
+    <div class="tbody">
+      <div class="tmsg">${s.msg}</div>
+      <div class="tmeta">
+        ${s.prov?`<span class="tprov ${s.prov}">${provLabel(s.prov)}</span>`:''}
+        ${s.ms?`<span class="ttime">${s.ms} ms</span>`:''}
+        ${s.flag?`<span class="tflag-chip">${s.flag}</span>`:''}
+      </div>
+    </div>`;
+  traceBody.appendChild(line);
+  nodes.push({el:line, group:false, status:s.status});
+});
+
+// footer summary (appended, revealed at end)
+const foot = document.createElement('div');
+foot.className='trace-foot';
+const totalMs = traceSteps.reduce((a,s)=>a+(s.ms||0),0);
+foot.innerHTML = `
+  <div class="t"><span class="dot" style="width:6px;height:6px;"></span> RUN COMPLETE</div>
+  <div class="stats">
+    <div><span>fact agents</span><b>15 · all ok</b></div>
+    <div><span>live backends</span><b>moat-real · emet-live</b></div>
+    <div><span>flags</span><b>0 veto · 3 divergence · 1 unknown</b></div>
+    <div><span>panel</span><b>3 conditional · 2 abstained</b></div>
+    <div><span>fact-agent compute</span><b>~${(totalMs/1000).toFixed(1)} s</b></div>
+  </div>`;
+traceBody.appendChild(foot);
+
+/* ============================ STREAMING ANIMATION ============================ */
+// Left cards: stagger reveal
+function revealCards(){
+  const allCards = [...document.querySelectorAll('#internalCards .card'),...document.querySelectorAll('#externalCards .card')];
+  allCards.forEach((c,i)=> setTimeout(()=>c.classList.add('in'), 120 + i*55));
+}
+// Trace: stream each node
+function streamTrace(){
+  let d = 200;
+  nodes.forEach((n)=>{
+    setTimeout(()=>{
+      n.el.style.opacity='1';
+      n.el.classList.add('in');
+      // autoscroll the trace pane
+      n.el.scrollIntoView({block:'nearest', behavior:'smooth'});
+    }, d);
+    d += n.group ? 180 : (220 + Math.random()*140);
+  });
+  // reveal footer + center blocks after stream
+  setTimeout(()=>{
+    foot.classList.add('in');
+    document.getElementById('traceTag').textContent = 'complete';
+    document.querySelector('.trace-toolbar .live').innerHTML = '<span class="dot"></span> DONE';
+    document.querySelector('.trace-toolbar .live .dot').classList.remove('pulse');
+    // ensure trace scrolls back to top so user can read the run
+    setTimeout(()=> traceBody.scrollTo({top:0,behavior:'smooth'}), 400);
+  }, d+200);
+}
+// Center: reveal synthesis -> divergence -> personas (the "answer assembling")
+function revealCenter(){
+  setTimeout(()=>document.getElementById('synthCard').classList.add('in'), 500);
+  setTimeout(()=>document.getElementById('divBlock').classList.add('in'), 900);
+  const personas = document.querySelectorAll('#spread .persona');
+  personas.forEach((p,i)=> setTimeout(()=>p.classList.add('in'), 1300 + i*150));
+}
+
+window.addEventListener('load', ()=>{
+  revealCards();
+  streamTrace();
+  revealCenter();
+});
+</script>
+</body>
+</html>

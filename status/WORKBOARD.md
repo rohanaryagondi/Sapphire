@@ -58,8 +58,19 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ## gavin  (`@GavinWongYF`) — contributor
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
+| `console-ui-design-refinement` | **🎨 assigned → Gavin** | **Standard.** Iterate the **★ LOKA-native 3-pane console** WITH Gavin into the agreed design (collaborative: present options → get Gavin's calls → refine). LEFT = agent cards by the two data planes · CENTER = synthesis + roundtable spread + DIVERGENCE · RIGHT = live trace. Stay strictly inside LOKA/Chainlit tokens (no new aesthetic); **do NOT touch the runtime `frontend/`** — design iteration only, in `docs/design/console-ui/`. DoD: a refined `sapphire_loka.html` Gavin signs off + a short decisions note. Keep binary-free + self-contained; preserve honesty markers; real TSC2 data stays internal-only. | `gavin/console-ui-design-refinement` | [**brief**](../docs/superpowers/plans/2026-06-25-console-ui-design-refinement.md) · [`docs/design/console-ui/`](../docs/design/console-ui/README.md) |
 | `semantic-corpora` (6) | **✅ 6/6 COMPLETE (#30,#38,#48,#66,#68,#72)** | ~~global-regulatory-divergence ✅~~ · ~~financial-investor ✅~~ · ** · kol-social-signal · patient-advocacy · policy-legislative · reputational-institutional** — one PR per agent, per the **locked** method. First corpus reviewed + merged (gate CLEAN, suite 381) — **method proven; batch the remaining 5.** Self-auth BenchSci for the EMET pass. | `gavin/corpus-<agent>` | [tools](tools.md) · [**brief**](../docs/superpowers/plans/2026-06-23-semantic-corpora-delegation.md) |
 
+> **🎨 Gavin — NEW: `console-ui-design-refinement` (assigned).** Refine the LOKA-native 3-pane console WITH Gavin
+> into the agreed design. Read the [**brief**](../docs/superpowers/plans/2026-06-25-console-ui-design-refinement.md) +
+> [`docs/design/console-ui/README.md`](../docs/design/console-ui/README.md). View it:
+> `python3 -m http.server 8090 --directory docs/design/console-ui` → open `/index.html` (★ LOKA-native loads first).
+> Work **collaboratively** — present the open choices (trace rail · density · left-card grouping · spread/DIVERGENCE ·
+> two-plane signposting), get Gavin's calls, iterate `sapphire_loka.html`. **Stay inside LOKA/Chainlit tokens** (no new
+> aesthetic); **do NOT modify `frontend/`** (the fold-in is a later task, only when Gavin signals ready). Keep it
+> binary-free + self-contained; preserve the honesty markers; real TSC2 data is **internal-only**. Branch
+> `gavin/console-ui-design-refinement` from latest `main`; ship via PR (Head Claude reviews/merges). Blocked? `dev/HELP.md`.
+>
 > **Gavin — first corpus ✅ merged (#30); now batch the remaining 5.** The method is proven end-to-end (your
 > dual-source build passed the gate + content audit clean). Keep the watcher running
 > (`bash dev/watch-assignments.sh gavin GavinWongYF`). For each of the remaining 5

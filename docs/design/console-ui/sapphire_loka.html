@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — CNS Decision Firm</title>
+<!-- Brand mark = the Quiver gem, recolored to --primary; inlined as a data: URI (no binary asset). -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22324%22%20height%3D%22254%22%20viewBox%3D%220%200%20324%20254%22%3E%3Cg%20transform%3D%22translate%280%2C254%29%20scale%280.1%2C-0.1%29%22%20fill%3D%22%23ee2bee%22%3E%3Cpath%20d%3D%22M1040%202528%20c-297%20-63%20-567%20-227%20-749%20-454%20-314%20-390%20-374%20-931%20-151%20-1374%20156%20-311%20421%20-538%20768%20-658%20l107%20-37%20280%20-3%20280%20-3%20-466%20468%20c-257%20257%20-474%20479%20-483%20493%20-38%2058%20-9%20152%2057%20183%2043%2021%2068%2021%20110%203%2018%20-8%20274%20-257%20597%20-580%20l565%20-566%20205%200%20205%200%20-838%20838%20-837%20837%200%2052%20c0%2044%205%2058%2031%2087%2036%2042%2085%2058%20132%2045%2024%20-6%20261%20-238%20957%20-934%20l925%20-925%20229%200%20228%200%20-688%20696%20c-379%20383%20-693%20706%20-697%20718%20-5%2011%20-6%2041%20-4%2066%204%2035%2013%2051%2041%2077%2031%2029%2043%2033%2088%2033%20l52%200%20287%20-286%20287%20-287%209%2049%20c15%2090%209%20362%20-10%20451%20-42%20195%20-123%20374%20-241%20533%20-15%2019%20-66%2075%20-114%20123%20-175%20177%20-401%20300%20-647%20352%20-81%2017%20-440%2019%20-515%203z%22/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ===== Chainlit / shadcn token system (the running app's theme.json, dark) ===== */
+  :root{
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 8% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 300 85% 55%;          /* Quiver purple — the ONLY brand override */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 14%;
+    --muted-foreground: 240 5% 65%;
+    --accent: 240 4% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 300 85% 55%;
+    --radius: 0.5rem;
+
+    /* semantic colors derived inside the token system */
+    --success: 142 70% 45%;
+    --warning: 38 92% 55%;
+
+    /* the two data planes (internal vault = cool, leans toward primary; external = neutral/open) */
+    --vault: 280 70% 62%;            /* cool purple-leaning accent for the private vault */
+
+    --font-sans: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:var(--font-sans);
+    font-size:14px;
+    color:hsl(var(--foreground));
+    background:hsl(var(--background));
+    -webkit-font-smoothing:antialiased;
+    overflow:hidden;
+  }
+  ::selection{background:hsl(var(--primary)/.35);color:#fff;}
+
+  /* scrollbars — quiet, shadcn-like */
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:hsl(240 4% 22%);border-radius:6px;border:2px solid transparent;background-clip:padding-box;}
+  ::-webkit-scrollbar-thumb:hover{background:hsl(240 4% 30%);background-clip:padding-box;}
+
+  a{color:hsl(var(--primary));text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  .mono{font-family:var(--font-mono);}
+
+  /* ============================ TOP BAR (Chainlit header) ============================ */
+  .header{
+    height:56px;flex:none;
+    display:flex;align-items:center;gap:14px;
+    padding:0 16px;
+    background:hsl(var(--background));
+    border-bottom:1px solid hsl(var(--border));
+    position:relative;z-index:40;
+  }
+  .brand{display:flex;align-items:center;gap:10px;min-width:0;}
+  /* inline Quiver gem mark — currentColor picks up the Quiver purple (--primary) */
+  .brand .gem-mark{height:24px;width:auto;display:block;color:hsl(var(--primary));flex:none;}
+  .brand .name{font-size:14px;font-weight:600;color:hsl(var(--foreground));white-space:nowrap;letter-spacing:-.1px;}
+  .brand .name .dim{color:hsl(var(--muted-foreground));font-weight:500;}
+  .hdr-sep{width:1px;height:24px;background:hsl(var(--border));flex:none;}
+
+  /* chat-profile selector (static pills) */
+  .profiles{display:flex;align-items:center;gap:4px;background:hsl(var(--secondary));padding:3px;border-radius:calc(var(--radius) + 2px);}
+  .profiles .pf{
+    font-size:12px;font-weight:500;color:hsl(var(--muted-foreground));
+    padding:5px 11px;border-radius:var(--radius);cursor:default;white-space:nowrap;line-height:1;
+    border:1px solid transparent;transition:color .12s, background .12s;
+  }
+  .profiles .pf:hover{color:hsl(var(--foreground));}
+  .profiles .pf.active{
+    background:hsl(var(--primary)/.16);color:hsl(300 90% 80%);
+    border-color:hsl(var(--primary)/.45);font-weight:600;
+  }
+
+  .hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  /* the one design CHOICE — trace mode segmented control */
+  .seg-wrap{display:flex;align-items:center;gap:8px;}
+  .seg-lbl{font-size:11px;color:hsl(var(--muted-foreground));font-family:var(--font-mono);letter-spacing:.3px;}
+  .segmented{display:inline-flex;background:hsl(var(--secondary));padding:3px;border-radius:var(--radius);border:1px solid hsl(var(--border));}
+  .segmented button{
+    font-family:var(--font-sans);font-size:12px;font-weight:500;
+    color:hsl(var(--muted-foreground));background:transparent;border:none;cursor:pointer;
+    padding:5px 11px;border-radius:calc(var(--radius) - 2px);line-height:1;transition:all .14s;
+  }
+  .segmented button:hover{color:hsl(var(--foreground));}
+  .segmented button[aria-pressed="true"]{
+    background:hsl(var(--accent));color:hsl(var(--foreground));
+    box-shadow:0 1px 2px rgba(0,0,0,.4);font-weight:600;
+  }
+  .ghost-btn{
+    font-family:var(--font-sans);font-size:12.5px;font-weight:500;
+    color:hsl(var(--foreground));background:transparent;
+    border:1px solid hsl(var(--border));border-radius:var(--radius);
+    padding:6px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;line-height:1;transition:all .14s;
+  }
+  .ghost-btn:hover{background:hsl(var(--accent));border-color:hsl(240 4% 24%);}
+  .ghost-btn .plus{font-size:14px;line-height:1;color:hsl(var(--muted-foreground));}
+
+  /* ============================ 3-PANE GRID ============================ */
+  .stage{
+    height:calc(100vh - 56px);
+    display:grid;
+    grid-template-columns:minmax(320px,0.92fr) minmax(460px,1.55fr) minmax(360px,1fr);
+    position:relative;
+  }
+  .pane{height:100%;display:flex;flex-direction:column;min-height:0;min-width:0;}
+  .pane.left{border-right:1px solid hsl(var(--border));background:hsl(240 9% 5%);}
+  .pane.center{background:hsl(var(--background));}
+  .pane.right{border-left:1px solid hsl(var(--border));background:hsl(240 9% 5%);}
+
+  .pane-head{
+    flex:none;height:44px;
+    padding:0 16px;border-bottom:1px solid hsl(var(--border));
+    display:flex;align-items:center;gap:9px;background:hsl(var(--background));
+  }
+  .pane-head h2{
+    margin:0;font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;
+    color:hsl(var(--muted-foreground));
+  }
+  .pane-head .ix{
+    font-family:var(--font-mono);font-size:9.5px;color:hsl(var(--muted-foreground));
+    border:1px solid hsl(var(--border));border-radius:5px;padding:2px 6px;letter-spacing:.4px;
+  }
+  .pane-head .tag{margin-left:auto;font-family:var(--font-mono);font-size:10.5px;color:hsl(240 5% 45%);}
+  .pane-body{flex:1;overflow-y:auto;overflow-x:hidden;}
+
+  /* ============================ LEFT — Element cards (two data planes) ============================ */
+  .left-inner{padding:14px 14px 48px;}
+  .plane{margin-bottom:20px;}
+  .plane:last-child{margin-bottom:0;}
+  .plane-head{
+    display:flex;align-items:center;gap:8px;padding:0 2px 4px;margin-bottom:10px;
+  }
+  .plane-head .lk{font-size:13px;line-height:1;}
+  .plane-head .ttl{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+  .plane-head .ct{
+    margin-left:auto;font-family:var(--font-mono);font-size:10px;font-weight:600;
+    padding:1px 7px;border-radius:999px;line-height:1.6;
+  }
+  .plane.internal .plane-head .ttl{color:hsl(300 80% 78%);}
+  .plane.internal .plane-head .ct{background:hsl(var(--primary)/.16);color:hsl(300 85% 78%);border:1px solid hsl(var(--primary)/.3);}
+  .plane.external .plane-head .ttl{color:hsl(var(--muted-foreground));}
+  .plane.external .plane-head .ct{background:hsl(var(--secondary));color:hsl(var(--muted-foreground));border:1px solid hsl(var(--border));}
+  .plane-sub{font-size:10.5px;color:hsl(240 5% 45%);font-family:var(--font-mono);padding:0 2px 10px;line-height:1.5;}
+
+  .card{
+    position:relative;
+    border-radius:var(--radius);
+    padding:11px 12px;
+    margin-bottom:8px;
+    background:hsl(var(--card));
+    border:1px solid hsl(var(--border));
+    cursor:pointer;
+    transition:border-color .14s ease, box-shadow .14s ease, background .14s ease;
+    opacity:0;transform:translateY(6px);
+  }
+  .card.in{opacity:1;transform:none;}
+  .card:hover{border-color:hsl(240 4% 24%);background:hsl(240 8% 8%);}
+  /* internal vault treatment: cool purple left edge + faint tint */
+  .plane.internal .card{
+    background:linear-gradient(90deg, hsl(var(--primary)/.07), hsl(var(--card)) 42%);
+    border-color:hsl(var(--primary)/.22);
+  }
+  .plane.internal .card::before{
+    content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;
+    background:hsl(var(--primary)/.85);
+  }
+  .plane.internal .card:hover{border-color:hsl(var(--primary)/.4);}
+
+  .card-top{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+  .card-src{font-size:11.5px;font-weight:600;color:hsl(var(--foreground));display:flex;align-items:center;gap:6px;min-width:0;}
+  .card-src .glyph{font-size:11px;flex:none;}
+  .plane.internal .card-src .glyph{color:hsl(300 80% 72%);}
+  .plane.external .card-src .glyph{color:hsl(var(--muted-foreground));}
+  .card-src .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chev{margin-left:auto;color:hsl(240 5% 45%);font-size:10px;transition:transform .18s ease;flex:none;}
+  .card.open .chev{transform:rotate(90deg);}
+
+  .card-val{
+    font-size:12.5px;line-height:1.5;color:hsl(var(--muted-foreground));
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .card.open .card-val{-webkit-line-clamp:unset;color:hsl(0 0% 88%);}
+  .card-val .gene{color:hsl(300 75% 75%);font-weight:600;}
+  .plane.internal .card-val .gene{color:hsl(300 80% 78%);}
+  .card-val .tok{font-family:var(--font-mono);font-size:11px;color:hsl(0 0% 80%);background:hsl(var(--secondary));padding:0 4px;border-radius:4px;}
+
+  .card-foot{margin-top:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+
+  .card-detail{max-height:0;overflow:hidden;transition:max-height .25s ease, margin .25s ease, opacity .2s ease;opacity:0;}
+  .card.open .card-detail{max-height:260px;margin-top:10px;opacity:1;}
+  .card-detail .row{
+    font-family:var(--font-mono);font-size:10.5px;color:hsl(var(--muted-foreground));
+    display:flex;gap:8px;padding:4px 0;border-top:1px solid hsl(var(--border));line-height:1.45;
+  }
+  .card-detail .row:first-child{border-top:none;}
+  .card-detail .row b{color:hsl(240 5% 50%);min-width:62px;font-weight:500;flex:none;}
+  .card-detail .row span{color:hsl(0 0% 80%);word-break:break-word;}
+  .vault-hint{
+    display:flex;align-items:center;gap:6px;margin-top:9px;padding:6px 8px;border-radius:6px;
+    background:hsl(var(--primary)/.08);border:1px dashed hsl(var(--primary)/.3);
+    font-size:10px;color:hsl(300 60% 78%);font-family:var(--font-mono);letter-spacing:.2px;
+  }
+
+  /* ===== chips (shadcn badge family) ===== */
+  .chip{
+    display:inline-flex;align-items:center;gap:4px;
+    font-family:var(--font-mono);font-size:9.5px;font-weight:600;letter-spacing:.2px;
+    padding:2.5px 7px;border-radius:6px;white-space:nowrap;line-height:1;border:1px solid transparent;
+  }
+  .chip.tier{background:hsl(var(--secondary));border-color:hsl(var(--border));color:hsl(var(--muted-foreground));}
+  .chip.tier.t1{background:hsl(var(--success)/.14);border-color:hsl(var(--success)/.4);color:hsl(142 65% 60%);}
+  .chip.tier.t2{background:hsl(var(--primary)/.12);border-color:hsl(var(--primary)/.3);color:hsl(300 75% 78%);}
+  .chip.tier.t3{background:hsl(var(--warning)/.12);border-color:hsl(var(--warning)/.36);color:hsl(38 90% 65%);}
+
+  .chip.prov{background:hsl(var(--accent));border-color:hsl(var(--border));color:hsl(var(--muted-foreground));text-transform:none;}
+  .chip.prov.moat-real{background:hsl(var(--primary)/.12);border-color:hsl(var(--primary)/.34);color:hsl(300 80% 80%);}
+  .chip.prov.emet-live{background:hsl(var(--success)/.12);border-color:hsl(var(--success)/.34);color:hsl(142 65% 62%);}
+  .chip.prov.fda-primary{background:hsl(var(--destructive)/.12);border-color:hsl(var(--destructive)/.34);color:hsl(0 80% 72%);}
+  .chip.prov.qmodels{background:hsl(265 70% 60%/.14);border-color:hsl(265 70% 60%/.34);color:hsl(265 80% 80%);}
+  .chip.prov.semantic-web{background:hsl(210 60% 55%/.12);border-color:hsl(210 60% 55%/.32);color:hsl(210 75% 75%);}
+
+  .chip.live{background:hsl(var(--success)/.14);border-color:hsl(var(--success)/.4);color:hsl(142 65% 62%);text-transform:none;}
+  .chip.live .d{width:5px;height:5px;border-radius:50%;background:hsl(142 70% 50%);box-shadow:0 0 5px hsl(142 70% 50%);}
+  .chip.sim{background:hsl(var(--warning)/.1);border-color:hsl(var(--warning)/.34);color:hsl(38 90% 66%);text-transform:none;}
+  .chip.flag{background:hsl(var(--destructive)/.12);border-color:hsl(var(--destructive)/.4);color:hsl(0 80% 74%);text-transform:none;}
+  .chip.flag.ku{background:hsl(var(--warning)/.1);border-color:hsl(var(--warning)/.34);color:hsl(38 90% 66%);}
+
+  /* ============================ CENTER — assistant message thread ============================ */
+  .center-scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+  .thread{max-width:820px;margin:0 auto;padding:24px 28px 64px;}
+
+  /* user message (the question) — Chainlit user bubble, right aligned-ish but kept simple */
+  .msg-user{display:flex;justify-content:flex-end;margin-bottom:26px;}
+  .msg-user .bubble{
+    max-width:80%;
+    background:hsl(var(--secondary));border:1px solid hsl(var(--border));
+    border-radius:var(--radius);padding:12px 15px;
+  }
+  .msg-user .meta{font-size:10.5px;color:hsl(240 5% 50%);font-family:var(--font-mono);margin-bottom:6px;letter-spacing:.3px;}
+  .msg-user .q{font-size:15px;font-weight:600;color:hsl(var(--foreground));line-height:1.4;}
+  .msg-user .qtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .qtag{font-family:var(--font-mono);font-size:10px;color:hsl(var(--muted-foreground));padding:3px 8px;border-radius:6px;border:1px solid hsl(var(--border));background:hsl(var(--background));}
+  .qtag b{color:hsl(300 70% 78%);font-weight:600;}
+
+  /* assistant message */
+  .msg-asst{display:flex;gap:13px;align-items:flex-start;}
+  .avatar{
+    width:30px;height:30px;border-radius:50%;flex:none;
+    background:hsl(var(--primary)/.14);border:1px solid hsl(var(--primary)/.38);
+    display:grid;place-items:center;margin-top:2px;
+  }
+  .avatar svg{width:17px;height:17px;display:block;}
+  .avatar svg path{fill:hsl(var(--primary));}
+  .asst-body{flex:1;min-width:0;}
+  .asst-name{font-size:12.5px;font-weight:600;color:hsl(var(--foreground));margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+  .asst-name .role{color:hsl(var(--muted-foreground));font-weight:400;font-size:11.5px;}
+
+  /* synthesis hero card (assistant markdown answer surface) */
+  .synth{
+    border-radius:calc(var(--radius) + 2px);
+    border:1px solid hsl(var(--primary)/.3);
+    background:linear-gradient(180deg, hsl(var(--primary)/.06), hsl(var(--card)));
+    margin-bottom:22px;overflow:hidden;
+    opacity:0;transform:translateY(8px);transition:opacity .45s ease, transform .45s ease;
+  }
+  .synth.in{opacity:1;transform:none;}
+  .synth-head{display:flex;align-items:center;gap:9px;padding:12px 16px;border-bottom:1px solid hsl(var(--border));}
+  .synth-head .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:hsl(300 70% 78%);font-weight:600;}
+  .synth-head .badge-sim{margin-left:auto;}
+  .synth-body{padding:16px;}
+  .verdict-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  .verdict{font-size:21px;font-weight:700;letter-spacing:-.3px;color:hsl(var(--foreground));line-height:1.15;}
+  .verdict .em{color:hsl(300 85% 72%);}
+  .conf{display:inline-flex;align-items:center;gap:9px;padding:6px 11px;border-radius:var(--radius);background:hsl(var(--warning)/.1);border:1px solid hsl(var(--warning)/.3);}
+  .conf .lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:hsl(var(--muted-foreground));}
+  .conf .meter{display:flex;gap:3px;}
+  .conf .meter i{width:6px;height:13px;border-radius:2px;background:hsl(240 4% 22%);}
+  .conf .meter i.on{background:hsl(38 92% 58%);}
+  .conf .val{font-size:12px;font-weight:600;color:hsl(38 90% 62%);}
+
+  .synth-detail{font-size:13.5px;line-height:1.6;color:hsl(0 0% 82%);margin-bottom:15px;}
+  .synth-detail b{color:hsl(var(--foreground));font-weight:600;}
+  .synth-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  .sg{background:hsl(var(--background));border:1px solid hsl(var(--border));border-radius:var(--radius);padding:11px 12px;}
+  .sg .k{font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:hsl(240 5% 50%);margin-bottom:6px;}
+  .sg .v{font-size:13px;font-weight:600;color:hsl(var(--foreground));}
+  .sg .v.big{font-size:22px;font-weight:700;}
+  .sg .v.big small{font-size:11px;color:hsl(var(--muted-foreground));font-weight:400;margin-left:3px;}
+  .sg.div-sg .v.big{color:hsl(0 80% 72%);}
+  .exp-box{margin-top:14px;padding:11px 13px;border-radius:var(--radius);background:hsl(var(--primary)/.07);border:1px dashed hsl(var(--primary)/.32);font-size:12.5px;color:hsl(0 0% 82%);display:flex;gap:10px;align-items:flex-start;line-height:1.5;}
+  .exp-box .ic{color:hsl(300 75% 75%);font-size:14px;flex:none;margin-top:1px;}
+  .exp-box b{color:hsl(300 70% 78%);font-weight:600;}
+
+  /* divergence — the headline insight */
+  .divh{
+    border-radius:calc(var(--radius) + 2px);overflow:hidden;margin-bottom:22px;
+    border:1px solid hsl(var(--destructive)/.4);background:linear-gradient(180deg, hsl(var(--destructive)/.08), hsl(var(--card)));
+    opacity:0;transform:translateY(8px);transition:opacity .45s ease, transform .45s ease;
+  }
+  .divh.in{opacity:1;transform:none;}
+  .divh-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid hsl(var(--destructive)/.24);background:hsl(var(--destructive)/.06);}
+  .divh-head .ic{width:24px;height:24px;border-radius:7px;display:grid;place-items:center;flex:none;background:hsl(var(--destructive)/.16);border:1px solid hsl(var(--destructive)/.4);color:hsl(0 85% 75%);font-size:13px;}
+  .divh-head .t{font-size:13px;font-weight:700;color:hsl(0 85% 80%);letter-spacing:.2px;}
+  .divh-head .alpha{margin-left:auto;font-family:var(--font-mono);font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:hsl(0 80% 76%);border:1px solid hsl(var(--destructive)/.34);border-radius:6px;padding:3px 8px;}
+  .divh-sub{padding:10px 16px 2px;font-size:11.5px;color:hsl(var(--muted-foreground));font-style:italic;line-height:1.5;}
+  .div-list{padding:8px 16px 14px;display:flex;flex-direction:column;gap:8px;}
+  .div-item{display:flex;gap:11px;padding:11px 12px;border-radius:var(--radius);background:hsl(var(--background));border:1px solid hsl(var(--border));}
+  .div-item .n{font-family:var(--font-mono);font-size:11px;font-weight:700;color:hsl(0 85% 76%);flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:hsl(var(--destructive)/.12);border:1px solid hsl(var(--destructive)/.3);}
+  .div-item .tx{font-size:12px;line-height:1.55;color:hsl(0 0% 80%);}
+  .div-item .tx .tok{font-family:var(--font-mono);color:hsl(300 70% 78%);font-size:11px;}
+
+  /* roundtable spread */
+  .sec-h{display:flex;align-items:center;gap:11px;margin:0 0 12px;}
+  .sec-h h3{margin:0;font-size:13.5px;font-weight:700;color:hsl(var(--foreground));letter-spacing:-.1px;}
+  .sec-h .sub{font-family:var(--font-mono);font-size:10.5px;color:hsl(240 5% 48%);}
+  .sec-h .ln{flex:1;height:1px;background:hsl(var(--border));}
+  .sec-h .key{display:flex;gap:9px;font-family:var(--font-mono);font-size:9.5px;color:hsl(240 5% 50%);align-items:center;}
+  .sec-h .key i{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:3px;vertical-align:middle;}
+
+  .sim-banner{
+    display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:var(--radius);margin-bottom:13px;
+    background:hsl(var(--warning)/.07);border:1px dashed hsl(var(--warning)/.34);font-size:11.5px;color:hsl(0 0% 78%);line-height:1.5;
+  }
+  .sim-banner .ic{font-size:14px;flex:none;}
+  .sim-banner b{color:hsl(38 90% 64%);font-weight:600;}
+
+  .spread{display:flex;flex-direction:column;gap:10px;}
+  .persona{
+    border-radius:var(--radius);padding:14px 15px;background:hsl(var(--card));border:1px solid hsl(var(--border));
+    transition:border-color .15s ease, box-shadow .15s ease;position:relative;overflow:hidden;
+    opacity:0;transform:translateY(6px);
+  }
+  .persona.in{opacity:1;transform:none;}
+  .persona:hover{border-color:hsl(240 4% 24%);}
+  .persona::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;}
+  .persona.conditional::before{background:hsl(38 92% 55%);}
+  .persona.abstained{border-style:dashed;border-color:hsl(240 4% 20%);background:hsl(240 8% 6%);}
+  .persona.abstained::before{background:hsl(240 5% 38%);}
+
+  .p-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:10px;}
+  .p-avatar{
+    width:32px;height:32px;border-radius:8px;flex:none;display:grid;place-items:center;
+    font-family:var(--font-mono);font-size:11px;font-weight:700;color:hsl(300 80% 80%);
+    background:hsl(var(--primary)/.14);border:1px solid hsl(var(--primary)/.3);
+  }
+  .persona.abstained .p-avatar{background:hsl(var(--secondary));border-color:hsl(var(--border));color:hsl(240 5% 50%);}
+  .p-id{flex:1;min-width:0;}
+  .p-name{font-size:12.5px;font-weight:600;color:hsl(var(--foreground));line-height:1.3;}
+  .p-lens{font-family:var(--font-mono);font-size:9.5px;color:hsl(240 5% 50%);letter-spacing:.3px;margin-top:3px;text-transform:uppercase;}
+  .p-verdict{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;}
+  .stance{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 9px;border-radius:6px;}
+  .stance.conditional{background:hsl(var(--warning)/.12);border:1px solid hsl(var(--warning)/.36);color:hsl(38 90% 64%);}
+  .stance.hold{background:hsl(var(--secondary));border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground));}
+  .conviction{display:flex;align-items:center;gap:6px;}
+  .conviction .lbl{font-family:var(--font-mono);font-size:9px;color:hsl(240 5% 48%);letter-spacing:.3px;}
+  .conviction .pips{display:flex;gap:2.5px;}
+  .conviction .pips i{width:6px;height:6px;border-radius:50%;background:hsl(240 4% 22%);}
+  .conviction .pips i.on{background:hsl(38 90% 58%);}
+
+  .p-rationale{font-size:12px;line-height:1.6;color:hsl(var(--muted-foreground));border-top:1px solid hsl(var(--border));padding-top:10px;}
+  .p-rationale .gene{color:hsl(300 70% 76%);font-weight:600;}
+  .p-rationale .tok{font-family:var(--font-mono);font-size:11px;color:hsl(0 0% 78%);}
+  .abstain-note{display:flex;align-items:flex-start;gap:9px;font-size:12px;color:hsl(var(--muted-foreground));border-top:1px dashed hsl(240 4% 20%);padding-top:10px;line-height:1.5;}
+  .abstain-note .ic{font-size:12px;flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:hsl(var(--warning)/.1);border:1px solid hsl(var(--warning)/.3);color:hsl(38 90% 62%);margin-top:1px;}
+  .abstain-note b{color:hsl(38 90% 64%);font-weight:600;}
+
+  /* ============================ RIGHT — trace (cot="full" step tree) ============================ */
+  .trace-toolbar{
+    flex:none;display:flex;align-items:center;gap:9px;padding:9px 14px;height:40px;
+    border-bottom:1px solid hsl(var(--border));background:hsl(var(--background));
+    font-family:var(--font-mono);font-size:10px;color:hsl(240 5% 48%);
+  }
+  .trace-toolbar .live{display:flex;align-items:center;gap:6px;color:hsl(142 65% 55%);font-weight:600;}
+  .trace-toolbar .dot{width:7px;height:7px;border-radius:50%;background:hsl(142 70% 50%);}
+  .trace-toolbar .dot.pulse{animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 hsl(142 70% 50%/.5);}70%{box-shadow:0 0 0 6px hsl(142 70% 50%/0);}100%{box-shadow:0 0 0 0 hsl(142 70% 50%/0);}}
+  .trace-toolbar .eng{margin-left:auto;}
+  .trace-toolbar .eng b{color:hsl(300 70% 78%);font-weight:600;}
+  .trace-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:8px 0 52px;}
+
+  /* ---- Step tree (default) ---- */
+  .tgroup{margin-bottom:4px;}
+  .tgroup-h{
+    display:flex;align-items:center;gap:8px;padding:9px 14px 5px;
+    font-family:var(--font-mono);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;color:hsl(240 5% 45%);font-weight:600;
+  }
+  .tgroup-h .ln{flex:1;height:1px;background:hsl(var(--border));}
+
+  .step{
+    opacity:0;transform:translateY(4px);transition:opacity .3s ease, transform .3s ease;
+  }
+  .step.in{opacity:1;transform:none;}
+  .step-row{
+    display:flex;gap:8px;padding:6px 14px 6px 12px;align-items:flex-start;cursor:pointer;
+    transition:background .12s;border-left:2px solid transparent;
+  }
+  .step-row:hover{background:hsl(240 6% 8%);}
+  .step.has-children > .step-row .schev{transition:transform .18s;}
+  .step.collapsed > .step-row .schev{transform:rotate(-90deg);}
+  .step.collapsed > .step-children{display:none;}
+  .schev{font-size:9px;color:hsl(240 5% 45%);flex:none;width:11px;margin-top:4px;text-align:center;}
+  .schev.leaf{visibility:hidden;}
+  .sstat{flex:none;width:13px;height:13px;border-radius:50%;margin-top:2px;display:grid;place-items:center;font-size:8px;font-weight:700;}
+  .sstat.ok{background:hsl(var(--success)/.18);color:hsl(142 65% 60%);}
+  .sstat.ok::after{content:"✓";}
+  .sstat.warn{background:hsl(var(--warning)/.18);color:hsl(38 90% 62%);}
+  .sstat.warn::after{content:"!";}
+  .sstat.flag{background:hsl(var(--destructive)/.2);color:hsl(0 85% 74%);}
+  .sstat.flag::after{content:"!";}
+  .sstat.info{background:hsl(var(--primary)/.18);color:hsl(300 75% 78%);}
+  .sstat.info::after{content:"›";}
+  .sstat.run{background:hsl(var(--warning)/.18);position:relative;}
+  .sstat.run::after{content:"";width:7px;height:7px;border-radius:50%;border:1.5px solid hsl(38 90% 60%);border-top-color:transparent;animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .sbody{flex:1;min-width:0;}
+  .slabel{font-size:11.5px;line-height:1.45;color:hsl(0 0% 84%);}
+  .slabel b{color:hsl(var(--foreground));font-weight:600;}
+  .slabel .gene{color:hsl(300 70% 76%);}
+  .slabel .veto{color:hsl(0 80% 72%);font-weight:600;}
+  .sdetail{display:flex;gap:7px;align-items:center;margin-top:4px;flex-wrap:wrap;font-family:var(--font-mono);}
+  .sprov{font-size:9px;padding:1px 6px;border-radius:5px;letter-spacing:.2px;}
+  .sprov.moat-real{background:hsl(var(--primary)/.12);color:hsl(300 78% 80%);}
+  .sprov.emet-live{background:hsl(var(--success)/.12);color:hsl(142 65% 62%);}
+  .sprov.qmodels{background:hsl(265 70% 60%/.14);color:hsl(265 80% 80%);}
+  .sprov.fda-primary{background:hsl(var(--destructive)/.12);color:hsl(0 80% 74%);}
+  .sprov.semantic-web{background:hsl(210 60% 55%/.12);color:hsl(210 75% 76%);}
+  .sprov.sim{background:hsl(var(--warning)/.1);color:hsl(38 90% 64%);}
+  .stime{font-size:9px;color:hsl(240 5% 45%);}
+  .sflag{font-size:9px;color:hsl(0 85% 76%);background:hsl(var(--destructive)/.12);padding:1px 6px;border-radius:5px;}
+  .sflag.warn{color:hsl(38 90% 64%);background:hsl(var(--warning)/.1);}
+
+  .step-children{
+    margin-left:18px;border-left:1px solid hsl(var(--border));padding-left:2px;
+  }
+
+  /* ---- Live stream (flat feed) ---- */
+  .stream-line{
+    display:flex;gap:9px;padding:5px 14px;font-size:11px;line-height:1.4;align-items:flex-start;
+    opacity:0;transform:translateX(6px);transition:opacity .3s ease, transform .3s ease;
+  }
+  .stream-line.in{opacity:1;transform:none;}
+  .stream-line:hover{background:hsl(240 6% 8%);}
+  .stream-line .ts{font-family:var(--font-mono);color:hsl(240 5% 42%);flex:none;font-size:10px;width:60px;margin-top:1px;}
+  .stream-line .sstat{margin-top:1px;}
+  .stream-line .sbody{flex:1;min-width:0;}
+
+  .trace-foot{
+    margin:14px 14px 0;padding:12px 13px;border-radius:var(--radius);
+    background:hsl(var(--success)/.07);border:1px solid hsl(var(--success)/.26);
+    opacity:0;transition:opacity .4s ease;
+  }
+  .trace-foot.in{opacity:1;}
+  .trace-foot .t{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:hsl(142 65% 58%);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+  .trace-foot .t .dot{width:6px;height:6px;border-radius:50%;background:hsl(142 70% 50%);}
+  .trace-foot .stats{display:flex;flex-direction:column;gap:5px;font-family:var(--font-mono);font-size:10.5px;color:hsl(var(--muted-foreground));}
+  .trace-foot .stats div{display:flex;justify-content:space-between;gap:12px;}
+  .trace-foot .stats b{color:hsl(0 0% 84%);font-weight:600;text-align:right;}
+
+  /* density: compact */
+  body.compact .left-inner{padding:10px 12px 40px;}
+  body.compact .card{padding:8px 10px;margin-bottom:6px;}
+  body.compact .card-val{font-size:11.5px;}
+  body.compact .thread{padding:16px 22px 52px;}
+  body.compact .synth-body,body.compact .div-list{padding-top:12px;}
+  body.compact .persona{padding:11px 12px;}
+  body.compact .step-row{padding-top:4px;padding-bottom:4px;}
+  body.compact .stream-line{padding-top:3px;padding-bottom:3px;}
+  body.compact .synth-detail{font-size:13px;}
+
+  /* responsive fallback */
+  @media (max-width:1180px){
+    body{overflow:auto;}
+    .stage{grid-template-columns:1fr;height:auto;}
+    .pane{height:auto;}
+    .pane.left{border-right:none;border-bottom:1px solid hsl(var(--border));}
+    .pane.right{border-left:none;border-top:1px solid hsl(var(--border));}
+    .pane-body,.center-scroll,.trace-body{max-height:620px;}
+    .synth-grid{grid-template-columns:1fr;}
+    .header{flex-wrap:wrap;height:auto;padding:8px 12px;gap:8px;}
+    .hdr-right{width:100%;}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===== TOP BAR ===== -->
+  <header class="header">
+    <div class="brand">
+      <!-- Sapphire / Quiver gem mark (inline SVG, recolored to --primary) + wordmark -->
+      <svg class="gem-mark" viewBox="0 0 324 254" role="img" aria-label="Sapphire by Quiver Bioscience">
+        <g transform="translate(0,254) scale(0.1,-0.1)" fill="currentColor">
+          <path d="M1040 2528 c-297 -63 -567 -227 -749 -454 -314 -390 -374 -931 -151 -1374 156 -311 421 -538 768 -658 l107 -37 280 -3 280 -3 -466 468 c-257 257 -474 479 -483 493 -38 58 -9 152 57 183 43 21 68 21 110 3 18 -8 274 -257 597 -580 l565 -566 205 0 205 0 -838 838 -837 837 0 52 c0 44 5 58 31 87 36 42 85 58 132 45 24 -6 261 -238 957 -934 l925 -925 229 0 228 0 -688 696 c-379 383 -693 706 -697 718 -5 11 -6 41 -4 66 4 35 13 51 41 77 31 29 43 33 88 33 l52 0 287 -286 287 -287 9 49 c15 90 9 362 -10 451 -42 195 -123 374 -241 533 -15 19 -66 75 -114 123 -175 177 -401 300 -647 352 -81 17 -440 19 -515 3z"/>
+        </g>
+      </svg>
+      <span class="hdr-sep"></span>
+      <span class="name">Sapphire <span class="dim">— CNS Decision Firm</span></span>
+    </div>
+    <span class="hdr-sep"></span>
+    <div class="profiles" title="Chat profile">
+      <span class="pf">Demo</span>
+      <span class="pf">Live</span>
+      <span class="pf active">Live (cheap·haiku)</span>
+      <span class="pf">Replay</span>
+    </div>
+    <div class="hdr-right">
+      <div class="seg-wrap">
+        <span class="seg-lbl">Trace</span>
+        <div class="segmented" id="traceMode" role="group" aria-label="Trace view">
+          <button data-mode="tree" aria-pressed="true">Step tree</button>
+          <button data-mode="stream" aria-pressed="false">Live stream</button>
+        </div>
+      </div>
+      <div class="segmented" id="density" role="group" aria-label="Density">
+        <button data-d="comfortable" aria-pressed="true">Comfortable</button>
+        <button data-d="compact" aria-pressed="false">Compact</button>
+      </div>
+      <button class="ghost-btn"><span class="plus">+</span> New Chat</button>
+    </div>
+  </header>
+
+  <!-- ===== 3-PANE STAGE ===== -->
+  <div class="stage">
+
+    <!-- LEFT — element cards -->
+    <section class="pane left">
+      <div class="pane-head">
+        <span class="ix">B1</span>
+        <h2>Fact Dossier</h2>
+        <span class="tag">elements · two planes</span>
+      </div>
+      <div class="pane-body">
+        <div class="left-inner">
+          <!-- INTERNAL plane -->
+          <div class="plane internal">
+            <div class="plane-head">
+              <span class="lk">🔒</span>
+              <span class="ttl">INTERNAL · Quiver moat</span>
+              <span class="ct" id="intCt">8</span>
+            </div>
+            <div class="plane-sub">private CNS_DFP · EP-signature space · never leaves the vault</div>
+            <div id="internalCards"></div>
+          </div>
+          <!-- EXTERNAL plane -->
+          <div class="plane external">
+            <div class="plane-head">
+              <span class="lk">🌐</span>
+              <span class="ttl">EXTERNAL · public evidence</span>
+              <span class="ct" id="extCt">16</span>
+            </div>
+            <div class="plane-sub">published literature · regulatory · IP · public identifiers only</div>
+            <div id="externalCards"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CENTER — assistant message thread -->
+    <section class="pane center">
+      <div class="pane-head">
+        <span class="ix">RESP</span>
+        <h2>Response</h2>
+        <span class="tag">facts + how each player reacted</span>
+      </div>
+      <div class="center-scroll">
+        <div class="thread">
+
+          <!-- user message -->
+          <div class="msg-user">
+            <div class="bubble">
+              <div class="meta">You · prioritization</div>
+              <div class="q">Is TSC2 a viable target in tuberous sclerosis?</div>
+              <div class="qtags">
+                <span class="qtag">disease <b>tuberous sclerosis / mTORopathy CNS</b></span>
+                <span class="qtag">modality <b>small molecule</b></span>
+                <span class="qtag">scope <b>A·B·C</b></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- assistant message -->
+          <div class="msg-asst">
+            <div class="avatar">
+              <svg viewBox="0 0 324 254" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <g transform="translate(0,254) scale(0.1,-0.1)">
+                  <path d="M1040 2528 c-297 -63 -567 -227 -749 -454 -314 -390 -374 -931 -151 -1374 156 -311 421 -538 768 -658 l107 -37 280 -3 280 -3 -466 468 c-257 257 -474 479 -483 493 -38 58 -9 152 57 183 43 21 68 21 110 3 18 -8 274 -257 597 -580 l565 -566 205 0 205 0 -838 838 -837 837 0 52 c0 44 5 58 31 87 36 42 85 58 132 45 24 -6 261 -238 957 -934 l925 -925 229 0 228 0 -688 696 c-379 383 -693 706 -697 718 -5 11 -6 41 -4 66 4 35 13 51 41 77 31 29 43 33 88 33 l52 0 287 -286 287 -287 9 49 c15 90 9 362 -10 451 -42 195 -123 374 -241 533 -15 19 -66 75 -114 123 -175 177 -401 300 -647 352 -81 17 -440 19 -515 3z"/>
+                </g>
+              </svg>
+            </div>
+            <div class="asst-body">
+              <div class="asst-name">Sapphire <span class="role">· Roundtable Moderator synthesis</span></div>
+
+              <!-- SYNTHESIS -->
+              <div class="synth" id="synthCard">
+                <div class="synth-head">
+                  <span class="lbl">◆ Synthesis</span>
+                  <span class="chip sim badge-sim">🧪 simulated — real models pending</span>
+                </div>
+                <div class="synth-body">
+                  <div class="verdict-row">
+                    <div class="verdict"><span class="em">Conditional advance</span></div>
+                    <div class="conf">
+                      <span class="lbl">Confidence</span>
+                      <span class="meter"><i class="on"></i><i class="on"></i><i></i></span>
+                      <span class="val">Medium</span>
+                    </div>
+                  </div>
+                  <div class="synth-detail">
+                    <b>3 conditional verdicts</b> across the seated panel · <b>2 abstentions</b> on guardrail checks · <b>0 vetoes</b>. Mechanism is well-characterized (TSC1–TSC2 GAP → Rheb → mTORC1) and the rescue chemistry is real but modest. Address open items before IND filing.
+                  </div>
+                  <div class="synth-grid">
+                    <div class="sg"><div class="k">Spread</div><div class="v">3 conditional · 2 abstained</div></div>
+                    <div class="sg"><div class="k">Vetoes</div><div class="v big">0<small>dispositive</small></div></div>
+                    <div class="sg div-sg"><div class="k">Divergences</div><div class="v big">3<small>surfaced</small></div></div>
+                  </div>
+                  <div class="exp-box">
+                    <span class="ic">⚗</span>
+                    <div><b>Proposed experiment:</b> Run orthogonal in vivo validation for TSC2 in a disease-relevant model.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DIVERGENCE -->
+              <div class="divh" id="divBlock">
+                <div class="divh-head">
+                  <span class="ic">⚡</span>
+                  <span class="t">DIVERGENCE — surfaced, not reconciled</span>
+                  <span class="alpha">often the alpha</span>
+                </div>
+                <div class="divh-sub">Internal ↔ external (and known-unknown) tensions. We surface them; the roundtable adjudicates — we never auto-reconcile.</div>
+                <div class="div-list" id="divList"></div>
+              </div>
+
+              <!-- ROUNDTABLE -->
+              <div class="sec-h">
+                <h3>Roundtable — the spread</h3>
+                <span class="sub">Bucket 2 · independent verdicts</span>
+                <span class="ln"></span>
+                <span class="key"><span><i style="background:hsl(38 92% 55%)"></i>conditional</span><span><i style="background:hsl(240 5% 40%)"></i>abstain</span></span>
+              </div>
+              <div class="sim-banner">
+                <span class="ic">🧪</span>
+                <div><b>Roundtable reasoning is SIMULATED.</b> Persona verdicts below are placeholder model output — real partner reasoning is pending. <b>No forced consensus:</b> the spread is the product, not a single number.</div>
+              </div>
+              <div class="spread" id="spread"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT — trace -->
+    <section class="pane right">
+      <div class="pane-head">
+        <span class="ix">TRACE</span>
+        <h2>Chain of Thought</h2>
+        <span class="tag" id="traceTag">streaming…</span>
+      </div>
+      <div class="trace-toolbar">
+        <span class="live" id="traceLive"><span class="dot pulse"></span> RUNNING</span>
+        <span>append-only · trace.jsonl</span>
+        <span class="eng">eng <b>6444d0e8</b></span>
+      </div>
+      <div class="trace-body" id="traceBody"></div>
+    </section>
+
+  </div>
+
+<script>
+/* ============================ REAL DATA (verbatim from demo_data.json) ============================ */
+const DATA = {
+  engagement_id:"eng_6444d0e8",
+  internal: [
+    {value:"EP-signature mimic: TSC1 (gene) ~ TSC2 KO (cos 0.083)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: CMIP (gene) ~ TSC2 KO (cos 0.191)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: DACT1 (gene) ~ TSC2 KO (cos 0.213)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"EP-signature mimic: SOX15 (gene) ~ TSC2 KO (cos 0.225)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Isorhamnetin (compound) opposes TSC2 KO EP-signature (cos 0.253)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: GW-406381 (compound) opposes TSC2 KO EP-signature (cos 0.321)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Momelotinib (compound) opposes TSC2 KO EP-signature (cos 0.328)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"},
+    {value:"Rescue candidate: Cyclothiazide (compound) opposes TSC2 KO EP-signature (cos 0.336)", tier:"T2", prov:"moat-real", source:"Quiver moat (CNS_DFP, real)"}
+  ],
+  external: [
+    {value:"Tuberous sclerosis complex is an autosomal dominant disorder caused by inactivating mutations in TSC1 (hamartin) or TSC2 (tuberin).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — TSC genetics review [PMID:27226234]"},
+    {value:"The TSC1-TSC2 heterodimer is a GTPase-activating protein (GAP) for Rheb; loss of TSC2 de-represses Rheb → mTORC1 signaling.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — TSC1/TSC2 GAP mechanism [PMID:21329690]"},
+    {value:"Alesi et al. (2024) provided a mechanistic refinement of TSC2/mTORC1 with therapeutic implications in TSC2-driven mouse models.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — Alesi et al. 2024 [PMID:38195686]"},
+    {value:"mTORC1 drives anabolic programs (protein synthesis via S6K1/4E-BP1, lipid biosynthesis, ribosome biogenesis).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — mTORC1 anabolic programs [PMID:26060906]"},
+    {value:"EXIST-1 phase III (n=117, TSC-associated SEGA): everolimus objective response 35% vs 0% placebo (p<0.0001).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-1 phase III [PMID:22136276]"},
+    {value:"EXIST-2 (Cochrane meta-analysis, 235 pts): everolimus significantly increased ≥50% renal AML volume reduction (RR 24.69) vs placebo.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-2 / Cochrane 2016 [PMID:27409709]"},
+    {value:"EXIST-3 phase III: adjunctive everolimus gave a significant dose-dependent reduction in drug-resistant focal seizures in TSC.", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — EXIST-3 phase III [PMID:29338461]"},
+    {value:"Everolimus is FDA/EMA-approved for TSC-associated SEGA and renal AML (and EU-approved for TSC-related seizures).", tier:"T2", prov:"emet-live", source:"EMET (PubMed) — everolimus TSC approvals [PMID:30069763]"},
+    {value:"Q-Models: binding / selectivity / ADMET quantification on the surfaced candidate (track returned no numeric envelope this run).", tier:"T2", prov:"qmodels", source:"Q-Models", sim:true},
+    {value:"FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.", tier:"T2", prov:"fda-primary", source:"BrainStorm Cell Therapeutics press release; FDA CRL Nov 2022", flag:"DIVERGENCE"},
+    {value:"FDA ALS drug-development guidance (Sept 2019): trial designs should minimize placebo-only exposure and target core motor aspects (weakness/survival).", tier:"T1", prov:"fda-primary", source:"FDA / Federal Register 2019-20629"},
+    {value:"No TSC2-specific FDA precedent found in corpus. Gap areas: mTOR inhibitor history in tuberous sclerosis, TS-specific endpoint guidance, pediatric CNS seizure development precedent.", tier:"T3", prov:"fda-primary", source:"Corpus gap analysis", flag:"KNOWN_UNKNOWN"},
+    {value:"Foundational TSC2 gene patent US6207374B1 ('Tuberous sclerosis 2 gene and uses thereof') is expired as of 2015; no blocking IP on basic TSC2 identification/diagnostics.", tier:"T1", prov:"semantic-web", source:"US6207374B1, Google Patents"},
+    {value:"Cold Spring Harbor Laboratory / Massachusetts General Hospital holds WO2018213618A1 ('Gene therapy for tuberous sclerosis'), covering AAV-mediated TSC2 replacement with condensed tuberin (cTuberin) to overcome ~5.4 kb packaging constraint. US grant US11958887B2. Estimated expiry 2038-2040.", tier:"T1", prov:"semantic-web", source:"WO2018213618A1, US11958887B2, Google Patents"},
+    {value:"BridgeBio Gene Therapy Research has pending patents (Canada 2022, US 2024) on recombinant AAV with engineered condensed tuberin (cTuberin/micro-Tuberin) for TSC2 gene therapy. Most advanced gene therapy IP in this space. Estimated expiry 2042-2044 if granted.", tier:"T1", prov:"semantic-web", source:"BridgeBio patent filings, PatSnap, Pharmaceutical Technology"},
+    {value:"Everolimus (Afinitor, Novartis rapalog) is FDA-approved for TSC-related subependymal giant cell astrocytomas (SEGAs, 2009) and renal angiomyolipomas. Orange Book listed. Composition/method patents US11406623B2, US12102619B2, US11160795B2. Estimated expiry 2032-2034.", tier:"T1", prov:"semantic-web", source:"US11406623B2, US12102619B2, Orange Book listings, Google Patents"}
+  ],
+  divergence: [
+    "FDA CRL (Refuse-to-File) for NurOwn (MSC-NTF cells) in ALS (2022): pivotal Phase 3 missed primary endpoint; FDA will not file BLA without substantial evidence from pivotal trial.",
+    "NCT03082833 (AZD2014 in TSC1/2-mutated gastric cancer): Phase II trial terminated for lack of efficacy (2019-05). Note: TSC1/2 mutation in oncology context (gastric cancer), not primary CNS TSC indication; relevance to CNS target unclear.",
+    "FAERS disproportionality data (live) and PMR/PMC commitments not accessed; live EMET/FAERS pull required for full real-time signal landscape"
+  ],
+  round1: [
+    {persona:"Dr. Ryan Watts, CSO, Denali Therapeutics", lens:"scientific", stance:"conditional", conviction:4, status:"ok",
+     rationale:"The rescue cosine scores—Isorhamnetin 0.25, Momelotinib 0.328—are non-zero but modest; translational biology rarely yields perfect phenotypic matches. The TSC1-TSC2 heterodimer mechanism as a GAP for Rheb is well-characterized, and Everolimus FDA approval for TSC-associated seizures anchors target credibility. However, EXIST-3 data cutoff (2015) predates modern sequencing and validation toolsets."},
+    {persona:"Pharma BD Lead — Rare Disease (BioMarin)", lens:"commercial", stance:"conditional", conviction:3, status:"ok",
+     rationale:"The dossier shows Isorhamnetin and Momelotinib opposing the TSC2 KO EP-signature with meaningful potency. However, Everolimus (mTOR inhibitor) FDA-approved for TSC-associated seizures already owns clinical access. The dossier flags reimbursement complexity if TSC2 therapy positioned as adjunctive to everolimus—that kills margin. Since TSC2-specific restoration or gene-therapy approaches lack established access…"},
+    {persona:"Venture GP — neuro (Third Rock)", lens:"investability", stance:"hold", conviction:0, status:"abstained",
+     rationale:"abstained (guardrail-violation)"},
+    {persona:"Pharma Neuro SVP, ex-FDA (Takeda Neuro)", lens:"regulatory", stance:"conditional", conviction:3, status:"ok",
+     rationale:"TSC2 restoration sits on a well-characterized mechanism (TSC1-TSC2 GAP function for Rheb), and everolimus's FDA approval for TSC-associated seizures establishes regulatory precedent for TSC-focused interventions. The absence of FDA/EMA/PMDA/MHRA/TGA regulatory divergence is a clean signal. However, adjunctive positioning to everolimus triggers reimbursement complexity, and TSC2-specific restoration remains unprecedented…"},
+    {persona:"Adversarial Red-Team (always seated)", lens:"adversarial", stance:"hold", conviction:0, status:"abstained",
+     rationale:"abstained (guardrail-violation)"}
+  ]
+};
+
+/* ============================ HELPERS ============================ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtFact(s){
+  let h = esc(s);
+  h = h.replace(/(PMID:\d+|NCT\d+|WO\d+[A-Z]\d|US\d+[A-Z]?\d*B\d|US\d{6,}B\d|RR\s?\d+\.?\d*|cos\s?\d\.\d+|p&lt;?0?\.\d+|n=\d+)/g,'<span class="tok">$1</span>');
+  h = h.replace(/\b(TSC1|TSC2|CMIP|DACT1|SOX15|Rheb|mTORC1|S6K1|4E-BP1)\b/g,'<span class="gene">$1</span>');
+  return h;
+}
+function fmtDiv(s){
+  let h = esc(s);
+  h = h.replace(/(NCT\d+|PMID:\d+|FAERS|PMR\/PMC|MSC-NTF|AZD2014|CRL|BLA)/g,'<span class="tok">$1</span>');
+  return h;
+}
+const tierClass = t => 't'+t.replace('T','');
+const provLabel = p => p;
+const liveProv = {'moat-real':true,'emet-live':true};   // truly-live agents
+const initials = n => n.replace(/[^A-Za-z ]/g,'').split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+
+/* ============================ LEFT — element cards ============================ */
+function cardHTML(f, plane){
+  const isLive = !!liveProv[f.prov];
+  const liveChip = isLive
+    ? `<span class="chip live"><span class="d"></span>live</span>`
+    : (f.sim ? `<span class="chip sim">🧪 stub track</span>` : '');
+  const flagChip = f.flag==='DIVERGENCE' ? `<span class="chip flag">⚡ divergence</span>`
+                 : f.flag==='KNOWN_UNKNOWN' ? `<span class="chip flag ku">◇ known-unknown</span>` : '';
+  const glyph = plane==='internal' ? '🔒' : '🌐';
+  const srcShort = f.source.split('[')[0].split('(')[0].trim();
+  const tierDesc = f.tier==='T1' ? 'primary / regulatory' : f.tier==='T2' ? 'published evidence' : 'gap / unverified';
+  return `
+  <div class="card" data-plane="${plane}" tabindex="0">
+    <div class="card-top">
+      <div class="card-src"><span class="glyph">${glyph}</span><span class="nm">${esc(srcShort)}</span></div>
+      <span class="chev">▸</span>
+    </div>
+    <div class="card-val">${fmtFact(f.value)}</div>
+    <div class="card-foot">
+      <span class="chip tier ${tierClass(f.tier)}">${f.tier}</span>
+      <span class="chip prov ${f.prov}">${provLabel(f.prov)}</span>
+      ${liveChip}${flagChip}
+    </div>
+    <div class="card-detail">
+      <div class="row"><b>source</b><span>${esc(f.source)}</span></div>
+      <div class="row"><b>tier</b><span>${f.tier} · ${tierDesc}</span></div>
+      <div class="row"><b>provenance</b><span>${provLabel(f.prov)} ${isLive?'· live':(f.sim?'· stub track':'· recorded')}</span></div>
+      ${f.flag?`<div class="row"><b>flag</b><span style="color:hsl(0 85% 76%)">${esc(f.flag)}</span></div>`:''}
+      ${plane==='internal'?`<div class="vault-hint">🔒 sealed to CNS_DFP — never leaves the vault</div>`:''}
+    </div>
+  </div>`;
+}
+document.getElementById('internalCards').innerHTML = DATA.internal.map(f=>cardHTML(f,'internal')).join('');
+document.getElementById('externalCards').innerHTML = DATA.external.map(f=>cardHTML(f,'external')).join('');
+document.getElementById('intCt').textContent = DATA.internal.length;
+document.getElementById('extCt').textContent = DATA.external.length;
+function toggleCard(c){ c.classList.toggle('open'); }
+document.querySelectorAll('.card').forEach(c=>{
+  c.addEventListener('click', ()=>toggleCard(c));
+  c.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleCard(c); }});
+});
+
+/* ============================ CENTER — divergence + roundtable ============================ */
+document.getElementById('divList').innerHTML = DATA.divergence.map((d,i)=>`
+  <div class="div-item">
+    <div class="n">${i+1}</div>
+    <div class="tx">${fmtDiv(d)}</div>
+  </div>`).join('');
+
+function personaHTML(p){
+  const abst = p.status==='abstained';
+  const cls = abst ? 'abstained '+p.stance : p.stance;
+  const pips = Array.from({length:5},(_,i)=>`<i class="${i<p.conviction?'on':''}"></i>`).join('');
+  const body = abst
+    ? `<div class="abstain-note"><span class="ic">⚠</span><div><b>Abstained — guardrail check.</b> No verdict filed (${esc(p.rationale)}). Counted as a non-vote, not a position.</div></div>`
+    : `<div class="p-rationale">${fmtFact(p.rationale)}</div>`;
+  const verdictBlock = abst
+    ? `<div class="p-verdict"><span class="stance hold">ABSTAINED</span><span class="chip sim">🧪 sim</span></div>`
+    : `<div class="p-verdict">
+         <span class="stance ${p.stance}">${esc(p.stance)}</span>
+         <div class="conviction"><span class="lbl">CONV</span><div class="pips">${pips}</div></div>
+         <span class="chip sim">🧪 sim</span>
+       </div>`;
+  return `
+  <div class="persona ${cls}">
+    <div class="p-top">
+      <div class="p-avatar">${initials(p.persona)}</div>
+      <div class="p-id">
+        <div class="p-name">${esc(p.persona)}</div>
+        <div class="p-lens">${esc(p.lens)} lens</div>
+      </div>
+      ${verdictBlock}
+    </div>
+    ${body}
+  </div>`;
+}
+document.getElementById('spread').innerHTML = DATA.round1.map(personaHTML).join('');
+
+/* ============================ TRACE MODEL (shared event list, two views) ============================ */
+/* Each event: {group, status, label, prov, ms, flag, flagcls, depth}
+   depth 0 = parent step; depth 1 = child step (nested under the most recent depth-0). */
+let T0 = new Date(); T0.setHours(9,41,7,0);
+let clock = new Date(T0);
+function advance(ms){ clock = new Date(clock.getTime() + (ms||1400)); return clock.toTimeString().slice(0,8); }
+
+const EV = [];
+function ev(group, status, label, opts={}){ EV.push({group, status, label, depth:opts.depth||0, prov:opts.prov||null, ms:opts.ms||null, flag:opts.flag||null, flagcls:opts.flagcls||null}); }
+
+// PLAN
+ev('Plan','info','<b>Engagement Lead</b> · triage → prioritization. Deliverable: <b>ranked, de-risked target list</b>.');
+ev('Plan','info','Scope locked → fields <b>A·B·C</b>, skip D·E·F. Modality default <b>small molecule</b>.',{depth:1});
+ev('Plan','ok','<b>Research Manager</b> dispatched 5 fact agents + queued 5-persona panel.',{depth:1});
+
+// BUCKET 1
+ev('Bucket 1 · Facts','ok','<b>Internal Science Lead</b> — 8 EP-signature mimics + rescue candidates from CNS_DFP.',{prov:'moat-real', ms:412});
+ev('Bucket 1 · Facts','ok','top mimic <span class="gene">TSC1</span> (cos 0.083); rescues Isorhamnetin → Cyclothiazide.',{depth:1, prov:'moat-real', ms:118});
+ev('Bucket 1 · Facts','ok','<b>EMET Analyst</b> — 8 cited T2 facts (live BenchSci).',{prov:'emet-live', ms:2380});
+ev('Bucket 1 · Facts','ok','<span class="gene">TSC1/TSC2</span>→<span class="gene">Rheb</span>→<span class="gene">mTORC1</span>; EXIST-1/2/3 everolimus.',{depth:1, prov:'emet-live', ms:640});
+ev('Bucket 1 · Facts','warn','<b>Q-Models Runner</b> — binding/selectivity/ADMET track returned no numeric envelope this run.',{prov:'qmodels', ms:640, flag:'🧪 stub track', flagcls:'warn'});
+ev('Bucket 1 · Facts','ok','<b>FDA Institutional Memory <span class="veto">⛔</span></b> — dispositive-veto check on class.',{prov:'fda-primary', ms:1190});
+ev('Bucket 1 · Facts','ok','no TSC2-specific FDA precedent in corpus; NurOwn ALS CRL on file.',{depth:1, prov:'fda-primary', ms:210});
+ev('Bucket 1 · Facts','ok','<b>Post-Market Safety</b> — class FAERS / label-liability scan.',{prov:'semantic-web', ms:880});
+ev('Bucket 1 · Facts','ok','<b>Patent / IP <span class="veto">⛔</span></b> — TSC2 base patent expired 2015; CSHL/MGH + BridgeBio gene-therapy IP live to ~2044.',{prov:'semantic-web', ms:1040});
+
+// FLAGS
+ev('Flags · Research Mgr','flag','<b>DIVERGENCE ×3</b> surfaced — NurOwn ALS CRL · <span class="gene">AZD2014</span> NCT03082833 terminated · FAERS not live-pulled.',{flag:'⚡ divergence'});
+ev('Flags · Research Mgr','info','<b>VETO ×0</b> · <b>KNOWN-UNKNOWN ×1</b> (TS-specific endpoint precedent). Dossier passes completeness gate.');
+
+// BUCKET 2
+ev('Bucket 2 · Roundtable','warn','🧪 Persona reasoning <b>SIMULATED</b> (real partner models pending). Round-1 independent verdicts:',{flag:'🧪 simulated', flagcls:'warn'});
+ev('Bucket 2 · Roundtable','ok','<b>CSO · Denali</b> (scientific) → <b>conditional</b>, conviction 4/5.',{depth:1, prov:'sim', ms:820});
+ev('Bucket 2 · Roundtable','ok','<b>BD · BioMarin</b> (commercial) → <b>conditional</b>, conviction 3/5.',{depth:1, prov:'sim', ms:790});
+ev('Bucket 2 · Roundtable','warn','<b>Venture GP · Third Rock</b> (investability) → <b>abstained</b> (guardrail-violation).',{depth:1, ms:210, flag:'⚠ abstain', flagcls:'warn'});
+ev('Bucket 2 · Roundtable','ok','<b>Neuro SVP / ex-FDA · Takeda</b> (regulatory) → <b>conditional</b>, conviction 3/5.',{depth:1, prov:'sim', ms:805});
+ev('Bucket 2 · Roundtable','warn','<b>Adversarial Red-Team</b> (always seated) → <b>abstained</b> (guardrail-violation).',{depth:1, ms:205, flag:'⚠ abstain', flagcls:'warn'});
+
+// SYNTHESIS
+ev('Synthesis','ok','<b>Roundtable Moderator</b> — no forced consensus. Spread: 3 conditional · 2 abstained · 0 veto.');
+ev('Synthesis','warn','<b>Verdict: Conditional advance</b> · confidence <b>medium</b> · proposed orthogonal in vivo validation. 🧪 synthesis simulated.',{depth:1, flag:'🧪 simulated', flagcls:'warn'});
+
+const totalMs = EV.reduce((a,e)=>a+(e.ms||0),0);
+
+/* ----- build the footer (shared) ----- */
+function footEl(){
+  const foot = document.createElement('div');
+  foot.className='trace-foot';
+  foot.innerHTML = `
+    <div class="t"><span class="dot"></span> Run complete</div>
+    <div class="stats">
+      <div><span>fact agents</span><b>5 dispatched · all ok</b></div>
+      <div><span>live backends</span><b>moat-real · emet-live</b></div>
+      <div><span>simulated</span><b>roundtable + synthesis</b></div>
+      <div><span>flags</span><b>0 veto · 3 divergence · 1 unknown</b></div>
+      <div><span>panel</span><b>3 conditional · 2 abstained</b></div>
+      <div><span>fact compute</span><b>~${(totalMs/1000).toFixed(1)} s</b></div>
+    </div>`;
+  return foot;
+}
+
+/* ----- status helpers ----- */
+function statDot(status){ return `<span class="sstat ${status==='flag'?'flag':status==='warn'?'warn':status==='info'?'info':'ok'}"></span>`; }
+function meta(e){
+  return `<div class="sdetail">
+    ${e.prov?`<span class="sprov ${e.prov}">${provLabel(e.prov)}</span>`:''}
+    ${e.ms?`<span class="stime">${e.ms} ms</span>`:''}
+    ${e.flag?`<span class="sflag ${e.flagcls==='warn'?'warn':''}">${e.flag}</span>`:''}
+  </div>`;
+}
+
+/* ============================ VIEW A — STEP TREE (cot=full) ============================ */
+function buildTree(){
+  const body = document.getElementById('traceBody');
+  body.innerHTML='';
+  const streamNodes = [];   // ordered for the streaming animation
+  let lastGroup = null, groupEl=null, currentParent=null, currentChildren=null;
+
+  EV.forEach(e=>{
+    if(e.group!==lastGroup){
+      groupEl = document.createElement('div');
+      groupEl.className='tgroup';
+      groupEl.innerHTML = `<div class="tgroup-h">${esc(e.group)} <span class="ln"></span></div>`;
+      body.appendChild(groupEl);
+      lastGroup = e.group; currentParent=null; currentChildren=null;
+      streamNodes.push(groupEl.querySelector('.tgroup-h'));
+    }
+    const step = document.createElement('div');
+    step.className='step';
+    step.innerHTML = `
+      <div class="step-row">
+        <span class="schev leaf">▾</span>
+        ${statDot(e.status)}
+        <div class="sbody"><div class="slabel">${e.label}</div>${meta(e)}</div>
+      </div>`;
+    if(e.depth===0){
+      groupEl.appendChild(step);
+      currentParent = step;
+      currentChildren = null;
+    } else {
+      // nest under the current parent
+      if(currentParent){
+        if(!currentChildren){
+          currentChildren = document.createElement('div');
+          currentChildren.className='step-children';
+          currentParent.appendChild(currentChildren);
+          currentParent.classList.add('has-children');
+          currentParent.querySelector('.schev').classList.remove('leaf');
+        }
+        currentChildren.appendChild(step);
+      } else {
+        groupEl.appendChild(step);
+      }
+    }
+    streamNodes.push(step);
+  });
+
+  // collapse/expand interaction
+  body.querySelectorAll('.step.has-children > .step-row').forEach(row=>{
+    row.addEventListener('click', e=>{
+      e.stopPropagation();
+      row.parentElement.classList.toggle('collapsed');
+    });
+  });
+
+  const foot = footEl();
+  body.appendChild(foot);
+  return {streamNodes, foot};
+}
+
+/* ============================ VIEW B — LIVE STREAM (flat feed) ============================ */
+function buildStream(){
+  const body = document.getElementById('traceBody');
+  body.innerHTML='';
+  clock = new Date(T0);
+  const streamNodes = [];
+  let lastGroup=null;
+  EV.forEach(e=>{
+    if(e.group!==lastGroup){
+      const gh = document.createElement('div');
+      gh.className='tgroup-h'; gh.style.paddingTop='12px';
+      gh.innerHTML = `${esc(e.group)} <span class="ln"></span>`;
+      body.appendChild(gh);
+      streamNodes.push(gh);
+      lastGroup=e.group;
+    }
+    const stamp = advance(e.ms || 1400);
+    const line = document.createElement('div');
+    line.className='stream-line';
+    line.innerHTML = `
+      <span class="ts">${stamp}</span>
+      ${statDot(e.status)}
+      <div class="sbody"><div class="slabel">${e.label}</div>${meta(e)}</div>`;
+    body.appendChild(line);
+    streamNodes.push(line);
+  });
+  const foot = footEl();
+  body.appendChild(foot);
+  return {streamNodes, foot};
+}
+
+/* ============================ STREAMING ANIMATION (the "watch the firm think") ============================ */
+let streamTimer = null;
+let streamRAFs = [];
+function clearStreamTimers(){ streamRAFs.forEach(id=>clearTimeout(id)); streamRAFs=[]; }
+
+function runStream(view, animate){
+  const {streamNodes, foot} = view;
+  const body = document.getElementById('traceBody');
+  const live = document.getElementById('traceLive');
+  const tag = document.getElementById('traceTag');
+
+  if(!animate){
+    streamNodes.forEach(n=>n.classList.add('in'));
+    foot.classList.add('in');
+    live.innerHTML = '<span class="dot"></span> Done';
+    tag.textContent = 'complete';
+    return;
+  }
+
+  // reset toolbar to running
+  live.innerHTML = '<span class="dot pulse"></span> RUNNING';
+  tag.textContent = 'streaming…';
+
+  let d = 160;
+  streamNodes.forEach((n,i)=>{
+    // running spinner appears, then resolves to its final status dot
+    const dot = n.querySelector ? n.querySelector('.sstat') : null;
+    const isStep = n.classList.contains('step') || n.classList.contains('stream-line');
+    const finalStatusEl = dot;
+    let finalClass = dot ? dot.className : '';
+    streamRAFs.push(setTimeout(()=>{
+      n.classList.add('in');
+      if(isStep && dot){
+        // briefly show running, then resolve
+        const wasClass = dot.className;
+        dot.className = 'sstat run';
+        streamRAFs.push(setTimeout(()=>{ dot.className = wasClass; }, 240));
+      }
+      n.scrollIntoView({block:'nearest', behavior:'smooth'});
+    }, d));
+    d += isStep ? (150 + Math.random()*120) : 120;
+  });
+
+  streamRAFs.push(setTimeout(()=>{
+    foot.classList.add('in');
+    tag.textContent = 'complete';
+    live.innerHTML = '<span class="dot"></span> Done';
+    setTimeout(()=> body.scrollTo({top:0, behavior:'smooth'}), 450);
+  }, d + 220));
+}
+
+/* ============================ MODE + DENSITY TOGGLES ============================ */
+let currentMode = 'tree';
+let firstRender = true;
+
+function renderTrace(animate){
+  clearStreamTimers();
+  const view = currentMode==='tree' ? buildTree() : buildStream();
+  runStream(view, animate);
+}
+
+document.getElementById('traceMode').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  const mode = btn.dataset.mode;
+  if(mode===currentMode) return;
+  document.querySelectorAll('#traceMode button').forEach(b=>b.setAttribute('aria-pressed', b===btn?'true':'false'));
+  currentMode = mode;
+  renderTrace(false);   // instant re-render on manual toggle (no re-stream)
+});
+
+document.getElementById('density').addEventListener('click', e=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  document.querySelectorAll('#density button').forEach(b=>b.setAttribute('aria-pressed', b===btn?'true':'false'));
+  document.body.classList.toggle('compact', btn.dataset.d==='compact');
+});
+
+/* ============================ CENTER reveal ============================ */
+function revealCenter(){
+  setTimeout(()=>document.getElementById('synthCard').classList.add('in'), 450);
+  setTimeout(()=>document.getElementById('divBlock').classList.add('in'), 820);
+  document.querySelectorAll('#spread .persona').forEach((p,i)=> setTimeout(()=>p.classList.add('in'), 1200 + i*140));
+}
+/* ============================ LEFT reveal ============================ */
+function revealCards(){
+  const all = [...document.querySelectorAll('#internalCards .card'), ...document.querySelectorAll('#externalCards .card')];
+  all.forEach((c,i)=> setTimeout(()=>c.classList.add('in'), 100 + i*48));
+}
+
+window.addEventListener('load', ()=>{
+  revealCards();
+  renderTrace(true);   // animate the streaming trace on load
+  revealCenter();
+});
+</script>
+</body>
+</html>
