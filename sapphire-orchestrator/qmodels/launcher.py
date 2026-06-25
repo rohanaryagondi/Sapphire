@@ -36,7 +36,10 @@ EXPECTED_ACCOUNT = "255493511886"
 NAME_PREFIX = "sapphire-qmodels"
 TAGS = {"Project": "sapphire-qmodels", "CreatedBy": "claude-overnight-2026-06-21"}
 BUDGET_CAP_USD = float(os.environ.get("QMODELS_BUDGET_CAP", "0.50"))
-PUBLIC_AMI_SSM = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"  # resolved at launch
+PUBLIC_AMI_SSM = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"  # CPU smoke
+# GPU jobs need NVIDIA drivers/CUDA + the userdata's apt (Ubuntu). The al2023 CPU AMI has neither —
+# use the AWS Deep Learning Base GPU AMI (Ubuntu 22.04, OSS NVIDIA driver). Resolved at launch.
+GPU_AMI_SSM = "/aws/service/deeplearning/ami/x86_64/base-oss-nvidia-driver-gpu-ubuntu-22.04/latest/ami-id"
 SMOKE_INSTANCE_TYPE = "t3.micro"
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]                  # repo root (recipe `code` paths)
@@ -46,7 +49,9 @@ _LEDGER = _RUN_DIR / "aws_ledger.jsonl"
 _SNAPSHOT = _RUN_DIR / "aws_preexisting_snapshot.json"
 
 # rough on-demand $/hr (us-east-1) for budget estimates — conservative
-_HOURLY = {"t3.micro": 0.0104, "t3.small": 0.0208, "g5.xlarge": 1.006, "g4dn.xlarge": 0.526}
+_HOURLY = {"t3.micro": 0.0104, "t3.small": 0.0208, "t3.xlarge": 0.1664,
+           "g5.xlarge": 1.006, "g4dn.xlarge": 0.526,
+           "g6e.xlarge": 1.861, "g6e.2xlarge": 2.242}  # g6e = the Boltz workhorse (L40S 48GB)
 
 
 class SafetyRefusal(Exception):
@@ -254,6 +259,12 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
     return _launch_live(job, bucket, max_minutes)
 
 
+def _ami_ssm_for(job: dict) -> str:
+    """The SSM AMI parameter for this job: the GPU/Ubuntu DL AMI for tool (GPU) jobs, the CPU
+    al2023 AMI for the smoke plumbing test."""
+    return PUBLIC_AMI_SSM if job.get("kind") == "smoke" else GPU_AMI_SSM
+
+
 def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
     _assert_identity()  # account gate
     ensure_bucket()     # idempotent, ledgered: the GPU job's userdata uploads result.json here
@@ -261,7 +272,7 @@ def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
         # Re-render userdata with REAL presigned URLs (submit_job used placeholders for dry-run).
         urls = _stage_and_presign(job, bucket)
         job["userdata"] = _render_tool_userdata(job, urls, max_minutes)
-    ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value")
+    ami = _aws("ssm", "get-parameter", "--name", _ami_ssm_for(job), "--query", "Parameter.Value")
     tag_spec = "ResourceType=instance,Tags=[" + ",".join(
         [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
     import base64

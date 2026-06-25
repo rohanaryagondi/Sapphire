@@ -231,6 +231,18 @@ class TestPresign(unittest.TestCase):
         self.assertIn("X-Amz-Signature", url)
 
 
+class TestAmiSelection(unittest.TestCase):
+    """A GPU (tool) job must boot the Ubuntu Deep-Learning GPU AMI; smoke uses the CPU al2023 AMI."""
+
+    def test_tool_job_uses_gpu_ubuntu_ami(self):
+        ssm = L._ami_ssm_for({"kind": "tool", "tool_id": "boltz2"})
+        self.assertEqual(ssm, L.GPU_AMI_SSM)
+        self.assertIn("gpu-ubuntu-22.04", ssm)          # NVIDIA driver + apt-based, as the userdata needs
+
+    def test_smoke_job_uses_cpu_ami(self):
+        self.assertEqual(L._ami_ssm_for({"kind": "smoke"}), L.PUBLIC_AMI_SSM)
+
+
 class TestGpuRecipes(unittest.TestCase):
     """Per-tool GPU recipes (Gap 2) — Boltz-2 input mapping + unwired-tool refusal."""
 
