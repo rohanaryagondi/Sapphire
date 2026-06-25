@@ -49,6 +49,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 
 ## Open requests
 
+### [OPEN] test_qmodels_launcher does a bare `import boto3` — errors (not skips) on boto3-less envs  ·  from: hayes  ·  date: 2026-06-25  ·  branch: hayes/corpus-post-market-safety
+**Blocking?** no for me (I `pip install boto3` to unblock my Gate 1) — but it makes the full suite RED on any contributor/CI box without boto3 (same class as the cp1252/moat `crossplatform-test-hardening` fixes).
+**Context:** after `git pull` (your #86 `qmodels-aws-gpu` merged), `bash dev/run-tests.sh` went RED on my Windows box: the `tests` suite had 2 ERRORS in `test_qmodels_launcher.TestPresign` (`test_presigned_get_for_input_staging`, `test_presigned_put_is_a_put_url_for_the_key`).
+**Bug:** `sapphire-orchestrator/tests/test_qmodels_launcher.py:215` `_client()` does a bare `import boto3` (comment "# available; presigning is pure local signing") → `ModuleNotFoundError: No module named 'boto3'` where boto3 isn't installed. Every other suite is stdlib-only, so boto3 isn't a guaranteed env dep.
+**What I tried / read:** confirmed pre-existing on `main` (my change is corpus data only; the `corpus` suite passes). `pip install boto3` (1.43.36) flips Gate 1 to GREEN (591) — so it's purely the missing dep, not a logic bug.
+**My current best guess:** guard `TestPresign` (and any boto3-dependent test) with `@unittest.skipUnless(_has_boto3, "boto3 not installed")` — the same skip-without-dep pattern as `aso-tox`/sklearn and the experiment-design live test — so the suite is green on boto3-less envs and the presign tests still run where boto3 is present. (Or add boto3 to a documented dev-deps list the gate notes.)
+**Answer (lead fills):** —
+
 ### [OPEN] patent-ip-t1-patent-domains: add granted-patent primary domains to the T1 allowlist  ·  from: hayes  ·  date: 2026-06-25  ·  branch: hayes/corpus-patent-ip
 **Blocking?** no — patent-ip ships now with patent cards tiered **T2**; this is a T1-upgrade request (same pattern as the ex-US-regulator allowlist fix, PR #31).
 **Context:** `semantic-corpora`, patent-ip corpus. The agent spec (`architecture/bucket1/semantic/patent-ip.md`) says *"Tier granted patents & Orange/Purple Book listings T1 (primary)."* But `dev/validate-corpus.sh`'s T1 allowlist is US `.gov`/`.edu`/PMC/NCBI (+ ex-US regulators) — it does NOT include patent-primary domains, so granted-patent cards (whose primary record I read on `patents.google.com`) can't be T1 without failing the gate.
