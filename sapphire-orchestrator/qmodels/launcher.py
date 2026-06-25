@@ -25,6 +25,7 @@ import json
 import os
 import shlex
 import subprocess
+import time
 import uuid
 from pathlib import Path
 
@@ -38,7 +39,8 @@ BUDGET_CAP_USD = float(os.environ.get("QMODELS_BUDGET_CAP", "0.50"))
 PUBLIC_AMI_SSM = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64"  # resolved at launch
 SMOKE_INSTANCE_TYPE = "t3.micro"
 
-_RUN_DIR = Path(__file__).resolve().parents[2] / "RohanOnly" / "qmodels_run"
+_REPO_ROOT = Path(__file__).resolve().parents[2]                  # repo root (recipe `code` paths)
+_RUN_DIR = _REPO_ROOT / "RohanOnly" / "qmodels_run"
 _JOBS_DIR = _RUN_DIR / "jobs"
 _LEDGER = _RUN_DIR / "aws_ledger.jsonl"
 _SNAPSHOT = _RUN_DIR / "aws_preexisting_snapshot.json"
@@ -255,6 +257,10 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
 def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
     _assert_identity()  # account gate
     ensure_bucket()     # idempotent, ledgered: the GPU job's userdata uploads result.json here
+    if job.get("kind") != "smoke":
+        # Re-render userdata with REAL presigned URLs (submit_job used placeholders for dry-run).
+        urls = _stage_and_presign(job, bucket)
+        job["userdata"] = _render_tool_userdata(job, urls, max_minutes)
     ami = _aws("ssm", "get-parameter", "--name", PUBLIC_AMI_SSM, "--query", "Parameter.Value")
     tag_spec = "ResourceType=instance,Tags=[" + ",".join(
         [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
@@ -271,19 +277,57 @@ def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
     return job
 
 
-def job_status(job_id: str) -> dict:
+def job_status(job_id: str, aws=None) -> dict:
+    """Poll a job. When the instance has terminated (the userdata's `shutdown -h now`), DOWNLOAD
+    result.json from S3, attach it, and set status='done' (Gap 3 — previously this never retrieved
+    the prediction). `aws` is injectable for offline tests."""
+    aws = aws or _aws
     p = _job_path(job_id)
     if not p.exists():
         return {"ok": False, "job_id": job_id, "status": "unknown"}
     job = json.loads(p.read_text())
-    if job.get("status") in ("dry-run-validated", "refused-budget", "done", "torn-down"):
+    if job.get("status") in ("dry-run-validated", "refused-budget", "done", "done-no-result", "torn-down"):
         return job
     iid = job.get("instance_id")
     if iid:
-        st = _aws("ec2", "describe-instances", "--instance-ids", iid,
-                  "--query", "Reservations[].Instances[].State.Name")
-        job["instance_state"] = (st[0] if st else None)
+        st = aws("ec2", "describe-instances", "--instance-ids", iid,
+                 "--query", "Reservations[].Instances[].State.Name")
+        state = (st[0] if st else None)
+        job["instance_state"] = state
+        if state in ("terminated", "shutting-down", "stopped"):
+            # finished → fetch the prediction the GPU box uploaded (presigned PUT → S3)
+            bucket = _bucket_name()
+            try:
+                raw = aws("s3", "cp", f"s3://{bucket}/{job_id}/result.json", "-", parse=False)
+                job["result"] = json.loads(raw)
+                job["status"] = "done"
+            except Exception as e:
+                job["status"] = "done-no-result"
+                job["note"] = f"instance {state} but no parseable result.json: {str(e)[:160]}"
     _write_job(job)
+    return job
+
+
+def wait_for(job_id: str, timeout: int = 3600, poll: int = 30, aws=None, sleep=None) -> dict:
+    """Block until the job is done (result retrieved) or `timeout` s elapse. On timeout, BELT:
+    safe_terminate the instance if it's somehow still alive (ledgered). `sleep`/`aws` injectable."""
+    sleep = sleep or time.sleep
+    waited = 0
+    while waited < timeout:
+        job = job_status(job_id, aws=aws)
+        if job.get("status") in ("done", "done-no-result", "torn-down", "timeout-torn-down"):
+            return job
+        sleep(poll)
+        waited += poll
+    job = job_status(job_id, aws=aws)
+    iid = job.get("instance_id")
+    if iid and job.get("instance_state") in ("running", "pending", "stopping", "stopped"):
+        try:
+            safe_terminate(iid)                       # ledgered belt — don't leak a running GPU box
+            job["status"] = "timeout-torn-down"
+            _write_job(job)
+        except SafetyRefusal:
+            pass
     return job
 
 
@@ -406,3 +450,34 @@ def _gpu_recipe(tool_id: str) -> dict:
     if r is None:
         raise SafetyRefusal(f"no GPU recipe for tool '{tool_id}' — refuse to launch an unwired eval.")
     return r
+
+
+def _stage_and_presign(job: dict, bucket: str, aws=None, presign=None) -> dict:
+    """LIVE: upload the recipe's code files + the built inputs JSON to s3://bucket/<job_id>/, then
+    return a presigned-URL dict (GET each + PUT result/progress.log) to inject into the userdata.
+    No instance IAM role needed (plan Gap-4 option b). `aws`/`presign` injectable for offline tests."""
+    aws = aws or _aws
+    presign = presign or _presign
+    recipe = _gpu_recipe(job["tool_id"])
+    jid = job["job_id"]
+    urls: dict = {}
+    for fn, local in recipe["code"].items():                    # stage code
+        key = f"{jid}/{fn}"
+        aws("s3", "cp", str(_REPO_ROOT / local), f"s3://{bucket}/{key}", parse=False)
+        urls[f"get:{fn}"] = presign(bucket, key, "get_object")
+    import tempfile                                              # stage inputs JSON
+    fd, tmp = tempfile.mkstemp(suffix=".json")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(_build_inputs(job))
+        ikey = f"{jid}/{recipe['inputs_name']}"
+        aws("s3", "cp", tmp, f"s3://{bucket}/{ikey}", parse=False)
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+    urls[f"get:{recipe['inputs_name']}"] = presign(bucket, ikey, "get_object")
+    urls[f"put:{recipe['result']}"] = presign(bucket, f"{jid}/{recipe['result']}", "put_object")
+    urls["put:progress.log"] = presign(bucket, f"{jid}/progress.log", "put_object")
+    return urls

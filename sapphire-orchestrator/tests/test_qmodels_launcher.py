@@ -137,6 +137,77 @@ class TestUserdataRender(unittest.TestCase):
             L._RUN_DIR, L._JOBS_DIR, L._LEDGER = prev
 
 
+class TestLifecycle(unittest.TestCase):
+    """Gap 3 — staging + S3 result retrieval + wait_for, all offline (injected aws/presign)."""
+
+    def setUp(self):
+        from pathlib import Path
+        self._tmp = tempfile.mkdtemp()
+        self._prev = (L._RUN_DIR, L._JOBS_DIR, L._LEDGER)
+        L._RUN_DIR, L._JOBS_DIR, L._LEDGER = (
+            Path(self._tmp), Path(self._tmp) / "jobs", Path(self._tmp) / "ledger.jsonl")
+
+    def tearDown(self):
+        L._RUN_DIR, L._JOBS_DIR, L._LEDGER = self._prev
+
+    def test_stage_and_presign_builds_full_url_set(self):
+        calls = []
+        aws = lambda *a, **k: calls.append(a) or {}
+        presign = lambda b, key, method="get_object", **k: f"https://{b}/{key}?sig=X&m={method}"
+        job = {"job_id": "sapphire-qmodels-tool-1", "tool_id": "boltz2",
+               "inputs": {"target_seq": "MK", "smiles": "CCO"}}
+        urls = L._stage_and_presign(job, "buck", aws=aws, presign=presign)
+        self.assertEqual(set(urls), {"get:boltz_runner.py", "get:complexes.json",
+                                     "put:results.json", "put:progress.log"})
+        cps = [a for a in calls if a[:2] == ("s3", "cp")]
+        self.assertGreaterEqual(len(cps), 2)              # code + inputs uploaded
+        self.assertIn("put_object", urls["put:results.json"])
+
+    def test_job_status_downloads_result_when_terminated(self):
+        from pathlib import Path
+        Path(L._JOBS_DIR).mkdir(parents=True, exist_ok=True)
+        L._write_job({"job_id": "j1", "status": "launched", "instance_id": "i-abc"})
+        result_json = json.dumps({"prob_binder": 0.81, "log_ic50": -6.2})
+
+        def aws(*a, **k):
+            if a[:2] == ("ec2", "describe-instances"):
+                return ["terminated"]
+            if a[:2] == ("s3", "cp"):
+                return result_json                        # parse=False path returns the body
+            return {}
+        job = L.job_status("j1", aws=aws)
+        self.assertEqual(job["status"], "done")
+        self.assertEqual(job["result"]["prob_binder"], 0.81)
+
+    def test_job_status_done_no_result_when_missing(self):
+        from pathlib import Path
+        Path(L._JOBS_DIR).mkdir(parents=True, exist_ok=True)
+        L._write_job({"job_id": "j2", "status": "launched", "instance_id": "i-xyz"})
+
+        def aws(*a, **k):
+            if a[:2] == ("ec2", "describe-instances"):
+                return ["terminated"]
+            if a[:2] == ("s3", "cp"):
+                raise RuntimeError("NoSuchKey")
+            return {}
+        job = L.job_status("j2", aws=aws)
+        self.assertEqual(job["status"], "done-no-result")   # honest: no fabricated prediction
+
+    def test_wait_for_returns_when_done(self):
+        from pathlib import Path
+        Path(L._JOBS_DIR).mkdir(parents=True, exist_ok=True)
+        L._write_job({"job_id": "j3", "status": "launched", "instance_id": "i-1"})
+
+        def aws(*a, **k):
+            if a[:2] == ("ec2", "describe-instances"):
+                return ["terminated"]
+            if a[:2] == ("s3", "cp"):
+                return json.dumps({"prob_binder": 0.5})
+            return {}
+        job = L.wait_for("j3", timeout=120, poll=1, aws=aws, sleep=lambda _s: None)
+        self.assertEqual(job["status"], "done")
+
+
 class TestPresign(unittest.TestCase):
     """Presigned URL generation (Gap 4b) — boto3 signs locally (no network), offline-safe."""
 
