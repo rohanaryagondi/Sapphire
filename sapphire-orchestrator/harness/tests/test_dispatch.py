@@ -68,6 +68,44 @@ class TestDispatch(unittest.TestCase):
         out = D.dispatch(c, {"n": 3}, ctx={"python_fns": {"step": lambda i: {"v": i["n"]}}})
         self.assertEqual(out["v"], 3)
 
+    # ── Opt-2 — batch-per-bucket dispatch ────────────────────────────────────
+    def test_batch_empty_items(self):
+        self.assertEqual(D.dispatch_claude_batch([]), {})
+
+    def test_batch_prompt_and_schema(self):
+        a = Contract(id="patent-ip", role="", kind="claude-subagent",
+                     output_schema={"type": "object", "properties": {"facts": {"type": "array"}}})
+        b = Contract(id="payer", role="", kind="claude-subagent", output_schema={"type": "object"})
+        items = [(a, {"candidate": "TSC2"}), (b, {"candidate": "TSC2"})]
+        prompt = D.build_batch_prompt(items)
+        self.assertTrue(prompt.startswith(D.SHARED_PREAMBLE))
+        self.assertIn("### AGENT: patent-ip", prompt)
+        self.assertIn("### AGENT: payer", prompt)
+        schema = D._batch_schema(items)
+        self.assertEqual(set(schema["required"]), {"patent-ip", "payer"})
+        self.assertIn("patent-ip", schema["properties"])
+
+    def test_batch_returns_per_agent_outputs(self):
+        a = Contract(id="patent-ip", role="", kind="claude-subagent", output_schema={"type": "object"})
+        b = Contract(id="payer", role="", kind="claude-subagent", output_schema={"type": "object"})
+        body = {"patent-ip": {"facts": [{"value": "x"}]}, "payer": {"facts": []}}
+        env = json.dumps({"structured_output": body})
+        out = D.dispatch_claude_batch([(a, {}), (b, {})], runner=fake_runner(env))
+        self.assertEqual(out["patent-ip"], {"facts": [{"value": "x"}]})
+        self.assertEqual(out["payer"], {"facts": []})
+
+    def test_batch_missing_agent_raises(self):
+        a = Contract(id="patent-ip", role="", kind="claude-subagent", output_schema={"type": "object"})
+        b = Contract(id="payer", role="", kind="claude-subagent", output_schema={"type": "object"})
+        env = json.dumps({"structured_output": {"patent-ip": {"facts": []}}})  # payer missing
+        with self.assertRaises(RuntimeError):
+            D.dispatch_claude_batch([(a, {}), (b, {})], runner=fake_runner(env))
+
+    def test_batch_nonzero_raises(self):
+        a = Contract(id="patent-ip", role="", kind="claude-subagent", output_schema={"type": "object"})
+        with self.assertRaises(RuntimeError):
+            D.dispatch_claude_batch([(a, {})], runner=fake_runner("", returncode=1, stderr="boom"))
+
     def test_dispatch_emet_without_handler_errors(self):
         c = Contract(id="emet-runner", role="", kind="emet-playwright")
         with self.assertRaises(RuntimeError):
@@ -111,6 +149,48 @@ class TestDispatch(unittest.TestCase):
         argv = captured[0]
         self.assertIn("--model", argv)
         self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
+
+    # ── Opt-1 — cache-friendly context flags + shared preamble ───────────────
+    def test_build_prompt_starts_with_shared_preamble(self):
+        c = Contract(id="x", role="", kind="claude-subagent", spec=None)
+        p = D.build_prompt(c, {"gene": "SCN11A"})
+        self.assertTrue(p.startswith(D.SHARED_PREAMBLE))   # identical + FIRST → cache reuse
+        self.assertIn("SCN11A", p)                         # inputs still present
+
+    def test_context_flags_on_by_default(self):
+        prev = os.environ.pop("SAPPHIRE_DISPATCH_FULL_CONTEXT", None)
+        try:
+            flags = D._context_flags()
+        finally:
+            if prev is not None:
+                os.environ["SAPPHIRE_DISPATCH_FULL_CONTEXT"] = prev
+        self.assertIn("--setting-sources", flags)
+        self.assertIn("user", flags)
+        self.assertIn("--exclude-dynamic-system-prompt-sections", flags)
+
+    def test_context_flags_opt_out(self):
+        prev = os.environ.get("SAPPHIRE_DISPATCH_FULL_CONTEXT")
+        os.environ["SAPPHIRE_DISPATCH_FULL_CONTEXT"] = "1"
+        try:
+            self.assertEqual(D._context_flags(), [])
+        finally:
+            if prev is None:
+                os.environ.pop("SAPPHIRE_DISPATCH_FULL_CONTEXT", None)
+            else:
+                os.environ["SAPPHIRE_DISPATCH_FULL_CONTEXT"] = prev
+
+    def test_dispatch_claude_includes_context_flags(self):
+        c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
+        env = json.dumps({"structured_output": {"ok": True}})
+        captured = []
+        prev = os.environ.pop("SAPPHIRE_DISPATCH_FULL_CONTEXT", None)
+        try:
+            D.dispatch_claude(c, {"q": 1}, runner=capturing_runner(captured, env))
+        finally:
+            if prev is not None:
+                os.environ["SAPPHIRE_DISPATCH_FULL_CONTEXT"] = prev
+        self.assertIn("--setting-sources", captured[0])
+        self.assertIn("--exclude-dynamic-system-prompt-sections", captured[0])
 
     def test_dispatch_claude_no_model_when_env_unset(self):
         c = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})

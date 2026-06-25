@@ -48,7 +48,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+### [OPEN] dispatch-optimization Opt-3: warm stream-json worker needs a per-turn context reset the `-p` CLI doesn't expose  ·  from: rohan  ·  date: 2026-06-25  ·  branch: rohan/dispatch-optimization
+**Blocking?** no — Opt-1 (cache-stable prefix, drop CLAUDE.md) + Opt-2 (batch-per-bucket, flagged) ship now and capture most of the win; this is the design call for the bigger Opt-3.
+**Context:** Opt-3 wants ONE long-lived `claude` process reused across the ~16 agents (warm *process*, cold *conversation*) to kill the cold-boot latencies. **Spike (CLI 2.1.190, measured):** `--input-format stream-json --output-format stream-json --verbose` IS supported (one JSON message → `system/assistant/result`). **But** one `-p` invocation is **one conversation** — feeding agent N after agent N-1 makes turn N see turn N-1, so context *accumulates* → ADDS tokens (the anti-pattern the brief warns against: "a warm worker that bloats context is worse than cold -p"). `-p` exposes **no per-turn context-reset/`/clear` control**.
+**Question:** sanctioned mechanism for warm-process + per-agent-reset? **(a)** the **Agent SDK** (`claude_agent_sdk` / `@anthropic-ai/claude-agent-sdk`) — a session with an explicit reset/new-conversation per agent (clean, but a non-stdlib dep that must live OUTSIDE the engine, e.g. a `harness/worker/` subprocess seam like aso-tox); **(b)** a stream-json control message that resets (none found); **(c)** warm-process-only, re-send each agent's prompt, measure whether the boot-latency saving beats the re-sent input-token cost.
+**What I tried / read:** `claude --help` (2.1.190) — stream-json + `--exclude-dynamic-system-prompt-sections` + `--setting-sources` confirmed; no reset control for `-p` stream-json. Per-call baseline in `dev/reports/rohan/dispatch-optimization-report.md` (Opt-1 already → cache_creation 0 on warm calls + drops ~5k CLAUDE.md/agent).
+**My current best guess:** ship Opt-1 + Opt-2 now (done); implement Opt-3 later via the **Agent SDK seam (a)** behind `dispatch_claude` with a **cold `claude -p` fallback on any worker error** — but only if a measured boot-latency win justifies the dep/lifecycle complexity. Until then Opt-3 stays this design note, not a fragile impl (per the brief). Non-blocking.
+**Answer (lead fills):** —
 
 ---
 

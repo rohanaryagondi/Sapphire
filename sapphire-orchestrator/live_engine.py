@@ -148,6 +148,32 @@ def _wire_emet_handler(ctx: dict) -> None:
         ctx["emet_handler"] = make_emet_handler()
 
 
+def _batch_bucket1(known_ids, bucket1_inputs, ctx, registry) -> dict:
+    """Opt-2: batch the corpus-less claude-subagent Bucket-1 agents into ONE claude call
+    (~6 boots → 1). Returns `{agent_id: output}`; `{}` on ANY failure → the caller falls back to
+    per-agent dispatch (honest cold-fallback, never a guessed result). Corpus agents and
+    python/qmodels/emet agents are intentionally excluded (their inputs/paths differ)."""
+    from harness.contracts import resolve
+    from harness.dispatch import dispatch_claude_batch
+    items = []
+    for aid in _BUCKET1_AGENTS:
+        if aid not in known_ids or has_corpus(aid):
+            continue
+        try:
+            contract = resolve(aid, registry)
+        except KeyError:
+            continue
+        if contract.kind != "claude-subagent":
+            continue
+        items.append((contract, bucket1_inputs))
+    if not items:
+        return {}
+    try:
+        return dispatch_claude_batch(items, runner=ctx.get("runner"))
+    except Exception:
+        return {}
+
+
 def _build_moat_agent():
     """Return the real moat backend closure."""
     def _moat_agent(inputs: dict) -> dict:
@@ -290,6 +316,16 @@ def run_live(
         "sequences": resolved_sequences,
     }
 
+    # Opt-2 (dispatch-optimization): optionally batch the corpus-less claude-subagent Bucket-1
+    # agents into ONE claude call. Opt-in via ctx["batch_buckets"]; on ANY failure we fall back to
+    # per-agent dispatch. Each batched output still flows through the FULL per-agent harness path
+    # (validation + guardrails + provenance stamp + trace) via dispatch_fn below — only the
+    # generation transport changes; guards/provenance/schemas are unaffected.
+    batched_outputs: dict = (
+        _batch_bucket1(known_ids, bucket1_inputs, ctx, registry)
+        if ctx.get("batch_buckets") else {}
+    )
+
     for agent_id in _BUCKET1_AGENTS:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
@@ -307,12 +343,21 @@ def run_live(
             if corpus_cards else bucket1_inputs
         )
 
+        # If this agent was answered in the Opt-2 batch, feed its output through the SAME harness
+        # path via dispatch_fn (validation/guards/provenance/trace run unchanged). Else dispatch
+        # normally (the per-agent, per-kind backend).
+        disp_fn = None
+        if agent_id in batched_outputs:
+            _o = batched_outputs[agent_id]
+            disp_fn = lambda contract, inputs, ctx, _o=_o: _o  # noqa: E731
+
         res = harness.run(
             agent_id,
             agent_inputs,
             engagement_id=eid,
             ctx=ctx,
             registry=registry,
+            dispatch_fn=disp_fn,
         )
 
         agent_statuses.append({

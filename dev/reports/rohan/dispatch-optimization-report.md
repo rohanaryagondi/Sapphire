@@ -69,4 +69,33 @@ boots are slow) but makes a single end-to-end wall-clock impractical/noisy. The 
   per-agent context; a warm worker that accumulates turns is worse than cold `-p`). Raised in
   `dev/HELP.md` for the SDK/session-API path.
 
-*(Opt deltas filled in as each lands.)*
+## Measured deltas
+
+### Opt-1 — drop CLAUDE.md + cache-stable prefix (SHIPPED, default-on)
+`build_prompt` now leads with a stable `SHARED_PREAMBLE` (identical across agents → cache-reusable
+user prefix); `dispatch_claude` appends `--setting-sources user --exclude-dynamic-system-prompt-sections`
+(opt out with `SAPPHIRE_DISPATCH_FULL_CONTEXT=1`).
+- **CLAUDE.md dropped: ~5,164 tok/agent** (measured: baseline cache_creation 14,460 → 9,296).
+- **Warm-call cache_creation → 0** (stable prefix; vs baseline 14,460 *every* call).
+- **Per-run system-prefix cost (16 agents): ~315,600 → ~48,000 base-equiv ≈ −85%** (projection from the
+  per-call table; cache_creation≈1.25×, cache_read≈0.1×).
+- **Live-verified:** a real `dispatch_claude` call (haiku, flags on) returned valid structured output
+  in **8.4 s** — outputs unchanged, no regression.
+
+### Opt-2 — batch-per-bucket (SHIPPED, opt-in `ctx["batch_buckets"]`)
+`dispatch_claude_batch(items)` = ONE `claude` call for the **6 corpus-less claude-subagent Bucket-1
+agents** (patent-ip, global-regulatory-divergence, clinical-trial-registry, post-market-safety, payer,
+financial) → `{id: output}`; each output flows through the **unchanged** per-agent harness path
+(validate + guardrails + provenance + trace) via `dispatch_fn`. On ANY batch failure → honest
+per-agent fallback (tested). Corpus / python / qmodels / emet agents stay per-agent.
+- **6 cold boots → 1** for that bucket; the ~24k cache-stable system prefix is paid **once**, not 6×
+  (projected ≈ 5 × 24k ≈ **120k cache-read tokens saved** + 5 fewer boots/run, on top of Opt-1).
+- **Tradeoff (documented, why it's opt-in):** the 6 specs share one generation context, so the *model
+  output* may differ from isolated per-agent runs — guards/provenance/schemas are identical, but the
+  text isn't byte-guaranteed; hence flagged, default-off. *(A live 1-call-vs-6 measurement is
+  reproducible via the per-call harness; not re-run here to avoid burning tokens overnight.)*
+
+### Opt-3 — warm worker → **design note** (`dev/HELP.md`)
+Spike showed `-p` stream-json has no per-turn context reset → a warm worker would accumulate turns
+(worse than cold). Deferred to the Agent-SDK seam with cold-fallback; written up rather than shipped
+fragile, per the brief.

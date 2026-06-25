@@ -1400,6 +1400,82 @@ class TestDataBoundaryAdversarial(unittest.TestCase):
         self.assertEqual(viols[0].guardrail, "data_boundary")
 
 
+def _batch_aware_runner(cmd):
+    """A fake claude runner that handles BOTH the Opt-2 batch prompt and single-agent prompts.
+    For a batch prompt it returns one object keyed by each `### AGENT: <id>` block."""
+    import re
+    prompt = ""
+    for i, tok in enumerate(cmd):
+        if tok == "-p" and i + 1 < len(cmd):
+            prompt = cmd[i + 1]
+            break
+    if "MULTIPLE specialist agents" in prompt:
+        ids = re.findall(r"### AGENT: (\S+)", prompt)
+        body = {aid: {"candidate": "X",
+                      "facts": [{"value": f"batched {aid} fact", "source": "PMID:7", "tier": "T2"}],
+                      "provenance": "semantic-web"}
+                for aid in ids}
+        return types.SimpleNamespace(stdout=json.dumps({"structured_output": body}),
+                                     returncode=0, stderr="")
+    return _fake_claude_runner(cmd)
+
+
+class TestBatchBucket1(unittest.TestCase):
+    """Opt-2 — batched Bucket-1 dispatch produces the same per-agent guarded/stamped facts."""
+
+    def setUp(self):
+        self._eng = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_batched_agents_land_facts_and_are_stamped(self):
+        ctx = _build_ctx()
+        ctx["runner"] = _batch_aware_runner
+        ctx["batch_buckets"] = True
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
+        agents = {a["id"]: a for a in result["discover"]["agents"]}
+        # A batched corpus-less claude-subagent agent fired ok with its provenance stamped.
+        self.assertEqual(agents.get("patent-ip", {}).get("status"), "ok")
+        batched_facts = [f for f in result["discover"]["dossier"]
+                         if "batched" in f.get("value", "")]
+        self.assertTrue(batched_facts, "batched agents' facts must reach the dossier")
+        # provenance is stamped exactly as the per-agent path would (external plane).
+        self.assertTrue(all(f.get("provenance") for f in batched_facts))
+
+    def test_batch_failure_falls_back_to_per_agent(self):
+        # A batch runner that errors → run_live still completes via per-agent dispatch.
+        def _broken_batch(cmd):
+            prompt = next((cmd[i + 1] for i, t in enumerate(cmd) if t == "-p"), "")
+            if "MULTIPLE specialist agents" in prompt:
+                return types.SimpleNamespace(stdout="", returncode=1, stderr="batch boom")
+            return _fake_claude_runner(cmd)
+        ctx = _build_ctx()
+        ctx["runner"] = _broken_batch
+        ctx["batch_buckets"] = True
+        result = run_live("Is TSC2 a viable target?", ctx=ctx)
+        agents = {a["id"]: a for a in result["discover"]["agents"]}
+        # patent-ip still answered (per-agent fallback via the single-agent fake runner).
+        self.assertEqual(agents.get("patent-ip", {}).get("status"), "ok")
+
+    def test_default_path_does_not_batch(self):
+        # Without the flag, _batch_bucket1 is never consulted (no batch prompt issued).
+        seen = {"batch": False}
+
+        def _watch(cmd):
+            prompt = next((cmd[i + 1] for i, t in enumerate(cmd) if t == "-p"), "")
+            if "MULTIPLE specialist agents" in prompt:
+                seen["batch"] = True
+            return _fake_claude_runner(cmd)
+        ctx = _build_ctx()
+        ctx["runner"] = _watch
+        run_live("Is TSC2 a viable target?", ctx=ctx)  # no batch_buckets
+        self.assertFalse(seen["batch"])
+
+
 class TestEmetHandlerWiring(unittest.TestCase):
     """W1 — run_live registers a live EMET handler on ctx=None (lazy, setdefault)."""
 
