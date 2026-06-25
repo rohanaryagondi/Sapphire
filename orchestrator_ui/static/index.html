@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire Orchestrator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='%23a07cff'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.28'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── NAV ───────────────────────────────────────────────────── -->
+  <header class="nav">
+    <div class="nav-group">
+      <button class="toggle-btn" id="leftToggle" aria-pressed="true" aria-label="Toggle the Orchestrator Trace panel">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+          <rect x="8" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+        </svg>
+        Orchestrator Trace
+      </button>
+    </div>
+
+    <a class="brand" href="#" title="Sapphire Orchestrator — LLM-driven CNS decision agent">
+      <svg class="brand-mark" width="17" height="17" viewBox="0 0 32 32" aria-hidden="true">
+        <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
+        <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+      </svg>
+      Sapphire Orchestrator
+    </a>
+
+    <div class="nav-group right">
+      <div class="live-badge" id="liveBadge"><span class="live-dot"></span><span id="liveLabel">Ready</span></div>
+      <button class="toggle-btn" id="rightToggle" aria-pressed="true" aria-label="Toggle the Plan &amp; Results panel">
+        Plan &amp; Results
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+          <rect x="9" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── WORKSPACE (3-pane) ───────────────────────────────────── -->
+  <div class="workspace">
+
+    <!-- LEFT PANE — Orchestrator Trace: live tool calls + reasoning -->
+    <aside class="panel left open" id="leftPanel" role="complementary" aria-label="Orchestrator Trace">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <span>Orchestrator Trace</span>
+          <span class="head-sub" id="traceStatus">idle</span>
+        </div>
+        <div class="panel-scroll" id="traceList">
+          <div class="hint">Tool calls and reasoning stream here as the LLM orchestrator works —
+            moat queries, EMET lookups, and step-by-step scientific reasoning in real time.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER — the main content: query input + results -->
+    <main class="chat-col" id="chatCol">
+      <div class="thread" id="thread">
+        <div class="thread-inner" id="threadInner">
+
+          <div class="empty" id="emptyState">
+            <svg class="empty-mark" width="42" height="42" viewBox="0 0 32 32" aria-hidden="true">
+              <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
+              <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+            </svg>
+            <div class="empty-heading">Ask the Orchestrator</div>
+            <div class="empty-sub">A <code style="font-size:12px;color:var(--purple)">claude -p</code> agent
+              decides the flow, queries the Quiver moat and EMET, reasons as the scientific team,
+              and returns a cited ranked answer — live.</div>
+          </div>
+
+          <!-- Results area (hidden until a run completes) -->
+          <div id="resultsArea" style="display:none">
+            <!-- Plan steps -->
+            <div id="planSteps"></div>
+            <!-- Ranked genes table -->
+            <div id="rankedGenes"></div>
+            <!-- Synthesis callout -->
+            <div id="synthesis"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="inputbar">
+        <div class="inputbar-inner">
+          <div class="suggestions" id="suggestions">
+            <button class="sug" data-q="Rank genes that rescue the TSC2-K/O phenotype based on Quiver data and supporting evidence">★ Rank TSC2-K/O rescue genes</button>
+            <button class="sug" data-q="Is TSC2 a viable target in tuberous sclerosis?">TSC2 in tuberous sclerosis</button>
+            <button class="sug" data-q="Nav1.8 pain targets — worth prioritizing?">Nav1.8 pain targets</button>
+            <button class="sug" data-q="What are the top rescue genes for TSC2 knockout based on Quiver internal EP-signature data?">TSC2 moat-first ranking</button>
+          </div>
+          <div class="input-wrap">
+            <textarea class="chat-input" id="chatInput" rows="1"
+              placeholder="Ask a CNS question — the LLM orchestrator calls tools and reasons live…"></textarea>
+            <button class="send" id="sendBtn" aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 13V3M4 7L8 3L12 7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="legend" id="legend">
+            <span class="lg"><span class="dot real"></span>moat-real</span>
+            <span class="lg"><span class="dot cap"></span>emet-live</span>
+            <span class="lg sep">LLM orchestrator: decides tool calls, reasons as the scientific team, cites real PMIDs</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANE — Plan & Results summary -->
+    <aside class="panel right open" id="rightPanel" role="complementary" aria-label="Plan and Results">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <span>Plan &amp; Results</span>
+          <span class="head-sub" id="rightStatus">idle</span>
+        </div>
+        <div class="panel-scroll" id="rightScroll">
+          <div class="hint" id="rightHint">The orchestrator's plan and ranked results appear here
+            once the run completes.</div>
+          <div id="rightPlan"></div>
+          <div id="rightGeneList"></div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
