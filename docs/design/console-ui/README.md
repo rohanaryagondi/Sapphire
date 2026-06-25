@@ -1,5 +1,10 @@
 # Sapphire Console — UI/UX design
 
+> **Gavin (UI lead): this directory IS the full showcase served at :8090.** Run
+> `python3 -m http.server 8090 --directory docs/design/console-ui` then open `index.html` to switch
+> between all four designs. Review everything here; the **★ LOKA-native console** (`sapphire_loka.html`)
+> is the direction to refine.
+
 > **⚠ INTERNAL ONLY.** These mockups embed **real internal TSC2 moat values** (the `moat-real`
 > signatures, consistent with the committed `sapphire-orchestrator/scenarios/tsc2_live_run.json`
 > scenario). They are design artifacts for the team — do **not** publish, screenshot for external
@@ -124,3 +129,14 @@ recolored to `--primary`); the favicon is an inline `data:` URI. The only networ
 Google Fonts CDN for **Inter** (the app's typeface), which degrades gracefully to `system-ui`. No
 images or other assets are committed here (Gate-3 blocks committed binaries; the real `logo_dark.png`
 already lives at `frontend/public/`).
+
+## The source data — `demo_data.json`
+
+`demo_data.json` is the **real TSC2 source data the mockups render** — the same `moat-real` run the
+INTERNAL-ONLY header refers to, captured from the committed TSC2 engagement (text JSON, no binaries).
+It holds the **query** (*Is TSC2 a viable target in tuberous sclerosis?*), the **8-stage plan**, the
+**8 internal moat facts** (Internal Vault), the **18 external evidence entries** (incl. the **EMET
+PMID**-cited facts), the **5 persona** round-1 verdicts (Denali CSO · BioMarin BD · Third Rock GP ·
+Takeda ex-FDA SVP · Adversarial Red-Team), the **3 DIVERGENCE** flags (internal↔external, surfaced not
+reconciled), and the **synthesis** (recommendation · confidence · proposed experiment · entities). The
+values inlined in the four HTMLs are drawn from this file — keep them consistent if you re-capture.

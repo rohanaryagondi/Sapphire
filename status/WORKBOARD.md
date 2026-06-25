@@ -74,6 +74,9 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 > aesthetic); **do NOT modify `frontend/`** (the fold-in is a later task, only when Gavin signals ready). Keep it
 > binary-free + self-contained; preserve the honesty markers; real TSC2 data is **internal-only**. Branch
 > `gavin/console-ui-design-refinement` from latest `main`; ship via PR (Head Claude reviews/merges). Blocked? `dev/HELP.md`.
+> The **COMPLETE showcase** (★ LOKA-native + the 3 explorations + the `index.html` switcher + `demo_data.json` + README)
+> is in [`docs/design/console-ui/`](../docs/design/console-ui/README.md) — serve it (`python3 -m http.server 8090 --directory docs/design/console-ui`)
+> and open `index.html` for the exact `:8090` UI.
 >
 > **Gavin — first corpus ✅ merged (#30); now batch the remaining 5.** The method is proven end-to-end (your
 > dual-source build passed the gate + content audit clean). Keep the watcher running
