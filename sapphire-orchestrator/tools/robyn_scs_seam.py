@@ -69,6 +69,13 @@ def findings(inputs: dict, *, runner=None) -> dict:
                            "source": "robyn_scs pipeline", "tier": "T3", "flag": "KNOWN_UNKNOWN"}]}
 
     s = resp.get("summary", {}) or {}
+    # Defensive honesty guard (belt-and-suspenders for the endpoint's own empty-plate check):
+    # zero FOVs/quartets means the pipeline never ran on real data — abstain (KNOWN_UNKNOWN)
+    # rather than emit a confidence-inflating "0 connections across 0 FOVs" T2 success fact.
+    if not s.get("n_fovs") and not s.get("n_quartets"):
+        return {"candidate": candidate, "provenance": PROVENANCE,
+                "facts": [{"value": "robyn_scs: no FOV quartets in input — pipeline did not run",
+                           "source": "robyn_scs pipeline", "tier": "T3", "flag": "KNOWN_UNKNOWN"}]}
     tiers = ", ".join(f"{k}:{v}" for k, v in (s.get("tiers") or {}).items())
     facts = [{
         "value": (f"robyn_scs connectivity: {s.get('n_connections', 0)} tiered connection(s) across "

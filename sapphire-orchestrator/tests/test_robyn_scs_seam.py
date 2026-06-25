@@ -73,6 +73,19 @@ class TestRobynScsSeam(unittest.TestCase):
         self.assertTrue(is_valid_provenance("robyn-scs"))
         self.assertEqual(plane_for("robyn-scs"), "internal")  # imaging-derived internal data
 
+    def test_empty_plate_real_subprocess_does_not_fabricate(self):
+        # NON-mocked: exercises the real _default_runner → firm_endpoint.py on an EMPTY plate dir.
+        # Whether the heavy deps import or not, the honest outcome is the same: NO fabricated
+        # "0 connections" success fact — either honest-empty or a KNOWN_UNKNOWN. (Gate-5 defect repro.)
+        with tempfile.TemporaryDirectory() as d:
+            out = seam.findings({"candidate": "X", "robyn_scs": {"input_dir": d}})
+        facts = out["facts"]
+        if facts:
+            self.assertEqual(facts[0].get("flag"), "KNOWN_UNKNOWN")
+            self.assertNotIn("tiered connection", facts[0]["value"])  # never a success fact
+        else:
+            self.assertEqual(facts, [])
+
 
 class TestRobynScsThroughRunLive(unittest.TestCase):
     """The robyn-scs agent is registered + fires honest-empty in a standard (no-imaging) run."""

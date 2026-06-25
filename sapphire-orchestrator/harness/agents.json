@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "title": "Sapphire agent registry \u2014 the contracts the harness enforces",
+    "title": "Sapphire agent registry — the contracts the harness enforces",
     "purpose": "One entry per callable agent. 'spec' points to the architecture/*.md (reasoning); the rest is the machine envelope the harness checks. Mirrors qmodels/registry.json.",
     "honesty": "provenance + guardrails are enforced mechanically, not by trust."
   },
@@ -8,1090 +8,500 @@
     "verdict": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "persona",
-        "stance",
-        "conviction",
-        "rationale",
-        "fact_claims"
-      ],
+      "required": ["persona", "stance", "conviction", "rationale", "fact_claims"],
       "properties": {
-        "persona": {
-          "type": "string"
-        },
-        "stance": {
-          "type": "string",
-          "enum": [
-            "pass",
-            "conditional",
-            "hold",
-            "no_go"
-          ]
-        },
-        "conviction": {
-          "type": "integer"
-        },
-        "rationale": {
-          "type": "string"
-        },
-        "top_risk": {
-          "type": "string"
-        },
-        "ask": {
-          "type": "string"
-        },
-        "fact_claims": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "claim",
-              "cite"
-            ],
-            "properties": {
-              "claim": {
-                "type": "string"
-              },
-              "cite": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "fact_requests": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "provenance": {
-          "type": "string"
-        }
+        "persona": {"type": "string"},
+        "stance": {"type": "string", "enum": ["pass", "conditional", "hold", "no_go"]},
+        "conviction": {"type": "integer"},
+        "rationale": {"type": "string"},
+        "top_risk": {"type": "string"},
+        "ask": {"type": "string"},
+        "fact_claims": {"type": "array", "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["claim", "cite"],
+          "properties": {"claim": {"type": "string"}, "cite": {"type": "string"}}
+        }},
+        "fact_requests": {"type": "array", "items": {"type": "string"}},
+        "provenance": {"type": "string"}
       }
     },
     "findings": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "candidate",
-        "facts"
-      ],
+      "required": ["candidate", "facts"],
       "properties": {
-        "candidate": {
-          "type": "string"
-        },
-        "facts": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": [
-              "value",
-              "source",
-              "tier"
-            ],
-            "properties": {
-              "value": {
-                "type": "string"
-              },
-              "source": {
-                "type": "string"
-              },
-              "tier": {
-                "type": "string",
-                "enum": [
-                  "T1",
-                  "T2",
-                  "T3",
-                  "T4"
-                ]
-              },
-              "flag": {
-                "type": "string",
-                "enum": [
-                  "VETO",
-                  "DIVERGENCE",
-                  "KNOWN_UNKNOWN"
-                ]
-              },
-              "provenance": {
-                "type": "string"
-              }
-            }
+        "candidate": {"type": "string"},
+        "facts": {"type": "array", "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "source", "tier"],
+          "properties": {
+            "value": {"type": "string"},
+            "source": {"type": "string"},
+            "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+            "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+            "provenance": {"type": "string"}
           }
-        },
-        "provenance": {
-          "type": "string"
-        }
+        }},
+        "provenance": {"type": "string"}
       }
     }
   },
   "agents": [
     {
       "id": "company-partner",
-      "role": "Bucket2 persona \u2014 verdict on the dossier through a company mandate",
+      "role": "Bucket2 persona — verdict on the dossier through a company mandate",
       "spec": "architecture/bucket2/company-partner-template.md",
       "kind": "claude-subagent",
       "param": "persona_file",
-      "output_schema": {
-        "$ref": "#/schemas/verdict"
-      },
+      "output_schema": {"$ref": "#/schemas/verdict"},
       "tools_allowed": [],
-      "guardrails": [
-        "must_cite_dossier",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "fda-institutional-memory",
-      "role": "Bucket1 semantic veto-class \u2014 FDA precedent + dispositive veto",
+      "role": "Bucket1 semantic veto-class — FDA precedent + dispositive veto",
       "spec": "architecture/bucket1/semantic/fda-institutional-memory.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "fda-primary",
       "veto_class": true,
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "emet-runner",
-      "role": "EMET (BenchSci) driver via Playwright \u2014 the single door to the BEKG",
+      "role": "EMET (BenchSci) driver via Playwright — the single door to the BEKG",
       "spec": "architecture/bucket1/scientific/emet-analyst.md",
       "kind": "emet-playwright",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "mcp__playwright"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "public_identifiers_only",
-        "facts_only_cited",
-        "emet_tab_discipline",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["mcp__playwright"],
+      "guardrails": ["data_boundary", "public_identifiers_only", "facts_only_cited", "emet_tab_discipline", "stamp_provenance"],
       "provenance_label": "emet-live",
       "timeout_s": 300,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "escalate"
-      }
+      "retry": {"max_repair": 1, "on_hard_fail": "escalate"}
     },
     {
       "id": "q-models-runner",
-      "role": "Bucket1 \u2014 runs a Q-Models tool on a named pair (delegates to QModelsClient)",
+      "role": "Bucket1 — runs a Q-Models tool on a named pair (delegates to QModelsClient)",
       "spec": "architecture/bucket1/scientific/q-models-runner.md",
       "kind": "qmodels-delegate",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "qmodels"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "public_identifiers_only",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["qmodels"],
+      "guardrails": ["data_boundary", "public_identifiers_only", "stamp_provenance"],
       "provenance_label": "qmodels",
       "timeout_s": 60,
-      "retry": {
-        "max_repair": 0,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 0, "on_hard_fail": "abstain"}
     },
     {
       "id": "internal-science-lead",
-      "role": "Owns Quiver's internal EP/CRISPR moat \u2014 turns a question into an internal hypothesis, decides what needs external validation, and flags where the moat disagrees with the world",
+      "role": "Owns Quiver's internal EP/CRISPR moat — turns a question into an internal hypothesis, decides what needs external validation, and flags where the moat disagrees with the world",
       "spec": "architecture/bucket1/scientific/internal-science-lead.md",
       "kind": "python",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
+      "output_schema": {"$ref": "#/schemas/findings"},
       "tools_allowed": [],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "moat-real",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "patent-ip",
-      "role": "Freedom-to-operate and patentability analyst \u2014 maps the patent landscape and raises a dispositive veto when a blocking in-force patent stands between the program and market",
+      "role": "Freedom-to-operate and patentability analyst — maps the patent landscape and raises a dispositive veto when a blocking in-force patent stands between the program and market",
       "spec": "architecture/bucket1/semantic/patent-ip.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "veto_class": true,
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "global-regulatory-divergence",
-      "role": "Maps what regulators outside the FDA have decided about the same target / mechanism / class \u2014 approvals FDA hasn't granted, evidence packages FDA hasn't accepted, safety signals FDA hasn't acted on",
+      "role": "Maps what regulators outside the FDA have decided about the same target / mechanism / class — approvals FDA hasn't granted, evidence packages FDA hasn't accepted, safety signals FDA hasn't acted on",
       "spec": "architecture/bucket1/semantic/global-regulatory-divergence.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "dea-scheduling",
-      "role": "Determines the controlled-substance status and scheduling trajectory of the compound / class \u2014 because a Schedule I/II designation reshapes the trial path, manufacturing, prescribing, and commercial potential",
+      "role": "Determines the controlled-substance status and scheduling trajectory of the compound / class — because a Schedule I/II designation reshapes the trial path, manufacturing, prescribing, and commercial potential",
       "spec": "architecture/bucket1/semantic/dea-scheduling.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "clinical-trial-registry",
-      "role": "Reads the trial registry as an intelligence analyst \u2014 protocol amendments, enrollment health, posted adverse-event tables, and termination timing are signals about competitive and clinical risk",
+      "role": "Reads the trial registry as an intelligence analyst — protocol amendments, enrollment health, posted adverse-event tables, and termination timing are signals about competitive and clinical risk",
       "spec": "architecture/bucket1/semantic/clinical-trial-registry.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "post-market-safety",
-      "role": "Class-level safety intelligence officer \u2014 reads the real-world adverse-event record of every approved drug sharing the mechanism, target, or structural class with the candidate",
+      "role": "Class-level safety intelligence officer — reads the real-world adverse-event record of every approved drug sharing the mechanism, target, or structural class with the candidate",
       "spec": "architecture/bucket1/semantic/post-market-safety.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "financial",
-      "role": "Reads the investor record of public companies in the space \u2014 SEC filings, earnings transcripts, and deal-term structures that encode how both buy-side and sell-side price the asset class",
+      "role": "Reads the investor record of public companies in the space — SEC filings, earnings transcripts, and deal-term structures that encode how both buy-side and sell-side price the asset class",
       "spec": "architecture/bucket1/semantic/financial-investor.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "payer",
-      "role": "Answers the commercial question discovery teams defer too long \u2014 will payers cover this, and at what price? Regulatory approval and commercial success are not the same event",
+      "role": "Answers the commercial question discovery teams defer too long — will payers cover this, and at what price? Regulatory approval and commercial success are not the same event",
       "spec": "architecture/bucket1/semantic/payer-market-access.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "manufacturing-cmc",
-      "role": "Asks the manufacturing question before anyone else does \u2014 can this be made consistently at commercial scale, by a qualified facility? A program with no viable CMC path is not a program",
+      "role": "Asks the manufacturing question before anyone else does — can this be made consistently at commercial scale, by a qualified facility? A program with no viable CMC path is not a program",
       "spec": "architecture/bucket1/semantic/manufacturing-cmc.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "patient-advocacy",
-      "role": "Treats patient communities as strategic stakeholders \u2014 organized advocacy shapes FDA's benefit-risk framing, drives trial recruitment, applies congressional pressure, and affects payer coverage",
+      "role": "Treats patient communities as strategic stakeholders — organized advocacy shapes FDA's benefit-risk framing, drives trial recruitment, applies congressional pressure, and affects payer coverage",
       "spec": "architecture/bucket1/semantic/patient-advocacy.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "kol-social",
-      "role": "Reads the informal scientific discourse \u2014 what researchers and analysts say before they publish, including social signals that precede formal publication by months",
+      "role": "Reads the informal scientific discourse — what researchers and analysts say before they publish, including social signals that precede formal publication by months",
       "spec": "architecture/bucket1/semantic/kol-social-signal.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "policy-legislative",
-      "role": "Reads the legislative and political environment governing what FDA can do, what DEA will do, and what drugs will cost \u2014 for power signals, not just policy content",
+      "role": "Reads the legislative and political environment governing what FDA can do, what DEA will do, and what drugs will cost — for power signals, not just policy content",
       "spec": "architecture/bucket1/semantic/policy-legislative.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "reputational",
-      "role": "Reads how the program, its sponsor, and its mechanism are perceived by press, institutions, and the scientific establishment \u2014 because reputational headwinds affect FDA relationships, partnership interest, and payer posture",
+      "role": "Reads how the program, its sponsor, and its mechanism are perceived by press, institutions, and the scientific establishment — because reputational headwinds affect FDA relationships, partnership interest, and payer posture",
       "spec": "architecture/bucket1/semantic/reputational-institutional.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/findings"
-      },
-      "tools_allowed": [
-        "WebSearch",
-        "WebFetch"
-      ],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "output_schema": {"$ref": "#/schemas/findings"},
+      "tools_allowed": ["WebSearch", "WebFetch"],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "semantic-web",
       "timeout_s": 180,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "ex-fda-regulator",
-      "role": "A former FDA neurology/psychiatry division reviewer who predicts the agency's stance on the program \u2014 endpoints, trial design, safety bar, approvability",
+      "role": "A former FDA neurology/psychiatry division reviewer who predicts the agency's stance on the program — endpoints, trial design, safety bar, approvability",
       "spec": "architecture/bucket2/institutional/ex-fda-regulator.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/verdict"
-      },
+      "output_schema": {"$ref": "#/schemas/verdict"},
       "tools_allowed": [],
-      "guardrails": [
-        "must_cite_dossier",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "adversarial-red-team",
-      "role": "The professional skeptic \u2014 a short-seller / kill-the-deal diligence mind whose only job is to build the strongest honest case that this program fails",
+      "role": "The professional skeptic — a short-seller / kill-the-deal diligence mind whose only job is to build the strongest honest case that this program fails",
       "spec": "architecture/bucket2/institutional/adversarial-red-team.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/verdict"
-      },
+      "output_schema": {"$ref": "#/schemas/verdict"},
       "tools_allowed": [],
-      "guardrails": [
-        "must_cite_dossier",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "payer-partner",
-      "role": "A health-plan / PBM / HTA decision-maker who judges whether the program gets covered, and at what price \u2014 the commercial reality after approval",
+      "role": "A health-plan / PBM / HTA decision-maker who judges whether the program gets covered, and at what price — the commercial reality after approval",
       "spec": "architecture/bucket2/institutional/payer-market-access.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/verdict"
-      },
+      "output_schema": {"$ref": "#/schemas/verdict"},
       "tools_allowed": [],
-      "guardrails": [
-        "must_cite_dossier",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "kol-partner",
-      "role": "An independent academic key opinion leader in the disease area \u2014 judges the scientific credibility of the thesis the way the field's experts will, free of any company's mandate",
+      "role": "An independent academic key opinion leader in the disease area — judges the scientific credibility of the thesis the way the field's experts will, free of any company's mandate",
       "spec": "architecture/bucket2/institutional/kol-academic.md",
       "kind": "claude-subagent",
-      "output_schema": {
-        "$ref": "#/schemas/verdict"
-      },
+      "output_schema": {"$ref": "#/schemas/verdict"},
       "tools_allowed": [],
-      "guardrails": [
-        "must_cite_dossier",
-        "veto_is_gate",
-        "stamp_provenance"
-      ],
+      "guardrails": ["must_cite_dossier", "veto_is_gate", "stamp_provenance"],
       "provenance_label": "persona-judgment",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 2,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     },
     {
       "id": "aso-tox",
-      "role": "Bucket-1 safety fact source \u2014 sequence-based acute ASO toxicity screen (Hagedorn + Zhang GBR; threshold >1.0 = Toxic). External subprocess delegate; fires only when ASO sequences are present in inputs.",
+      "role": "Bucket-1 safety fact source — sequence-based acute ASO toxicity screen (Hagedorn + Zhang GBR; threshold >1.0 = Toxic). External subprocess delegate; fires only when ASO sequences are present in inputs.",
       "spec": "tools/aso_tox/README.md",
       "kind": "python",
       "output_schema": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
+        "required": ["candidate", "facts"],
         "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
             }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "invalid_sequences": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "error": {
-            "type": "string"
-          }
+          }},
+          "provenance": {"type": "string"},
+          "invalid_sequences": {"type": "array", "items": {"type": "string"}},
+          "error": {"type": "string"}
         }
       },
       "tools_allowed": [],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
       "provenance_label": "aso-tox",
       "timeout_s": 120,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
-    },
-    {
-      "id": "gnomad-constraint",
-      "role": "Bucket-1 quantitative fact source \u2014 gnomAD gene loss-of-function constraint (pLI, LOEUF, missense Z) via the public GraphQL API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
-      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
-      "kind": "python",
-      "output_schema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
-        "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      },
-      "tools_allowed": [],
-      "guardrails": [
-        "facts_only_cited",
-        "stamp_provenance",
-        "data_boundary"
-      ],
-      "provenance_label": "gnomad",
-      "timeout_s": 30,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
-    },
-    {
-      "id": "gtex-expression",
-      "role": "Bucket-1 quantitative fact source \u2014 GTEx tissue expression (median TPM per tissue) + CNS selectivity via the public REST API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
-      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
-      "kind": "python",
-      "output_schema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
-        "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      },
-      "tools_allowed": [],
-      "guardrails": [
-        "facts_only_cited",
-        "stamp_provenance",
-        "data_boundary"
-      ],
-      "provenance_label": "gtex",
-      "timeout_s": 60,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
-    },
-    {
-      "id": "interpro-domains",
-      "role": "Bucket-1 structured fact source \u2014 InterPro protein domain/family annotations (with IPR accessions) via UniProt (symbol\u2192accession) + the public InterPro REST API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
-      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
-      "kind": "python",
-      "output_schema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
-        "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      },
-      "tools_allowed": [],
-      "guardrails": [
-        "facts_only_cited",
-        "stamp_provenance",
-        "data_boundary"
-      ],
-      "provenance_label": "interpro",
-      "timeout_s": 60,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
-    },
-    {
-      "id": "geneset-enrichment",
-      "role": "Bucket-1 quantitative fact source \u2014 g:Profiler functional enrichment (top over-represented GO / pathway terms with p-values) over the query's gene set, via the public g:GOSt REST API. Fires when a gene set / target is present in inputs; honest-empty otherwise. Public identifiers only.",
-      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
-      "kind": "python",
-      "output_schema": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
-        "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
-            }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "error": {
-            "type": "string"
-          }
-        }
-      },
-      "tools_allowed": [],
-      "guardrails": [
-        "facts_only_cited",
-        "stamp_provenance",
-        "data_boundary"
-      ],
-      "provenance_label": "gprofiler",
-      "timeout_s": 60,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
     },
     {
       "id": "robyn-scs",
-      "role": "Bucket-1 internal fact source \u2014 Robyn's SCS/STA neuronal-connectivity pipeline (imaging-derived; tiered connections + neuron classification). External subprocess delegate (numpy/scipy/pandas in tools/robyn_scs); fires ONLY when imaging data (a v17_traces plate dir) is present in inputs, else honest-empty.",
+      "role": "Bucket-1 INTERNAL fact source — Robyn's SCS/STA neuronal-connectivity pipeline (imaging-derived; tiered connections + neuron classification). External subprocess delegate (numpy/scipy/pandas in tools/robyn_scs); fires ONLY when imaging data (a v17_traces plate dir) is present in inputs, else honest-empty.",
       "spec": "tools/robyn_scs/README.md",
       "kind": "python",
       "output_schema": {
         "type": "object",
         "additionalProperties": false,
-        "required": [
-          "candidate",
-          "facts"
-        ],
+        "required": ["candidate", "facts"],
         "properties": {
-          "candidate": {
-            "type": "string"
-          },
-          "facts": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "value",
-                "source",
-                "tier"
-              ],
-              "properties": {
-                "value": {
-                  "type": "string"
-                },
-                "source": {
-                  "type": "string"
-                },
-                "tier": {
-                  "type": "string",
-                  "enum": [
-                    "T1",
-                    "T2",
-                    "T3",
-                    "T4"
-                  ]
-                },
-                "flag": {
-                  "type": "string",
-                  "enum": [
-                    "VETO",
-                    "DIVERGENCE",
-                    "KNOWN_UNKNOWN"
-                  ]
-                },
-                "provenance": {
-                  "type": "string"
-                }
-              }
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
             }
-          },
-          "provenance": {
-            "type": "string"
-          },
-          "invalid_sequences": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "error": {
-            "type": "string"
-          }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
         }
       },
       "tools_allowed": [],
-      "guardrails": [
-        "data_boundary",
-        "facts_only_cited",
-        "stamp_provenance"
-      ],
+      "guardrails": ["facts_only_cited", "stamp_provenance"],
       "provenance_label": "robyn-scs",
       "timeout_s": 600,
-      "retry": {
-        "max_repair": 1,
-        "on_hard_fail": "abstain"
-      }
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "gnomad-constraint",
+      "role": "Bucket-1 quantitative fact source — gnomAD gene loss-of-function constraint (pLI, LOEUF, missense Z) via the public GraphQL API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
+      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance", "data_boundary"],
+      "provenance_label": "gnomad",
+      "timeout_s": 30,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "gtex-expression",
+      "role": "Bucket-1 quantitative fact source — GTEx tissue expression (median TPM per tissue) + CNS selectivity via the public REST API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
+      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance", "data_boundary"],
+      "provenance_label": "gtex",
+      "timeout_s": 60,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "interpro-domains",
+      "role": "Bucket-1 structured fact source — InterPro protein domain/family annotations (with IPR accessions) via UniProt (symbol→accession) + the public InterPro REST API. Fires when a target gene symbol is present in inputs; honest-empty otherwise. Public identifiers only.",
+      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance", "data_boundary"],
+      "provenance_label": "interpro",
+      "timeout_s": 60,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "geneset-enrichment",
+      "role": "Bucket-1 quantitative fact source — g:Profiler functional enrichment (top over-represented GO / pathway terms with p-values) over the query's gene set, via the public g:GOSt REST API. Fires when a gene set / target is present in inputs; honest-empty otherwise. Public identifiers only.",
+      "spec": "docs/superpowers/plans/2026-06-23-quantitative-fact-seams.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["facts_only_cited", "stamp_provenance", "data_boundary"],
+      "provenance_label": "gprofiler",
+      "timeout_s": 60,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
     }
   ]
 }

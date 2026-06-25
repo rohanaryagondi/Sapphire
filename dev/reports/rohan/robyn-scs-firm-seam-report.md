@@ -16,8 +16,8 @@ stays stdlib, **fires only when relevant** (imaging data present), honest-empty 
   `firm_endpoint.py`, maps the summary to dossier facts. **Honest-empty `[]`** for a standard
   target/diligence query (no imaging data), exactly like aso-tox with no sequences. Pipeline error →
   a `KNOWN_UNKNOWN` fact, never a fabricated connectivity result.
-- **Registered** `robyn-scs` (kind `python`, provenance `robyn-scs`, guards
-  `data_boundary`/`facts_only_cited`/`stamp_provenance`) in `harness/agents.json`; wired into
+- **Registered** `robyn-scs` (kind `python`, provenance `robyn-scs`, guards `facts_only_cited`/`stamp_provenance` —
+  NO `data_boundary` (that guard is for external-fetch agents; robyn-scs is internal-plane, like moat-real)) in `harness/agents.json`; wired into
   `live_engine` Bucket-1 (`_BUCKET1_AGENTS` + ctx setdefault).
 - **Provenance `robyn-scs` → INTERNAL plane** (`contracts/provenance.py`): robyn_scs facts derive
   from Quiver's own imaging — proprietary internal data, protected by `data_boundary` like `moat-real`.
@@ -30,6 +30,9 @@ robyn_scs needs MATLAB-split imaging CSVs we don't have in this repo, so the sea
 real data here** — it is honest-empty for every standard query (incl. the TSC2 demo). The fire path
 (summary → facts) is verified by a **mocked subprocess** (the brief's "verify by import/signature,
 not execution"); the real-data run is an analyst-side activity once imaging CSVs are provided.
+
+## Honesty (Head Claude Gate-5 fix)
+An empty/absent plate yields zero FOV quartets — `firm_endpoint.py` returns an honest `ok:false` (not a `0 connections` success), and the seam maps it to `KNOWN_UNKNOWN` (defensive guard too). A **non-mocked** test exercises the real subprocess on an empty dir and asserts no fabricated success fact.
 
 ## Gates
 - **Gate 1:** `bash dev/run-tests.sh` → GREEN (+ robyn-scs seam tests + provenance + run_live wiring).

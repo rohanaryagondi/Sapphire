@@ -65,6 +65,13 @@ def main() -> int:
         kw = {k: req[k] for k in ("scs_score_thresh", "sta_score_thresh", "scs_min_ap", "sta_min_ap")
               if k in req}
         batch = endpoints.run_batch(input_dir, output_dir=req.get("output_dir"), **kw)
+        # Honesty: an empty/absent plate yields zero FOV quartets. Do NOT report that as a
+        # "ran and found nothing" success (confidence-inflating) — return an honest error so the
+        # seam abstains (KNOWN_UNKNOWN) instead of emitting a "0 connections" fact.
+        if not (batch.get("quartets") or []):
+            print(json.dumps({"ok": False, "error": "no FOV quartets found in input_dir "
+                              "(absent/empty plate — expected <plate>/v17_traces/FOV_*_{spont,stim}_part{1,2}.csv)"}))
+            return 0
         print(json.dumps({"ok": True, "summary": _summarise(batch)}))
     except Exception as exc:  # never raise into the seam — honest error JSON
         print(json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}))

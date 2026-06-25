@@ -123,8 +123,9 @@ def _build_ctx():
         # gnomad-constraint would hit a public network API via the real seam; mock it
         # (honest-empty) so the offline suite never touches the network.
         "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn, "interpro-domains": _fake_interpro_fn, "geneset-enrichment": _fake_geneset_fn},
-        # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
-        #       that run_live wires the REAL moat + aso-tox backends by default.
+        # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"]/["robyn-scs"]
+        #       so that run_live wires the REAL moat + aso-tox + robyn-scs backends by default.
+        #       (robyn-scs is honest-empty without imaging input, so it stays $0/offline here.)
     }
 
 
