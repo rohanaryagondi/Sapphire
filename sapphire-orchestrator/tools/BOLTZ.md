@@ -12,6 +12,12 @@ otherwise stays silent (honest-empty). EMET + gnomAD/GTEx say what the literatur
 population genetics *report*; Boltz returns a *model-predicted* answer to "does this
 ligand/binder physically engage this target, and how confidently?"
 
+> **Status: WIRED into the live firm** (`rohan/boltz-firm-wire`). The `boltz` agent is
+> registered in `harness/agents.json` (kind `python`, provenance `boltz`) and dispatched
+> by `live_engine.run_live` in Bucket-1. It activates **only** when a structure/affinity
+> input is in scope (see *How it activates* below); otherwise it stays dormant
+> (honest-empty), exactly like `aso-tox` with no ASO sequences.
+
 ---
 
 ## The API (confirmed live 2026-06-25)
@@ -149,43 +155,60 @@ degrades to a `KNOWN_UNKNOWN` rather than blocking the dossier.
 
 ---
 
-## NEXT steps — wiring into `live_engine` Bucket-1
+## How it activates (wired into `live_engine` Bucket-1)
 
-The seam is built, contract-registered, and tested, but **not yet wired into the live
-firm** (deliberately — mirrors how the ASO pieces landed incrementally). To fire it in
-`live_engine.run_live`, mirror the `aso-tox` wiring exactly:
+Boltz is now a first-class Bucket-1 agent dispatched through the harness, mirroring the
+`aso-tox` wiring exactly. It activates **only** when a structure/affinity input is in
+scope; with neither a target sequence nor a candidate ligand it stays dormant
+(honest-empty) — so it is safe to leave in the default `_BUCKET1_AGENTS` list and
+incurs **no spend** on ordinary target-level questions.
 
-1. **Register the agent** in `harness/agents.json` (copy the `gnomad-constraint`
-   entry): `id: "boltz"`, `kind: "python"`, `provenance_label: "boltz"`,
-   guardrails `["facts_only_cited", "stamp_provenance", "data_boundary"]`,
-   `tools_allowed: []`, and the same `output_schema` (it already matches the
-   `{candidate, facts:[{value,source,tier[,flag]}], provenance, error?}` shape the
-   seam emits). Set a generous `timeout_s` (the job is async; e.g. 360) and
-   `retry.on_hard_fail: "abstain"`.
+**Two input channels** (precedence: explicit param > query-text extractor), exactly
+like the ASO `sequences` channel:
 
-2. **Import + wire the fn** in `live_engine.py` (next to the other seams, ~L312):
-   ```python
-   from tools import boltz_seam
-   ...
-   if "boltz" not in ctx["python_fns"]:
-       ctx["python_fns"]["boltz"] = boltz_seam.findings
-   ```
+1. **Explicit `structure=` param** (the primary, intended path) —
+   `run_live(query, structure={...})`. The recognised PUBLIC keys are
+   `target_sequence` / `protein_sequence`, `ligand_smiles` / `ligand_ccd`, or a
+   pre-built `entities` list (+ optional `binding`). These arrive **from the upstream
+   ASO Design / small-molecule tools** — the same handoff point ASO Design uses to feed
+   sequences to `aso-tox`. A single protein + a single ligand auto-requests a
+   `binding_confidence`. Only these whitelisted structural keys are threaded into
+   `bucket1_inputs` — never arbitrary caller keys.
 
-3. **Thread the structural inputs** into `bucket1_inputs` (~L349): add
-   `target_sequence` / `ligand_smiles` (or `ligand_ccd`) alongside the existing
-   `sequences` key. These should arrive **from the upstream ASO Design / small-molecule
-   tools** (the same way ASO sequences feed `aso-tox` today) — e.g. ASO Design emits a
-   target sequence + candidate, which Boltz folds/scores. Until those tools feed
-   structural inputs, Boltz returns honest-empty.
+2. **Query-text fallback** (`_extract_structure_inputs`, best-effort) — when no
+   explicit `structure=` is given, the engine extracts a `target_sequence` from the
+   query: the first standalone token of **≥ 25 uppercase amino-acid letters that
+   contains at least one non-ATGC residue** (so a long pure-ATGC ASO/DNA token is never
+   misread as a protein, and gene symbols — which carry digits — never match). SMILES
+   are deliberately **not** extracted from free text (a false positive would trigger a
+   paid job); a ligand comes only via the explicit `structure=` channel.
 
-4. **Add `"boltz"` to `_BUCKET1_AGENTS`** so the dispatch loop runs it (it will
-   honest-empty on non-structural questions, so it's safe to always include).
+**When it fires:** a target protein sequence in scope (fold → `structure_confidence`),
+or a protein + a ligand (→ adds `binding_confidence` / `optimization_score`). **When it
+stays dormant:** a normal gene/target question with no sequence and no ligand → the seam
+returns `facts: []` and the agent reports `ok` (honest-empty), with **no network call**.
 
-5. **Capture a scenario** (`_build/capture_scenario.py`) for a target+ligand question
-   so the Console shows a real Boltz binding fact — never fabricated.
+**Boundary:** the harness `data_boundary` guardrail scans the threaded structural inputs
+and **blocks** the dispatch if any internal marker (e.g. `QS\d+`, `latent_vector`) is
+present — Boltz never transmits internal moat data. `boltz_seam.assert_public_only()` is
+a second in-seam tripwire. The `BOLTZ_API_KEY` is read by the seam from the gitignored
+`RohanOnly/boltz_api.env` **at call time** — it is never read by `live_engine`, never
+passed through `ctx`, and never committed. No key ⇒ honest `KNOWN_UNKNOWN`, no fabrication.
 
-6. **Gating note:** because each call is paid, consider an engine flag (mirroring the
-   Q-Models two-speed routing) so Boltz fires only when the question is genuinely a
-   structure/binding question, or behind an explicit opt-in, to avoid surprise spend on
-   every Bucket-1 pass. A `estimate-cost` pre-check ($0) before `start` is available if
-   a spend guard is wanted.
+The wiring is covered by `tests/test_live_engine.py::TestBoltzWiring` (fires + fact
+lands when structure present; query-text activation; dormant + no-network otherwise;
+honest-degrade on missing key / API-down; internal-id boundary block) — all offline, $0,
+no live key.
+
+### Still open (post-wire)
+
+- **Capture a scenario** (`_build/capture_scenario.py`) for a target+ligand question so
+  the Console shows a real Boltz binding fact — never fabricated.
+- **Spend guard:** because each live call is paid (~$0.025+ per fold), consider a
+  `estimate-cost` ($0) pre-check before `start`, or an explicit engine opt-in flag
+  (mirroring the Q-Models two-speed routing), if surprise spend on a query that happens
+  to carry a sequence becomes a concern. Today the activation gate (a sequence/ligand
+  must be in scope) is the spend boundary.
+- **Wire the upstream ASO Design / small-molecule tool** to populate the `structure=`
+  channel directly (today it is populated by the explicit param or the query-text
+  extractor).

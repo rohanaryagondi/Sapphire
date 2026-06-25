@@ -27,6 +27,7 @@ if _PKG not in sys.path:
 import harness
 from live_engine import run_live
 from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
+from tools import boltz_seam
 
 
 # ── Fake runner helpers ──────────────────────────────────────────────────────
@@ -813,6 +814,208 @@ class TestGnomadConstraintWiring(unittest.TestCase):
         self.assertIsNotNone(agent)
         self.assertIn(agent["status"], ("abstained", "escalated"),
                       f"expected data_boundary to block gnomad; got {agent}")
+
+
+# ── Boltz structure/binding seam fixtures (recorded live shapes, 2026-06-25) ─
+# START response (job accepted, pending). RETRIEVE response with a ligand-protein
+# binding job → both a structure_confidence and a binding_confidence fact.
+_BOLTZ_START_PENDING = {
+    "id": "sab_pred_WIRETEST0001", "status": "pending", "output": None,
+    "error": None, "model": "boltz-2.1",
+}
+_BOLTZ_RETRIEVE_BINDING = {
+    "id": "sab_pred_WIRETEST0001", "status": "succeeded", "error": None,
+    "output": {
+        "best_sample": {"metrics": {"structure_confidence": 0.91, "complex_plddt": 0.88,
+                                    "ptm": 0.7, "iptm": 0.65}},
+        "binding_metrics": {"binding_confidence": 0.83, "optimization_score": 0.42,
+                            "type": "ligand_protein_binding_metrics"},
+    },
+}
+# A public protein sequence (≥25 aa, not pure ATGC) + a public ligand SMILES — the
+# structure/affinity inputs that activate Boltz. Public identifiers only.
+_BOLTZ_PROTEIN = "MKTAYIAKQRQISFVKSHFSRQMKTAYIAKQR"
+_BOLTZ_SMILES = "CC(=O)Oc1ccccc1C(=O)O"
+
+
+def _boltz_fake_http(method, path, api_key, body=None):
+    """Fake boltz _http: POST→pending start, GET→succeeded binding job. No live key,
+    no network — the seam's single network boundary, monkeypatched."""
+    if method == "POST":
+        return dict(_BOLTZ_START_PENDING)
+    return dict(_BOLTZ_RETRIEVE_BINDING)
+
+
+class TestBoltzWiring(unittest.TestCase):
+    """The boltz structure/binding seam, wired into run_live, fires ONLY when a
+    structure/affinity input is in scope and lands a real cited 'boltz'-provenance fact
+    in the dossier — proving the harness schema-validation + provenance-stamping path
+    end-to-end. The Boltz Compute API is monkeypatched at the seam's _http boundary
+    ($0, offline, NO live key — _resolve_key is patched to a dummy)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _ctx(self):
+        """Offline ctx. boltz is NOT pre-populated in python_fns, so run_live wires the
+        REAL seam (boltz_seam.findings); the network is mocked at boltz_seam._http."""
+        ctx = _build_ctx()
+        ctx.setdefault("python_fns", {}).pop("boltz", None)
+        return ctx
+
+    # ── (a) Boltz fires + a boltz-provenance fact lands when structure present ──
+    def test_boltz_fact_lands_when_structure_present(self):
+        """run_live with a target sequence + ligand SMILES (structure= channel) lands
+        ≥1 fact with provenance 'boltz' in the dossier, the boltz agent is 'ok', and the
+        real binding number flows through (non-vacuous). No live key, no network."""
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY_TEST_KEY"), \
+             mock.patch.object(boltz_seam, "_http", _boltz_fake_http), \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                "Will this candidate engage the target?",
+                structure={"target_sequence": _BOLTZ_PROTEIN, "ligand_smiles": _BOLTZ_SMILES},
+                ctx=self._ctx(),
+            )
+        dossier = result["discover"]["dossier"]
+        boltz_facts = [f for f in dossier if f.get("provenance") == "boltz"]
+        self.assertTrue(
+            len(boltz_facts) >= 1,
+            f"expected ≥1 boltz fact; dossier provenances: "
+            f"{[f.get('provenance') for f in dossier]}"
+        )
+        # Non-vacuous: the recorded binding number must appear in a landed fact value.
+        vals = " || ".join(f["value"] for f in boltz_facts)
+        self.assertIn("binding_confidence 0.83", vals, vals)
+        self.assertTrue(all(f["tier"] == "T2" for f in boltz_facts), boltz_facts)
+        # The fact must be EXTERNAL-plane (derived from the 'boltz' provenance).
+        self.assertTrue(all(f.get("plane") == "external" for f in boltz_facts), boltz_facts)
+        # The agent must be 'ok' and provenance-stamped by the harness.
+        agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
+        self.assertIsNotNone(agent, "boltz not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
+        self.assertEqual(agent["provenance"], "boltz", f"expected boltz provenance; got {agent}")
+
+    def test_boltz_fires_on_protein_sequence_in_query_text(self):
+        """The query-text activation channel: a protein sequence embedded in the query
+        (no explicit structure= param) is extracted and activates Boltz → ≥1 boltz fact.
+        Proves _extract_structure_inputs wires through end-to-end."""
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY_TEST_KEY"), \
+             mock.patch.object(boltz_seam, "_http", _boltz_fake_http), \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                f"Predict the fold for target sequence {_BOLTZ_PROTEIN} please.",
+                ctx=self._ctx(),
+            )
+        boltz_facts = [f for f in result["discover"]["dossier"]
+                       if f.get("provenance") == "boltz"]
+        self.assertTrue(len(boltz_facts) >= 1,
+                        f"expected ≥1 boltz fact from query-text protein; got {boltz_facts}")
+        # Fold-only (no ligand) → a structure_confidence fact, no binding.
+        vals = " ".join(f["value"] for f in boltz_facts)
+        self.assertIn("structure_confidence", vals, vals)
+
+    # ── (b) Boltz stays DORMANT when no structure/affinity input is in scope ────
+    def test_no_structure_input_dormant_no_network(self):
+        """A normal gene query (no sequence, no ligand) → boltz must NOT call the network,
+        dispatches honest-empty (status 'ok'), and contributes 0 boltz facts. This mirrors
+        how aso-tox stays silent without ASO sequences."""
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY"), \
+             mock.patch.object(boltz_seam, "_http") as http_mock, \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=self._ctx(),
+            )
+            http_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
+        self.assertIsNotNone(agent, "boltz not in discover.agents")
+        self.assertEqual(agent["status"], "ok", f"expected ok (dormant/honest-empty); got {agent}")
+        boltz_facts = [f for f in result["discover"]["dossier"]
+                       if f.get("provenance") == "boltz"]
+        self.assertEqual(len(boltz_facts), 0, f"expected 0 boltz facts; got {boltz_facts}")
+
+    # ── (c) Honest-degrade when the API key is absent ───────────────────────────
+    def test_missing_key_degrades_honestly_no_crash(self):
+        """Structure inputs ARE present but the BOLTZ_API_KEY is absent → the seam must
+        degrade to a KNOWN_UNKNOWN abstain fact (never a fabricated structure/affinity),
+        the engine must NOT crash, and the boltz agent stays 'ok' (it returned an honest
+        envelope with a flagged fact, not a hard failure). No network call is made."""
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: None), \
+             mock.patch.object(boltz_seam, "_http") as http_mock, \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                "Will this candidate engage the target?",
+                structure={"target_sequence": _BOLTZ_PROTEIN, "ligand_smiles": _BOLTZ_SMILES},
+                ctx=self._ctx(),
+            )
+            http_mock.assert_not_called()  # no key ⇒ no network
+        boltz_facts = [f for f in result["discover"]["dossier"]
+                       if f.get("provenance") == "boltz"]
+        # Exactly the honest KNOWN_UNKNOWN abstain fact — present, flagged, never fabricated.
+        self.assertTrue(len(boltz_facts) >= 1,
+                        f"expected the honest KNOWN_UNKNOWN fact; got {boltz_facts}")
+        self.assertTrue(any(f.get("flag") == "KNOWN_UNKNOWN" for f in boltz_facts),
+                        f"expected a KNOWN_UNKNOWN flag; got {boltz_facts}")
+        self.assertTrue(all("unavailable" in f["value"].lower() for f in boltz_facts),
+                        f"KNOWN_UNKNOWN fact must say it's unavailable; got {boltz_facts}")
+        agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok",
+                         f"expected honest 'ok' with a KNOWN_UNKNOWN fact; got {agent}")
+
+    def test_api_down_degrades_no_crash(self):
+        """If the Boltz API is unreachable the engine must not crash: boltz degrades to a
+        KNOWN_UNKNOWN fact and stays 'ok' (honest envelope, no fabrication)."""
+        import urllib.error
+
+        def _boom(method, path, api_key, body=None):
+            raise urllib.error.URLError("connection refused")
+
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY"), \
+             mock.patch.object(boltz_seam, "_http", _boom), \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                "Will this candidate engage the target?",
+                structure={"target_sequence": _BOLTZ_PROTEIN, "ligand_smiles": _BOLTZ_SMILES},
+                ctx=self._ctx(),
+            )
+        agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
+        self.assertIsNotNone(agent)
+        self.assertEqual(agent["status"], "ok", f"expected honest 'ok'; got {agent}")
+        boltz_facts = [f for f in result["discover"]["dossier"]
+                       if f.get("provenance") == "boltz"]
+        self.assertTrue(any(f.get("flag") == "KNOWN_UNKNOWN" for f in boltz_facts),
+                        f"expected a KNOWN_UNKNOWN flag on API-down; got {boltz_facts}")
+
+    # ── boundary: internal data in a structural input must block Boltz ──────────
+    def test_internal_id_in_structure_blocks_boltz(self):
+        """data_boundary must block boltz when an internal id (QS\\d+) rides in a structural
+        input — the seam never fires (no network), the agent abstains. Boltz receives PUBLIC
+        identifiers only; internal moat data must never be transmitted."""
+        with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY"), \
+             mock.patch.object(boltz_seam, "_http") as http_mock, \
+             mock.patch.object(boltz_seam, "_sleep", lambda s: None):
+            result = run_live(
+                "Will this candidate engage the target?",
+                # An internal candidate id smuggled into the structural channel.
+                structure={"target_sequence": _BOLTZ_PROTEIN, "ligand_ccd": "QS00123"},
+                ctx=self._ctx(),
+            )
+            http_mock.assert_not_called()
+        agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
+        self.assertIsNotNone(agent)
+        self.assertIn(agent["status"], ("abstained", "escalated"),
+                      f"expected data_boundary to block boltz; got {agent}")
+        boltz_facts = [f for f in result["discover"]["dossier"]
+                       if f.get("provenance") == "boltz"]
+        self.assertEqual(len(boltz_facts), 0, f"expected 0 boltz facts on block; got {boltz_facts}")
 
 
 # ── GTEx seam fixtures (recorded TSC2 GTEx v2 responses) ─────────────────────
