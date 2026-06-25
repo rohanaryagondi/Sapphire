@@ -595,7 +595,10 @@ def run_live(
     rescue_ranked: list[dict] = []
     gene_mechanisms: list[dict] = []
     if _is_rescue_ranking_query(query) and target and "rescue-mechanism" in known_ids:
-        rescue_ranked = rescue_genes(target, k=8)  # structured: rank/gene/cosine (cosine kept local)
+        # Top-K rescuers. K=6 bounds the real claude mechanism call (~35s/gene observed) under the
+        # agent timeout while still giving a substantive ranked list. cosine is kept LOCAL (the view),
+        # never sent to the agent.
+        rescue_ranked = rescue_genes(target, k=6)
         if rescue_ranked:
             # The cited public literature already in the dossier (EMET / corpus) is the grounding set.
             evidence = [

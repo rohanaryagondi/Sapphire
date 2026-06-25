@@ -567,7 +567,7 @@
       "guardrails": ["data_boundary", "stamp_provenance"],
       "provenance_label": "scientific-reasoning",
       "simulate_exempt": true,
-      "timeout_s": 240,
+      "timeout_s": 300,
       "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     }
   ]
