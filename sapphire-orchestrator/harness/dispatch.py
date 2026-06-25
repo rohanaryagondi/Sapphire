@@ -13,6 +13,15 @@ from .errors import HarnessEscalation  # noqa: F401  (re-exported for handlers)
 ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 
+# Opt-1 (dispatch-optimization): identical across every agent and FIRST in the prompt, so the
+# 5-min prompt cache reuses this user-message prefix across the fan-out. Keep it short + STABLE
+# (no per-call/per-agent text) — any drift busts the shared cache.
+SHARED_PREAMBLE = (
+    "You are one specialist agent in Sapphire's CNS drug-discovery firm. Answer ONLY from your "
+    "spec + the INPUTS below; return ONLY the structured object the JSON schema enforces, with no "
+    "commentary. Public identifiers only; never fabricate — abstain honestly if you cannot answer."
+)
+
 
 def _read_spec(spec) -> str:
     if not spec:
@@ -23,10 +32,28 @@ def _read_spec(spec) -> str:
 
 def build_prompt(contract, inputs) -> str:
     return (
+        f"{SHARED_PREAMBLE}\n\n"
         f"{_read_spec(contract.spec)}\n\n"
         f"## INPUTS\n{json.dumps(inputs, indent=2)}\n\n"
         "Return ONLY the structured object (the JSON schema is enforced). Do not add commentary."
     )
+
+
+def _context_flags() -> list:
+    """Opt-1 cache/cost flags for a sub-agent `claude -p` call (measured, see the report):
+
+      --setting-sources user                  → do NOT load the project CLAUDE.md (~5k tok/agent;
+                                                the agent's spec is already in its prompt).
+      --exclude-dynamic-system-prompt-sections → move cwd/env/git/memory-paths out of the system
+                                                prefix → STABLE prefix → warm cache_creation→0.
+
+    Both keep the cacheable Claude Code preamble (unlike a full --system-prompt override, which
+    measured cache_read→0). Opt out with SAPPHIRE_DISPATCH_FULL_CONTEXT=1 (restores the old
+    full-context behavior) — escape hatch if an agent ever needs project memory/settings.
+    """
+    if os.environ.get("SAPPHIRE_DISPATCH_FULL_CONTEXT", "").strip() in ("1", "true", "yes"):
+        return []
+    return ["--setting-sources", "user", "--exclude-dynamic-system-prompt-sections"]
 
 
 def dispatch_claude(contract, inputs, runner=None) -> dict:
@@ -43,6 +70,7 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
     model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
     if model:
         cmd += ["--model", model]
+    cmd += _context_flags()  # Opt-1: drop CLAUDE.md + cache-stable prefix
     if contract.tools_allowed:
         cmd += ["--allowedTools", ",".join(contract.tools_allowed)]
     if runner is None:
@@ -58,6 +86,77 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
         result = env.get("result", "")
         body = json.loads(result) if result else {}
     return body
+
+
+def build_batch_prompt(items) -> str:
+    """One prompt for N claude-subagent agents (Opt-2). SHARED_PREAMBLE first (cache), then a
+    labeled block per agent. The model returns ONE object keyed by agent id."""
+    parts = [
+        SHARED_PREAMBLE,
+        "You are answering as MULTIPLE specialist agents in a single pass. For EACH agent block "
+        "below, produce that agent's structured object **from its own spec + INPUTS only** — do not "
+        "let one agent's spec leak into another's answer. Return ONE JSON object whose keys are the "
+        "agent ids and whose values are each agent's structured object; nothing else.",
+    ]
+    for contract, inputs in items:
+        parts.append(
+            f"### AGENT: {contract.id}\n{_read_spec(contract.spec)}\n"
+            f"## INPUTS\n{json.dumps(inputs, indent=2)}"
+        )
+    return "\n\n".join(parts)
+
+
+def _batch_schema(items) -> dict:
+    """A combined object schema: each agent id → its own output_schema (per-agent enforcement)."""
+    props = {c.id: (c.output_schema or {"type": "object"}) for c, _ in items}
+    return {"type": "object", "properties": props, "required": [c.id for c, _ in items]}
+
+
+def dispatch_claude_batch(items, runner=None) -> dict:
+    """Opt-2: ONE `claude -p` call for a list of (contract, inputs) claude-subagent items →
+    `{agent_id: structured_output}`. ~N boots → 1. Honors the same model + Opt-1 context flags.
+    Raises on a non-zero exit, unparseable output, or any missing agent id — the CALLER then falls
+    back to per-agent dispatch (honest fallback, never a guessed result). The per-agent guardrails,
+    provenance stamping, validation, and trace are applied UNCHANGED downstream (the harness runs
+    them on each returned output via a dispatch_fn), so only the generation transport changes."""
+    items = list(items)
+    if not items:
+        return {}
+    cmd = [
+        CLAUDE_BIN, "-p", build_batch_prompt(items),
+        "--output-format", "json",
+        "--json-schema", json.dumps(_batch_schema(items)),
+    ]
+    model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    if model:
+        cmd += ["--model", model]
+    cmd += _context_flags()
+    # Forward the UNION of the batched agents' allowed tools (each agent's per-call --allowedTools
+    # would otherwise be dropped → batched agents run tool-blind, e.g. web-search agents lose
+    # WebSearch/WebFetch). The union is a superset; each agent uses only what its spec needs, and
+    # per-agent output is still validated/guarded downstream.
+    tools = sorted({t for c, _ in items for t in (c.tools_allowed or [])})
+    if tools:
+        cmd += ["--allowedTools", ",".join(tools)]
+    if runner is None:
+        timeout_s = max((c.timeout_s for c, _ in items), default=300)
+
+        def runner(cmd):
+            return subprocess.run(cmd, capture_output=True, text=True,
+                                  timeout=timeout_s, cwd=str(ROOT))
+    proc = runner(cmd)
+    if getattr(proc, "returncode", 0) != 0:
+        raise RuntimeError(f"batch claude exited {getattr(proc, 'returncode', '?')}: "
+                           f"{(proc.stderr or '')[:200]}")
+    env = json.loads(proc.stdout)
+    body = env.get("structured_output")
+    if body is None:
+        result = env.get("result", "")
+        body = json.loads(result) if result else {}
+    missing = [c.id for c, _ in items if c.id not in body]
+    if missing:
+        raise RuntimeError(f"batch response missing agents: {missing}")
+    return {c.id: body[c.id] for c, _ in items}
 
 
 def dispatch_qmodels(contract, inputs, client=None) -> dict:
