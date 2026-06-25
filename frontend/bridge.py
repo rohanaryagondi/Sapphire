@@ -85,25 +85,27 @@ def _resolve_emet_envelopes(query: str, emet_envelopes: dict | None) -> dict:
 
 
 def _ctx_with_session_emet(mock: bool, envelopes: dict):
-    """Build the run ctx, injecting the in-session EMET handler when envelopes are present.
+    """Build the run ctx, ALWAYS injecting the in-session EMET handler (robustness).
 
     The session handler (backed by captured envelopes) is the front end's REAL-EMET path: for a
-    COVERED candidate it lands real `emet-live` PMIDs; for an UNCOVERED one it abstains honestly.
-    It is set ON the ctx so it WINS over `run_live`'s default (`claude -p`) handler — which
-    `_wire_emet_handler` only `setdefault`s. With no envelopes we return `build_ctx(mock)`
-    unchanged, so the `claude -p` path stays as the documented non-default fallback.
+    COVERED candidate it lands real `emet-live` PMIDs; for an UNCOVERED one it returns
+    `login_required` so the EMET agent abstains HONESTLY and INSTANTLY.
+
+    We inject it even when `envelopes` is empty (e.g. a basic Quiver-only query, or any gene we
+    have not pre-captured): the handler then fast-abstains instead of falling through to
+    `run_live`'s default `claude -p` driver, which is slow / hangs / fails and made the console
+    fragile for any non-pre-captured query. So EVERY query now completes promptly — covered
+    candidates get real EMET, uncovered ones abstain honestly (never a hang, never fabricated).
 
     Live (`mock=False`) has ctx=None: we materialise a fresh dict carrying ONLY the handler, and
     `run_live` `setdefault`s the rest (real moat / seams / Q-Models still load). Demo (`mock=True`)
     starts from the mock ctx and the session handler overwrites its mock EMET handler.
     """
     base = build_ctx(mock)
-    if not envelopes:
-        return base
     _ensure_engine_on_path()
     from emet.session_bridge import make_session_emet_handler
     ctx = dict(base) if base else {}
-    ctx["emet_handler"] = make_session_emet_handler(envelopes)
+    ctx["emet_handler"] = make_session_emet_handler(envelopes or {})
     return ctx
 
 
