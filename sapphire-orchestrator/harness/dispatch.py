@@ -35,6 +35,14 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
         "--output-format", "json",
         "--json-schema", json.dumps(contract.output_schema or {}),
     ]
+    # Cost control: pin the agent's model (e.g. haiku for a cheap live run) when an operator
+    # sets it. Reads CLAUDE_MODEL first (the bridge's lever) then SAPPHIRE_MODEL (serve.py's
+    # lever) so EITHER env works on this path — serve.py:_run_live reads SAPPHIRE_MODEL into its
+    # local `CLAUDE_MODEL`, so accepting both keeps the two paths consistent. Additive +
+    # backward-compatible — neither set → the CLI default.
+    model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    if model:
+        cmd += ["--model", model]
     if contract.tools_allowed:
         cmd += ["--allowedTools", ",".join(contract.tools_allowed)]
     if runner is None:

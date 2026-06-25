@@ -128,6 +128,26 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
     }
 
 
+def _wire_emet_handler(ctx: dict) -> None:
+    """Register the live EMET handler on ctx if the caller didn't supply one (setdefault).
+
+    LAZY import — `emet.handler` pulls in the Playwright/Claude-driving seam, which must NOT
+    enter the engine's import graph at module-import time (the engine stays stdlib-only).
+    Importing here, only when run_live actually wires backends, keeps that boundary.
+
+    Session-reuse caveat (honest): the live runner drives EMET by shelling out to a SEPARATE
+    `claude -p` subprocess (its own Playwright browser), so it does NOT inherit the interactive
+    session's already-authenticated BenchSci browser/tabs, and contends on the Chrome
+    profile lock. When it lands on the BenchSci login screen the runner returns
+    `{"login_required": true}` → the handler escalates → the emet agent abstains HONESTLY
+    (no fabricated facts). Reliable session sharing is an open design question — see
+    `dev/HELP.md` (EMET-MCP vs shared persistent profile vs in-session orchestration).
+    """
+    if "emet_handler" not in ctx:
+        from emet.handler import make_emet_handler
+        ctx["emet_handler"] = make_emet_handler()
+
+
 def _build_moat_agent():
     """Return the real moat backend closure."""
     def _moat_agent(inputs: dict) -> dict:
@@ -240,6 +260,11 @@ def run_live(
     # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
     if "geneset-enrichment" not in ctx["python_fns"]:
         ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
+
+    # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
+    # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
+    # _wire_emet_handler for the lazy import + the honest session-reuse caveat.
+    _wire_emet_handler(ctx)
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents

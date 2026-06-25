@@ -47,12 +47,22 @@ suite uses) — no `claude` CLI, no network, no AWS. Use this to inspect the ful
 path Gate-5 verifies.
 
 ### Live (real firm) — real backends
-`ctx=None` → the real moat (if `RohanOnly/moat/moat.sqlite` is built) + real seams. The live
-persona/fact subagents shell out to the **`claude` CLI** (Claude Code on your subscription); EMET
-needs the Playwright `emet-runner` skill. **Without a model the live path abstains honestly** — agents
-report `abstained`/`escalated`, the dossier is degraded, and the UI shows that openly. It never
-crashes and never fabricates. A real run is **slow** (multi-agent, no token stream) — the app shows a
-"Convening the firm…" step while it runs.
+`ctx=None` → the real moat (if `RohanOnly/moat/moat.sqlite` is built) + real seams + a registered
+live **EMET** handler. The live persona/fact subagents shell out to the **`claude` CLI** (Claude Code
+on your subscription); EMET drives the Playwright `emet-runner` skill against your **logged-in BenchSci
+session**. **If EMET hits a login screen (session not shared / not authenticated) the agent abstains
+honestly** with a `login-required` note — it never fabricates. Likewise without a model the live
+subagents abstain honestly; the UI shows degraded agents + KNOWN_UNKNOWNS openly. A real run is
+**slow** (multi-agent, no token stream). *(EMET session-sharing for the headless subprocess path is an
+open design question — see `dev/HELP.md`.)*
+
+### Live (cheap · haiku) — real firm, cheap reasoning
+Same live backends as **Live** (real moat · real EMET · real seams/corpora · real Q-Models), but every
+`claude` agent (Bucket-1 fact agents + Bucket-2 personas) runs on **haiku** — pinned via `CLAUDE_MODEL`
+(the bridge's lever; `dispatch_claude` also honors `SAPPHIRE_MODEL`, serve.py's lever) →
+`dispatch_claude --model` — so a real run doesn't burn default-model tokens.
+**Honest:** the facts are real; only the model is cheaper (nothing is mocked or relabeled). Needs the
+`claude` CLI + a logged-in EMET session.
 
 No AWS, no DynamoDB/S3: this fork uses Chainlit's **default local (in-memory) data layer** — chat
 history is ephemeral (fine for a control surface).

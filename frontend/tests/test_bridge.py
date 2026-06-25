@@ -64,6 +64,41 @@ class TestBridge(unittest.TestCase):
         self.assertEqual(captured["sequences"], ["GCACTTGAATTTCACGTTGT"])
         self.assertEqual(validate_run_live(r), [])
 
+    def test_model_sets_claude_model_env_during_run_and_restores(self):
+        # The cheap-live lever: `model` must be visible to dispatch_claude (via CLAUDE_MODEL)
+        # DURING the run, and restored afterwards.
+        import os
+        import live_engine
+        seen = {}
+        orig = live_engine.run_live
+
+        def _spy(query, *, sequences=None, ctx=None, **kw):
+            seen["during"] = os.environ.get("CLAUDE_MODEL")
+            return orig(query, sequences=sequences, ctx=ctx, **kw)
+
+        prev = os.environ.pop("CLAUDE_MODEL", None)
+        live_engine.run_live = _spy
+        try:
+            r = bridge.run("q", mock=True, model="claude-haiku-4-5")
+        finally:
+            live_engine.run_live = orig
+            if prev is not None:
+                os.environ["CLAUDE_MODEL"] = prev
+        self.assertEqual(seen["during"], "claude-haiku-4-5")          # set during the run
+        self.assertEqual(r["_model"], "claude-haiku-4-5")             # echoed on the result
+        self.assertIsNone(os.environ.get("CLAUDE_MODEL"))             # restored (was unset) after
+
+    def test_no_model_leaves_env_untouched(self):
+        import os
+        prev = os.environ.pop("CLAUDE_MODEL", None)
+        try:
+            r = bridge.run("q", mock=True)
+            self.assertIsNone(os.environ.get("CLAUDE_MODEL"))
+            self.assertEqual(r["_model"], "")
+        finally:
+            if prev is not None:
+                os.environ["CLAUDE_MODEL"] = prev
+
     def test_build_ctx_live_is_none(self):
         self.assertIsNone(bridge.build_ctx(False))
         self.assertIsInstance(bridge.build_ctx(True), dict)
