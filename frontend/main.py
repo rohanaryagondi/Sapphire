@@ -13,6 +13,7 @@ Run from the repo root:
 """
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 
@@ -25,10 +26,19 @@ if str(_HERE) not in sys.path:
 import bridge          # noqa: E402  in-process run_live seam
 import render          # noqa: E402  pure run_live dict → specs
 import elements        # noqa: E402  specs → chainlit messages (imports chainlit+pandas)
+import progress        # noqa: E402  pure progress-event → step-label formatting
 from starters import STARTERS  # noqa: E402
 
 DEMO_PROFILE = "Demo (mock backends)"
 LIVE_PROFILE = "Live (real firm)"
+CHEAP_PROFILE = "Live (cheap · haiku)"
+REPLAY_PROFILE = "Replay (captured TSC2 · $0)"
+REPLAY_SCENARIO = "tsc2_live_run"
+
+# The cheap-live model: real backends (moat/EMET/seams/corpora), but every claude agent
+# (Bucket-1 fact agents + Bucket-2 personas) runs on haiku so a real run doesn't burn
+# default-model tokens. Pinned via CLAUDE_MODEL through the bridge → dispatch_claude --model.
+CHEAP_MODEL = "claude-haiku-4-5"
 
 
 @cl.set_starters
@@ -52,6 +62,22 @@ async def chat_profiles(current_user=None):
                                   "live persona/fact subagents; without it they abstain honestly. "
                                   "A real run is slow (multi-agent, no token stream)."),
         ),
+        cl.ChatProfile(
+            name=CHEAP_PROFILE,
+            markdown_description=("**Real firm, cheap reasoning** — same live backends as Live "
+                                  "(real moat · real EMET · real seams/corpora · real Q-Models), "
+                                  "but every claude agent runs on **haiku** so it doesn't burn "
+                                  "default-model tokens. Honest: facts are real; only the model is "
+                                  "cheaper. Needs the `claude` CLI + a logged-in EMET session."),
+        ),
+        cl.ChatProfile(
+            name=REPLAY_PROFILE,
+            markdown_description=("**Captured TSC2 run — $0 instant replay.** A frozen REAL "
+                                  "engagement (real Quiver moat · 8 real EMET PMIDs · the live "
+                                  "persona spread · real DIVERGENCEs), captured once and replayed "
+                                  "deterministically — no model, no network. Provenance/tiers/flags "
+                                  "verbatim. ⚠ Contains internal moat data — internal demo only."),
+        ),
     ]
 
 
@@ -67,22 +93,113 @@ async def on_start():
     ).send()
 
 
+def _profile_run_kwargs(profile: str) -> dict:
+    """Map the selected chat profile → bridge.run kwargs.
+
+    Demo → mock backends ($0). Live → real backends, CLI-default model. Live (cheap) → real
+    backends, haiku model (cheap reasoning). Unknown → Demo (safe default).
+    """
+    if profile == LIVE_PROFILE:
+        return {"mock": False, "model": None}
+    if profile == CHEAP_PROFILE:
+        return {"mock": False, "model": CHEAP_MODEL}
+    return {"mock": True, "model": None}
+
+
+class _StepTree:
+    """Builds the live step tree from streamed run_live progress events. Top-level steps for
+    plan/flags/synthesis; parent groups for bucket1/roundtable, with a child step per agent/
+    persona that flips pending→done in place. Honest labels via progress.py (abstain ⇒ ⚠)."""
+
+    def __init__(self):
+        self._parents = {}   # stage -> cl.Step
+        self._children = {}  # (stage, agent_id) -> cl.Step
+        self._top = {}       # stage -> cl.Step (plan/flags/synthesis)
+
+    async def _parent(self, stage):
+        if stage not in self._parents:
+            p = cl.Step(name=progress.parent_name(stage), type="tool")
+            await p.send()
+            self._parents[stage] = p
+        return self._parents[stage]
+
+    async def handle(self, ev):
+        stage = ev.get("stage")
+        done = progress.is_done(ev)
+        if stage in ("plan", "flags", "synthesis"):
+            st = self._top.get(stage)
+            if st is None:
+                st = cl.Step(name=progress.step_name(ev), type="tool")
+                await st.send()
+                self._top[stage] = st
+            if done:
+                st.output = progress.step_output(ev)
+                await st.update()
+            return
+        # bucket1 / roundtable → child step under a parent group
+        parent = await self._parent(stage)
+        key = (stage, ev.get("agent_id"))
+        st = self._children.get(key)
+        if st is None:
+            st = cl.Step(name=progress.step_name(ev), type="tool", parent_id=parent.id)
+            await st.send()
+            self._children[key] = st
+        if done:
+            st.output = progress.step_output(ev)
+            await st.update()
+
+
+async def _run_with_live_steps(query: str, kwargs: dict) -> dict:
+    """Sync→async bridge: run `bridge.run` (which calls the synchronous `run_live`) in a worker
+    thread; its `on_progress` callback marshals each event back to THIS event loop via a
+    thread-safe queue, which we drain to update `cl.Step`s LIVE — steps appear DURING the run,
+    not after. Returns the final result dict (sentinel-terminated)."""
+    loop = asyncio.get_running_loop()
+    q: asyncio.Queue = asyncio.Queue()
+
+    def _on_progress(ev):                      # called on the worker thread
+        loop.call_soon_threadsafe(q.put_nowait, {"__event__": ev})
+
+    async def _runner():
+        res = await asyncio.to_thread(bridge.run, query, on_progress=_on_progress, **kwargs)
+        loop.call_soon_threadsafe(q.put_nowait, {"__result__": res})
+        return res
+
+    task = asyncio.create_task(_runner())
+    tree = _StepTree()
+    result = None
+    while True:
+        item = await q.get()
+        if "__result__" in item:
+            result = item["__result__"]
+            break
+        await tree.handle(item["__event__"])
+    await task                                 # propagate any (already-defensively-handled) state
+    return result
+
+
+async def _render_final(result: dict) -> None:
+    """The rich final view (dossier/planes/roundtable/synthesis) — unchanged from before."""
+    for msg in elements.to_messages(render.render_run(result)):
+        await cl.Message(content=msg["content"], elements=msg["elements"]).send()
+
+
 @cl.on_message
 async def on_message(message: cl.Message):
     profile = cl.user_session.get("chat_profile") or DEMO_PROFILE
-    mock = (profile != LIVE_PROFILE)
     query = (message.content or "").strip()
     if not query:
         await cl.Message(content="_Please enter a question._").send()
         return
 
-    async with cl.Step(name="Convening the firm…", type="run") as step:
-        step.input = query
-        # bridge.run never raises; it runs the firm in-process (mock or live).
-        result = await cl.make_async(bridge.run)(query, mock=mock)
-        step.output = (f"via={result.get('_via')} · {result.get('_elapsed_s')}s · "
-                       f"{'mock' if result.get('_mock') else 'live'} backends")
+    if profile == REPLAY_PROFILE:
+        # $0 deterministic replay of a frozen REAL capture — no model, no network, no live steps.
+        async with cl.Step(name="Replaying captured TSC2 run…", type="run") as step:
+            result = await cl.make_async(bridge.replay)(REPLAY_SCENARIO)
+            step.output = f"via=replay · captured {result.get('_captured_at', '')} · $0 (frozen real run)"
+        await _render_final(result)
+        return
 
-    # Map the run_live dict → render specs → chainlit messages; send each in order.
-    for msg in elements.to_messages(render.render_run(result)):
-        await cl.Message(content=msg["content"], elements=msg["elements"]).send()
+    # Live / Cheap / Demo: stream the firm convening as a live step tree, then the rich final view.
+    result = await _run_with_live_steps(query, _profile_run_kwargs(profile))
+    await _render_final(result)

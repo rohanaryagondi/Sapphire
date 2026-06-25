@@ -14,6 +14,7 @@ from __future__ import annotations
 import re
 import sys
 import os
+import time
 
 # Ensure the sapphire-orchestrator package root is on sys.path when called from tests CWD.
 _HERE = os.path.dirname(os.path.abspath(__file__))
@@ -27,7 +28,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
 
@@ -61,6 +62,9 @@ _BUCKET1_AGENTS = [
     # g:Profiler functional enrichment (top GO / pathway terms) over the gene set —
     # quantitative fact source. Fires when a gene set / target is present; honest-empty otherwise.
     "geneset-enrichment",
+    # robyn_scs SCS/STA neuronal-connectivity (internal, imaging-derived). Fires only when
+    # imaging data (a v17_traces plate dir) is present in inputs; honest-empty otherwise.
+    "robyn-scs",
 ]
 
 
@@ -128,6 +132,76 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
     }
 
 
+def _wire_emet_handler(ctx: dict) -> None:
+    """Register the live EMET handler on ctx if the caller didn't supply one (setdefault).
+
+    LAZY import — `emet.handler` pulls in the Playwright/Claude-driving seam, which must NOT
+    enter the engine's import graph at module-import time (the engine stays stdlib-only).
+    Importing here, only when run_live actually wires backends, keeps that boundary.
+
+    Session-reuse caveat (honest): the live runner drives EMET by shelling out to a SEPARATE
+    `claude -p` subprocess (its own Playwright browser), so it does NOT inherit the interactive
+    session's already-authenticated BenchSci browser/tabs, and contends on the Chrome
+    profile lock. When it lands on the BenchSci login screen the runner returns
+    `{"login_required": true}` → the handler escalates → the emet agent abstains HONESTLY
+    (no fabricated facts). Reliable session sharing is an open design question — see
+    `dev/HELP.md` (EMET-MCP vs shared persistent profile vs in-session orchestration).
+    """
+    if "emet_handler" not in ctx:
+        from emet.handler import make_emet_handler
+        ctx["emet_handler"] = make_emet_handler()
+
+
+def _batch_bucket1(known_ids, bucket1_inputs, ctx, registry) -> dict:
+    """Opt-2: batch the corpus-less claude-subagent Bucket-1 agents into ONE claude call
+    (~6 boots → 1). Returns `{agent_id: output}`; `{}` on ANY failure → the caller falls back to
+    per-agent dispatch (honest cold-fallback, never a guessed result). Corpus agents and
+    python/qmodels/emet agents are intentionally excluded (their inputs/paths differ)."""
+    from harness.contracts import resolve
+    from harness.dispatch import dispatch_claude_batch
+    items = []
+    for aid in _BUCKET1_AGENTS:
+        if aid not in known_ids or has_corpus(aid):
+            continue
+        try:
+            contract = resolve(aid, registry)
+        except KeyError:
+            continue
+        if contract.kind != "claude-subagent":
+            continue
+        items.append((contract, bucket1_inputs))
+    if not items:
+        return {}
+    try:
+        return dispatch_claude_batch(items, runner=ctx.get("runner"))
+    except Exception:
+        return {}
+
+
+def _emit(on_progress, eid, event: dict) -> None:
+    """Fire one live-progress milestone (live-run-visibility, additive side channel).
+
+    Two effects, both best-effort so they can NEVER break the engagement:
+      1. record a `{"type": "progress", ...}` event to the harness trace → the run is observable
+         by tailing `trace.jsonl` mid-run (incremental flush);
+      2. invoke the optional `on_progress(event)` callback (the front end's live step tree).
+
+    A bad callback or a trace-write failure is swallowed — progress is a side channel, never a
+    gate. `on_progress=None` ⇒ only the trace record (the trace was already written per agent;
+    these add the staged milestones), and the returned dict is byte-identical either way.
+    """
+    ev = dict(event)
+    try:
+        trace.record(eid, {"type": "progress", **ev})
+    except Exception:
+        pass
+    if on_progress is not None:
+        try:
+            on_progress(ev)
+        except Exception:
+            pass
+
+
 def _build_moat_agent():
     """Return the real moat backend closure."""
     def _moat_agent(inputs: dict) -> dict:
@@ -148,6 +222,7 @@ def run_live(
     ctx: dict | None = None,
     registry=None,
     engine: Orchestrator | None = None,
+    on_progress=None,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
@@ -214,6 +289,18 @@ def run_live(
     public_plan = {k: v for k, v in plan.items() if not k.startswith("_")}
     trace.open_engagement(eid, public_plan)
 
+    # Live progress: the plan is ready (fires immediately after triage, before any agent runs).
+    _emit(on_progress, eid, {
+        "stage": "plan", "phase": "done",
+        "deliverable": public_plan.get("deliverable", ""),
+        "disease": public_plan.get("disease", ""),
+        "modality": public_plan.get("modality", ""),
+        "agents": [a.get("name", a) if isinstance(a, dict) else a
+                   for a in public_plan.get("agents", [])],
+        "panel": [p.get("persona", p) if isinstance(p, dict) else p
+                  for p in public_plan.get("panel", [])],
+    })
+
     # -----------------------------------------------------------------------
     # 3. Wire the REAL moat backend (only if caller didn't supply one already)
     # -----------------------------------------------------------------------
@@ -240,6 +327,15 @@ def run_live(
     # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
     if "geneset-enrichment" not in ctx["python_fns"]:
         ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
+    # Wire the robyn_scs connectivity seam (stdlib orchestrator; numpy/scipy/pandas in the
+    # subprocess). Fires only when imaging data is present in inputs — honest-empty otherwise.
+    if "robyn-scs" not in ctx["python_fns"]:
+        ctx["python_fns"]["robyn-scs"] = robyn_scs_seam.findings
+
+    # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
+    # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
+    # _wire_emet_handler for the lazy import + the honest session-reuse caveat.
+    _wire_emet_handler(ctx)
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents
@@ -265,6 +361,16 @@ def run_live(
         "sequences": resolved_sequences,
     }
 
+    # Opt-2 (dispatch-optimization): optionally batch the corpus-less claude-subagent Bucket-1
+    # agents into ONE claude call. Opt-in via ctx["batch_buckets"]; on ANY failure we fall back to
+    # per-agent dispatch. Each batched output still flows through the FULL per-agent harness path
+    # (validation + guardrails + provenance stamp + trace) via dispatch_fn below — only the
+    # generation transport changes; guards/provenance/schemas are unaffected.
+    batched_outputs: dict = (
+        _batch_bucket1(known_ids, bucket1_inputs, ctx, registry)
+        if ctx.get("batch_buckets") else {}
+    )
+
     for agent_id in _BUCKET1_AGENTS:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
@@ -282,13 +388,43 @@ def run_live(
             if corpus_cards else bucket1_inputs
         )
 
+        # If this agent was answered in the Opt-2 batch, feed its output through the SAME harness
+        # path via dispatch_fn (validation/guards/provenance/trace run unchanged). Else dispatch
+        # normally (the per-agent, per-kind backend).
+        disp_fn = None
+        if agent_id in batched_outputs:
+            _o = batched_outputs[agent_id]
+            # Const dispatch_fn: returns the batched output verbatim. It IGNORES the harness
+            # repair prompt — so a batched output that fails schema/guard validation is retried
+            # with the same value and (correctly) abstains after max_repair, never accepted. The
+            # tradeoff: a batched agent cannot self-correct via prompt-repair the way a per-agent
+            # claude call can; bad batched output → honest abstain, not a fix-up.
+            disp_fn = lambda contract, inputs, ctx, _o=_o: _o  # noqa: E731
+
+        # Live progress: this Bucket-1 agent is starting.
+        _emit(on_progress, eid, {"stage": "bucket1", "agent_id": agent_id, "phase": "start"})
+        _t0 = time.monotonic()
+
         res = harness.run(
             agent_id,
             agent_inputs,
             engagement_id=eid,
             ctx=ctx,
             registry=registry,
+            dispatch_fn=disp_fn,
         )
+
+        _elapsed = round(time.monotonic() - _t0, 2)
+        # Live progress: this Bucket-1 agent is done — real status/provenance/fact-count + timing
+        # (honest: an abstain reports its status, never a "✓"). The corpus facts surfaced below
+        # are independent of the live agent, so they're folded into n_facts here.
+        _n_facts = (len(res.output.get("facts", [])) if (res.ok and res.output) else 0) + len(corpus_cards)
+        _emit(on_progress, eid, {
+            "stage": "bucket1", "agent_id": agent_id, "phase": "done",
+            "status": res.status, "provenance": res.provenance,
+            "n_facts": _n_facts, "elapsed_s": _elapsed,
+            "error": res.error if not res.ok else None,
+        })
 
         agent_statuses.append({
             "id": agent_id,
@@ -353,6 +489,13 @@ def run_live(
         "agents": agent_statuses,
     }
 
+    # Live progress: Bucket-1 flags computed (VETO ⛔ / DIVERGENCE ⚠ / known-unknowns).
+    _emit(on_progress, eid, {
+        "stage": "flags", "phase": "done",
+        "n_veto": len(veto_flags), "n_divergence": len(divergence_flags),
+        "n_known_unknowns": len(known_unknowns), "n_facts": len(all_dossier_facts),
+    })
+
     # -----------------------------------------------------------------------
     # 5. Bucket 2 — persona partners (one harness.run per seated persona)
     # -----------------------------------------------------------------------
@@ -370,6 +513,11 @@ def run_live(
         if "company-partner" not in known_ids:
             continue
 
+        # Live progress: this persona is deliberating (round 1).
+        _emit(on_progress, eid, {"stage": "roundtable", "agent_id": persona_name,
+                                 "phase": "start", "round": 1})
+        _t0 = time.monotonic()
+
         res = harness.run(
             "company-partner",
             {
@@ -382,13 +530,14 @@ def run_live(
             registry=registry,
         )
 
+        _elapsed = round(time.monotonic() - _t0, 2)
         if res.ok and res.output:
             verdict = dict(res.output)
             verdict.setdefault("provenance", res.provenance)
             verdict["status"] = res.status
             round1.append(verdict)
         else:
-            round1.append({
+            verdict = {
                 "persona": persona_name,
                 "lens": lens,
                 "stance": "hold",
@@ -397,11 +546,21 @@ def run_live(
                 "fact_claims": [],
                 "provenance": res.provenance,
                 "status": res.status,
-            })
+            }
+            round1.append(verdict)
+
+        # Live progress: this persona's verdict landed — stance·conviction, or honest abstention.
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name, "phase": "done", "round": 1,
+            "status": verdict.get("status", res.status),
+            "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
+            "elapsed_s": _elapsed,
+        })
 
     # -----------------------------------------------------------------------
     # 6. Synthesis — deterministic assembly
     # -----------------------------------------------------------------------
+    _emit(on_progress, eid, {"stage": "synthesis", "phase": "start"})
     stances = [v.get("stance", "hold") for v in round1 if isinstance(v, dict)]
     pass_count = stances.count("pass")
     no_go_count = stances.count("no_go")
@@ -443,6 +602,12 @@ def run_live(
         "proposed_experiment": proposed_experiment,
         "entities": ents,
     }
+
+    # Live progress: synthesis done — the recommendation + confidence.
+    _emit(on_progress, eid, {
+        "stage": "synthesis", "phase": "done",
+        "recommendation": recommendation, "confidence": confidence,
+    })
 
     # Close the trace and run the self-improvement reflection loop.
     trace.close_engagement(eid, syn)

@@ -47,16 +47,24 @@ class TestPlaneMapTotality(unittest.TestCase):
         self.assertEqual(invalid, {},
                          f"Labels with invalid plane values: {invalid}")
 
+    # The INTERNAL plane: Quiver-proprietary data sources that must NEVER leave to external
+    # agents. moat-real (CNS_DFP) and robyn-scs (SCS/STA neuronal-connectivity from Quiver's own
+    # imaging) are both internal IP. Adding a source here TIGHTENS the boundary (more data
+    # protected), never loosens it. (Data-boundary extension — flagged for the lead in dev/HELP.md.)
+    _INTERNAL_LABELS = {"moat-real", "robyn-scs"}
+
     def test_moat_real_is_internal(self):
         self.assertEqual(_PLANE_MAP["moat-real"], "internal")
 
-    def test_all_non_moat_labels_are_external(self):
-        """Every label in PROVENANCE except moat-real must map to 'external'."""
+    def test_robyn_scs_is_internal(self):
+        self.assertEqual(_PLANE_MAP["robyn-scs"], "internal")
+
+    def test_only_known_internal_labels_internal_rest_external(self):
+        """Exactly the known internal labels map to 'internal'; everything else is 'external'."""
         for label in PROVENANCE:
-            if label == "moat-real":
-                continue
-            self.assertEqual(_PLANE_MAP[label], "external",
-                             f"{label!r} should be external, got {_PLANE_MAP[label]!r}")
+            expected = "internal" if label in self._INTERNAL_LABELS else "external"
+            self.assertEqual(_PLANE_MAP[label], expected,
+                             f"{label!r} should be {expected}, got {_PLANE_MAP[label]!r}")
 
 
 # ---------------------------------------------------------------------------
