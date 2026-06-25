@@ -623,7 +623,7 @@ def run_live(
         # Top-K rescuers. K=6 bounds the real claude mechanism call (~35s/gene observed) under the
         # agent timeout while still giving a substantive ranked list. cosine is kept LOCAL (the view),
         # never sent to the agent.
-        rescue_ranked = rescue_genes(target, k=6)
+        rescue_ranked = rescue_genes(target, k=20)
         if rescue_ranked:
             # Grounding literature for the mechanism reasoner. PREFER a dedicated gene-specific rescue
             # envelope (captured via the moat→EMET flow: literature on the rescue GENES themselves);
@@ -824,16 +824,24 @@ def run_live(
                 "confidence": gm.get("confidence", "low"),
                 "source": r.get("source", ""),
             })
+        # INTEGRATED ranking: the moat surfaces the candidates (EP-signature reversal); the
+        # literature RE-ORDERS them by mechanistic plausibility. Sort by confidence (high>medium>low)
+        # then by the moat rank — so literature-validated rescuers lead while each row still shows its
+        # moat rank. This is the "rank by Quiver data AND mechanism" deliverable: a strong-signature
+        # gene with thin literature (DCTN6) falls below a lower-signature gene with a proven mechanism
+        # (MCRS1/RALA/INO80).
+        _conf_order = {"high": 0, "medium": 1, "low": 2}
+        ranked_genes.sort(key=lambda g: (_conf_order.get(g["confidence"], 3), g["rank"]))
         grounded = [g for g in ranked_genes if g["citations"]]
         top = ranked_genes[:5]
-        top_str = "; ".join(f"{g['rank']}. {g['gene']}" for g in top)
+        top_str = "; ".join(f"{g['gene']} (moat #{g['rank']}, {g['confidence']})" for g in top)
         recommendation = (
-            f"Top rescue-gene candidates for {target}-KO, ranked by Quiver EP-signature reversal "
-            f"with literature-grounded mechanism: {top_str}."
+            f"Ranked rescue-gene candidates for {target}-KO — the moat surfaced {len(ranked_genes)} "
+            f"signature-reversers; the literature re-prioritises by mechanism: {top_str}."
         )
         confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
         proposed_experiment = (
-            f"Validate the top rescue-gene candidate(s) ({', '.join(g['gene'] for g in top[:3])}) "
+            f"Validate the top mechanistic rescuer(s) ({', '.join(g['gene'] for g in top[:3])}) "
             f"against the {target}-KO phenotype in a disease-relevant CNS model."
         )
 
