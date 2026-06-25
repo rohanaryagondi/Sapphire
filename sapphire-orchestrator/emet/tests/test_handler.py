@@ -36,7 +36,7 @@ class TestHandler(unittest.TestCase):
 
 
 class TestDefaultRunnerModel(unittest.TestCase):
-    """The EMET subprocess honors the cheap-live model lever (CLAUDE_MODEL/SAPPHIRE_MODEL)."""
+    """EMET runs on its OWN capable model, DECOUPLED from the cheap-personas CLAUDE_MODEL lever."""
 
     def _run_capturing(self, env_var, env_val):
         captured = {}
@@ -46,10 +46,9 @@ class TestDefaultRunnerModel(unittest.TestCase):
             captured["timeout"] = kw.get("timeout")
             return SimpleNamespace(returncode=0, stdout=json.dumps({"structured_output": ENV}), stderr="")
 
-        prev_c = os.environ.pop("CLAUDE_MODEL", None)
-        prev_s = os.environ.pop("SAPPHIRE_MODEL", None)
-        prev_cdp = os.environ.pop("SAPPHIRE_EMET_CDP", None)
-        prev_prof = os.environ.pop("SAPPHIRE_EMET_PROFILE", None)
+        keys = ("CLAUDE_MODEL", "SAPPHIRE_MODEL", "SAPPHIRE_EMET_MODEL",
+                "SAPPHIRE_EMET_CDP", "SAPPHIRE_EMET_PROFILE")
+        prev = {k: os.environ.pop(k, None) for k in keys}
         # An authenticated source MUST be configured or _default_runner abstains before the
         # subprocess; set the CDP route so the live cmd is actually built + captured.
         os.environ["SAPPHIRE_EMET_CDP"] = "http://localhost:9222"
@@ -59,27 +58,29 @@ class TestDefaultRunnerModel(unittest.TestCase):
             with mock.patch.object(H, "subprocess", SimpleNamespace(run=_fake_run)):
                 H._default_runner({"candidate": "SCN11A", "question": "validate"})
         finally:
-            for k in ("CLAUDE_MODEL", "SAPPHIRE_MODEL", "SAPPHIRE_EMET_CDP", "SAPPHIRE_EMET_PROFILE"):
+            for k in keys:
                 os.environ.pop(k, None)
-            for k, v in (("CLAUDE_MODEL", prev_c), ("SAPPHIRE_MODEL", prev_s),
-                         ("SAPPHIRE_EMET_CDP", prev_cdp), ("SAPPHIRE_EMET_PROFILE", prev_prof)):
+            for k, v in prev.items():
                 if v is not None:
                     os.environ[k] = v
         self._captured = captured
         return captured["cmd"]
 
-    def test_model_added_when_claude_model_set(self):
+    def test_emet_uses_capable_default_ignoring_cheap_lever(self):
+        # CLAUDE_MODEL=haiku (the cheap-personas lever) must NOT drive EMET — it stays on the
+        # capable default (Gate-5: haiku tool-failed driving the agentic EMET UI).
         cmd = self._run_capturing("CLAUDE_MODEL", "claude-haiku-4-5")
         self.assertIn("--model", cmd)
-        self.assertEqual(cmd[cmd.index("--model") + 1], "claude-haiku-4-5")
+        self.assertEqual(cmd[cmd.index("--model") + 1], H._EMET_MODEL_DEFAULT)
+        self.assertNotIn("claude-haiku-4-5", cmd)
 
-    def test_model_added_when_sapphire_model_set(self):
-        cmd = self._run_capturing("SAPPHIRE_MODEL", "claude-haiku-4-5")
-        self.assertIn("--model", cmd)
+    def test_sapphire_emet_model_overrides(self):
+        cmd = self._run_capturing("SAPPHIRE_EMET_MODEL", "claude-opus-4-8")
+        self.assertEqual(cmd[cmd.index("--model") + 1], "claude-opus-4-8")
 
-    def test_no_model_when_env_unset(self):
+    def test_capable_default_when_unset(self):
         cmd = self._run_capturing(None, None)
-        self.assertNotIn("--model", cmd)
+        self.assertEqual(cmd[cmd.index("--model") + 1], H._EMET_MODEL_DEFAULT)
 
     def test_pins_strict_playwright_mcp_config(self):
         cmd = self._run_capturing(None, None)

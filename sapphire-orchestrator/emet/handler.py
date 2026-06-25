@@ -32,6 +32,9 @@ from .adapter import normalize_emet
 ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 _SKILL = ".claude/skills/emet-runner/SKILL.md"
+# EMET driving (agentic BenchSci Thorough research via playwright-mcp) is hard — it needs a capable
+# model and must NOT inherit the cheap-personas haiku lever. Default sonnet; $SAPPHIRE_EMET_MODEL overrides.
+_EMET_MODEL_DEFAULT = "claude-sonnet-4-6"
 # Gitignored, internal-only EMET tester credentials (SAPPHIRE_EMET_USER / _PASS / _PROFILE).
 _EMET_CREDS = ROOT / "RohanOnly" / "emet_creds.env"
 
@@ -186,10 +189,11 @@ def _default_runner(inputs) -> dict:
             "--mcp-config", cfg_path, "--strict-mcp-config",
             "--allowedTools", allowed_tools,
         ]
-        # Honor the cheap-live model lever so EMET's own claude subprocess doesn't run on the
-        # default model (an uncapped cost). Mirrors dispatch_claude: CLAUDE_MODEL (the bridge's
-        # lever) then SAPPHIRE_MODEL (serve.py's). Unset → CLI default.
-        model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+        # EMET runs on its OWN capable model, DECOUPLED from the cheap-personas CLAUDE_MODEL lever
+        # (Gate-5: driving BenchSci's agentic Thorough UI via playwright-mcp is hard — haiku
+        # tool-failed at it, even though the cheap-live profile runs personas on haiku). Default to
+        # a capable model; $SAPPHIRE_EMET_MODEL overrides. We deliberately do NOT read CLAUDE_MODEL.
+        model = (os.environ.get("SAPPHIRE_EMET_MODEL") or _EMET_MODEL_DEFAULT).strip()
         if model:
             cmd += ["--model", model]
         proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
