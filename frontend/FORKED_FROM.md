@@ -11,15 +11,16 @@ from its AWS Bedrock agent loop to Sapphire's in-process `live_engine.run_live` 
   We copy assets *out* of it; we do not edit it in place.
 - **Framework:** Chainlit `2.9.5` (pinned in `requirements.txt`).
 
-## License / attribution  ⚠ (escalated — `dev/HELP.md`)
+## Ownership / license  ✅ (RESOLVED — Quiver owns LOKA outright)
 
-The upstream repo has **no `LICENSE` file** and no license field in `pyproject.toml`/`README`
-(it is a Q-State Biosciences internal repo). Recorded honestly here:
-- **Attribution:** original work © Q-State Biosciences (LOKA / drug-discovery-agent).
-- **Status:** this fork is for **internal reuse within Quiver**. Whether explicit written
-  permission / a license header is required before `frontend/` ships **externally** is a human
-  call — raised in `dev/HELP.md` (`[OPEN] frontend-loka-fork: license/attribution`). Non-blocking
-  for the internal build; **must be resolved before any external distribution.**
+**Quiver owns LOKA in full.** Quiver contracted Loka to build the drug-discovery-agent
+(LOKA) for Quiver; Quiver owns every part of it and may do whatever it wants with it —
+internal use, modification, and **external distribution all permitted, no restriction**.
+(Confirmed by Rohan, 2026-06-24.)
+- **Attribution (courtesy):** original build by Loka for Q-State Biosciences (Quiver).
+- **Status:** no license gate. `frontend/` may ship internally or externally freely. The
+  earlier "resolve before external distribution" caveat is **withdrawn** — there is nothing
+  to resolve; the work is Quiver's property.
 
 ## What was KEPT (forked, adapted)
 
