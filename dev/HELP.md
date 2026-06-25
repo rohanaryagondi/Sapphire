@@ -49,6 +49,14 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 
 ## Open requests
 
+### [OPEN] robyn-scs firm seam: a SECOND internal-plane provenance label (data-boundary extension)  ·  from: rohan  ·  date: 2026-06-25  ·  branch: rohan/robyn-scs-firm-seam
+**Blocking?** no — shipped with the safe choice (internal); this is a confirm/redirect on a data-boundary call.
+**Context:** Track E wires Robyn's SCS/STA neuronal-connectivity pipeline into the firm as a Bucket-1 seam. Its facts derive from **Quiver's own imaging** (SCS/STA on Quiver electrophysiology) → proprietary internal IP. I mapped provenance `robyn-scs` → **plane `internal`** in `contracts/provenance.py` (so the `data_boundary` guard protects it exactly like `moat-real`).
+**Question:** this makes `robyn-scs` the **second** internal-plane label (previously the invariant was "only `moat-real` is internal" — encoded in `test_all_non_moat_labels_are_external`, which I generalised to an `_INTERNAL_LABELS = {moat-real, robyn-scs}` set). Marking it internal **tightens** the boundary (more data protected) — the conservative/safe direction; marking it external would risk leaking internal imaging data to EMET/web, which I won't do. Confirm `internal` is right, or redirect (e.g. if robyn_scs summaries are considered shareable aggregates).
+**What I tried / read:** `contracts/provenance.py` (`_PLANE_MAP`, the bidirectional sanity guard), `test_provenance.py` (the moat-only-internal invariant), the aso-tox seam pattern. The seam fires only when imaging data is present (honest-empty otherwise), so it doesn't affect the TSC2 demo.
+**My current best guess:** `internal` is correct and safe; keep it. Non-blocking.
+**Answer (lead fills):** —
+
 
 ### [RESOLVED] cheap-live-runs (W1): how should the live EMET handler reuse the user's authenticated BenchSci session?  ·  from: rohan  ·  date: 2026-06-24  ·  branch: rohan/cheap-live-runs
 **Question:** how to make a live EMET run reliably reuse the logged-in BenchSci session (the `run_live` subprocess can't inherit the interactive browser + Chrome profile-lock).

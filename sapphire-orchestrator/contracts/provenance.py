@@ -48,6 +48,9 @@ PROVENANCE = frozenset({
     "gtex",
     "interpro",
     "gprofiler",
+    # Quiver robyn_scs SCS/STA neuronal-connectivity pipeline (imaging-derived, INTERNAL;
+    # subprocess delegate). Fires only when imaging data is present in inputs.
+    "robyn-scs",
 })
 
 # ---------------------------------------------------------------------------
@@ -59,6 +62,7 @@ PROVENANCE = frozenset({
 _PLANE_MAP: dict[str, str] = {
     # --- internal plane ---
     "moat-real":        "internal",
+    "robyn-scs":        "internal",   # Quiver imaging-derived connectivity — internal data
 
     # --- external plane ---
     "emet-live":        "external",
