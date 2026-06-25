@@ -520,10 +520,11 @@ body {
    about the VERTICAL axis (rotateY) lands clean. The body SVG turns in 3D; a
    separate gleam SVG flashes over it. Small in the header, large on the hero,
    and the in-chat loading gem. */
-.gem { position: relative; display: inline-block; vertical-align: middle; line-height: 0; perspective: 520px; }
+.gem { position: relative; display: inline-block; vertical-align: middle; line-height: 0; perspective: 240px; }
 .gem-spin3d { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-style: preserve-3d; transform-origin: 50% 50%; }
 .gem-spin3d > svg, .gem > .gem-gleam { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: visible; }
-.gem-body { filter: drop-shadow(0 1px 4px rgba(77,124,254,0.4)); }
+.gem-back { transform: translateZ(-2.5px); }
+.gem-body { transform: translateZ(2.5px); filter: drop-shadow(0 1px 4px rgba(77,124,254,0.4)); }
 .gem-gleam { opacity: 0; transform-origin: 50% 50%; pointer-events: none; }
 .gem-sm { width: 24px; height: 24px; margin: 0 7px; }
 .gem-lg { width: 80px; height: 80px; margin: 0 auto 16px; }
@@ -857,10 +858,11 @@ textarea.chat-input::placeholder { color: var(--ink-3); }
          + text + '<span class="finding-tip">' + label + '</span></span>';
   }
 
-  /* Faceted sapphire — flat 3-tone (light top, mid sides, dark purple-blue base),
-     left-right mirror-symmetric so a 540° rotateY lands clean. Body + separate
-     gleam SVG (the gleam flashes; the body turns). */
-  var GEM_SVG = '<span class="gem-spin3d"><svg class="gem-body" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="50,7 83,31 64,40 50,29" fill="#6f9bff"/><polygon points="17,31 50,7 50,29 36,40" fill="#6f9bff"/><polygon points="83,31 83,69 64,60 64,40" fill="#4470e8"/><polygon points="17,69 17,31 36,40 36,60" fill="#4470e8"/><polygon points="83,69 50,93 50,71 64,60" fill="#383f8c"/><polygon points="50,93 17,69 36,60 50,71" fill="#383f8c"/><polygon points="50,29 64,40 64,60 50,71 36,60 36,40" fill="#6f9bff"/><g fill="none" stroke="#2b3a8a" stroke-width="0.6" opacity="0.45" stroke-linejoin="round"><polygon points="50,29 64,40 64,60 50,71 36,60 36,40"/><path d="M50,7 50,29M83,31 64,40M83,69 64,60M50,93 50,71M17,69 36,60M17,31 36,40"/></g><polygon points="50,7 83,31 83,69 50,93 17,69 17,31" fill="none" stroke="#243079" stroke-width="1.7" stroke-linejoin="round"/></svg></span><svg class="gem-gleam" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M64,12 L66.5,26 L75,28 L66.5,30 L64,44 L61.5,30 L53,28 L61.5,26 Z" fill="#ffffff"/></svg>';
+  /* Sapphire — frontend2 pentagon cut, in title-blue. Faceted (light top, mid
+     sides, deep-blue base) for a real cut-gem read; a darker BACK pentagon sits
+     behind it (translateZ) so the vertical-axis spin shows true 3D thickness.
+     Left-right symmetric so the 540-degree turn lands clean. Separate gleam SVG. */
+  var GEM_SVG = '<span class="gem-spin3d"><svg class="gem-back" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="16,2 30,12 24.5,30 7.5,30 2,12" fill="#24386f"/></svg><svg class="gem-body" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><polygon points="16,8 22.5,13.5 20,23 12,23 9.5,13.5" fill="#6f9bff"/><polygon points="16,2 30,12 22.5,13.5 16,8" fill="#6f9bff"/><polygon points="16,2 16,8 9.5,13.5 2,12" fill="#6f9bff"/><polygon points="30,12 24.5,30 20,23 22.5,13.5" fill="#4d7cfe"/><polygon points="7.5,30 2,12 9.5,13.5 12,23" fill="#4d7cfe"/><polygon points="24.5,30 7.5,30 12,23 20,23" fill="#324f9c"/><polygon points="16,2 30,12 16,14 2,12" fill="#ffffff" opacity="0.16"/><g fill="none" stroke="#21336b" stroke-width="0.4" opacity="0.5" stroke-linejoin="round"><polygon points="16,8 22.5,13.5 20,23 12,23 9.5,13.5"/><path d="M16,2 16,8M30,12 22.5,13.5M24.5,30 20,23M7.5,30 12,23M2,12 9.5,13.5"/></g><polygon points="16,2 30,12 24.5,30 7.5,30 2,12" fill="none" stroke="#1d2f63" stroke-width="1" stroke-linejoin="round"/></svg></span><svg class="gem-gleam" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22,4 L23,9.5 L27,11 L23,12.5 L22,18 L21,12.5 L17,11 L21,9.5 Z" fill="#ffffff"/></svg>';
 
   /* Plant the gem in the header + hero */
   (function () {
