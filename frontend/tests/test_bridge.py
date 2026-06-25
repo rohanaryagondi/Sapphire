@@ -38,6 +38,16 @@ class TestBridge(unittest.TestCase):
         self.assertTrue(r["_mock"])
         self.assertEqual(r["_via"], "harness-live")
 
+    def test_on_progress_forwarded_to_run_live(self):
+        events = []
+        r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True,
+                       on_progress=events.append)
+        self.assertEqual(validate_run_live(r), [])      # still a valid run
+        self.assertTrue(events, "bridge.run must forward on_progress to run_live")
+        stages = {e["stage"] for e in events}
+        self.assertEqual(stages, {"plan", "bucket1", "flags", "roundtable", "synthesis"})
+        self.assertEqual(events[0]["stage"], "plan")
+
     def test_empty_query_does_not_crash(self):
         # An empty query never raises. The engine treats it as a general-CNS run (not a
         # degraded/zero-fact result), so assert the contract-valid shape + that the firm
