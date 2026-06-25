@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sapphire — The Firm Convenes · TSC2 in Tuberous Sclerosis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --purple:#9C02FA; --red:#F51D3F; --magenta:#C20CA9; --lilac:#CAA1FF; --hotpink:#FF85FF;
+  --navy:#0D1130;
+  --bg0:#080a1c; --bg1:#0c1024; --bg2:#11152e; --panel:#141937; --panel2:#171c3e;
+  --line:rgba(202,161,255,.13); --line2:rgba(202,161,255,.08);
+  --ink:#eef0fb; --ink2:#b9bedd; --ink3:#878dba; --ink4:#5f648c;
+  --vault:#11331f; --vault-edge:rgba(110,231,183,.30); --vault-text:#74e6a8;
+  --open:rgba(202,161,255,.10);
+  --ok:#62e6a3; --warn:#ffcf6b; --abstain:#7d83ad;
+  --t1:#62e6a3; --t2:#7ab7ff; --t3:#ffcf6b;
+  --shadow:0 24px 60px -28px rgba(0,0,0,.85);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:
+    radial-gradient(1200px 720px at 78% -8%, rgba(156,2,250,.20), transparent 60%),
+    radial-gradient(960px 620px at 4% 4%, rgba(194,12,169,.13), transparent 58%),
+    radial-gradient(900px 700px at 50% 120%, rgba(245,29,63,.07), transparent 60%),
+    var(--bg0);
+  color:var(--ink); font-family:"Inter",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; font-size:14px; line-height:1.5; overflow:hidden;
+}
+::selection{background:rgba(156,2,250,.4); color:#fff}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(202,161,255,.16);border-radius:20px;border:2px solid transparent;background-clip:padding-box}
+::-webkit-scrollbar-thumb:hover{background:rgba(202,161,255,.30);background-clip:padding-box}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ TOP BAR ============ */
+.topbar{
+  height:60px; display:flex; align-items:center; gap:18px; padding:0 22px;
+  border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(20,25,55,.92), rgba(12,16,36,.72));
+  backdrop-filter:blur(14px); position:relative; z-index:40;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.gem{
+  width:30px;height:30px;position:relative;flex:none;
+  filter:drop-shadow(0 4px 14px rgba(156,2,250,.6));
+}
+.gem svg{display:block;animation:gemspin 14s linear infinite}
+@keyframes gemspin{to{transform:rotate(360deg)}}
+.brand .name{font-family:"Fraunces",serif;font-weight:600;font-size:20px;letter-spacing:.3px}
+.brand .name b{background:linear-gradient(92deg,#fff,var(--lilac) 60%,var(--hotpink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .sub{font-size:11px;color:var(--ink3);margin-top:1px;letter-spacing:.4px}
+.topbar .spacer{flex:1}
+.firm-tag{
+  display:flex;align-items:center;gap:9px;padding:6px 13px;border-radius:999px;
+  background:linear-gradient(90deg,rgba(156,2,250,.16),rgba(194,12,169,.10));
+  border:1px solid rgba(202,161,255,.24);font-size:12px;color:var(--lilac);font-weight:500;
+}
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 rgba(98,230,163,.6);animation:livepulse 2.2s infinite}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(98,230,163,.55)}70%{box-shadow:0 0 0 7px rgba(98,230,163,0)}100%{box-shadow:0 0 0 0 rgba(98,230,163,0)}}
+.eng-id{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--ink4);letter-spacing:.5px}
+.avatars-mini{display:flex;align-items:center}
+.avatars-mini .av{width:26px;height:26px;border-radius:50%;margin-left:-7px;border:2px solid var(--bg1);display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;font-family:"Inter"}
+.avatars-mini .more{background:#2a2f55;color:var(--ink2);font-size:9px}
+
+/* ============ LAYOUT ============ */
+.stage{
+  height:calc(100vh - 60px);
+  display:grid;
+  grid-template-columns:minmax(330px,1fr) minmax(560px,1.55fr) minmax(330px,1fr);
+  gap:0;
+}
+.col{height:100%;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.col.left{border-right:1px solid var(--line)}
+.col.right{border-left:1px solid var(--line);background:linear-gradient(180deg,rgba(10,13,30,.6),rgba(8,10,28,.3))}
+.col-head{
+  padding:15px 18px 12px;border-bottom:1px solid var(--line2);position:relative;flex:none;
+  background:linear-gradient(180deg,rgba(18,22,48,.5),transparent);
+}
+.col-head .eyebrow{font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:var(--ink4);font-weight:600}
+.col-head h2{margin:5px 0 0;font-family:"Fraunces",serif;font-weight:600;font-size:17px;letter-spacing:.2px;display:flex;align-items:center;gap:8px}
+.col-head .hint{font-size:11.5px;color:var(--ink3);margin-top:4px;line-height:1.45}
+.col-body{overflow-y:auto;flex:1;padding:14px 14px 30px}
+
+/* ============ LEFT: ROSTER ============ */
+.plane{margin-bottom:18px}
+.plane-head{
+  display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:11px;margin-bottom:9px;
+  font-size:11px;letter-spacing:.9px;text-transform:uppercase;font-weight:700;
+}
+.plane-head .lock{font-size:13px}
+.plane.internal .plane-head{background:linear-gradient(90deg,rgba(17,51,31,.85),rgba(17,51,31,.25));border:1px solid var(--vault-edge);color:var(--vault-text)}
+.plane.external .plane-head{background:linear-gradient(90deg,rgba(202,161,255,.10),transparent);border:1px solid var(--line);color:var(--lilac)}
+.plane-head .ct{margin-left:auto;font-size:10px;color:var(--ink3);font-weight:600;letter-spacing:.5px}
+.plane-head .liveb{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;letter-spacing:.5px;color:var(--ok)}
+.plane.internal .barnote{font-size:10.5px;color:var(--vault-text);opacity:.8;margin:-3px 2px 9px;display:flex;align-items:center;gap:6px}
+.plane.external .barnote{font-size:10.5px;color:var(--ink3);margin:-3px 2px 9px}
+
+/* agent card */
+.acard{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--line);border-radius:13px;margin-bottom:9px;overflow:hidden;
+  transition:border-color .2s, transform .2s, box-shadow .2s; position:relative;
+}
+.acard.internal{border-color:rgba(110,231,183,.18)}
+.acard.internal::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--vault-text),transparent)}
+.acard:hover{border-color:rgba(202,161,255,.34);transform:translateY(-1px);box-shadow:0 14px 30px -22px rgba(0,0,0,.8)}
+.acard-head{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;user-select:none}
+.av-ring{position:relative;flex:none}
+.avatar{
+  width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+  font-weight:700;font-size:12px;color:#fff;letter-spacing:.3px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.statusdot{position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;border:2.5px solid var(--panel)}
+.statusdot.ok{background:var(--ok)}
+.statusdot.veto{background:var(--red)}
+.acard .who{flex:1;min-width:0}
+.acard .who .role{font-size:12.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px;line-height:1.25}
+.acard .who .sub{font-size:10.5px;color:var(--ink3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.veto-badge{font-size:13px}
+.chev{color:var(--ink4);font-size:11px;transition:transform .25s;flex:none}
+.acard.open .chev{transform:rotate(90deg)}
+.acard-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.acard.open .acard-body{max-height:620px}
+.acard-inner{padding:0 12px 12px 12px;border-top:1px solid var(--line2)}
+.finding{font-size:12px;color:var(--ink2);line-height:1.5;padding:10px 0 8px}
+.finding .mono{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--lilac)}
+.finding b{color:var(--ink);font-weight:600}
+.fitem{display:flex;gap:8px;padding:7px 0;border-top:1px dashed var(--line2);font-size:11.5px;color:var(--ink2);line-height:1.45}
+.fitem:first-child{border-top:none}
+.fitem .dotm{flex:none;width:6px;height:6px;border-radius:50%;margin-top:6px;background:var(--lilac)}
+.fitem.rescue .dotm{background:var(--hotpink)}
+.cos{font-family:"JetBrains Mono",monospace;font-size:10.5px;color:var(--vault-text);background:rgba(110,231,183,.10);padding:1px 6px;border-radius:6px;margin-left:auto;flex:none;white-space:nowrap}
+.acard.external .cos{color:var(--t2);background:rgba(122,183,255,.10)}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.chip{font-size:9.5px;font-weight:600;letter-spacing:.4px;padding:3px 7px;border-radius:6px;display:inline-flex;align-items:center;gap:4px}
+.chip.t1{color:var(--t1);background:rgba(98,230,163,.12);border:1px solid rgba(98,230,163,.25)}
+.chip.t2{color:var(--t2);background:rgba(122,183,255,.12);border:1px solid rgba(122,183,255,.25)}
+.chip.t3{color:var(--t3);background:rgba(255,207,107,.12);border:1px solid rgba(255,207,107,.25)}
+.chip.prov{color:var(--ink2);background:rgba(202,161,255,.07);border:1px solid var(--line)}
+.chip.live{color:var(--ok);background:rgba(98,230,163,.10);border:1px solid rgba(98,230,163,.22)}
+.chip.vault{color:var(--vault-text);background:rgba(110,231,183,.10);border:1px solid var(--vault-edge)}
+.chip.flag{color:var(--warn);background:rgba(255,207,107,.10);border:1px solid rgba(255,207,107,.28)}
+.src{font-size:10px;color:var(--ink4);margin-top:8px;line-height:1.4;font-family:"JetBrains Mono",monospace}
+.src a,.pmid{color:var(--t2);text-decoration:none}
+.more-agents{
+  text-align:center;font-size:11px;color:var(--ink3);padding:10px;border:1px dashed var(--line);
+  border-radius:11px;cursor:pointer;transition:.2s;background:rgba(202,161,255,.03);
+}
+.more-agents:hover{color:var(--lilac);border-color:rgba(202,161,255,.3)}
+
+/* ============ CENTER ============ */
+.col.center{background:linear-gradient(180deg,rgba(13,17,38,.35),transparent)}
+.center-body{overflow-y:auto;flex:1;padding:0}
+.q-hero{padding:22px 26px 18px;border-bottom:1px solid var(--line2);position:relative}
+.q-hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(202,161,255,.3),transparent)}
+.q-eyebrow{font-size:10px;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink4);font-weight:600;display:flex;align-items:center;gap:8px}
+.q-text{font-family:"Fraunces",serif;font-weight:600;font-size:27px;line-height:1.18;margin:9px 0 12px;letter-spacing:.1px}
+.q-text .accent{background:linear-gradient(92deg,var(--lilac),var(--hotpink));-webkit-background-clip:text;background-clip:text;color:transparent}
+.q-meta{display:flex;flex-wrap:wrap;gap:7px}
+.q-meta .m{font-size:10.5px;padding:4px 9px;border-radius:7px;background:rgba(202,161,255,.06);border:1px solid var(--line);color:var(--ink2);font-weight:500}
+.q-meta .m b{color:var(--lilac);font-weight:600}
+
+/* synthesis */
+.synth{margin:18px 22px;border-radius:var(--r);overflow:hidden;border:1px solid rgba(202,161,255,.22);
+  background:linear-gradient(150deg,rgba(33,22,60,.9),rgba(20,25,55,.7));box-shadow:var(--shadow);position:relative}
+.synth::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 200px at 88% -20%,rgba(156,2,250,.25),transparent 70%);pointer-events:none}
+.synth-head{display:flex;align-items:center;gap:11px;padding:15px 18px 0;position:relative}
+.synth-head .lbl{font-size:10px;letter-spacing:2.2px;text-transform:uppercase;color:var(--lilac);font-weight:700}
+.sim-badge{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.6px;
+  color:var(--warn);background:rgba(255,207,107,.10);border:1px solid rgba(255,207,107,.32);padding:4px 10px;border-radius:999px}
+.synth-verdict{padding:11px 18px 5px;position:relative}
+.synth-verdict .big{font-family:"Fraunces",serif;font-weight:600;font-size:23px;line-height:1.2}
+.synth-verdict .big .hl{color:var(--hotpink)}
+.synth-sub{font-size:12.5px;color:var(--ink2);padding:4px 18px 14px;line-height:1.5;position:relative}
+.synth-rail{display:flex;gap:0;border-top:1px solid var(--line2);position:relative}
+.srail{flex:1;padding:12px 16px;border-right:1px solid var(--line2)}
+.srail:last-child{border-right:none}
+.srail .k{font-size:9.5px;letter-spacing:1.3px;text-transform:uppercase;color:var(--ink4);font-weight:600}
+.srail .v{font-size:13px;color:var(--ink);margin-top:5px;font-weight:600;display:flex;align-items:center;gap:7px}
+.conf-pips{display:inline-flex;gap:3px}
+.conf-pips i{width:7px;height:7px;border-radius:2px;background:rgba(255,255,255,.14)}
+.conf-pips i.on{background:var(--warn)}
+.srail .v.exp{font-size:11.5px;font-weight:500;color:var(--ink2);line-height:1.4}
+
+/* divergence pin */
+.diverge-pin{margin:0 22px 18px;border-radius:14px;border:1px solid rgba(255,133,255,.3);
+  background:linear-gradient(120deg,rgba(60,18,52,.55),rgba(36,18,52,.4));overflow:hidden;position:relative}
+.diverge-pin::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--hotpink),var(--red))}
+.dp-head{display:flex;align-items:center;gap:9px;padding:12px 16px 8px}
+.dp-head .ico{font-size:15px}
+.dp-head .t{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--hotpink)}
+.dp-head .ct{margin-left:auto;font-size:10px;color:var(--ink3);font-weight:600}
+.dp-note{font-size:11px;color:var(--ink3);padding:0 16px 8px;line-height:1.45}
+.dp-list{padding:0 16px 14px;display:flex;flex-direction:column;gap:8px}
+.dp-item{display:flex;gap:9px;font-size:11.5px;color:var(--ink2);line-height:1.5;padding:9px 11px;background:rgba(0,0,0,.18);border-radius:9px;border:1px solid rgba(255,133,255,.12)}
+.dp-item .n{flex:none;width:18px;height:18px;border-radius:6px;background:rgba(255,133,255,.16);color:var(--hotpink);font-size:10px;font-weight:700;display:grid;place-items:center;margin-top:1px}
+.dp-item b{color:var(--lilac);font-weight:600}
+
+/* roundtable */
+.rt-head{display:flex;align-items:center;gap:11px;padding:6px 22px 4px;margin-top:4px}
+.rt-head .ttl{font-family:"Fraunces",serif;font-weight:600;font-size:18px;display:flex;align-items:center;gap:9px}
+.rt-head .tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);font-weight:600;margin-left:auto}
+.rt-intro{font-size:12px;color:var(--ink3);padding:2px 22px 8px;line-height:1.5}
+
+/* spread meter */
+.spread{margin:6px 22px 14px;padding:13px 16px;border-radius:13px;background:linear-gradient(180deg,rgba(20,25,55,.65),rgba(14,18,40,.4));border:1px solid var(--line)}
+.spread .lbl{font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--ink4);font-weight:700;display:flex;align-items:center;gap:7px}
+.spread .lbl em{font-style:normal;color:var(--lilac);font-weight:600;letter-spacing:.3px;text-transform:none;font-size:11px;margin-left:auto}
+.spread-track{display:flex;height:34px;border-radius:9px;overflow:hidden;margin-top:10px;border:1px solid var(--line2)}
+.seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.5px;color:#06121a;position:relative;transition:flex .6s ease}
+.seg.advance{background:linear-gradient(90deg,rgba(98,230,163,.85),rgba(98,230,163,.6));color:#06231a}
+.seg.conditional{background:linear-gradient(90deg,rgba(255,207,107,.92),rgba(255,180,90,.7));color:#3a2300}
+.seg.hold{background:linear-gradient(90deg,rgba(125,131,173,.5),rgba(95,100,140,.4));color:#dfe2f5}
+.spread-legend{display:flex;gap:16px;margin-top:9px;font-size:10.5px;color:var(--ink3)}
+.spread-legend .li{display:flex;align-items:center;gap:6px}
+.spread-legend .sw{width:9px;height:9px;border-radius:3px}
+
+/* debate thread */
+.thread{padding:2px 22px 26px;position:relative}
+.thread::before{content:"";position:absolute;left:42px;top:8px;bottom:60px;width:2px;background:linear-gradient(180deg,rgba(202,161,255,.32),rgba(202,161,255,.05));border-radius:2px}
+.turn{display:flex;gap:14px;margin-bottom:14px;position:relative;opacity:0;transform:translateY(12px);animation:turnIn .5s forwards}
+.turn .av-col{flex:none;position:relative;z-index:2}
+.turn .speaker-av{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:13px;color:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.14)}
+.turn .speaker-av .sd{position:absolute;right:-3px;bottom:-3px;width:13px;height:13px;border-radius:50%;border:3px solid var(--bg0)}
+.bubble{flex:1;min-width:0;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:13px 15px;transition:border-color .2s}
+.turn:hover .bubble{border-color:rgba(202,161,255,.3)}
+.bub-head{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.bub-head .nm{font-size:13.5px;font-weight:700;color:var(--ink)}
+.bub-head .firm{font-size:10.5px;color:var(--ink3);font-weight:500}
+.bub-head .lens{font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:var(--ink4);background:rgba(202,161,255,.06);border:1px solid var(--line);padding:2px 7px;border-radius:5px;font-weight:600}
+.verdict-pill{margin-left:auto;display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:700;padding:4px 11px;border-radius:999px;letter-spacing:.3px}
+.verdict-pill.conditional{color:var(--warn);background:rgba(255,207,107,.12);border:1px solid rgba(255,207,107,.32)}
+.verdict-pill.abstained{color:var(--abstain);background:rgba(125,131,173,.12);border:1px solid rgba(125,131,173,.3)}
+.conv{display:inline-flex;gap:2.5px;align-items:center;margin-left:2px}
+.conv i{width:6px;height:11px;border-radius:2px;background:rgba(255,255,255,.13)}
+.conv i.on{background:var(--warn)}
+.rationale{font-size:12px;color:var(--ink2);line-height:1.55;margin-top:9px}
+.rationale .cite{color:var(--lilac);font-weight:600}
+.abst-row{display:flex;align-items:center;gap:9px;margin-top:8px;font-size:11.5px;color:var(--abstain);background:rgba(125,131,173,.07);border:1px dashed rgba(125,131,173,.3);padding:9px 11px;border-radius:9px}
+.abst-row .shield{font-size:14px}
+.turn.abstained .bubble{background:linear-gradient(180deg,rgba(20,23,44,.6),rgba(16,19,38,.5));border-style:dashed;opacity:.92}
+.conv-label{font-size:9.5px;color:var(--ink4);letter-spacing:.5px}
+
+/* ============ RIGHT: TRACE FEED ============ */
+.trace-stats{display:flex;gap:8px;padding:0 0 12px}
+.tstat{flex:1;text-align:center;padding:10px 6px;border-radius:11px;background:linear-gradient(180deg,var(--panel),var(--panel2));border:1px solid var(--line)}
+.tstat .n{font-family:"Fraunces",serif;font-size:19px;font-weight:600;color:var(--ink);line-height:1}
+.tstat .n.live{color:var(--ok)}
+.tstat .k{font-size:9px;letter-spacing:.7px;text-transform:uppercase;color:var(--ink4);margin-top:4px;font-weight:600}
+.feed{position:relative;padding-left:6px}
+.feed::before{content:"";position:absolute;left:13px;top:6px;bottom:14px;width:2px;background:linear-gradient(180deg,rgba(202,161,255,.28),rgba(202,161,255,.04))}
+.tev{position:relative;padding:0 0 13px 30px;opacity:0;transform:translateX(8px);animation:tevIn .45s forwards}
+.tev .node{position:absolute;left:7px;top:3px;width:15px;height:15px;border-radius:50%;background:var(--bg1);border:2px solid var(--ink4);display:grid;place-items:center;z-index:2}
+.tev .node i{width:5px;height:5px;border-radius:50%;background:var(--ink4)}
+.tev.ok .node{border-color:var(--ok)}
+.tev.ok .node i{background:var(--ok)}
+.tev.run .node{border-color:var(--lilac)}
+.tev.run .node i{background:var(--lilac);animation:livepulse 1.5s infinite}
+.tev.veto .node{border-color:var(--warn)}
+.tev.veto .node i{background:var(--warn)}
+.tev .line1{display:flex;align-items:baseline;gap:8px}
+.tev .actor{font-size:11.5px;font-weight:600;color:var(--ink)}
+.tev .time{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:9.5px;color:var(--ink4);flex:none}
+.tev .msg{font-size:11px;color:var(--ink3);line-height:1.45;margin-top:3px}
+.tev .msg b{color:var(--ink2);font-weight:600}
+.tev .ptag{display:inline-flex;align-items:center;gap:4px;font-size:8.5px;font-weight:700;letter-spacing:.4px;padding:1.5px 6px;border-radius:5px;margin-top:6px}
+.tev .ptag.live{color:var(--ok);background:rgba(98,230,163,.1);border:1px solid rgba(98,230,163,.22)}
+.tev .ptag.sim{color:var(--warn);background:rgba(255,207,107,.1);border:1px solid rgba(255,207,107,.26)}
+.tev .ptag.real{color:var(--vault-text);background:rgba(110,231,183,.1);border:1px solid var(--vault-edge)}
+.tev .ptag.web{color:var(--lilac);background:rgba(202,161,255,.07);border:1px solid var(--line)}
+.feed-cursor{display:flex;align-items:center;gap:9px;padding:6px 0 0 30px;position:relative;font-size:11px;color:var(--lilac);font-style:italic}
+.feed-cursor .node{position:absolute;left:9px;top:2px;width:11px;height:11px;border-radius:50%;background:var(--lilac);animation:livepulse 1.4s infinite}
+.feed-cursor.done{color:var(--ok)}
+.feed-cursor.done .node{background:var(--ok);animation:none}
+.boundary-note{margin-top:14px;padding:11px 12px;border-radius:11px;background:linear-gradient(180deg,rgba(17,51,31,.4),rgba(17,51,31,.15));border:1px solid var(--vault-edge);font-size:10.5px;color:var(--vault-text);line-height:1.5}
+.boundary-note .h{font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:7px;margin-bottom:5px;text-transform:uppercase;font-size:10px}
+
+@keyframes turnIn{to{opacity:1;transform:none}}
+@keyframes tevIn{to{opacity:1;transform:none}}
+
+/* responsive */
+@media(max-width:1180px){
+  body{overflow:auto}
+  .stage{grid-template-columns:1fr;height:auto}
+  .col{height:auto}
+  .col.left,.col.right{border:none;border-top:1px solid var(--line)}
+  .col-body,.center-body{overflow:visible}
+}
+.legend-foot{font-size:9.5px;color:var(--ink4);padding:8px 4px 0;line-height:1.5;border-top:1px solid var(--line2);margin-top:10px}
+.legend-foot .row{display:flex;gap:14px;flex-wrap:wrap;margin-top:5px}
+.legend-foot .row span{display:inline-flex;align-items:center;gap:5px}
+.legend-foot .sw{width:9px;height:9px;border-radius:3px;flex:none}
+</style>
+</head>
+<body>
+
+<!-- ============ TOP BAR ============ -->
+<div class="topbar">
+  <div class="brand">
+    <div class="gem">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none">
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#CAA1FF"/><stop offset=".5" stop-color="#9C02FA"/><stop offset="1" stop-color="#C20CA9"/>
+        </linearGradient></defs>
+        <path d="M16 2 L28 11 L23 28 L9 28 L4 11 Z" fill="url(#g1)" stroke="#FF85FF" stroke-width=".7" opacity=".95"/>
+        <path d="M16 2 L23 28 M16 2 L9 28 M4 11 L28 11 M4 11 L16 16 L28 11" stroke="#fff" stroke-width=".5" opacity=".4"/>
+      </svg>
+    </div>
+    <div>
+      <div class="name"><b>Sapphire</b></div>
+      <div class="sub">CNS Decision Firm · Quiver Bioscience</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="avatars-mini" title="The firm in session">
+    <span class="av" style="background:linear-gradient(135deg,#6ee7b7,#10b981)">IS</span>
+    <span class="av" style="background:linear-gradient(135deg,#7ab7ff,#3b82f6)">EM</span>
+    <span class="av" style="background:linear-gradient(135deg,#CAA1FF,#9C02FA)">RW</span>
+    <span class="av" style="background:linear-gradient(135deg,#FF85FF,#C20CA9)">BM</span>
+    <span class="av" style="background:linear-gradient(135deg,#ffcf6b,#f59e0b)">TK</span>
+    <span class="av more">+10</span>
+  </div>
+  <div class="firm-tag"><span class="pulse-dot"></span> Firm in session</div>
+  <div class="eng-id">eng_6444d0e8</div>
+</div>
+
+<!-- ============ STAGE ============ -->
+<div class="stage">
+
+  <!-- ========== LEFT — ROSTER ========== -->
+  <section class="col left">
+    <div class="col-head">
+      <div class="eyebrow">Bucket 1 · Fact Agents</div>
+      <h2>The Junior Analysts</h2>
+      <div class="hint">Each agent gathers cited facts, grouped by the two data planes. Cards expand for evidence + provenance.</div>
+    </div>
+    <div class="col-body" id="leftBody">
+
+      <!-- INTERNAL PLANE -->
+      <div class="plane internal">
+        <div class="plane-head">
+          <span class="lock">🔒</span> Internal · Quiver Vault
+          <span class="liveb"><span class="pulse-dot" style="width:6px;height:6px"></span> live · real moat</span>
+        </div>
+        <div class="barnote">🔒 Private CNS_DFP — never leaves to EMET / web / Q-Models</div>
+
+        <!-- Internal Science Lead -->
+        <div class="acard internal open" data-card>
+          <div class="acard-head" data-toggle>
+            <div class="av-ring">
+              <div class="avatar" style="background:linear-gradient(135deg,#6ee7b7,#10b981)">IS</div>
+              <span class="statusdot ok"></span>
+            </div>
+            <div class="who">
+              <div class="role">Internal Science Lead</div>
+              <div class="sub">owns the moat hypothesis · EP-signatures</div>
+            </div>
+            <span class="chev">▶</span>
+          </div>
+          <div class="acard-body"><div class="acard-inner">
+            <div class="finding"><b>8 EP-signature matches</b> for the <span class="mono">TSC2 KO</span> perturbation — 4 gene mimics that <i>recapitulate</i> the KO state, 4 compounds that <i>oppose</i> it (rescue candidates). Cosine distance: lower = closer match.</div>
+            <div class="fitem"><span class="dotm"></span><span><b>TSC1</b> gene mimics TSC2 KO</span><span class="cos">cos 0.083</span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>CMIP</b> gene mimics TSC2 KO</span><span class="cos">cos 0.191</span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>DACT1</b> gene mimics TSC2 KO</span><span class="cos">cos 0.213</span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>SOX15</b> gene mimics TSC2 KO</span><span class="cos">cos 0.225</span></div>
+            <div class="fitem rescue"><span class="dotm"></span><span><b>Isorhamnetin</b> opposes signature (rescue)</span><span class="cos">cos 0.253</span></div>
+            <div class="fitem rescue"><span class="dotm"></span><span><b>GW-406381</b> opposes signature (rescue)</span><span class="cos">cos 0.321</span></div>
+            <div class="fitem rescue"><span class="dotm"></span><span><b>Momelotinib</b> opposes signature (rescue)</span><span class="cos">cos 0.328</span></div>
+            <div class="fitem rescue"><span class="dotm"></span><span><b>Cyclothiazide</b> opposes signature (rescue)</span><span class="cos">cos 0.336</span></div>
+            <div class="chips">
+              <span class="chip t2">TIER T2</span>
+              <span class="chip vault">🔒 moat-real</span>
+              <span class="chip live">● live</span>
+            </div>
+            <div class="src">Quiver moat (CNS_DFP, real) · 8 signatures</div>
+          </div></div>
+        </div>
+      </div>
+
+      <!-- EXTERNAL PLANE -->
+      <div class="plane external">
+        <div class="plane-head">
+          <span class="lock">🌐</span> External · Public Evidence
+          <span class="ct">11 agents · open sources</span>
+        </div>
+        <div class="barnote">Public identifiers only — gene symbols, SMILES, disease terms</div>
+
+        <!-- EMET Analyst -->
+        <div class="acard external open" data-card>
+          <div class="acard-head" data-toggle>
+            <div class="av-ring">
+              <div class="avatar" style="background:linear-gradient(135deg,#7ab7ff,#3b82f6)">EM</div>
+              <span class="statusdot ok"></span>
+            </div>
+            <div class="who">
+              <div class="role">EMET Analyst</div>
+              <div class="sub">BenchSci · genetics · pathway · drug-safety</div>
+            </div>
+            <span class="chev">▶</span>
+          </div>
+          <div class="acard-body"><div class="acard-inner">
+            <div class="fitem"><span class="dotm"></span><span>TSC is autosomal dominant — inactivating mutations in <b>TSC1 (hamartin)</b> or <b>TSC2 (tuberin)</b>. <span class="pmid">[PMID:27226234]</span></span></div>
+            <div class="fitem"><span class="dotm"></span><span>TSC1–TSC2 heterodimer is a <b>GAP for Rheb</b>; loss of TSC2 de-represses Rheb → mTORC1. <span class="pmid">[PMID:21329690]</span></span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>EXIST-1</b> Ph III (n=117, SEGA): everolimus response <b>35% vs 0%</b> placebo (p&lt;0.0001). <span class="pmid">[PMID:22136276]</span></span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>EXIST-2</b> (Cochrane, 235 pts): everolimus ≥50% renal AML reduction <b>RR 24.69</b>. <span class="pmid">[PMID:27409709]</span></span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>EXIST-3</b> Ph III: adjunctive everolimus → dose-dependent ↓ drug-resistant focal seizures. <span class="pmid">[PMID:29338461]</span></span></div>
+            <div class="fitem"><span class="dotm"></span><span>Everolimus <b>FDA/EMA-approved</b> for TSC-SEGA + renal AML (EU: TSC seizures). <span class="pmid">[PMID:30069763]</span></span></div>
+            <div class="chips">
+              <span class="chip t2">TIER T2</span>
+              <span class="chip prov">emet-live</span>
+              <span class="chip live">● live · 8 PMIDs</span>
+            </div>
+            <div class="src">EMET (PubMed / BenchSci BEKG) — live Playwright pull</div>
+          </div></div>
+        </div>
+
+        <!-- Q-Models Runner -->
+        <div class="acard external" data-card>
+          <div class="acard-head" data-toggle>
+            <div class="av-ring">
+              <div class="avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed)">QM</div>
+              <span class="statusdot ok"></span>
+            </div>
+            <div class="who">
+              <div class="role">Q-Models Runner</div>
+              <div class="sub">binding · selectivity · ADMET</div>
+            </div>
+            <span class="chev">▶</span>
+          </div>
+          <div class="acard-body"><div class="acard-inner">
+            <div class="finding">Queued to quantify binding / selectivity / ADMET on the surfaced rescue candidates. No quantitative result returned in this pass — model launchpad acknowledged, prediction pending.</div>
+            <div class="chips">
+              <span class="chip t2">TIER T2</span>
+              <span class="chip prov">qmodels</span>
+            </div>
+            <div class="src">Q-Models launchpad · awaiting candidate hand-off</div>
+          </div></div>
+        </div>
+
+        <!-- FDA Institutional Memory -->
+        <div class="acard external" data-card>
+          <div class="acard-head" data-toggle>
+            <div class="av-ring">
+              <div class="avatar" style="background:linear-gradient(135deg,#f87171,#dc2626)">FM</div>
+              <span class="statusdot ok"></span>
+            </div>
+            <div class="who">
+              <div class="role">FDA Institutional Memory <span class="veto-badge" title="veto-class agent">⛔</span></div>
+              <div class="sub">dispositive-veto check · prior CRL/withdrawal</div>
+            </div>
+            <span class="chev">▶</span>
+          </div>
+          <div class="acard-body"><div class="acard-inner">
+            <div class="fitem"><span class="dotm" style="background:var(--warn)"></span><span>FDA <b>Refuse-to-File</b> for NurOwn (MSC-NTF) in ALS (2022) — Ph 3 missed primary; relevance flagged <b>DIVERGENCE</b>.</span></div>
+            <div class="fitem"><span class="dotm"></span><span>FDA ALS guidance (Sept 2019): minimize placebo-only exposure; target core motor aspects.</span></div>
+            <div class="fitem"><span class="dotm" style="background:var(--t3)"></span><span><b>No TSC2-specific FDA precedent</b> in corpus — gap: mTOR-inhibitor history in TSC, TS-specific endpoints. <i>known-unknown</i></span></div>
+            <div class="chips">
+              <span class="chip t1">T1</span><span class="chip t2">T2</span><span class="chip t3">T3</span>
+              <span class="chip prov">fda-primary</span>
+              <span class="chip flag">⚑ no VETO raised</span>
+            </div>
+            <div class="src">FDA primary · Federal Register 2019-20629 · corpus gap analysis</div>
+          </div></div>
+        </div>
+
+        <!-- Patent / IP -->
+        <div class="acard external" data-card>
+          <div class="acard-head" data-toggle>
+            <div class="av-ring">
+              <div class="avatar" style="background:linear-gradient(135deg,#fb923c,#ea580c)">IP</div>
+              <span class="statusdot ok"></span>
+            </div>
+            <div class="who">
+              <div class="role">Patent / IP <span class="veto-badge" title="veto-class agent">⛔</span></div>
+              <div class="sub">freedom-to-operate · blocking IP</div>
+            </div>
+            <span class="chev">▶</span>
+          </div>
+          <div class="acard-body"><div class="acard-inner">
+            <div class="fitem"><span class="dotm" style="background:var(--ok)"></span><span>Foundational TSC2 gene patent <b>US6207374B1 expired (2015)</b> — no blocking IP on basic TSC2 ID/diagnostics.</span></div>
+            <div class="fitem"><span class="dotm"></span><span>CSHL / MGH hold <b>WO2018213618A1</b> — AAV TSC2 replacement w/ condensed tuberin. Expiry ~2038–2040.</span></div>
+            <div class="fitem"><span class="dotm"></span><span><b>BridgeBio</b> pending (cTuberin/micro-Tuberin) — most advanced gene-therapy IP. Expiry ~2042–2044.</span></div>
+            <div class="fitem"><span class="dotm"></span><span>Everolimus (Afinitor) composition/method patents — expiry ~2032–2034.</span></div>
+            <div class="chips">
+              <span class="chip t1">TIER T1</span>
+              <span class="chip prov">semantic-web</span>
+              <span class="chip flag">⚑ no VETO raised</span>
+            </div>
+            <div class="src">Google Patents · Orange Book · PatSnap</div>
+          </div></div>
+        </div>
+
+        <!-- collapsed roster -->
+        <div class="more-agents" id="moreAgents">+ 9 more fact agents reported in · click to expand the roster</div>
+        <div id="extraRoster" style="display:none">
+          <!-- Post-Market Safety -->
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#fca5a5,#ef4444)">PS</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">Post-Market Safety</div><div class="sub">class FAERS · label liabilities</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner">
+              <div class="finding">Class FAERS / label liability scan returned. Live FAERS disproportionality + PMR/PMC commitments <b>not yet accessed</b> — flagged as DIVERGENCE (real-time pull required).</div>
+              <div class="chips"><span class="chip t2">T2</span><span class="chip prov">semantic-web</span><span class="chip flag">⚑ DIVERGENCE</span></div>
+            </div></div>
+          </div>
+          <!-- gnomAD -->
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#7ab7ff,#2563eb)">GC</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">gnomAD Constraint</div><div class="sub">population genetic constraint</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner">
+              <div class="finding">Population constraint metrics for TSC2 retrieved (loss-of-function intolerance signal consistent with a haploinsufficient tumor-suppressor).</div>
+              <div class="chips"><span class="chip t2">T2</span><span class="chip prov">gnomad</span><span class="chip live">● live</span></div>
+            </div></div>
+          </div>
+          <!-- GTEx -->
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#5eead4,#0d9488)">GX</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">GTEx Expression</div><div class="sub">tissue expression profile</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner">
+              <div class="finding">TSC2 tissue-expression profile pulled across CNS and peripheral tissues for off-target exposure context.</div>
+              <div class="chips"><span class="chip t2">T2</span><span class="chip prov">gtex</span><span class="chip live">● live</span></div>
+            </div></div>
+          </div>
+          <!-- the rest, compact -->
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#CAA1FF,#7c3aed)">RG</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">Global Regulatory Divergence</div><div class="sub">FDA · EMA · PMDA · MHRA · TGA</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">No regulatory divergence across agencies — a clean signal (cited by the ex-FDA partner downstream).</div><div class="chips"><span class="chip t2">T2</span><span class="chip prov">semantic-web</span></div></div></div>
+          </div>
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#93c5fd,#3b82f6)">CT</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">Clinical-Trial Registry</div><div class="sub">ClinicalTrials.gov landscape</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">Trial landscape scanned. <b>NCT03082833</b> (AZD2014, TSC1/2-mutated gastric cancer) terminated for lack of efficacy (2019) — flagged DIVERGENCE (oncology context, not CNS TSC).</div><div class="chips"><span class="chip t2">T2</span><span class="chip prov">semantic-web</span><span class="chip flag">⚑ DIVERGENCE</span></div></div></div>
+          </div>
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#fde68a,#f59e0b)">PY</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">Payer / Reimbursement</div><div class="sub">access & coverage</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">Adjunctive-to-everolimus positioning flagged as a reimbursement risk (margin pressure) — surfaced by the BioMarin BD partner.</div><div class="chips"><span class="chip t2">T2</span><span class="chip prov">semantic-web</span></div></div></div>
+          </div>
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#6ee7b7,#059669)">FN</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">Financial</div><div class="sub">market / deal comparables</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">Rare-disease market and deal comparables compiled for the investability lens.</div><div class="chips"><span class="chip t2">T2</span><span class="chip prov">semantic-web</span></div></div></div>
+          </div>
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#FF85FF,#C20CA9)">AT</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">ASO Toxicity</div><div class="sub">acute-tox GBR model</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">No ASO sequences present in this small-molecule query → ASO acute-tox model not fired (stub). Activates downstream of the ASO Design tool.</div><div class="chips"><span class="chip t3">stub</span><span class="chip prov">aso-tox</span></div></div></div>
+          </div>
+          <div class="acard external" data-card>
+            <div class="acard-head" data-toggle>
+              <div class="av-ring"><div class="avatar" style="background:linear-gradient(135deg,#c4b5fd,#8b5cf6)">ID</div><span class="statusdot ok"></span></div>
+              <div class="who"><div class="role">InterPro Domains + Gene-set</div><div class="sub">domains · enrichment</div></div>
+              <span class="chev">▶</span>
+            </div>
+            <div class="acard-body"><div class="acard-inner"><div class="finding">TSC2 protein domains (InterPro) and pathway enrichment (g:Profiler) annotated for mechanistic context.</div><div class="chips"><span class="chip t2">T2</span><span class="chip prov">interpro · gprofiler</span><span class="chip live">● live</span></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend-foot">
+        <b style="color:var(--ink2)">Tiers</b> — T1 primary/authoritative · T2 peer-reviewed/derived · T3 gap/inference
+        <div class="row">
+          <span><span class="sw" style="background:var(--t1)"></span>T1</span>
+          <span><span class="sw" style="background:var(--t2)"></span>T2</span>
+          <span><span class="sw" style="background:var(--t3)"></span>T3 / known-unknown</span>
+          <span><span class="sw" style="background:var(--vault-text)"></span>🔒 internal vault</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CENTER — THE RESPONSE ========== -->
+  <section class="col center">
+    <div class="center-body">
+
+      <!-- Question hero -->
+      <div class="q-hero">
+        <div class="q-eyebrow">Engagement · Prioritization <span style="color:var(--ink4)">›</span> a ranked, de-risked target list</div>
+        <div class="q-text">Is <span class="accent">TSC2</span> a viable target in tuberous sclerosis?</div>
+        <div class="q-meta">
+          <span class="m">disease <b>tuberous sclerosis / mTORopathy</b></span>
+          <span class="m">modality <b>small molecule</b></span>
+          <span class="m">fields <b>A · B · C</b></span>
+          <span class="m"><b>15</b> fact agents · <b>5</b> partners</span>
+        </div>
+      </div>
+
+      <!-- Synthesis -->
+      <div class="synth">
+        <div class="synth-head">
+          <span class="lbl">⬡ The Firm's Synthesis</span>
+          <span class="sim-badge" title="Model reasoning is simulated for now; live reasoning pending">🧪 SIMULATED · reasoning</span>
+        </div>
+        <div class="synth-verdict">
+          <div class="big">Conditional advance — <span class="hl">3 conditional verdicts</span>.</div>
+        </div>
+        <div class="synth-sub">Address the open items before IND filing. The mechanism is well-characterized and the rescue chemistry is real but modest; no veto, but no clean green light either. <b>The spread is the product.</b></div>
+        <div class="synth-rail">
+          <div class="srail">
+            <div class="k">Confidence</div>
+            <div class="v"><span class="conf-pips"><i class="on"></i><i class="on"></i><i></i></span> medium</div>
+          </div>
+          <div class="srail">
+            <div class="k">Verdict spread</div>
+            <div class="v">3 conditional · 2 abstain</div>
+          </div>
+          <div class="srail" style="flex:1.4">
+            <div class="k">Proposed next experiment</div>
+            <div class="v exp">Run orthogonal in-vivo validation for TSC2 in a disease-relevant model.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIVERGENCE pinned -->
+      <div class="diverge-pin">
+        <div class="dp-head">
+          <span class="ico">◆</span>
+          <span class="t">Divergence · pinned insight</span>
+          <span class="ct">3 surfaced · NOT auto-reconciled</span>
+        </div>
+        <div class="dp-note">Internal↔external tension the firm surfaces rather than resolves — often where the alpha hides. The orchestrator does <i>not</i> silently reconcile these.</div>
+        <div class="dp-list">
+          <div class="dp-item"><span class="n">1</span><span><b>AZD2014 / NCT03082833</b> — Ph II in TSC1/2-mutated gastric cancer terminated for lack of efficacy (2019). Oncology context, not primary CNS TSC; relevance to the CNS target <b>unclear</b>.</span></div>
+          <div class="dp-item"><span class="n">2</span><span><b>NurOwn ALS Refuse-to-File</b> (2022) — a class-adjacent FDA disposition flagged by Institutional Memory; not directly on TSC2 but kept in view.</span></div>
+          <div class="dp-item"><span class="n">3</span><span><b>FAERS / PMR-PMC not accessed</b> — live disproportionality + post-market commitments still require a real-time EMET/FAERS pull for the full signal landscape.</span></div>
+        </div>
+      </div>
+
+      <!-- ROUNDTABLE -->
+      <div class="rt-head">
+        <div class="ttl">⬡ The Partner Roundtable</div>
+        <span class="tag">Bucket 2 · deliberation</span>
+      </div>
+      <div class="rt-intro">Five partners read the same dossier and reach their own verdict — independently. They cite facts; they never invent them. No forced consensus.</div>
+
+      <!-- Spread meter -->
+      <div class="spread">
+        <div class="lbl">Where the room lands <em>they disagree — by design</em></div>
+        <div class="spread-track">
+          <div class="seg conditional" style="flex:3">3 CONDITIONAL</div>
+          <div class="seg hold" style="flex:2">2 ABSTAINED</div>
+        </div>
+        <div class="spread-legend">
+          <span class="li"><span class="sw" style="background:var(--ok)"></span>Advance · 0</span>
+          <span class="li"><span class="sw" style="background:var(--warn)"></span>Conditional · 3</span>
+          <span class="li"><span class="sw" style="background:rgba(125,131,173,.6)"></span>Abstained (guardrail) · 2</span>
+        </div>
+      </div>
+
+      <!-- DEBATE thread -->
+      <div class="thread" id="thread">
+
+        <!-- Watts -->
+        <div class="turn" style="animation-delay:.15s">
+          <div class="av-col"><div class="speaker-av" style="background:linear-gradient(135deg,#CAA1FF,#9C02FA)">RW<span class="sd" style="background:var(--warn)"></span></div></div>
+          <div class="bubble">
+            <div class="bub-head">
+              <span class="nm">Dr. Ryan Watts</span>
+              <span class="firm">CSO · Denali Therapeutics</span>
+              <span class="lens">scientific</span>
+              <span class="verdict-pill conditional">conditional <span class="conv-label">conv</span><span class="conv"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></span>
+            </div>
+            <div class="rationale">The rescue cosine scores — <span class="cite">Isorhamnetin 0.25, Momelotinib 0.328</span> — are non-zero but modest; translational biology rarely yields perfect phenotypic matches. The <span class="cite">TSC1-TSC2 GAP-for-Rheb</span> mechanism is well-characterized, and everolimus's FDA approval for TSC seizures anchors target credibility. However, the EXIST-3 data cutoff (2015) predates modern sequencing and validation toolsets.</div>
+          </div>
+        </div>
+
+        <!-- BioMarin -->
+        <div class="turn" style="animation-delay:.35s">
+          <div class="av-col"><div class="speaker-av" style="background:linear-gradient(135deg,#FF85FF,#C20CA9)">BM<span class="sd" style="background:var(--warn)"></span></div></div>
+          <div class="bubble">
+            <div class="bub-head">
+              <span class="nm">Pharma BD Lead</span>
+              <span class="firm">Rare Disease · BioMarin</span>
+              <span class="lens">commercial</span>
+              <span class="verdict-pill conditional">conditional <span class="conv-label">conv</span><span class="conv"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span>
+            </div>
+            <div class="rationale">The dossier shows <span class="cite">Isorhamnetin and Momelotinib</span> opposing the TSC2 KO signature with meaningful potency. But <span class="cite">everolimus already owns clinical access</span> for TSC-associated seizures. If a TSC2 therapy is positioned as adjunctive to everolimus, reimbursement complexity kills margin — and TSC2-specific restoration / gene-therapy approaches still lack established…</div>
+          </div>
+        </div>
+
+        <!-- Takeda ex-FDA -->
+        <div class="turn" style="animation-delay:.55s">
+          <div class="av-col"><div class="speaker-av" style="background:linear-gradient(135deg,#ffcf6b,#f59e0b)">TK<span class="sd" style="background:var(--warn)"></span></div></div>
+          <div class="bubble">
+            <div class="bub-head">
+              <span class="nm">Pharma Neuro SVP · ex-FDA</span>
+              <span class="firm">Takeda Neuro</span>
+              <span class="lens">regulatory</span>
+              <span class="verdict-pill conditional">conditional <span class="conv-label">conv</span><span class="conv"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></span>
+            </div>
+            <div class="rationale">TSC2 restoration sits on a well-characterized mechanism (<span class="cite">TSC1-TSC2 GAP for Rheb</span>), and everolimus's approval establishes regulatory precedent for TSC interventions. The <span class="cite">absence of FDA/EMA/PMDA/MHRA/TGA divergence</span> is a clean signal. However, adjunctive positioning triggers reimbursement complexity, and TSC2-specific restoration…</div>
+          </div>
+        </div>
+
+        <!-- Third Rock — ABSTAINED -->
+        <div class="turn abstained" style="animation-delay:.78s">
+          <div class="av-col"><div class="speaker-av" style="background:linear-gradient(135deg,#5f648c,#3a3f63)">3R<span class="sd" style="background:var(--abstain)"></span></div></div>
+          <div class="bubble">
+            <div class="bub-head">
+              <span class="nm">Venture GP</span>
+              <span class="firm">Neuro · Third Rock</span>
+              <span class="lens">investability</span>
+              <span class="verdict-pill abstained">abstained</span>
+            </div>
+            <div class="abst-row"><span class="shield">🛡️</span><span><b>Abstained — guardrail check.</b> The harness withheld this verdict (guardrail-violation); shown honestly, not counted as an opinion.</span></div>
+          </div>
+        </div>
+
+        <!-- Red-Team — ABSTAINED -->
+        <div class="turn abstained" style="animation-delay:1s">
+          <div class="av-col"><div class="speaker-av" style="background:linear-gradient(135deg,#7d83ad,#4a4f73)">RT<span class="sd" style="background:var(--abstain)"></span></div></div>
+          <div class="bubble">
+            <div class="bub-head">
+              <span class="nm">Adversarial Red-Team</span>
+              <span class="firm">Institutional · always seated</span>
+              <span class="lens">adversarial</span>
+              <span class="verdict-pill abstained">abstained</span>
+            </div>
+            <div class="abst-row"><span class="shield">🛡️</span><span><b>Abstained — guardrail check.</b> The seat that must stress every claim was held back by a guardrail-violation; surfaced, never silently dropped.</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== RIGHT — TRACE FEED ========== -->
+  <section class="col right">
+    <div class="col-head">
+      <div class="eyebrow">Transparency · Agent Traces</div>
+      <h2>The Firm Convenes <span class="pulse-dot" style="width:7px;height:7px"></span></h2>
+      <div class="hint">A live, append-only record of every box that fired — actor · provenance · timing.</div>
+    </div>
+    <div class="col-body">
+      <div class="trace-stats">
+        <div class="tstat"><div class="n">15</div><div class="k">Agents</div></div>
+        <div class="tstat"><div class="n live">5</div><div class="k">Live · real</div></div>
+        <div class="tstat"><div class="n">3</div><div class="k">Divergence</div></div>
+        <div class="tstat"><div class="n">0</div><div class="k">Vetoes</div></div>
+      </div>
+
+      <div class="feed" id="feed"><!-- streamed by JS --></div>
+
+      <div class="feed-cursor" id="cursor"><span class="node"></span><span id="cursorTxt">convening the firm…</span></div>
+
+      <div class="boundary-note">
+        <div class="h">🔒 Data-boundary enforced</div>
+        Internal EP/CRISPR scores never crossed to EMET, the web, or Q-Models. Only public identifiers (gene symbols, SMILES, disease terms) left the vault — mechanically guarded by the harness.
+      </div>
+
+      <div class="legend-foot">
+        <b style="color:var(--ink2)">Provenance</b>
+        <div class="row">
+          <span><span class="sw" style="background:var(--ok)"></span>live · real (moat / EMET)</span>
+          <span><span class="sw" style="background:var(--warn)"></span>🧪 simulated (roundtable)</span>
+          <span><span class="sw" style="background:var(--lilac)"></span>semantic-web</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- expandable agent cards ---------- */
+document.querySelectorAll('[data-toggle]').forEach(function(h){
+  h.addEventListener('click', function(){
+    h.closest('[data-card]').classList.toggle('open');
+  });
+});
+
+/* ---------- reveal extra roster ---------- */
+var more = document.getElementById('moreAgents');
+var extra = document.getElementById('extraRoster');
+more.addEventListener('click', function(){
+  var showing = extra.style.display === 'block';
+  extra.style.display = showing ? 'none' : 'block';
+  more.textContent = showing
+    ? '+ 9 more fact agents reported in · click to expand the roster'
+    : '▾ collapse the rest of the roster';
+});
+
+/* ---------- streaming trace feed ---------- */
+var events = [
+  {actor:'Engagement Lead', cls:'ok', tag:null, t:'00:00.4', msg:'Triaged query → <b>prioritization</b>. Scoped fields <b>A·B·C</b>; convened 15 fact agents + 5 partners.'},
+  {actor:'Internal Science Lead', cls:'ok', tag:'real', tagtxt:'● moat-real', t:'00:02.1', msg:'Pulled <b>8 EP-signatures</b> for TSC2 KO from the Quiver vault — 4 gene mimics, 4 rescue compounds.'},
+  {actor:'EMET Analyst', cls:'ok', tag:'live', tagtxt:'● emet-live', t:'00:05.7', msg:'Live BenchSci pull returned <b>8 PMIDs</b> — mechanism, EXIST-1/2/3, approvals.'},
+  {actor:'gnomAD · GTEx · InterPro', cls:'ok', tag:'live', tagtxt:'● live', t:'00:07.3', msg:'Constraint, expression + domain annotations retrieved for TSC2.'},
+  {actor:'FDA Institutional Memory ⛔', cls:'veto', tag:'web', tagtxt:'fda-primary', t:'00:09.0', msg:'Veto-class scan — <b>no dispositive precedent</b> on TSC2. Logged a known-unknown; <b>no VETO raised</b>.'},
+  {actor:'Patent / IP ⛔', cls:'veto', tag:'web', tagtxt:'semantic-web', t:'00:10.4', msg:'FTO clear on core TSC2; gene-therapy IP (CSHL, BridgeBio) noted. <b>No VETO raised</b>.'},
+  {actor:'Clinical-Trial Registry', cls:'ok', tag:'web', tagtxt:'semantic-web', t:'00:11.8', msg:'Flagged <b>AZD2014 / NCT03082833</b> terminated (oncology) → <b>DIVERGENCE</b>.'},
+  {actor:'Q-Models Runner', cls:'ok', tag:'web', tagtxt:'qmodels', t:'00:13.2', msg:'Launchpad acknowledged; candidate hand-off pending — no quantitative result this pass.'},
+  {actor:'Research Manager', cls:'ok', tag:null, t:'00:15.9', msg:'Completeness + contradiction sweep → dossier <b>sealed</b>. 3 DIVERGENCE surfaced, 0 vetoes.'},
+  {actor:'Dr. Ryan Watts · Denali', cls:'ok', tag:'sim', tagtxt:'🧪 simulated', t:'00:18.6', msg:'Weighed in — <b>conditional</b> (conv 4). Cited rescue cosines + GAP mechanism.'},
+  {actor:'BioMarin BD', cls:'ok', tag:'sim', tagtxt:'🧪 simulated', t:'00:20.1', msg:'<b>Conditional</b> (conv 3) — everolimus owns access; adjunctive margin risk.'},
+  {actor:'Takeda Neuro · ex-FDA', cls:'ok', tag:'sim', tagtxt:'🧪 simulated', t:'00:21.7', msg:'<b>Conditional</b> (conv 3) — clean cross-agency signal; reimbursement caveat.'},
+  {actor:'Third Rock GP', cls:'veto', tag:null, t:'00:23.0', msg:'<b>Abstained</b> — guardrail-violation. Verdict withheld, surfaced honestly.'},
+  {actor:'Adversarial Red-Team', cls:'veto', tag:null, t:'00:24.2', msg:'<b>Abstained</b> — guardrail-violation. Always-seated, held back this round.'},
+  {actor:'Roundtable Moderator', cls:'ok', tag:null, t:'00:26.5', msg:'Synthesis: <b>Conditional advance</b> · medium confidence. Next: orthogonal in-vivo validation.'}
+];
+
+var feed = document.getElementById('feed');
+var cursor = document.getElementById('cursor');
+var cursorTxt = document.getElementById('cursorTxt');
+var i = 0;
+function emit(){
+  if(i >= events.length){
+    cursor.classList.add('done');
+    cursorTxt.textContent = 'dossier sealed · roundtable adjourned';
+    return;
+  }
+  var e = events[i++];
+  var div = document.createElement('div');
+  div.className = 'tev ' + e.cls;
+  div.style.animationDelay = '0s';
+  var ptag = e.tag ? '<span class="ptag '+e.tag+'">'+e.tagtxt+'</span>' : '';
+  div.innerHTML =
+    '<div class="node"><i></i></div>' +
+    '<div class="line1"><span class="actor">'+e.actor+'</span><span class="time">'+e.t+'</span></div>' +
+    '<div class="msg">'+e.msg+'</div>' + ptag;
+  feed.appendChild(div);
+  feed.parentElement.scrollTop = feed.parentElement.scrollHeight;
+  var delay = 480 + Math.random()*360;
+  setTimeout(emit, delay);
+}
+setTimeout(emit, 500);
+</script>
+</body>
+</html>

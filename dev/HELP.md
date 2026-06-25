@@ -48,7 +48,22 @@ ambiguous brief, a failing gate you don't understand, or a design call above you
 ---
 
 ## Open requests
-_None._
+
+### [OPEN] patent-ip-t1-patent-domains: add granted-patent primary domains to the T1 allowlist  ·  from: hayes  ·  date: 2026-06-25  ·  branch: hayes/corpus-patent-ip
+**Blocking?** no — patent-ip ships now with patent cards tiered **T2**; this is a T1-upgrade request (same pattern as the ex-US-regulator allowlist fix, PR #31).
+**Context:** `semantic-corpora`, patent-ip corpus. The agent spec (`architecture/bucket1/semantic/patent-ip.md`) says *"Tier granted patents & Orange/Purple Book listings T1 (primary)."* But `dev/validate-corpus.sh`'s T1 allowlist is US `.gov`/`.edu`/PMC/NCBI (+ ex-US regulators) — it does NOT include patent-primary domains, so granted-patent cards (whose primary record I read on `patents.google.com`) can't be T1 without failing the gate.
+**Question:** add granted-patent primary domains to the T1 allowlist — `patents.google.com` (the USPTO/WIPO granted-patent record), and optionally `uspto.gov`/`ppubs.uspto.gov`, `worldwide.espacenet.com`, `patentscope.wipo.int`? A granted patent IS a primary legal record (the spec treats it as T1); pending apps / WO PCT publications stay T2/landscape.
+**What I tried / read:** the spec + METHOD + the gate's `PRIMARY_SUFFIX/PRIMARY_HOST/PRIMARY_REGULATOR`. I verified all 7 cards against the actual patent pages and used verbatim claim/abstract substrings. Per "don't edit the gate — raise via HELP," I left the allowlist untouched.
+**My current best guess:** add a `PRIMARY_PATENT = ("patents.google.com", ...)` tuple, T1-eligible for **granted** patents only. On resolution I re-tier the 5 granted-US patent cards to T1 (the WO PCT + the lapsed-capsid landscape cards stay T2).
+**Answer (lead fills):** —
+
+### [OPEN] validate-corpus.sh hardcodes /tmp — fails under Windows python3  ·  from: hayes  ·  date: 2026-06-25  ·  branch: hayes/corpus-patent-ip
+**Blocking?** no — I verified my corpus via the gate's exact checks run directly (CLEAN: 7 cards, schema/tier ok, all 7 URLs HTTP 200). This is a cross-platform tooling bug, same class as the moat dir-name / cp1252 fixes (`crossplatform-test-hardening`).
+**Context:** running `bash dev/validate-corpus.sh sapphire-orchestrator/corpus/patent-ip` on the Windows contributor box.
+**Bug:** the Python phase does `open("/tmp/_corpus_urls.txt","w")` (line ~88) and the bash phase reads `< /tmp/_corpus_urls.txt` (line ~104). Under git-bash with native Windows `python3`, Python resolves `/tmp/...` → `C:\tmp\...` (absent → `FileNotFoundError`), while bash's MSYS `/tmp` is a different dir — so the script can't run on Windows (and creating `C:\tmp` would make the two halves use different files → the URL-liveness phase silently reads an empty list = false-clean).
+**What I tried / read:** prepended the real Python dir to PATH + added a `python3.exe` shim (so `python3` resolves); the remaining failure is purely the hardcoded `/tmp`.
+**My current best guess:** `mktemp` the intermediate file and pass it to the Python phase as a second argv, read it back in bash, `rm -f` at the end. Approver-owned tooling, so flagging rather than patching — happy to send a diff.
+**Answer (lead fills):** —
 
 ---
 

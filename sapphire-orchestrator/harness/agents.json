@@ -339,6 +339,39 @@
       "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
     },
     {
+      "id": "boltz",
+      "role": "Bucket-1 structural / binding fact source — Boltz-2 biomolecular structure + binding-affinity prediction via the hosted Boltz Compute API (x-api-key auth; ASYNC start→poll). Fires only when a target protein sequence and/or a candidate ligand (SMILES/CCD) is present in inputs (e.g. downstream of the ASO Design / small-molecule tools), else honest-empty. PUBLIC identifiers only — sequences/SMILES leave Quiver, internal moat data never does (data_boundary + in-seam tripwire). Cited model-predicted T2 facts; honest KNOWN_UNKNOWN when the key is absent / API down / job fails.",
+      "spec": "sapphire-orchestrator/tools/BOLTZ.md",
+      "kind": "python",
+      "output_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["candidate", "facts"],
+        "properties": {
+          "candidate": {"type": "string"},
+          "facts": {"type": "array", "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["value", "source", "tier"],
+            "properties": {
+              "value": {"type": "string"},
+              "source": {"type": "string"},
+              "tier": {"type": "string", "enum": ["T1", "T2", "T3", "T4"]},
+              "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+              "provenance": {"type": "string"}
+            }
+          }},
+          "provenance": {"type": "string"},
+          "error": {"type": "string"}
+        }
+      },
+      "tools_allowed": [],
+      "guardrails": ["data_boundary", "facts_only_cited", "stamp_provenance"],
+      "provenance_label": "boltz",
+      "timeout_s": 360,
+      "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
       "id": "robyn-scs",
       "role": "Bucket-1 INTERNAL fact source — Robyn's SCS/STA neuronal-connectivity pipeline (imaging-derived; tiered connections + neuron classification). External subprocess delegate (numpy/scipy/pandas in tools/robyn_scs); fires ONLY when imaging data (a v17_traces plate dir) is present in inputs, else honest-empty.",
       "spec": "tools/robyn_scs/README.md",

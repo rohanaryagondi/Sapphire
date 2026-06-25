@@ -43,6 +43,11 @@ PROVENANCE = frozenset({
     "corpus",
     # Quiver ASO acute-toxicity delegate (subprocess; sklearn env)
     "aso-tox",
+    # Boltz-2 biomolecular structure + binding-affinity model (hosted Boltz Compute
+    # API via stdlib urllib seam). EXTERNAL model run against PUBLIC identifiers only
+    # (protein/RNA/DNA sequences, ligand SMILES, CCD codes); never receives Quiver
+    # internal moat data.
+    "boltz",
     # quantitative-fact Bucket-1 seams (public APIs via stdlib urllib seams)
     "gnomad",
     "gtex",
@@ -83,6 +88,7 @@ _PLANE_MAP: dict[str, str] = {
     "mock":             "external",
     "corpus":           "external",   # pre-ingested public literature
     "aso-tox":          "external",   # public ASO sequences; GBR model is local but inputs are public
+    "boltz":            "external",   # hosted Boltz-2 structure/binding model; public-identifier inputs only
     "gnomad":           "external",
     "gtex":             "external",
     "interpro":         "external",
