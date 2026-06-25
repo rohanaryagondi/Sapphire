@@ -49,6 +49,9 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 
 > **Hayes — run autonomously** (`dev/CONTRIBUTOR_RULES.md` §Autonomous operation): keep
 > `bash dev/watch-assignments.sh hayes HayesStewart-QuiverBS` running (board + HELP + PR-review channels).
+> **✅ Your violet console design was ADOPTED + merged (#97 mock + #99 Chainlit tint, 2026-06-25)** — the user
+> chose Hayes's full design; #99 intentionally supersedes #94's sapphire-blue as the runtime look. Both gated green
+> (render-checked :8015, suite 662). No action needed; continue your `semantic-corpora` queue below.
 > **Status:** `quant-fact-seams` ✅ · `experiment-design` (#28/#36) ✅ · `robyn-scs-endpoint-wiring` (#44) ✅ — all complete.
 > **🔨 NOW: your 6 `semantic-corpora`** (patent-ip · post-market-safety · clinical-trial-registry ·
 > payer-market-access · manufacturing-cmc · dea-scheduling). Read the
@@ -118,6 +121,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `console-chainlit-violet` (**adopted** — Chainlit runtime violet tint, mock parity: dark `--background`→`256 19% 11%`=`#1a1722`, header/composer neutral; intentionally overrides #94 sapphire-blue. frontend/public only. Render-checked :8015 ✓, suite 662 ✓) | hayes | 2026-06-25 | PR #99 |
+| `console-ui-refine` (**adopted** — violet MOCKUP: canvas `#1a1722` + `--purple #a07cff`, per-sub-agent cards 14→**42**, blue↔purple attributed-finding highlight; docs/design only, runtime untouched. Rendered :8015 ✓, 0 console errors) | hayes | 2026-06-25 | PR #97 |
 | `console-ui-chat-tweaks` (mock-only: agent wing as 14-category expandable tree + 5 attributed `#4d7cfe` findings on Gavin's chat-first prototype; composes with #94, runtime untouched) | hayes | 2026-06-25 | PR #95 |
 | `real-live-emet-frontend` (session-bridge = front-end's real-EMET path; supersedes #77/#84; Gate-5 a+b+c PASS — 9 real TSC2 PMIDs) | rohan | 2026-06-25 | PR #90 |
 | `semantic-corpora` (post-market-safety — Hayes's 4th corpus) | hayes | 2026-06-25 | PR #87 |
