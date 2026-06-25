@@ -146,6 +146,33 @@ class TestRescueRankingDeliverable(_Base):
         phases = {e.get("phase") for e in steps}
         self.assertEqual(phases, {"start", "done"})
 
+    def test_uncited_high_confidence_downgraded_to_low(self):
+        """HONESTY (cite-or-hedge): an uncited high/medium claim is forced to low by the engine,
+        so a confident-but-unsupported mechanism is never presented as well-grounded."""
+        import json
+        from emet.session_bridge import make_session_emet_handler
+        from live_engine import run_live
+
+        body = {"target": "TSC2", "provenance": "scientific-reasoning", "gene_mechanisms": [
+            # high confidence but NO citations — must be downgraded
+            {"gene": "DCTN6", "rank": 1, "mechanism": "Confident but uncited mTORC1 claim.",
+             "citations": [], "confidence": "high"},
+            # medium with a citation — must be preserved
+            {"gene": "FZD7", "rank": 2, "mechanism": "Cited Wnt/mTORC1 claim.",
+             "citations": ["PMID:99"], "confidence": "medium"}]}
+
+        class _Proc:
+            returncode = 0
+            stderr = ""
+            stdout = json.dumps({"structured_output": body})
+
+        ctx = {"runner": lambda cmd: _Proc(),
+               "emet_handler": make_session_emet_handler({})}
+        res = run_live("rank genes that rescue the TSC2 KO phenotype", ctx=ctx)
+        ranked = {g["gene"]: g for g in res["synthesize"]["ranked_genes"]}
+        self.assertEqual(ranked["DCTN6"]["confidence"], "low")   # uncited high → low
+        self.assertEqual(ranked["FZD7"]["confidence"], "medium")  # cited medium preserved
+
     def test_mechanism_facts_in_dossier(self):
         from live_engine import run_live
         res = run_live("rank genes that rescue the TSC2 KO phenotype", ctx=self._ctx())
@@ -179,6 +206,14 @@ class TestIntentDetection(unittest.TestCase):
         self.assertFalse(_is_rescue_ranking_query("What is the safety profile of rapamycin?"))
         # "rescue" alone, without a gene+KO cue, does not trigger the deliverable
         self.assertFalse(_is_rescue_ranking_query("Can this drug rescue patients?"))
+
+    def test_rejects_compound_ranking(self):
+        # a rescue-COMPOUND ranking question is a different deliverable — must NOT hit the gene path
+        from live_engine import _is_rescue_ranking_query
+        self.assertFalse(_is_rescue_ranking_query(
+            "rank the rescue compound candidates for the TSC2 knockout signature"))
+        self.assertFalse(_is_rescue_ranking_query(
+            "which small-molecule rescue drugs reverse the TSC2 KO phenotype?"))
 
 
 if __name__ == "__main__":

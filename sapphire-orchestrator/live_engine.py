@@ -161,9 +161,15 @@ def _is_rescue_ranking_query(query: str) -> bool:
     q = query or ""
     if not _RESCUE_RE.search(q):
         return False
-    has_gene_cue = re.search(r"\bgenes?\b|\brank\b|\bidentif", q, re.I) is not None
+    # Require an explicit GENE cue (the deliverable ranks GENES) — a bare "rank"/"identify" is too
+    # loose. And exclude compound/drug/molecule ranking questions, which are a different deliverable
+    # (the moat's rescue COMPOUNDS), so "rank the rescue compound candidates for TSC2 KO" does NOT
+    # trigger the gene path. Conservative by design: a miss falls back to IND synthesis (no harm).
+    has_gene_cue = re.search(r"\bgenes?\b", q, re.I) is not None
+    is_compound_q = re.search(r"\bcompounds?\b|\bdrugs?\b|\bmolecules?\b|\bsmall[- ]molecules?\b",
+                              q, re.I) is not None
     has_ko_cue = re.search(r"\bK/?O\b|knock-?out|knock-?down|phenotype|signature", q, re.I) is not None
-    return has_gene_cue and has_ko_cue
+    return has_gene_cue and has_ko_cue and not is_compound_q
 
 
 def _known_agent_ids(registry) -> set:
@@ -613,6 +619,13 @@ def run_live(
             _elapsed = round(time.monotonic() - _t0, 2)
             if mres.ok and mres.output:
                 gene_mechanisms = mres.output.get("gene_mechanisms", []) or []
+            # Enforce "cite or hedge" MECHANICALLY (defense in depth — the JSON schema cannot): an
+            # uncited high/medium claim is downgraded to low, so a confident-but-unsupported mechanism
+            # can never be presented as well-grounded. The agent is instructed to do this; this makes
+            # it a guarantee regardless of what the model returns.
+            for gm in gene_mechanisms:
+                if gm.get("confidence") in ("high", "medium") and not (gm.get("citations") or []):
+                    gm["confidence"] = "low"
             # Surface each cited mechanism as a dossier fact (provenance scientific-reasoning).
             for gm in gene_mechanisms:
                 cites = ", ".join(gm.get("citations", []) or [])
