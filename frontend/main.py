@@ -32,8 +32,16 @@ from starters import STARTERS  # noqa: E402
 DEMO_PROFILE = "Demo (mock backends)"
 LIVE_PROFILE = "Live (real firm)"
 CHEAP_PROFILE = "Live (cheap · haiku)"
+SIMULATE_PROFILE = "Live (demo · simulated models)"
 REPLAY_PROFILE = "Replay (captured TSC2 · $0)"
 REPLAY_SCENARIO = "tsc2_live_run"
+
+# 🧪 simulated-models banner — shown on every simulated run so the labeling is unmistakable.
+SIMULATE_BANNER = (
+    "🧪 **Simulated-models run.** Real **moat**, **EMET PMIDs**, **seams** and **Q-Models** — but the "
+    "**roundtable verdicts + any claude fact-agent reasoning are SIMULATED** (labeled `🧪 simulated`, "
+    "provenance `simulated`), not real model output. For a fast demo while real reasoning is wired in."
+)
 
 # The cheap-live model: real backends (moat/EMET/seams/corpora), but every claude agent
 # (Bucket-1 fact agents + Bucket-2 personas) runs on haiku so a real run doesn't burn
@@ -71,6 +79,14 @@ async def chat_profiles(current_user=None):
                                   "cheaper. Needs the `claude` CLI + a logged-in EMET session."),
         ),
         cl.ChatProfile(
+            name=SIMULATE_PROFILE,
+            markdown_description=("**Fast demo — real facts, 🧪 simulated reasoning.** Real moat · "
+                                  "real EMET PMIDs (logged-in) · real seams/Q-Models, but the "
+                                  "**roundtable verdicts + claude fact-agents are SIMULATED** "
+                                  "(clearly labeled `🧪 simulated`) so the run is fast while real "
+                                  "`claude -p` reasoning is wired in. Honest: simulated ≠ real verdict."),
+        ),
+        cl.ChatProfile(
             name=REPLAY_PROFILE,
             markdown_description=("**Captured TSC2 run — $0 instant replay.** A frozen REAL "
                                   "engagement (real Quiver moat · 8 real EMET PMIDs · the live "
@@ -103,6 +119,9 @@ def _profile_run_kwargs(profile: str) -> dict:
         return {"mock": False, "model": None}
     if profile == CHEAP_PROFILE:
         return {"mock": False, "model": CHEAP_MODEL}
+    if profile == SIMULATE_PROFILE:
+        # Real backends (moat/EMET/seams), but claude-subagent reasoning is 🧪 simulated (fast).
+        return {"mock": False, "model": CHEAP_MODEL, "simulate": True}
     return {"mock": True, "model": None}
 
 
@@ -200,6 +219,9 @@ async def on_message(message: cl.Message):
         await _render_final(result)
         return
 
-    # Live / Cheap / Demo: stream the firm convening as a live step tree, then the rich final view.
+    # Live / Cheap / Demo / Simulated: stream the firm convening as a live step tree, then the
+    # rich final view. A simulated run shows the 🧪 banner up-front so the labeling is unmistakable.
+    if profile == SIMULATE_PROFILE:
+        await cl.Message(content=SIMULATE_BANNER).send()
     result = await _run_with_live_steps(query, _profile_run_kwargs(profile))
     await _render_final(result)

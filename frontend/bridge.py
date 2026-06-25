@@ -80,8 +80,13 @@ def _error_envelope(query: str, exc: Exception) -> dict:
 
 
 def run(query: str, *, mock: bool = True, sequences: list | None = None,
-        model: str | None = None, on_progress=None) -> dict:
+        model: str | None = None, on_progress=None, simulate: bool = False) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
+
+    `simulate` (SAPPHIRE_SIMULATE_MODELS) replaces every claude-subagent's model reasoning
+    (persona verdicts + claude fact agents) with a CLEARLY-LABELED 🧪 simulated stand-in
+    (provenance `simulated`) — fast, for the demo, while real `claude -p` is slow. Real EMET /
+    moat / seams / Q-Models stay genuinely REAL. The env is set + restored around this call.
 
     `on_progress(event)` is forwarded to `run_live` (live-run-visibility): it fires per
     milestone (plan, each Bucket-1 agent start/done, flags, each persona start/done, synthesis)
@@ -104,10 +109,13 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
     """
     started = time.monotonic()
     _prev_model = os.environ.get("CLAUDE_MODEL")
+    _prev_sim = os.environ.get("SAPPHIRE_SIMULATE_MODELS")
     try:
         _ensure_engine_on_path()
         if model:
             os.environ["CLAUDE_MODEL"] = model
+        if simulate:
+            os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
         from live_engine import run_live
         result = run_live(query, sequences=sequences, ctx=build_ctx(mock),
                           on_progress=on_progress)
@@ -119,9 +127,15 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
                 os.environ.pop("CLAUDE_MODEL", None)
             else:
                 os.environ["CLAUDE_MODEL"] = _prev_model
+        if simulate:
+            if _prev_sim is None:
+                os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+            else:
+                os.environ["SAPPHIRE_SIMULATE_MODELS"] = _prev_sim
     result["_elapsed_s"] = round(time.monotonic() - started, 2)
     result["_mock"] = bool(mock)
     result["_model"] = model or ""
+    result["_simulated"] = bool(simulate)
     return result
 
 

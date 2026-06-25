@@ -51,6 +51,11 @@ PROVENANCE = frozenset({
     # Quiver robyn_scs SCS/STA neuronal-connectivity pipeline (imaging-derived, INTERNAL;
     # subprocess delegate). Fires only when imaging data is present in inputs.
     "robyn-scs",
+    # LABELED simulated model reasoning (SAPPHIRE_SIMULATE_MODELS=1): a claude-subagent's
+    # persona/fact output stood in for a real `claude -p` call (fast demo). Always rendered with
+    # a "🧪 simulated" marker — NEVER presented as a real verdict. External plane (no internal
+    # data; it is a placeholder, not a real source).
+    "simulated",
 })
 
 # ---------------------------------------------------------------------------
@@ -82,6 +87,7 @@ _PLANE_MAP: dict[str, str] = {
     "gtex":             "external",
     "interpro":         "external",
     "gprofiler":        "external",
+    "simulated":        "external",   # labeled placeholder model reasoning — not a real source
 }
 
 # Sanity guard (BIDIRECTIONAL): the PROVENANCE set and _PLANE_MAP keys must match

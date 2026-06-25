@@ -26,6 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
+from contracts.run_live_schema import validate_run_live
 from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
 
 
@@ -1545,6 +1546,32 @@ class TestEmetHandlerWiring(unittest.TestCase):
         self.assertGreater(calls["n"], 0, "the registered emet handler must actually be invoked")
         agents = {a["id"]: a["status"] for a in result["discover"]["agents"]}
         self.assertEqual(agents.get("emet-runner"), "ok")  # fired, not abstained
+
+
+class TestSimulateModelsRunLive(unittest.TestCase):
+    """SAPPHIRE_SIMULATE_MODELS in a full run_live: persona reasoning is labeled-simulated, while
+    real moat/EMET facts stay genuinely real (the demo's honesty contract)."""
+
+    def setUp(self):
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+
+    def tearDown(self):
+        for k in ("SAPPHIRE_ENGAGEMENTS_DIR", "SAPPHIRE_MEMORY_DIR", "SAPPHIRE_SIMULATE_MODELS"):
+            os.environ.pop(k, None)
+
+    def test_personas_simulated_moat_stays_real(self):
+        r = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
+        self.assertEqual(validate_run_live(r), [])
+        # Every persona verdict is labeled simulated — never presented as a real verdict.
+        provs = [v.get("provenance") for v in r["consult"]["round1"]]
+        self.assertTrue(provs and all(p == "simulated" for p in provs), provs)
+        self.assertTrue(all("🧪 simulated" in v.get("rationale", "") for v in r["consult"]["round1"]))
+        # Real moat facts are untouched (internal plane, real provenance).
+        moat = [f for f in r["discover"]["dossier"] if f.get("provenance") == "moat-real"]
+        self.assertTrue(moat, "real moat facts must remain in a simulated run")
+        self.assertTrue(all(f.get("plane") == "internal" for f in moat))
 
 
 class TestLiveProgress(unittest.TestCase):

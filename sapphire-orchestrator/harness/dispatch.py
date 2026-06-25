@@ -13,6 +13,23 @@ from .errors import HarnessEscalation  # noqa: F401  (re-exported for handlers)
 ROOT = Path(__file__).resolve().parents[2]
 CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 
+
+def _agent_timeout(contract_timeout_s) -> int:
+    """The per-agent subprocess timeout (seconds), with an optional operator CAP.
+
+    Defaults to the contract's declared `timeout_s`, but `$SAPPHIRE_AGENT_TIMEOUT_S` caps it
+    (min of the two) so a fleet of live `claude -p` agents can't each block for the full
+    declared budget — a stuck agent hits the cap and abstains visibly. Floor 30s. Unset → the
+    contract value unchanged (backward-compatible)."""
+    base = contract_timeout_s if isinstance(contract_timeout_s, (int, float)) else 300
+    cap_env = (os.environ.get("SAPPHIRE_AGENT_TIMEOUT_S") or "").strip()
+    if cap_env:
+        try:
+            return max(30, min(int(base), int(cap_env)))
+        except (ValueError, TypeError):
+            pass
+    return int(base)
+
 # Opt-1 (dispatch-optimization): identical across every agent and FIRST in the prompt, so the
 # 5-min prompt cache reuses this user-message prefix across the fan-out. Keep it short + STABLE
 # (no per-call/per-agent text) — any drift busts the shared cache.
@@ -56,7 +73,64 @@ def _context_flags() -> list:
     return ["--setting-sources", "user", "--exclude-dynamic-system-prompt-sections"]
 
 
+# Labeled simulated model reasoning (SAPPHIRE_SIMULATE_MODELS=1). The real `claude -p` calls are
+# slow/can hang; for a fast, fully-working demo the claude-subagent reasoning (personas + claude
+# fact agents) is replaced by a LABELED placeholder. HONESTY: every simulated field carries this
+# marker + provenance 'simulated' so it can never be mistaken for a real verdict. Real EMET/moat/
+# seam agents do NOT pass through dispatch_claude, so they stay genuinely REAL.
+SIMULATE_MARKER = "🧪 simulated model — real reasoning pending"
+
+
+def _simulate_models_on() -> bool:
+    return (os.environ.get("SAPPHIRE_SIMULATE_MODELS") or "").strip() not in ("", "0", "false", "False")
+
+
+def _simulate_claude(contract, inputs) -> dict:
+    """A schema-valid, provenance='simulated', clearly-marked stand-in for one claude-subagent call.
+
+    Detects the two shapes the firm uses (persona verdict / fact-agent dossier) and fills a generic
+    fallback otherwise; only emits keys the schema allows (schemas are additionalProperties:false)."""
+    sch = contract.output_schema or {}
+    props = sch.get("properties") or {}
+    required = set(sch.get("required") or [])
+    cand = inputs.get("candidate") or inputs.get("target") or ""
+
+    # Persona / roundtable verdict shape.
+    if "stance" in props and "conviction" in props:
+        out = {
+            "persona": inputs.get("persona", "") or cand or "persona",
+            "stance": "conditional",
+            "conviction": 2,
+            "rationale": f"{SIMULATE_MARKER} (no real model call was made; placeholder verdict).",
+            "fact_claims": [],
+            "provenance": "simulated",
+        }
+        return {k: v for k, v in out.items() if k in props or k in required}
+
+    # Fact-agent shape: {candidate, facts:[{value, source, tier, ...}]}.
+    if "facts" in props:
+        fitems = ((props.get("facts") or {}).get("items") or {}).get("properties") or {}
+        fact = {"value": f"{SIMULATE_MARKER} (agent {contract.id})",
+                "source": "simulated", "tier": "T3", "flag": "KNOWN_UNKNOWN",
+                "provenance": "simulated"}
+        fact = {k: v for k, v in fact.items() if k in fitems}
+        out = {"candidate": cand, "facts": [fact], "provenance": "simulated"}
+        return {k: v for k, v in out.items() if k in props or k in required}
+
+    # Generic fallback: required scalars → marker; arrays → []; objects → {}.
+    out: dict = {}
+    for key in required:
+        t = (props.get(key) or {}).get("type")
+        out[key] = {"array": [], "object": {}, "integer": 0, "number": 0,
+                    "boolean": False}.get(t, SIMULATE_MARKER)
+    if "provenance" in props:
+        out["provenance"] = "simulated"
+    return out
+
+
 def dispatch_claude(contract, inputs, runner=None) -> dict:
+    if _simulate_models_on():
+        return _simulate_claude(contract, inputs)
     cmd = [
         CLAUDE_BIN, "-p", build_prompt(contract, inputs),
         "--output-format", "json",
@@ -76,7 +150,7 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
     if runner is None:
         def runner(cmd):
             return subprocess.run(cmd, capture_output=True, text=True,
-                                  timeout=contract.timeout_s, cwd=str(ROOT))
+                                  timeout=_agent_timeout(contract.timeout_s), cwd=str(ROOT))
     proc = runner(cmd)
     if getattr(proc, "returncode", 0) != 0:
         raise RuntimeError(f"claude exited {getattr(proc, 'returncode', '?')}: {(proc.stderr or '')[:200]}")
@@ -122,6 +196,8 @@ def dispatch_claude_batch(items, runner=None) -> dict:
     items = list(items)
     if not items:
         return {}
+    if _simulate_models_on():
+        return {c.id: _simulate_claude(c, inp) for c, inp in items}
     cmd = [
         CLAUDE_BIN, "-p", build_batch_prompt(items),
         "--output-format", "json",
@@ -139,7 +215,7 @@ def dispatch_claude_batch(items, runner=None) -> dict:
     if tools:
         cmd += ["--allowedTools", ",".join(tools)]
     if runner is None:
-        timeout_s = max((c.timeout_s for c, _ in items), default=300)
+        timeout_s = _agent_timeout(max((c.timeout_s for c, _ in items), default=300))
 
         def runner(cmd):
             return subprocess.run(cmd, capture_output=True, text=True,

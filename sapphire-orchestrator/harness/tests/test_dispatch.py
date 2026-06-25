@@ -243,5 +243,104 @@ class TestDispatch(unittest.TestCase):
                 os.environ["SAPPHIRE_MODEL"] = prev_s
         self.assertNotIn("--model", captured[0])
 
+
+class TestSimulateModels(unittest.TestCase):
+    """SAPPHIRE_SIMULATE_MODELS=1 → labeled, schema-valid simulated output, NO claude call."""
+
+    _VERDICT = Contract(
+        id="company-partner", role="", kind="claude-subagent", provenance_label="persona-judgment",
+        output_schema={"type": "object", "additionalProperties": False,
+                       "required": ["persona", "stance", "conviction", "rationale", "fact_claims"],
+                       "properties": {
+                           "persona": {"type": "string"},
+                           "stance": {"type": "string", "enum": ["pass", "conditional", "hold", "no_go"]},
+                           "conviction": {"type": "integer"},
+                           "rationale": {"type": "string"},
+                           "fact_claims": {"type": "array", "items": {"type": "object"}},
+                           "provenance": {"type": "string"}}})
+    _FACTS = Contract(
+        id="some-fact-agent", role="", kind="claude-subagent", provenance_label="semantic-web",
+        output_schema={"type": "object", "additionalProperties": False,
+                       "required": ["candidate", "facts"],
+                       "properties": {
+                           "candidate": {"type": "string"},
+                           "facts": {"type": "array", "items": {"type": "object",
+                                     "properties": {"value": {"type": "string"}, "source": {"type": "string"},
+                                                    "tier": {"type": "string"}, "provenance": {"type": "string"}}}},
+                           "provenance": {"type": "string"}}})
+
+    def setUp(self):
+        self._prev = os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+        if self._prev is not None:
+            os.environ["SAPPHIRE_SIMULATE_MODELS"] = self._prev
+
+    def _boom_runner(self, cmd):
+        raise AssertionError("claude must NOT be called when simulate-models is on")
+
+    def test_off_by_default(self):
+        self.assertFalse(D._simulate_models_on())
+
+    def test_persona_verdict_simulated_and_labeled(self):
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        out = D.dispatch_claude(self._VERDICT, {"persona": "Denali CSO"}, runner=self._boom_runner)
+        self.assertEqual(out["provenance"], "simulated")
+        self.assertIn(D.SIMULATE_MARKER, out["rationale"])     # 🧪 marker survives + is unmistakable
+        self.assertIn(out["stance"], ["pass", "conditional", "hold", "no_go"])  # schema-valid enum
+        self.assertEqual(out["persona"], "Denali CSO")          # echoes the input persona
+
+    def test_fact_agent_simulated_and_labeled(self):
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        out = D.dispatch_claude(self._FACTS, {"candidate": "TSC2"}, runner=self._boom_runner)
+        self.assertEqual(out["candidate"], "TSC2")
+        self.assertTrue(out["facts"])
+        self.assertEqual(out["facts"][0]["provenance"], "simulated")
+        self.assertIn("simulated", out["facts"][0]["value"].lower())
+
+    def test_only_schema_keys_emitted(self):
+        # additionalProperties:false → simulated output must contain ONLY declared keys.
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        out = D.dispatch_claude(self._VERDICT, {}, runner=self._boom_runner)
+        allowed = set(self._VERDICT.output_schema["properties"])
+        self.assertTrue(set(out).issubset(allowed), f"unexpected keys: {set(out) - allowed}")
+
+    def test_batch_also_simulates(self):
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        out = D.dispatch_claude_batch([(self._FACTS, {"candidate": "TSC2"})], runner=self._boom_runner)
+        self.assertIn("some-fact-agent", out)
+        self.assertEqual(out["some-fact-agent"]["provenance"], "simulated")
+
+
+class TestAgentTimeoutCap(unittest.TestCase):
+    """$SAPPHIRE_AGENT_TIMEOUT_S caps the per-agent subprocess timeout (min with the contract)."""
+
+    def setUp(self):
+        self._prev = os.environ.pop("SAPPHIRE_AGENT_TIMEOUT_S", None)
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_AGENT_TIMEOUT_S", None)
+        if self._prev is not None:
+            os.environ["SAPPHIRE_AGENT_TIMEOUT_S"] = self._prev
+
+    def test_unset_uses_contract(self):
+        self.assertEqual(D._agent_timeout(600), 600)
+
+    def test_cap_lowers_a_high_contract_timeout(self):
+        os.environ["SAPPHIRE_AGENT_TIMEOUT_S"] = "120"
+        self.assertEqual(D._agent_timeout(600), 120)      # min(600, 120)
+
+    def test_cap_does_not_raise_a_low_contract_timeout(self):
+        os.environ["SAPPHIRE_AGENT_TIMEOUT_S"] = "600"
+        self.assertEqual(D._agent_timeout(120), 120)      # min(120, 600)
+
+    def test_floor_and_bad_value(self):
+        os.environ["SAPPHIRE_AGENT_TIMEOUT_S"] = "5"
+        self.assertEqual(D._agent_timeout(600), 30)       # floored at 30
+        os.environ["SAPPHIRE_AGENT_TIMEOUT_S"] = "nonsense"
+        self.assertEqual(D._agent_timeout(300), 300)      # bad → contract value
+
+
 if __name__ == "__main__":
     unittest.main()
