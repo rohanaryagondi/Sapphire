@@ -750,11 +750,10 @@
     const isRescue = /rescue/.test(q) && /\bgene/.test(q);
     if (isRescue) {
       return [
-        "Pull the candidate rescue genes from the Quiver moat (internal EP-signature reversal ranking).",
-        "Gather cited literature on each candidate from EMET (BenchSci).",
-        "Run quantitative checks — gnomAD constraint, GTEx expression, InterPro domains, g:Profiler enrichment.",
-        "Reason over each gene's plausible mechanism and re-rank by literature support (scientific reasoner — a real model call).",
-        "Synthesise the ranked rescue-gene recommendation.",
+        "Locate the candidate rescue genes in the Quiver moat (confirm rescue direction + EP-signature rank).",
+        "Gather cited literature on each from EMET (BenchSci) — does it reverse the TSC2-KO / mTORC1 phenotype?",
+        "Reason over each gene's plausible mechanism and rank by biological plausibility (scientific reasoner — a real model call).",
+        "Synthesise the most plausible rescue-gene hits.",
       ];
     }
     const steps = ["Gather the cited fact dossier from the planned agents (moat, EMET, quantitative seams)."];

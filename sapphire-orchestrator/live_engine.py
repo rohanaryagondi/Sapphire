@@ -504,7 +504,18 @@ def run_live(
         if ctx.get("batch_buckets") else {}
     )
 
-    for agent_id in _BUCKET1_AGENTS:
+    # Lean rescue pipeline: a rescue-gene ranking uses ONLY the moat (rescue genes) + EMET
+    # (literature) + the rescue-mechanism reasoner. Q-Models and the quantitative seams
+    # (gnomAD/GTEx/InterPro/g:Profiler) produce facts that are NOT used in the ranking — so we do
+    # not run them for this query (honest: don't run or show what we don't use). Other queries
+    # keep the full roster.
+    _bucket1_agents = list(_BUCKET1_AGENTS)
+    if _is_rescue_ranking_query(query):
+        _RESCUE_SKIP = {"q-models-runner", "gnomad-constraint", "gtex-expression",
+                        "interpro-domains", "geneset-enrichment"}
+        _bucket1_agents = [a for a in _bucket1_agents if a not in _RESCUE_SKIP]
+
+    for agent_id in _bucket1_agents:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
             continue
