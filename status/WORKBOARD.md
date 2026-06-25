@@ -20,7 +20,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
-| `live-emet-session-reuse` | **🌙 assigned → Rohan Claude (keystone, after dispatch-opt)** | In-session EMET orchestration so a logged-in BenchSci session is reused → live PMIDs in the external plane; honest-abstain kept for no-session; shared-profile fallback if blocked. | `rohan/live-emet-session-reuse` | [runtime-harness](runtime-harness.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
+| `live-emet-session-reuse` | ✅ **MERGED (#57) — keystone, live-acceptance PASSED** | In-session EMET orchestration so a logged-in BenchSci session is reused → live PMIDs in the external plane; honest-abstain kept for no-session; shared-profile fallback if blocked. | `rohan/live-emet-session-reuse` | [runtime-harness](runtime-harness.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
 | `tsc2-demo-scenario` | **🌙 assigned → Rohan Claude (after A+B)** | Capture the real TSC2 run as a deterministic scenario (instant $0 replay) + a demo-script note. | `rohan/tsc2-demo-scenario` | [engine](engine.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
 | `robyn-scs-firm-seam` | **🌙 assigned → Rohan Claude (last/if time)** | Wire vendored+endpoint-wired robyn_scs into the firm as a Bucket-1 tool seam (heavy deps in tool; honest fire-when-relevant). | `rohan/robyn-scs-firm-seam` | [tools](tools.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
 | `cheap-live-runs` | ✅ **merged (#52)** | **Standard.** Make a live run usable + cheap: (1) wire `emet_handler` into `run_live`'s live ctx (lazy) so a logged-in EMET session is actually used — or abstain honestly + HELP if session-reuse needs a design call; (2) `CLAUDE_MODEL`→`--model` pass-through in `dispatch_claude` + a **"Live (cheap)"** front-end profile (haiku and/or mock personas, real facts). Engine stays stdlib; data boundary intact. | `rohan/cheap-live-runs` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-cheap-live-runs.md) |
@@ -87,6 +87,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `live-emet-session-reuse` (KEYSTONE) | rohan | 2026-06-25 | PR #57 |
 | `cheap-live-runs` (live-EMET wiring + haiku profile) | rohan | 2026-06-25 | PR #52 |
 | `semantic-corpora` (policy-legislative — Gavin's 3rd corpus) | gavin | 2026-06-24 | PR #48 |
 | `semantic-corpora` (financial-investor — Gavin's 2nd corpus) | gavin | 2026-06-24 | PR #38 |
