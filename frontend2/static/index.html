@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sapphire</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='%23a07cff'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.28'/%3E%3C/svg%3E">
+<!-- Faceted sapphire gem favicon — 5-face polygon with top-face highlight -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234d7cfe'/%3E%3Cstop offset='1' stop-color='%23a07cff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='url(%23g)'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.32'/%3E%3Cpolygon points='16,14 30,12 25,30 16,22' fill='white' opacity='.08'/%3E%3Cpolygon points='16,14 16,22 7,30 2,12' fill='black' opacity='.10'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/app.css">
 </head>
 <body>
@@ -24,9 +25,24 @@
     </div>
 
     <a class="brand" href="#" title="Sapphire — CNS decision firm">
-      <svg class="brand-mark" width="17" height="17" viewBox="0 0 32 32" aria-hidden="true">
-        <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
-        <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+      <!-- Faceted sapphire-blue gem: top-face + left/right lower faces give 3D depth -->
+      <svg class="brand-mark gem-logo" width="19" height="19" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="gemGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#4d7cfe"/>
+            <stop offset="1" stop-color="#a07cff"/>
+          </linearGradient>
+        </defs>
+        <!-- base body -->
+        <polygon points="16,2 30,12 25,30 7,30 2,12" fill="url(#gemGrad)"/>
+        <!-- top-face crown highlight -->
+        <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".32"/>
+        <!-- right lower face — lighter -->
+        <polygon points="16,14 30,12 25,30 16,22" fill="white" opacity=".09"/>
+        <!-- left lower face — darker -->
+        <polygon points="16,14 16,22 7,30 2,12" fill="black" opacity=".12"/>
+        <!-- gem center glint -->
+        <circle cx="16" cy="17" r="2.2" fill="white" opacity=".18"/>
       </svg>
       Sapphire
     </a>
@@ -74,9 +90,19 @@
         <div class="thread-inner" id="threadInner">
 
           <div class="empty" id="emptyState">
-            <svg class="empty-mark" width="42" height="42" viewBox="0 0 32 32" aria-hidden="true">
-              <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
-              <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+            <!-- Faceted sapphire-blue hero gem — matches brand-mark, larger for the hero -->
+            <svg class="empty-mark gem-hero" width="52" height="52" viewBox="0 0 32 32" aria-hidden="true">
+              <defs>
+                <linearGradient id="gemGradHero" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#4d7cfe"/>
+                  <stop offset="1" stop-color="#a07cff"/>
+                </linearGradient>
+              </defs>
+              <polygon points="16,2 30,12 25,30 7,30 2,12" fill="url(#gemGradHero)"/>
+              <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".34"/>
+              <polygon points="16,14 30,12 25,30 16,22" fill="white" opacity=".10"/>
+              <polygon points="16,14 16,22 7,30 2,12" fill="black" opacity=".13"/>
+              <circle cx="16" cy="17" r="2.5" fill="white" opacity=".22"/>
             </svg>
             <div class="empty-heading">Ask Sapphire</div>
             <div class="empty-sub">CNS drug discovery, cited and deliberated. The firm gathers a cited
