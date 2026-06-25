@@ -131,6 +131,13 @@ def dispatch_claude_batch(items, runner=None) -> dict:
     if model:
         cmd += ["--model", model]
     cmd += _context_flags()
+    # Forward the UNION of the batched agents' allowed tools (each agent's per-call --allowedTools
+    # would otherwise be dropped → batched agents run tool-blind, e.g. web-search agents lose
+    # WebSearch/WebFetch). The union is a superset; each agent uses only what its spec needs, and
+    # per-agent output is still validated/guarded downstream.
+    tools = sorted({t for c, _ in items for t in (c.tools_allowed or [])})
+    if tools:
+        cmd += ["--allowedTools", ",".join(tools)]
     if runner is None:
         timeout_s = max((c.timeout_s for c, _ in items), default=300)
 

@@ -90,7 +90,8 @@ agents** — currently **5**: patent-ip, clinical-trial-registry, post-market-sa
 and stays per-agent — the eligible set shrinks as more agents grow corpora.) Each batched output flows
 through the **unchanged** per-agent harness path (validate + guardrails + provenance + trace) via
 `dispatch_fn`. On ANY batch failure → honest per-agent fallback (tested). Corpus / python / qmodels /
-emet agents stay per-agent.
+emet agents stay per-agent. The batch call forwards the **union of the agents' `--allowedTools`**
+(all 5 carry `WebSearch`/`WebFetch`) so batched agents are **not** tool-blind (Head Claude Gate review).
 - **N cold boots → 1** for that bucket (N=5 today); the ~24k cache-stable system prefix is paid **once**,
   not N× (projected ≈ (N−1) × 24k ≈ **~96k cache-read tokens saved** + N−1 fewer boots/run, on top of
   Opt-1).

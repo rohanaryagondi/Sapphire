@@ -106,6 +106,28 @@ class TestDispatch(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             D.dispatch_claude_batch([(a, {})], runner=fake_runner("", returncode=1, stderr="boom"))
 
+    def test_batch_forwards_union_of_allowed_tools(self):
+        # Batched agents must NOT run tool-blind: their --allowedTools is forwarded (union).
+        a = Contract(id="patent-ip", role="", kind="claude-subagent",
+                     output_schema={"type": "object"}, tools_allowed=["WebSearch", "WebFetch"])
+        b = Contract(id="payer", role="", kind="claude-subagent",
+                     output_schema={"type": "object"}, tools_allowed=["WebSearch"])
+        captured = []
+        env = json.dumps({"structured_output": {"patent-ip": {}, "payer": {}}})
+        D.dispatch_claude_batch([(a, {}), (b, {})], runner=capturing_runner(captured, env))
+        argv = captured[0]
+        self.assertIn("--allowedTools", argv)
+        tools = argv[argv.index("--allowedTools") + 1].split(",")
+        self.assertIn("WebSearch", tools)
+        self.assertIn("WebFetch", tools)   # union across both agents
+
+    def test_batch_no_tools_flag_when_none_allowed(self):
+        a = Contract(id="x", role="", kind="claude-subagent", output_schema={"type": "object"})
+        captured = []
+        env = json.dumps({"structured_output": {"x": {}}})
+        D.dispatch_claude_batch([(a, {})], runner=capturing_runner(captured, env))
+        self.assertNotIn("--allowedTools", captured[0])
+
     def test_batch_includes_context_flags(self):
         # The batch call must also carry the Opt-1 cache flags (regression guard).
         a = Contract(id="patent-ip", role="", kind="claude-subagent", output_schema={"type": "object"})
