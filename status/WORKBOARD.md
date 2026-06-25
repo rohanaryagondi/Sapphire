@@ -117,6 +117,7 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `console-ui-chat-tweaks` (mock-only: agent wing as 14-category expandable tree + 5 attributed `#4d7cfe` findings on Gavin's chat-first prototype; composes with #94, runtime untouched) | hayes | 2026-06-25 | PR #95 |
 | `real-live-emet-frontend` (session-bridge = front-end's real-EMET path; supersedes #77/#84; Gate-5 a+b+c PASS — 9 real TSC2 PMIDs) | rohan | 2026-06-25 | PR #90 |
 | `semantic-corpora` (post-market-safety — Hayes's 4th corpus) | hayes | 2026-06-25 | PR #87 |
 | `qmodels-aws-gpu` (Task-2 CODE; GPU track labeled `gpu-unproven`; live proof pending) | rohan | 2026-06-25 | PR #86 |
