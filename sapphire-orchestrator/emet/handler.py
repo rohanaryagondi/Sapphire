@@ -129,12 +129,14 @@ def _emet_autologin_available() -> bool:
 
 
 def _emet_timeout_s() -> int:
-    """Bounded per-run EMET timeout (seconds). $SAPPHIRE_EMET_TIMEOUT_S overrides; default 240,
-    floor 30 — so a stuck EMET run abstains visibly instead of blocking the firm indefinitely."""
+    """Bounded per-run EMET timeout (seconds). $SAPPHIRE_EMET_TIMEOUT_S overrides; default 420,
+    floor 30 — a real EMET *Thorough* run (agentic multi-stage research) takes minutes, so the
+    default must accommodate it (Gate-5: a 240s cap timed out a working run). Still bounded so a
+    genuinely stuck run abstains visibly instead of blocking the firm indefinitely."""
     try:
-        return max(30, int(os.environ.get("SAPPHIRE_EMET_TIMEOUT_S", "240")))
+        return max(30, int(os.environ.get("SAPPHIRE_EMET_TIMEOUT_S", "420")))
     except (ValueError, TypeError):
-        return 240
+        return 420
 
 
 def _default_runner(inputs) -> dict:
@@ -175,8 +177,11 @@ def _default_runner(inputs) -> dict:
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             json.dump(cfg, fh)
+        # CRITICAL (Gate-5 root cause): the prompt begins with the emet-runner SKILL.md YAML
+        # frontmatter ("---"), and `claude -p <prompt>` parses a leading "---" as an unknown CLI
+        # option → exits 1 → EMET never runs. So pass the prompt on STDIN, NOT as an argv token.
         cmd = [
-            CLAUDE_BIN, "-p", prompt, "--output-format", "json",
+            CLAUDE_BIN, "-p", "--output-format", "json",
             # Pin the subprocess to ONLY our authenticated Playwright MCP (no other MCP servers).
             "--mcp-config", cfg_path, "--strict-mcp-config",
             "--allowedTools", allowed_tools,
@@ -187,7 +192,7 @@ def _default_runner(inputs) -> dict:
         model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
         if model:
             cmd += ["--model", model]
-        proc = subprocess.run(cmd, capture_output=True, text=True,
+        proc = subprocess.run(cmd, input=prompt, capture_output=True, text=True,
                               timeout=_emet_timeout_s(), cwd=str(ROOT))
     finally:
         try:

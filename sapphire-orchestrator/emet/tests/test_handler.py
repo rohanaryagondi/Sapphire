@@ -174,12 +174,25 @@ class TestEmetAutoLogin(unittest.TestCase):
 
         def _fake_run(cmd, **kw):
             captured["cmd"] = list(cmd)
+            captured["input"] = kw.get("input")         # prompt now flows via STDIN (Gate-5 fix)
             return SimpleNamespace(returncode=0, stdout=json.dumps({"structured_output": ENV}), stderr="")
 
         with mock.patch.object(H, "subprocess", SimpleNamespace(run=_fake_run)):
             H._default_runner({"candidate": "TSC2", "question": "validate"})
         cmd = captured["cmd"]
-        return cmd, cmd[cmd.index("-p") + 1]            # (cmd, prompt)
+        # The prompt must NOT be an argv token (a leading "---" would make `claude -p` exit 1) —
+        # it is passed on stdin. `-p` is immediately followed by a flag, never the prompt.
+        assert cmd[cmd.index("-p") + 1].startswith("--"), "prompt must not be an argv token"
+        return cmd, captured["input"]                   # (cmd, prompt-from-stdin)
+
+    def test_prompt_on_stdin_not_argv(self):
+        # Gate-5 root cause: the prompt begins with the SKILL.md "---" frontmatter; as an argv token
+        # `claude -p ---...` exits 1. It must go on STDIN; no argv token may start with "---".
+        cmd, prompt = self._capture_cmd()
+        self.assertTrue(prompt, "prompt must be passed (on stdin)")
+        self.assertFalse(any(tok.startswith("---") for tok in cmd),
+                         "no argv token may start with --- (claude -p would exit 1)")
+        self.assertIn("EMET", prompt)                    # the skill content rode in on stdin
 
     def test_creds_available_authorizes_autologin(self):
         os.environ["SAPPHIRE_EMET_USER"] = "tester@example.org"
@@ -212,7 +225,7 @@ class TestEmetTimeout(unittest.TestCase):
             os.environ["SAPPHIRE_EMET_TIMEOUT_S"] = self._prev
 
     def test_default_timeout(self):
-        self.assertEqual(H._emet_timeout_s(), 240)
+        self.assertEqual(H._emet_timeout_s(), 420)       # accommodates a real Thorough run
 
     def test_env_override(self):
         os.environ["SAPPHIRE_EMET_TIMEOUT_S"] = "90"
@@ -222,7 +235,7 @@ class TestEmetTimeout(unittest.TestCase):
         os.environ["SAPPHIRE_EMET_TIMEOUT_S"] = "5"
         self.assertEqual(H._emet_timeout_s(), 30)        # floored
         os.environ["SAPPHIRE_EMET_TIMEOUT_S"] = "garbage"
-        self.assertEqual(H._emet_timeout_s(), 240)       # bad → default
+        self.assertEqual(H._emet_timeout_s(), 420)       # bad → default
 
 
 if __name__ == "__main__":

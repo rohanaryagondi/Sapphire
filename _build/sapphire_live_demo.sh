@@ -38,6 +38,11 @@ else
   echo "note: no .emet-venv — run 'bash _build/emet_login.sh' once to bootstrap headless auto-login."
 fi
 
+# 2) Warm the @playwright/mcp npx cache in the background, so the FIRST live EMET run doesn't pay
+#    the one-time download (which made a real Thorough run exceed the timeout in Gate-5).
+echo "Warming the @playwright/mcp cache (background)…"
+( npx -y @playwright/mcp@latest --help >/dev/null 2>&1 & )
+
 echo ""
 echo "Opening the VISIBLE authenticated Chrome (CDP :$PORT) with the Sapphire console…"
 echo "  → Then run, in another shell:  export SAPPHIRE_EMET_CDP=http://localhost:$PORT"
