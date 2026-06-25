@@ -11,6 +11,13 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-24 — financial-investor corpus — Gavin's 2nd Bucket-1 corpus  (`main`, PR #38)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude).
+- What: dual-source corpus, 6 cards — recent CNS M&A + clinical-failure signals (BMS/Karuna $14B, AbbVie/Cerevel $8.7B + emraclidine Ph2 failure, J&J/Intra-Cellular $14.6B, Neumora navacaprant Ph3 failure, KarXT EMET card). SEC 8-K primaries T1; press/secondary T2; EMET card cites real PMID 33626254.
+- Gates: corpus gate CLEAN (unverifiable_by_fetch tags correct after fix-loop) · suite 478 green · content audited clean (0 fabrication, quotes ≤60w, tiers honest). One fix-loop: navacaprant card was missing the unverifiable_by_fetch tag → Gavin tagged it + synced main.
+
+---
+
 ## 2026-06-24 — robyn_scs endpoint wiring — tools/robyn_scs/  (`main`, PR #44)
 - Built-By: `hayes` (reviewed/gated/merged by Head Claude).
 - What: `tools/robyn_scs/` exposes the vendored SCS/STA connectivity pipeline (`vendor/robyn_scs/`) as 10
