@@ -11,6 +11,12 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — live-run visibility (#71) + reputational-institutional corpus 6/6 (#72)  (`main`)
+- #71 (Built-By rohan): `run_live(on_progress=)` + incremental trace flush + front-end live step tree — the firm now streams step-by-step (plan → each Bucket-1 agent w/ status+provenance+timing → flags → personas → synthesis), abstain shown honestly (never fake ok). Browser-verified streaming; suite 540. **Exposed** that the front-end Live EMET fails (detached browser can't reach the logged-in session) → new task `real-live-emet-frontend` (moat is real; that was a worktree artifact).
+- #72 (Built-By gavin): reputational-institutional corpus (4 cards: Cassava SEC + congressional probe, Lesne retraction, EMET check). **Gavin's semantic corpora COMPLETE: 6/6** (global-regulatory-divergence, financial-investor, policy-legislative, kol-social-signal, patient-advocacy, reputational-institutional).
+
+---
+
 ## 2026-06-25 — patient-advocacy corpus — Gavin's 5th Bucket-1 corpus  (`main`, PR #68)
 - Built-By: `gavin` (reviewed/gated/merged by Head Claude; reactive-net auto-gated). 5 cards: advocacy campaigns (Alzheimer's Assoc CMS), FDA ALS guidance (T1), eteplirsen accelerated-approval precedent, MJFF funding, EMET ALS-prognosis (PMID 21989247). Gate CLEAN · suite 527 · content clean.
 
