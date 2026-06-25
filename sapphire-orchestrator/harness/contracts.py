@@ -23,6 +23,12 @@ class Contract:
     on_hard_fail: str = "abstain"    # abstain | escalate
     veto_class: bool = False
     param: str | None = None
+    # When True, this claude-subagent does REAL reasoning even under SAPPHIRE_SIMULATE_MODELS=1
+    # (it is NOT replaced by the 🧪 simulated stub). Reserved for the scientific-core reasoners
+    # whose output IS the deliverable (e.g. rescue-mechanism) — so a fast demo can stub the
+    # personas/semantic agents while the science still runs for real. Tests still inject a mock
+    # runner via ctx so an exempt agent never shells a real `claude -p` in CI.
+    simulate_exempt: bool = False
 
 
 @dataclass
@@ -87,4 +93,5 @@ def resolve(agent_id: str, registry=None) -> Contract:
         on_hard_fail=retry.get("on_hard_fail", "abstain"),
         veto_class=entry.get("veto_class", False),
         param=entry.get("param"),
+        simulate_exempt=entry.get("simulate_exempt", False),
     )

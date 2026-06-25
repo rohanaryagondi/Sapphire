@@ -46,6 +46,27 @@
         }},
         "provenance": {"type": "string"}
       }
+    },
+    "gene_mechanisms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["target", "gene_mechanisms"],
+      "properties": {
+        "target": {"type": "string"},
+        "gene_mechanisms": {"type": "array", "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["gene", "mechanism", "confidence"],
+          "properties": {
+            "gene": {"type": "string"},
+            "rank": {"type": "integer"},
+            "mechanism": {"type": "string"},
+            "citations": {"type": "array", "items": {"type": "string"}},
+            "confidence": {"type": "string", "enum": ["high", "medium", "low"]}
+          }
+        }},
+        "provenance": {"type": "string"}
+      }
     }
   },
   "agents": [
@@ -535,6 +556,19 @@
       "provenance_label": "gprofiler",
       "timeout_s": 60,
       "retry": {"max_repair": 1, "on_hard_fail": "abstain"}
+    },
+    {
+      "id": "rescue-mechanism",
+      "role": "Bucket-1 scientific reasoner — given a target gene's KO and a RANKED list of candidate rescue genes (from the Quiver moat: public gene symbols + ordinal rank only) plus cited PUBLIC literature, produces a plausible, literature-grounded mechanistic explanation for why modulating each candidate would reverse the KO phenotype. Public identifiers only; every claim cites the provided literature; abstains (confidence=low, no citation) rather than fabricate.",
+      "spec": "architecture/bucket1/scientific/rescue-mechanism.md",
+      "kind": "claude-subagent",
+      "output_schema": {"$ref": "#/schemas/gene_mechanisms"},
+      "tools_allowed": [],
+      "guardrails": ["data_boundary", "stamp_provenance"],
+      "provenance_label": "scientific-reasoning",
+      "simulate_exempt": true,
+      "timeout_s": 240,
+      "retry": {"max_repair": 2, "on_hard_fail": "abstain"}
     }
   ]
 }

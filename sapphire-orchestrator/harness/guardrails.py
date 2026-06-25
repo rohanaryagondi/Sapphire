@@ -133,7 +133,11 @@ def stamp_provenance(contract, output) -> dict:
     EMET/moat/seam agents are not claude-subagents, so they keep their genuine label."""
     out = copy.deepcopy(output)
     label = contract.provenance_label
+    # A simulate_exempt agent (e.g. rescue-mechanism) does REAL reasoning even under the global
+    # simulate flag, so it KEEPS its genuine provenance label — only NON-exempt claude-subagents
+    # (the stubbed personas/semantic agents) are relabeled `simulated`.
     if getattr(contract, "kind", "") == "claude-subagent" and \
+            not getattr(contract, "simulate_exempt", False) and \
             (os.environ.get("SAPPHIRE_SIMULATE_MODELS") or "").strip() not in ("", "0", "false", "False"):
         label = "simulated"
     out["provenance"] = label

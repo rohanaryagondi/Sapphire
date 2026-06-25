@@ -61,6 +61,12 @@ PROVENANCE = frozenset({
     # a "🧪 simulated" marker — NEVER presented as a real verdict. External plane (no internal
     # data; it is a placeholder, not a real source).
     "simulated",
+    # Scientific mechanism reasoning — a claude-subagent (the rescue-mechanism agent) reasoning
+    # over PUBLIC inputs (candidate gene symbols + ordinal rank + cited public literature) to
+    # produce a plausible, literature-grounded mechanistic explanation. EXTERNAL plane: it never
+    # receives raw internal moat scores (only gene symbols + ordinal rank cross to it), and its
+    # claims must cite the provided public literature (it abstains rather than fabricate).
+    "scientific-reasoning",
 })
 
 # ---------------------------------------------------------------------------
@@ -94,6 +100,7 @@ _PLANE_MAP: dict[str, str] = {
     "interpro":         "external",
     "gprofiler":        "external",
     "simulated":        "external",   # labeled placeholder model reasoning — not a real source
+    "scientific-reasoning": "external",  # claude reasoning over public genes+rank+literature; no internal scores
 }
 
 # Sanity guard (BIDIRECTIONAL): the PROVENANCE set and _PLANE_MAP keys must match
