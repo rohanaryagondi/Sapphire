@@ -42,6 +42,12 @@ def _default_runner(inputs) -> dict:
         'appears, return exactly {"login_required": true}. Otherwise return ONLY the EMET envelope object.'
     )
     cmd = [CLAUDE_BIN, "-p", prompt, "--output-format", "json"]
+    # Honor the cheap-live model lever so EMET's own claude subprocess doesn't run on the
+    # default model (an uncapped cost). Mirrors dispatch_claude: CLAUDE_MODEL (the bridge's
+    # lever) then SAPPHIRE_MODEL (serve.py's). Unset → CLI default.
+    model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    if model:
+        cmd += ["--model", model]
     proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300, cwd=str(ROOT))
     if proc.returncode != 0:
         raise RuntimeError(f"emet runner (claude) exited {proc.returncode}: {(proc.stderr or '')[:200]}")

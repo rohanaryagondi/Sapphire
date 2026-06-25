@@ -17,6 +17,7 @@ an abstain — not a traceback in the user's face.
 """
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -78,22 +79,71 @@ def _error_envelope(query: str, exc: Exception) -> dict:
     }
 
 
-def run(query: str, *, mock: bool = True, sequences: list | None = None) -> dict:
+def run(query: str, *, mock: bool = True, sequences: list | None = None,
+        model: str | None = None) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
 
     `sequences` is forwarded to `run_live` (the documented ASO-Design handoff: when ASO
     candidates are present they reach the aso-tox agent; `None` lets run_live extract any
-    A/T/G/C tokens from the query itself). Never raises. On a hard failure returns
-    `_error_envelope`. Adds a single TOTAL wall-clock (`_elapsed_s`) — per-agent timing is NOT
-    available from the contract and is never faked.
+    A/T/G/C tokens from the query itself).
+
+    `model` (e.g. a haiku id) pins the LLM for every claude agent for the duration of THIS
+    run, via the `CLAUDE_MODEL` env that `dispatch_claude` reads — the "cheap live" lever
+    (real moat/EMET/seams/corpora, cheap reasoning). It is set and restored around the call
+    (single-user local surface); a concurrent run could briefly observe it, which is acceptable
+    here. `None` → the CLI default (existing Demo/Live behavior unchanged).
+
+    Never raises. On a hard failure returns `_error_envelope`. Adds a single TOTAL wall-clock
+    (`_elapsed_s`) — per-agent timing is NOT available from the contract and is never faked.
     """
     started = time.monotonic()
+    _prev_model = os.environ.get("CLAUDE_MODEL")
     try:
         _ensure_engine_on_path()
+        if model:
+            os.environ["CLAUDE_MODEL"] = model
         from live_engine import run_live
         result = run_live(query, sequences=sequences, ctx=build_ctx(mock))
     except Exception as exc:  # defensive — run_live is designed not to raise
         result = _error_envelope(query, exc)
+    finally:
+        if model:
+            if _prev_model is None:
+                os.environ.pop("CLAUDE_MODEL", None)
+            else:
+                os.environ["CLAUDE_MODEL"] = _prev_model
     result["_elapsed_s"] = round(time.monotonic() - started, 2)
     result["_mock"] = bool(mock)
+    result["_model"] = model or ""
     return result
+
+
+# Captured-scenario directory (real run_live outputs frozen for $0 deterministic replay).
+_SCENARIOS = _ENGINE / "scenarios"
+
+
+def replay(scenario: str = "tsc2_live_run") -> dict:
+    """Load a frozen, real `run_live` capture for **$0 deterministic replay** (no model, no
+    network). The captured dict is a real engagement (real moat + real EMET PMIDs + the live
+    spread) — rendered identically to a live run; provenance/tier/flags preserved verbatim.
+    Stamps `_via="replay"`, `_mock=False` (the facts are real, just frozen). On a missing/bad
+    file returns an honest error envelope (never fabricates)."""
+    import json
+    _ensure_engine_on_path()
+    path = _SCENARIOS / f"{scenario}.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return _error_envelope(f"replay:{scenario}", exc)
+    data["_via"] = "replay"
+    data["_mock"] = False
+    data["_replay"] = True
+    data["_elapsed_s"] = 0.0
+    return data
+
+
+def available_replays() -> list:
+    """List the frozen captured scenarios available for replay."""
+    if not _SCENARIOS.is_dir():
+        return []
+    return sorted(p.stem for p in _SCENARIOS.glob("*_live_run.json"))
