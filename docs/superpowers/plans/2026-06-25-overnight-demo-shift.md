@@ -23,6 +23,7 @@ live path proven once. Everything honestly labeled; nothing faked.
   public identifiers only. The two-plane render must stay correct.
 - **Engine stays stdlib-only** (lazy-import heavy deps); **don't touch `vendor/`**; run_live contract additive-only.
 - **All-haiku** for live agents during build/rehearsal (`CLAUDE_MODEL`/the cheap profile). Captured scenario replays $0.
+- **Bucket-2 roundtable = light touch.** It works; spot-check it **once or twice at most**. Spend effort on the EMET keystone (A), optimization (B), and capture (D) — do NOT burn cycles re-testing the persona roundtable.
 - **Gates 1–5** before every PR (Feature-tier → also Gate 6). Offline tests must stay green + not require live calls in CI.
 
 ## Tracks
@@ -53,7 +54,7 @@ detached `claude -p` subprocess. So `run_live`'s `emet-runner` returns **live ci
 Run the **TSC2 / tuberous-sclerosis** query through the real firm (haiku, EMET live) once, and **capture it as a
 deterministic scenario** (`scenarios/` + `_build/capture_scenario.py` machinery) so the front end can replay it
 instantly at $0. The scenario must reflect the REAL run (real moat facts, real EMET PMIDs, real seam/corpus facts,
-the persona spread, the synthesis, ideally a surfaced internal-vs-literature **DIVERGENCE**). DoD: the captured
+the persona spread, the synthesis, ideally a surfaced internal-vs-literature **DIVERGENCE**). **Internal moat data is APPROVED in the captured scenario (internal demo, Rohan-confirmed)** — keep real cosine/rescue values; **tag the scenario internal-only** (do not ship that JSON externally as-is; the moat values are the crown jewels). DoD: the captured
 scenario loads in the front end and renders the full transparent firm; a short `docs/` note describes the demo
 script (what to type, what to point at — the two planes, the divergence, the spread).
 
