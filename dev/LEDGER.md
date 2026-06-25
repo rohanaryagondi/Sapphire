@@ -11,6 +11,21 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — KEYSTONE: in-session EMET orchestration — real PMIDs land via run_live  (`main`, PR #57)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged + LIVE-acceptance-tested by Head Claude).
+- What: `emet/session_bridge.py::make_session_emet_handler(envelopes)` injects EMET envelopes captured from
+  the orchestrator's OWN authenticated browser into `run_live` via the `make_emet_handler` seam (candidate-keyed,
+  case-tolerant). Real cited PMIDs land as `emet-live` external-plane facts; honest-abstain (escalate) when no
+  envelope; nothing written to disk (no credential-at-rest). Resolves the live-EMET keystone (mechanism c).
+- Gates: Gate 2 Approved (fabrication analysis holds on every path); Gate 5 "Works as claimed" (injection lands
+  real PMIDs; no-envelope→escalate/0 facts; no cross-wiring; data-boundary fires pre-dispatch); suite **495 green**.
+  **Head Claude LIVE acceptance:** drove a fresh TSC2 Target-Validation run in an authenticated BenchSci session
+  (chat 21801696) → real PMIDs (33307091 etc.) → captured envelope → `run_live` → 3 emet-live PMIDs on the
+  external plane, emet-runner=ok. THE demo now has live external evidence.
+- Fast-follow (nit): commit a positive multi-candidate cross-wiring test (behavior already Gate-5-verified).
+
+---
+
 ## 2026-06-25 — cheap-live runs (live-EMET wiring + model lever + haiku profile)  (`main`, PR #52)
 - Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude).
 - What: W1 — `run_live` now lazily wires a real `emet_handler` into the live ctx (`setdefault`; engine import graph stays stdlib); EMET on `login_required` **abstains honestly** (escalate → no fabricated facts), session-reuse design parked to EMET-MCP / a `live-emet-session-reuse` interim. W2 — `CLAUDE_MODEL`/`SAPPHIRE_MODEL` → `--model` in BOTH `dispatch_claude` and the EMET subprocess; a 3rd Chainlit profile **"Live (cheap · haiku)"** (real backends, haiku reasoning, nothing mocked/relabeled). Demo/Live profiles unchanged; run_live contract additive.
