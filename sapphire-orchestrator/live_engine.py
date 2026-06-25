@@ -28,7 +28,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam, boltz_seam
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
 
@@ -50,6 +50,11 @@ _BUCKET1_AGENTS = [
     # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
     # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
     "aso-tox",
+    # Boltz-2 structure + binding-affinity (hosted Boltz Compute API). Contributes facts only
+    # when a target protein sequence and/or a candidate ligand (SMILES/CCD) is present in inputs
+    # (the structure channel — fed by the upstream ASO Design / small-molecule tools); returns
+    # facts=[] (honest empty) for standard target-level queries with no structure/affinity input.
+    "boltz",
     # gnomAD gene constraint (pLI / LOEUF / missense Z) — quantitative fact source.
     # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
     "gnomad-constraint",
@@ -100,6 +105,45 @@ def _extract_aso_sequences(query: str) -> list[str]:
             seen.add(seq)
             result.append(seq)
     return result
+
+
+# ---------------------------------------------------------------------------
+# Boltz structure/affinity input extraction helper
+# ---------------------------------------------------------------------------
+# A protein sequence token: standalone, ≥ 25 uppercase amino-acid letters, and
+# containing AT LEAST ONE letter outside {A,T,G,C} so it can never collide with an
+# ASO/DNA token (which _ASO_RE owns) — gene symbols always carry digits and so never
+# match.  The amino-acid alphabet is the standard 20 one-letter codes.
+_PROTEIN_RE = re.compile(r"\b[ACDEFGHIKLMNPQRSTVWY]{25,}\b")
+_ATGC_ONLY_RE = re.compile(r"^[ATGC]+$")
+
+
+def _extract_structure_inputs(query: str) -> dict:
+    """
+    Best-effort extraction of Boltz STRUCTURE/AFFINITY inputs from a query string.
+
+    This is the query-text fallback for the Boltz activation channel, mirroring
+    _extract_aso_sequences for the ASO channel.  The PRIMARY channel is the explicit
+    ``structure=`` param to run_live (fed by the upstream ASO Design / small-molecule
+    tools).  This extractor only fires on inputs unambiguous in free text:
+
+      - target_sequence : the FIRST standalone protein token that is ≥ 25 uppercase
+        amino-acid letters AND contains a non-ATGC residue (so a long pure-ATGC ASO/DNA
+        token is never misread as a protein; gene symbols carry digits and never match).
+
+    SMILES are deliberately NOT extracted from free text: a SMILES string overlaps with
+    ordinary punctuation/words and a false positive would trigger a paid Boltz job.  A
+    ligand is supplied only via the explicit ``structure=`` channel (ligand_smiles /
+    ligand_ccd).  Returns {} when no structural input is detectable — Boltz then stays
+    dormant (honest-empty), exactly like aso-tox with no sequences.
+    """
+    out: dict = {}
+    for m in _PROTEIN_RE.finditer(query):
+        tok = m.group(0)
+        if not _ATGC_ONLY_RE.match(tok):  # exclude pure-ATGC (those are ASO/DNA tokens)
+            out["target_sequence"] = tok
+            break
+    return out
 
 
 def _known_agent_ids(registry) -> set:
@@ -219,6 +263,7 @@ def run_live(
     query: str,
     *,
     sequences: list[str] | None = None,
+    structure: dict | None = None,
     ctx: dict | None = None,
     registry=None,
     engine: Orchestrator | None = None,
@@ -237,6 +282,17 @@ def run_live(
                 query text via _extract_aso_sequences().
                 NOTE: this is the documented handoff point for the future ASO-Design tool —
                 that tool will pass its designed sequences here after its own dispatch.
+    structure : optional dict of Boltz STRUCTURE/AFFINITY inputs — public identifiers only:
+                {"target_sequence"|"protein_sequence", "ligand_smiles"|"ligand_ccd"} (or a
+                pre-built {"entities": [...], "binding": {...}}).  When provided, these are
+                threaded into every Bucket-1 agent's inputs so the boltz agent folds/scores
+                them (a protein + a ligand auto-requests a binding_confidence).  If None
+                (default), the function falls back to extracting a target protein sequence
+                from the query text via _extract_structure_inputs().  Boltz fires ONLY when
+                a structure/affinity input is in scope — with neither a sequence nor a
+                ligand it stays dormant (honest-empty), mirroring aso-tox.
+                NOTE: this is the documented handoff point for the upstream ASO Design /
+                small-molecule tools — they pass a target sequence + candidate ligand here.
     ctx       : optional harness context dict (inject mock backends for testing).
     registry  : optional pre-loaded agents.json dict (default: harness.load_registry()).
     engine    : optional Orchestrator instance (default: new Orchestrator()).
@@ -262,6 +318,15 @@ def run_live(
         resolved_sequences: list[str] = _extract_aso_sequences(query)
     else:
         resolved_sequences = list(sequences)
+
+    # Resolve the structure/affinity channel (Boltz).  Same precedence as sequences:
+    # explicit structure= param > query-text extractor.  An explicit dict is used as-is
+    # (even if empty → Boltz stays dormant); None falls back to _extract_structure_inputs.
+    # This channel is the handoff point for the upstream ASO Design / small-molecule tools.
+    if structure is None:
+        resolved_structure: dict = _extract_structure_inputs(query)
+    else:
+        resolved_structure = dict(structure)
 
     # Load registry once (used for id-set lookups + harness.run).
     if registry is None:
@@ -311,6 +376,11 @@ def run_live(
     # Passes sequences through inputs — fires only when ASO sequences are present.
     if "aso-tox" not in ctx["python_fns"]:
         ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings
+    # Wire the Boltz structure/binding seam (stdlib-only orchestrator; urllib lives in the seam;
+    # the BOLTZ_API_KEY is read by the seam from RohanOnly/boltz_api.env at call time, never here).
+    # Passes structural inputs through — fires only when a target sequence and/or ligand is present.
+    if "boltz" not in ctx["python_fns"]:
+        ctx["python_fns"]["boltz"] = boltz_seam.findings
     # Wire the gnomAD constraint seam (stdlib-only orchestrator; urllib lives in the seam).
     # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
     if "gnomad-constraint" not in ctx["python_fns"]:
@@ -360,6 +430,18 @@ def run_live(
         # aso-tox will return facts=[] (honest empty) in that case.
         "sequences": resolved_sequences,
     }
+
+    # structure/affinity inputs threaded through to the boltz agent. Only the recognised
+    # PUBLIC structural keys are forwarded (target_sequence/protein_sequence, ligand_smiles,
+    # ligand_ccd, or a pre-built entities/binding) — never arbitrary caller keys, so no
+    # internal field can sneak into the dossier inputs. Absent ⇒ boltz honest-empties (dormant),
+    # mirroring how aso-tox stays silent without sequences. Populated from the explicit
+    # structure= param (preferred) or the query-text extractor.
+    _STRUCT_KEYS = ("target_sequence", "protein_sequence", "ligand_smiles", "ligand_ccd",
+                    "entities", "binding")
+    for _k in _STRUCT_KEYS:
+        if resolved_structure.get(_k):
+            bucket1_inputs[_k] = resolved_structure[_k]
 
     # Opt-2 (dispatch-optimization): optionally batch the corpus-less claude-subagent Bucket-1
     # agents into ONE claude call. Opt-in via ctx["batch_buckets"]; on ANY failure we fall back to
