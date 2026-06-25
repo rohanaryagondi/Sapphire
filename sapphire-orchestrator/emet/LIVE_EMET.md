@@ -14,14 +14,29 @@ The password is read from the env only — **never printed, logged, or committed
 bootstraps an isolated, gitignored playwright venv (`.emet-venv`). If BenchSci uses SSO/2FA and the
 password flow can't complete, the helper exits 2 and tells you to use `--manual`.
 
-## Then pick a route (set ONE env, then run a Live query)
-| Route | Env | Notes |
-|---|---|---|
-| **Persistent profile** | `export SAPPHIRE_EMET_PROFILE="$PWD/RohanOnly/emet_profile"` | The auto-login default. Close any login window first — Chrome locks a user-data-dir. |
-| **CDP** | `export SAPPHIRE_EMET_CDP=http://localhost:9222` | Keep the `--manual` window **open**; the runner connects to it. No profile-lock. |
+## The VISIBLE demo (recommended) — one launcher, two watchable tabs
+```bash
+cd frontend && chainlit run main.py        # shell A: serve the console → http://localhost:8000
+bash _build/sapphire_live_demo.sh          # shell B: auth + open a VISIBLE authenticated Chrome (CDP :9222)
+```
+The launcher opens ONE visible authenticated Chrome with the Sapphire console as **tab 1**. Pick the
+**"Live (demo · simulated models)"** profile and ask the TSC2 question — the EMET runner auto-detects
+the CDP endpoint and opens the real EMET query in a **second VISIBLE tab of the same window**, landing
+real `emet-live` PMIDs. You watch Sapphire convene + the PMIDs arrive, side by side.
 
-`SAPPHIRE_EMET_CDP` wins if both are set. With one set, a Live run's EMET agent reuses the
-authenticated browser and lands real `emet-live` PMIDs (the live step tree shows `EMET … ✓ N PMIDs`).
+## How the runner picks a browser (Task-1 precedence)
+The runner drives a **shared VISIBLE authenticated browser via CDP** — never a silent invisible one
+(`emet/handler.py::_resolve_emet_cdp`):
+| Order | Source | Notes |
+|---|---|---|
+| 1 | explicit `$SAPPHIRE_EMET_CDP` | e.g. `http://localhost:9222` — connect to that browser. |
+| 2 | **auto-detected** CDP on `$SAPPHIRE_EMET_CDP_PORT` (default 9222) | so the demo "just works" + stays **watchable** when the launcher's Chrome is up. |
+| 3 | `$SAPPHIRE_EMET_PROFILE` **only if** `$SAPPHIRE_EMET_ALLOW_HEADLESS=1` | a separate **invisible** headless browser — opt-in, never the silent default (it was the Gate-5 failure mode). |
+| 4 | none reachable | **honest abstain** (`login_required`) — run the launcher / `_build/emet_login.sh --manual` first. |
+
+A Live run then reuses that authenticated browser and lands real `emet-live` PMIDs (the live step tree
+shows `EMET … ✓ N PMIDs`). **Fallback:** if CDP is unreliable, the proven in-session capture path
+(`emet/session_bridge.py`, #57) injects a captured envelope instead.
 
 ## Simulated-models demo mode (fast, fully labeled)
 Real `claude -p` reasoning (personas + claude fact agents) is slow/can hang. The **`Live (demo ·

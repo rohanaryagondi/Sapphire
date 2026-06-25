@@ -92,11 +92,16 @@ class TestDefaultRunnerModel(unittest.TestCase):
 
 
 class TestEmetAuthGating(unittest.TestCase):
-    """The dedicated-authenticated-browser gating: CDP > profile > honest-abstain."""
+    """Task-1 re-architecture gating: explicit CDP > auto-detected VISIBLE CDP > opt-in headless
+    profile > honest-abstain. `probe` is injected so tests never hit the network."""
+
+    _NO = staticmethod(lambda _ep: False)   # CDP probe that finds nothing reachable
+    _YES = staticmethod(lambda _ep: True)    # CDP probe that finds a visible browser
 
     def setUp(self):
-        self._saved = {k: os.environ.pop(k, None)
-                       for k in ("SAPPHIRE_EMET_CDP", "SAPPHIRE_EMET_PROFILE")}
+        self._saved = {k: os.environ.pop(k, None) for k in
+                       ("SAPPHIRE_EMET_CDP", "SAPPHIRE_EMET_PROFILE", "SAPPHIRE_EMET_CDP_PORT",
+                        "SAPPHIRE_EMET_ALLOW_HEADLESS")}
 
     def tearDown(self):
         for k, v in self._saved.items():
@@ -104,37 +109,47 @@ class TestEmetAuthGating(unittest.TestCase):
             if v is not None:
                 os.environ[k] = v
 
-    def test_no_auth_source_returns_login_required(self):
-        # Neither env set → honest abstain BEFORE any subprocess (no fresh-browser tool-failure).
-        self.assertEqual(H._emet_mcp_config(), None)
-        self.assertEqual(H._default_runner({"candidate": "TSC2"}), {"login_required": True})
+    def test_no_auth_source_returns_none(self):
+        # Nothing set + no reachable CDP browser → None → honest abstain (no invisible fallback).
+        self.assertIsNone(H._emet_mcp_config(probe=self._NO))
 
     def test_no_auth_source_makes_agent_abstain(self):
-        # End to end: cfg None → login_required → handler escalates → agent abstains honestly.
+        # End to end: a definitely-closed port → no CDP → cfg None → login_required → escalate.
+        os.environ["SAPPHIRE_EMET_CDP_PORT"] = "59999"   # closed → autodetect fails fast
+        self.assertEqual(H._default_runner({"candidate": "TSC2"}), {"login_required": True})
         with self.assertRaises(HarnessEscalation):
             emet_handler(C, {"candidate": "TSC2"})
 
-    def test_cdp_route_builds_cdp_endpoint(self):
+    def test_explicit_cdp_builds_cdp_endpoint(self):
         os.environ["SAPPHIRE_EMET_CDP"] = "http://localhost:9222"
-        cfg = H._emet_mcp_config()
-        args = cfg["mcpServers"]["playwright"]["args"]
+        args = H._emet_mcp_config(probe=self._NO)["mcpServers"]["playwright"]["args"]
         self.assertIn("--cdp-endpoint", args)
         self.assertEqual(args[args.index("--cdp-endpoint") + 1], "http://localhost:9222")
         self.assertNotIn("--user-data-dir", args)
 
-    def test_profile_route_builds_user_data_dir(self):
+    def test_autodetected_visible_cdp_is_preferred(self):
+        # No explicit CDP, but a visible browser is reachable on the default port → use it (watchable).
+        args = H._emet_mcp_config(probe=self._YES)["mcpServers"]["playwright"]["args"]
+        self.assertIn("--cdp-endpoint", args)
+        self.assertEqual(args[args.index("--cdp-endpoint") + 1], "http://localhost:9222")
+
+    def test_headless_profile_requires_opt_in(self):
+        # Profile set but no reachable CDP and NO opt-in → abstain (don't silently go invisible).
         os.environ["SAPPHIRE_EMET_PROFILE"] = "/tmp/emet_profile"
-        cfg = H._emet_mcp_config()
-        args = cfg["mcpServers"]["playwright"]["args"]
+        self.assertIsNone(H._emet_mcp_config(probe=self._NO))
+        # With the explicit opt-in, the headless profile is used.
+        os.environ["SAPPHIRE_EMET_ALLOW_HEADLESS"] = "1"
+        args = H._emet_mcp_config(probe=self._NO)["mcpServers"]["playwright"]["args"]
         self.assertIn("--user-data-dir", args)
         self.assertEqual(args[args.index("--user-data-dir") + 1], "/tmp/emet_profile")
 
-    def test_cdp_takes_precedence_over_profile(self):
+    def test_cdp_takes_precedence_over_headless_profile(self):
         os.environ["SAPPHIRE_EMET_CDP"] = "http://localhost:9222"
         os.environ["SAPPHIRE_EMET_PROFILE"] = "/tmp/emet_profile"
-        args = H._emet_mcp_config()["mcpServers"]["playwright"]["args"]
+        os.environ["SAPPHIRE_EMET_ALLOW_HEADLESS"] = "1"
+        args = H._emet_mcp_config(probe=self._NO)["mcpServers"]["playwright"]["args"]
         self.assertIn("--cdp-endpoint", args)
-        self.assertNotIn("--user-data-dir", args)   # CDP wins → no profile-lock
+        self.assertNotIn("--user-data-dir", args)   # visible CDP wins over invisible profile
 
 
 class TestEmetAutoLogin(unittest.TestCase):

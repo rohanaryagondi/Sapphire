@@ -61,20 +61,56 @@ def make_emet_handler(runner=None):
     return _handler
 
 
-def _emet_mcp_config() -> dict | None:
-    """Build a Playwright-MCP config pinned to a DEDICATED authenticated browser, or None when no
-    authenticated source is configured (→ caller abstains honestly).
+def _cdp_reachable(endpoint: str, timeout: float = 1.5) -> bool:
+    """True if a CDP browser answers at `endpoint` (GET /json/version). stdlib urllib only."""
+    try:
+        import urllib.request
+        url = endpoint.rstrip("/") + "/json/version"
+        with urllib.request.urlopen(url, timeout=timeout) as r:  # noqa: S310 (localhost)
+            return getattr(r, "status", r.getcode()) == 200
+    except Exception:
+        return False
 
-    CDP ($SAPPHIRE_EMET_CDP) takes precedence over a persistent profile ($SAPPHIRE_EMET_PROFILE):
-    connecting to a live authenticated browser avoids the Chrome user-data-dir lock entirely.
+
+def _resolve_emet_cdp(probe=_cdp_reachable) -> str | None:
+    """The CDP endpoint of a VISIBLE authenticated browser to drive EMET in, or None.
+
+    Order: explicit `$SAPPHIRE_EMET_CDP`, else AUTO-DETECT a reachable browser on the default
+    local debug port (`$SAPPHIRE_EMET_CDP_PORT` or 9222 — i.e. `_build/emet_login.sh --manual`).
+    Auto-detect is why a Live run "just works" + stays WATCHABLE: the EMET call opens a visible
+    tab in the already-open authenticated browser, instead of a separate invisible headless one.
     """
     cdp = (os.environ.get("SAPPHIRE_EMET_CDP") or "").strip()
-    profile = (os.environ.get("SAPPHIRE_EMET_PROFILE") or "").strip()
-    args = ["-y", "@playwright/mcp@latest", "--browser", "chromium"]
     if cdp:
-        args += ["--cdp-endpoint", cdp]
-    elif profile:
-        args += ["--user-data-dir", profile]
+        return cdp
+    port = (os.environ.get("SAPPHIRE_EMET_CDP_PORT") or "9222").strip()
+    cand = f"http://localhost:{port}"
+    return cand if probe(cand) else None
+
+
+def _headless_profile_opt_in() -> bool:
+    """The headless `--user-data-dir` browser is INVISIBLE (you can't watch the EMET run) and was
+    the silent failure mode in Gate-5 — so it is now strictly OPT-IN via $SAPPHIRE_EMET_ALLOW_HEADLESS."""
+    return (os.environ.get("SAPPHIRE_EMET_ALLOW_HEADLESS") or "").strip().lower() in ("1", "true", "yes")
+
+
+def _emet_mcp_config(probe=_cdp_reachable) -> dict | None:
+    """Build a Playwright-MCP config pinned to an authenticated browser, or None → honest abstain.
+
+    Preference (Task-1 re-architecture): drive the **shared VISIBLE authenticated browser via CDP**
+    so the EMET call is watchable in a second tab and reuses the live session →
+      1. explicit `$SAPPHIRE_EMET_CDP`, or auto-detected CDP on the default port (visible browser);
+      2. ONLY if `$SAPPHIRE_EMET_ALLOW_HEADLESS` is set: a dedicated persistent `$SAPPHIRE_EMET_PROFILE`
+         (a SEPARATE, INVISIBLE headless browser — opt-in, never the silent default);
+      3. else None → the EMET agent abstains honestly (run `_build/emet_login.sh --manual` first).
+    """
+    args = ["-y", "@playwright/mcp@latest", "--browser", "chromium"]
+    cdp = _resolve_emet_cdp(probe)
+    profile = (os.environ.get("SAPPHIRE_EMET_PROFILE") or "").strip()
+    if cdp:
+        args += ["--cdp-endpoint", cdp]                       # VISIBLE shared browser — watchable
+    elif profile and _headless_profile_opt_in():
+        args += ["--user-data-dir", profile]                  # opt-in INVISIBLE headless fallback
     else:
         return None
     return {"mcpServers": {"playwright": {"command": "npx", "args": args}}}
