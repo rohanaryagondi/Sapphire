@@ -11,6 +11,11 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — patient-advocacy corpus — Gavin's 5th Bucket-1 corpus  (`main`, PR #68)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude; reactive-net auto-gated). 5 cards: advocacy campaigns (Alzheimer's Assoc CMS), FDA ALS guidance (T1), eteplirsen accelerated-approval precedent, MJFF funding, EMET ALS-prognosis (PMID 21989247). Gate CLEAN · suite 527 · content clean.
+
+---
+
 ## 2026-06-25 — kol-social-signal corpus — Gavin's 4th Bucket-1 corpus  (`main`, PR #66)
 - Built-By: `gavin` (reviewed/gated/merged by Head Claude; auto-gated by the post-shift reactive net).
 - What: dual-source corpus, 6 KOL-sentiment cards — named experts' public stances on lecanemab/aducanumab/Cobenfy (Kurkinen, Knopman, Bauchner+Alexander, Javitt), all PubMed-cited + correctly T2; EMET card (PMID 41352683) validates the lead KOL-skeptic claim.
