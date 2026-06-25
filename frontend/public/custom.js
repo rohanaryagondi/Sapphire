@@ -36,26 +36,24 @@
           padding: 0 1rem;
         `;
 
-        // Create main title
+        // Create main title — Gavin's chat-first hero ("Ask Sapphire").
+        // Sizing/weight/colour come from custom.css (#custom-welcome-title h1/p)
+        // so the look matches docs/design/console-ui/sapphire_chat.html; only
+        // minimal layout hints are set inline.
         const title = document.createElement('h1');
-        title.textContent = 'Sapphire';
+        title.textContent = 'Ask Sapphire';
         title.style.cssText = `
-          font-size: 2rem;
-          font-weight: 300;
-          letter-spacing: 0.02em;
           margin: 0 0 0.5rem 0;
-          color: var(--text-primary, #e0e0e0);
+          color: var(--text-primary, #ececec);
         `;
 
         // Create subtitle
         const subtitle = document.createElement('p');
-        subtitle.textContent = 'CNS decision firm — the dossier, the roundtable, the spread';
+        subtitle.textContent = 'CNS drug discovery, cited and deliberated.';
         subtitle.style.cssText = `
-          font-size: 1.2rem;
-          font-weight: 300;
-          margin: 0.5rem 0 2rem 0;
-          opacity: 0.7;
-          color: var(--text-secondary, #a0a0a0);
+          font-size: 1rem;
+          margin: 0.25rem 0 2rem 0;
+          color: var(--text-secondary, #909090);
         `;
 
         titleContainer.appendChild(title);
