@@ -82,6 +82,10 @@ can retire Sapphire's mock moat. Includes the reuse plan + the asks to Quiver.
 | `scenarios/` | shipped scenarios + `manifest.json` (variety matrix) + `capture.py` |
 
 ## 7. Run & test
+> **Demo:** the 2-minute **TSC2 / tuberous-sclerosis** walkthrough (real moat + real EMET PMIDs +
+> the spread + a DIVERGENCE, replayable $0/offline) is in [`frontend/DEMO_TSC2.md`](../frontend/DEMO_TSC2.md)
+> — pick the *"Replay (captured TSC2 · $0)"* profile in `chainlit run frontend/main.py`.
+
 ```bash
 # the firm, end-to-end (canned scenario)
 python sapphire-orchestrator/run.py nav1_8

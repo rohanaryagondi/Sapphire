@@ -123,8 +123,9 @@ def _build_ctx():
         # gnomad-constraint would hit a public network API via the real seam; mock it
         # (honest-empty) so the offline suite never touches the network.
         "python_fns": {"gnomad-constraint": _fake_gnomad_fn, "gtex-expression": _fake_gtex_fn, "interpro-domains": _fake_interpro_fn, "geneset-enrichment": _fake_geneset_fn},
-        # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"] so
-        #       that run_live wires the REAL moat + aso-tox backends by default.
+        # NOTE: do NOT pre-populate python_fns["internal-science-lead"]/["aso-tox"]/["robyn-scs"]
+        #       so that run_live wires the REAL moat + aso-tox + robyn-scs backends by default.
+        #       (robyn-scs is honest-empty without imaging input, so it stays $0/offline here.)
     }
 
 
@@ -1398,6 +1399,152 @@ class TestDataBoundaryAdversarial(unittest.TestCase):
             "data_boundary must return violations when s_internal is present",
         )
         self.assertEqual(viols[0].guardrail, "data_boundary")
+
+
+def _batch_aware_runner(cmd):
+    """A fake claude runner that handles BOTH the Opt-2 batch prompt and single-agent prompts.
+    For a batch prompt it returns one object keyed by each `### AGENT: <id>` block."""
+    import re
+    prompt = ""
+    for i, tok in enumerate(cmd):
+        if tok == "-p" and i + 1 < len(cmd):
+            prompt = cmd[i + 1]
+            break
+    if "MULTIPLE specialist agents" in prompt:
+        ids = re.findall(r"### AGENT: (\S+)", prompt)
+        body = {aid: {"candidate": "X",
+                      "facts": [{"value": f"batched {aid} fact", "source": "PMID:7", "tier": "T2"}],
+                      "provenance": "semantic-web"}
+                for aid in ids}
+        return types.SimpleNamespace(stdout=json.dumps({"structured_output": body}),
+                                     returncode=0, stderr="")
+    return _fake_claude_runner(cmd)
+
+
+class TestBatchBucket1(unittest.TestCase):
+    """Opt-2 — batched Bucket-1 dispatch produces the same per-agent guarded/stamped facts."""
+
+    def setUp(self):
+        self._eng = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_batched_agents_land_facts_and_are_stamped(self):
+        ctx = _build_ctx()
+        ctx["runner"] = _batch_aware_runner
+        ctx["batch_buckets"] = True
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
+        agents = {a["id"]: a for a in result["discover"]["agents"]}
+        # A batched corpus-less claude-subagent agent fired ok with its provenance stamped.
+        self.assertEqual(agents.get("patent-ip", {}).get("status"), "ok")
+        batched_facts = [f for f in result["discover"]["dossier"]
+                         if "batched" in f.get("value", "")]
+        self.assertTrue(batched_facts, "batched agents' facts must reach the dossier")
+        # provenance is stamped exactly as the per-agent path would (external plane).
+        self.assertTrue(all(f.get("provenance") for f in batched_facts))
+
+    def test_batch_failure_falls_back_to_per_agent(self):
+        # A batch runner that errors → run_live still completes via per-agent dispatch.
+        def _broken_batch(cmd):
+            prompt = next((cmd[i + 1] for i, t in enumerate(cmd) if t == "-p"), "")
+            if "MULTIPLE specialist agents" in prompt:
+                return types.SimpleNamespace(stdout="", returncode=1, stderr="batch boom")
+            return _fake_claude_runner(cmd)
+        ctx = _build_ctx()
+        ctx["runner"] = _broken_batch
+        ctx["batch_buckets"] = True
+        result = run_live("Is TSC2 a viable target?", ctx=ctx)
+        agents = {a["id"]: a for a in result["discover"]["agents"]}
+        # patent-ip still answered (per-agent fallback via the single-agent fake runner).
+        self.assertEqual(agents.get("patent-ip", {}).get("status"), "ok")
+
+    def test_default_path_does_not_batch(self):
+        # Without the flag, _batch_bucket1 is never consulted (no batch prompt issued).
+        seen = {"batch": False}
+
+        def _watch(cmd):
+            prompt = next((cmd[i + 1] for i, t in enumerate(cmd) if t == "-p"), "")
+            if "MULTIPLE specialist agents" in prompt:
+                seen["batch"] = True
+            return _fake_claude_runner(cmd)
+        ctx = _build_ctx()
+        ctx["runner"] = _watch
+        run_live("Is TSC2 a viable target?", ctx=ctx)  # no batch_buckets
+        self.assertFalse(seen["batch"])
+
+
+class TestEmetHandlerWiring(unittest.TestCase):
+    """W1 — run_live registers a live EMET handler on ctx=None (lazy, setdefault)."""
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def test_wire_registers_a_callable_emet_handler(self):
+        # The empty ctx (the ctx=None path) gains a real, callable emet_handler — no longer
+        # silently absent. Lazy import means this also proves emet.handler imports cleanly.
+        from live_engine import _wire_emet_handler
+        ctx = {}
+        _wire_emet_handler(ctx)
+        self.assertIn("emet_handler", ctx)
+        self.assertTrue(callable(ctx["emet_handler"]))
+
+    def test_wire_does_not_override_injected_handler(self):
+        from live_engine import _wire_emet_handler
+        sentinel = lambda contract, inputs: {"facts": []}  # noqa: E731
+        ctx = {"emet_handler": sentinel}
+        _wire_emet_handler(ctx)
+        self.assertIs(ctx["emet_handler"], sentinel)
+
+    def test_injected_mock_handler_lands_an_emet_fact(self):
+        # The brief's "injected mock emet_handler → the agent fires and lands a fact" check.
+        # This exercises the emet-runner DISPATCH path (handler supplied via _build_ctx);
+        # the NEW W1 wiring (registering a handler on ctx=None) is covered by
+        # test_wire_registers_a_callable_emet_handler + test_emet_runner_not_silently_absent_on_ctx_none.
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
+        dossier = result["discover"]["dossier"]
+        emet_facts = [f for f in dossier if f.get("provenance") == "emet-live"]
+        self.assertTrue(emet_facts, "the mock EMET handler should land >=1 emet-live fact")
+
+    def test_emet_runner_not_silently_absent_on_ctx_none(self):
+        # ctx=None must REGISTER a handler so emet-runner doesn't abstain with
+        # 'handler not registered'. We avoid a live call by mocking the handler the wiring
+        # installs (patch make_emet_handler to a recording mock), plus a mock claude runner.
+        import live_engine
+        calls = {"n": 0}
+
+        def _spy_handler(contract, inputs):
+            calls["n"] += 1
+            return {"candidate": inputs.get("candidate", ""),
+                    "facts": [{"value": "spy emet fact", "source": "PMID:1", "tier": "T2"}],
+                    "provenance": "emet-live"}
+
+        orig = live_engine._wire_emet_handler
+
+        def _patched(ctx):
+            ctx.setdefault("emet_handler", _spy_handler)
+
+        live_engine._wire_emet_handler = _patched
+        try:
+            # ctx provides the OTHER mock backends but NOT an emet_handler, so the wiring fills it.
+            ctx = _build_ctx()
+            ctx.pop("emet_handler", None)
+            result = run_live("Is TSC2 a viable target?", ctx=ctx)
+        finally:
+            live_engine._wire_emet_handler = orig
+        self.assertGreater(calls["n"], 0, "the registered emet handler must actually be invoked")
+        agents = {a["id"]: a["status"] for a in result["discover"]["agents"]}
+        self.assertEqual(agents.get("emet-runner"), "ok")  # fired, not abstained
 
 
 if __name__ == "__main__":

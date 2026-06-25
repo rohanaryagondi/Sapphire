@@ -11,6 +11,73 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-25 — kol-social-signal corpus — Gavin's 4th Bucket-1 corpus  (`main`, PR #66)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude; auto-gated by the post-shift reactive net).
+- What: dual-source corpus, 6 KOL-sentiment cards — named experts' public stances on lecanemab/aducanumab/Cobenfy (Kurkinen, Knopman, Bauchner+Alexander, Javitt), all PubMed-cited + correctly T2; EMET card (PMID 41352683) validates the lead KOL-skeptic claim.
+- Gates: corpus gate CLEAN (all URLs resolve) · suite green · content audited clean (real PMIDs, 0 fabrication, quotes <=60w).
+
+---
+
+## 2026-06-25 — robyn_scs firm seam (fire-when-relevant Bucket-1 tool) — Track E  (`main`, PR #62)
+- Built-By: `rohan` (reviewed + Gate-5-verified + merged by Head Claude).
+- What: `tools/robyn_scs_seam.py` wires the vendored robyn_scs SCS/STA pipeline into the firm as a Bucket-1 tool seam — fires only with a real imaging `input_dir`; honest KNOWN_UNKNOWN on empty/absent plate (no fabricated connectivity); stdlib engine (heavy deps in the tool); internal plane; traced + provenance-stamped (`robyn-scs`). Fix-loop: empty-plate honesty + drop data_boundary from the internal-plane agent + non-mocked test.
+- Gates: review Approved + Gate-5 PASS; suite **527 green**.
+- **OVERNIGHT COMPLETE:** Tracks A (#57) + B (#56) + D (#61) + E (#62) all shipped. TSC2 demo runs live + replays. Report: dev/reports/overnight-2026-06-25-demo.md.
+
+---
+
+## 2026-06-25 — TSC2 demo scenario captured ($0 deterministic replay) — Track D / DEMO COMPLETE  (`main`, PR #61)
+- Built-By: `rohan` (Rohan Claude; reviewed + Gate-5-verified + merged by Head Claude).
+- What: `scenarios/tsc2_live_run.json` — a REAL captured `run_live` run (wall 1050s; real moat internal-plane facts + 8 live EMET PMIDs external-plane + 5-persona spread + DIVERGENCE + synthesis), replayed by the front end instantly $0/offline. Reproducible capture script (`_build/capture_tsc2_live.py` emits `_internal_only`/`_data_notice`), internal-only tagged, honest demo doc (`frontend/DEMO_TSC2.md`; guardrail-abstentions shown honestly, not as deliberate holds).
+- Gates: review Approved + Gate-5 "Works as claimed" (verified REAL — not a dressed-up mock — and replays the full firm with the network blocked); 3-fix loop (reproducible tags, honest persona wording, TSC-relevant DIVERGENCE assertion). Suite **497 green**.
+- **MILESTONE: the overnight demo goal is met.** Tracks A (live-EMET keystone #57) + B (dispatch-opt #56) + D (#61) complete — the TSC2 demo runs live (real PMIDs land via run_live) AND replays from the captured scenario. Track E (robyn firm seam #62, BONUS) is in a fix loop; corpora ongoing.
+
+---
+
+## 2026-06-25 — dispatch optimization (Opt-1 cache-stable + Opt-2 batch, flagged)  (`main`, PR #56)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude). Transport/cost only — agent outputs/guards/provenance byte-identical.
+- What: Opt-1 — `dispatch_claude` adds `--setting-sources user` + `--exclude-dynamic-system-prompt-sections` (drops redundant project CLAUDE.md per sub-agent, keeps the cacheable preamble first → cache-stable shared prefix); guards stay harness-enforced regardless; `SAPPHIRE_DISPATCH_FULL_CONTEXT=1` escape hatch. Opt-2 — `dispatch_claude_batch` (flagged, opt-in) one call per bucket, forwards the UNION of agents' `--allowedTools`, per-item provenance/guards preserved. Opt-3 (warm worker) parked → Claude Agent SDK is the durable path (HELP-resolved).
+- Gates: review Approved (no behavior change — guards independent of CLAUDE.md) + Gate-5 PASS; suite **505 green**.
+
+---
+
+## 2026-06-25 — KEYSTONE: in-session EMET orchestration — real PMIDs land via run_live  (`main`, PR #57)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged + LIVE-acceptance-tested by Head Claude).
+- What: `emet/session_bridge.py::make_session_emet_handler(envelopes)` injects EMET envelopes captured from
+  the orchestrator's OWN authenticated browser into `run_live` via the `make_emet_handler` seam (candidate-keyed,
+  case-tolerant). Real cited PMIDs land as `emet-live` external-plane facts; honest-abstain (escalate) when no
+  envelope; nothing written to disk (no credential-at-rest). Resolves the live-EMET keystone (mechanism c).
+- Gates: Gate 2 Approved (fabrication analysis holds on every path); Gate 5 "Works as claimed" (injection lands
+  real PMIDs; no-envelope→escalate/0 facts; no cross-wiring; data-boundary fires pre-dispatch); suite **495 green**.
+  **Head Claude LIVE acceptance:** drove a fresh TSC2 Target-Validation run in an authenticated BenchSci session
+  (chat 21801696) → real PMIDs (33307091 etc.) → captured envelope → `run_live` → 3 emet-live PMIDs on the
+  external plane, emet-runner=ok. THE demo now has live external evidence.
+- Fast-follow (nit): commit a positive multi-candidate cross-wiring test (behavior already Gate-5-verified).
+
+---
+
+## 2026-06-25 — cheap-live runs (live-EMET wiring + model lever + haiku profile)  (`main`, PR #52)
+- Built-By: `rohan` (Rohan Claude; reviewed/gated/merged by Head Claude).
+- What: W1 — `run_live` now lazily wires a real `emet_handler` into the live ctx (`setdefault`; engine import graph stays stdlib); EMET on `login_required` **abstains honestly** (escalate → no fabricated facts), session-reuse design parked to EMET-MCP / a `live-emet-session-reuse` interim. W2 — `CLAUDE_MODEL`/`SAPPHIRE_MODEL` → `--model` in BOTH `dispatch_claude` and the EMET subprocess; a 3rd Chainlit profile **"Live (cheap · haiku)"** (real backends, haiku reasoning, nothing mocked/relabeled). Demo/Live profiles unchanged; run_live contract additive.
+- Gates: Gate 2 review = Approved; Gate 5 = "Works as claimed" — CRITICAL no-fabrication check passes (login_required → 0 EMET facts, agent `escalated`); lazy/stdlib boundary proven; `--model` argv present/absent verified; env set+restore leak-free. One fix-loop (thread `--model` into the EMET subprocess for honesty + cost). Suite **490 green**.
+- Follow-ups: `live-emet-session-reuse` (interim for live-EMET demos; prefer in-session orchestration) + EMET-MCP (durable).
+
+---
+
+## 2026-06-24 — policy-legislative corpus — Gavin's 3rd Bucket-1 corpus  (`main`, PR #48)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude).
+- What: dual-source corpus, 6 cards — US CNS policy/pricing: CMS anti-amyloid CED coverage (2022), IRA Medicare price-negotiation cycle-2 (15 drugs, 2025), FDA/FDORA accelerated-approval reform (cms.gov/fda.gov T1); IRA small-molecule pill-penalty (KFF T2); 2 EMET cards on real PMIDs (36449413 lecanemab CLARITY-AD, 40225240 CDR-SB MCID).
+- Gates: corpus gate CLEAN (all URLs resolve) · suite 478 green · content audited clean (0 fabrication, quotes <=60w, tiers honest).
+
+---
+
+## 2026-06-24 — financial-investor corpus — Gavin's 2nd Bucket-1 corpus  (`main`, PR #38)
+- Built-By: `gavin` (reviewed/gated/merged by Head Claude).
+- What: dual-source corpus, 6 cards — recent CNS M&A + clinical-failure signals (BMS/Karuna $14B, AbbVie/Cerevel $8.7B + emraclidine Ph2 failure, J&J/Intra-Cellular $14.6B, Neumora navacaprant Ph3 failure, KarXT EMET card). SEC 8-K primaries T1; press/secondary T2; EMET card cites real PMID 33626254.
+- Gates: corpus gate CLEAN (unverifiable_by_fetch tags correct after fix-loop) · suite 478 green · content audited clean (0 fabrication, quotes ≤60w, tiers honest). One fix-loop: navacaprant card was missing the unverifiable_by_fetch tag → Gavin tagged it + synced main.
+
+---
+
 ## 2026-06-24 — robyn_scs endpoint wiring — tools/robyn_scs/  (`main`, PR #44)
 - Built-By: `hayes` (reviewed/gated/merged by Head Claude).
 - What: `tools/robyn_scs/` exposes the vendored SCS/STA connectivity pipeline (`vendor/robyn_scs/`) as 10

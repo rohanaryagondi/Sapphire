@@ -27,7 +27,7 @@ from memory import recall
 from harness import trace
 import harness
 from selfimprove.reflect import reflect
-from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
+from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
 
@@ -61,6 +61,9 @@ _BUCKET1_AGENTS = [
     # g:Profiler functional enrichment (top GO / pathway terms) over the gene set —
     # quantitative fact source. Fires when a gene set / target is present; honest-empty otherwise.
     "geneset-enrichment",
+    # robyn_scs SCS/STA neuronal-connectivity (internal, imaging-derived). Fires only when
+    # imaging data (a v17_traces plate dir) is present in inputs; honest-empty otherwise.
+    "robyn-scs",
 ]
 
 
@@ -126,6 +129,52 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
         "from_corpus": True,
         "field": agent_id,
     }
+
+
+def _wire_emet_handler(ctx: dict) -> None:
+    """Register the live EMET handler on ctx if the caller didn't supply one (setdefault).
+
+    LAZY import — `emet.handler` pulls in the Playwright/Claude-driving seam, which must NOT
+    enter the engine's import graph at module-import time (the engine stays stdlib-only).
+    Importing here, only when run_live actually wires backends, keeps that boundary.
+
+    Session-reuse caveat (honest): the live runner drives EMET by shelling out to a SEPARATE
+    `claude -p` subprocess (its own Playwright browser), so it does NOT inherit the interactive
+    session's already-authenticated BenchSci browser/tabs, and contends on the Chrome
+    profile lock. When it lands on the BenchSci login screen the runner returns
+    `{"login_required": true}` → the handler escalates → the emet agent abstains HONESTLY
+    (no fabricated facts). Reliable session sharing is an open design question — see
+    `dev/HELP.md` (EMET-MCP vs shared persistent profile vs in-session orchestration).
+    """
+    if "emet_handler" not in ctx:
+        from emet.handler import make_emet_handler
+        ctx["emet_handler"] = make_emet_handler()
+
+
+def _batch_bucket1(known_ids, bucket1_inputs, ctx, registry) -> dict:
+    """Opt-2: batch the corpus-less claude-subagent Bucket-1 agents into ONE claude call
+    (~6 boots → 1). Returns `{agent_id: output}`; `{}` on ANY failure → the caller falls back to
+    per-agent dispatch (honest cold-fallback, never a guessed result). Corpus agents and
+    python/qmodels/emet agents are intentionally excluded (their inputs/paths differ)."""
+    from harness.contracts import resolve
+    from harness.dispatch import dispatch_claude_batch
+    items = []
+    for aid in _BUCKET1_AGENTS:
+        if aid not in known_ids or has_corpus(aid):
+            continue
+        try:
+            contract = resolve(aid, registry)
+        except KeyError:
+            continue
+        if contract.kind != "claude-subagent":
+            continue
+        items.append((contract, bucket1_inputs))
+    if not items:
+        return {}
+    try:
+        return dispatch_claude_batch(items, runner=ctx.get("runner"))
+    except Exception:
+        return {}
 
 
 def _build_moat_agent():
@@ -240,6 +289,15 @@ def run_live(
     # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
     if "geneset-enrichment" not in ctx["python_fns"]:
         ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
+    # Wire the robyn_scs connectivity seam (stdlib orchestrator; numpy/scipy/pandas in the
+    # subprocess). Fires only when imaging data is present in inputs — honest-empty otherwise.
+    if "robyn-scs" not in ctx["python_fns"]:
+        ctx["python_fns"]["robyn-scs"] = robyn_scs_seam.findings
+
+    # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
+    # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
+    # _wire_emet_handler for the lazy import + the honest session-reuse caveat.
+    _wire_emet_handler(ctx)
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents
@@ -265,6 +323,16 @@ def run_live(
         "sequences": resolved_sequences,
     }
 
+    # Opt-2 (dispatch-optimization): optionally batch the corpus-less claude-subagent Bucket-1
+    # agents into ONE claude call. Opt-in via ctx["batch_buckets"]; on ANY failure we fall back to
+    # per-agent dispatch. Each batched output still flows through the FULL per-agent harness path
+    # (validation + guardrails + provenance stamp + trace) via dispatch_fn below — only the
+    # generation transport changes; guards/provenance/schemas are unaffected.
+    batched_outputs: dict = (
+        _batch_bucket1(known_ids, bucket1_inputs, ctx, registry)
+        if ctx.get("batch_buckets") else {}
+    )
+
     for agent_id in _BUCKET1_AGENTS:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
@@ -282,12 +350,26 @@ def run_live(
             if corpus_cards else bucket1_inputs
         )
 
+        # If this agent was answered in the Opt-2 batch, feed its output through the SAME harness
+        # path via dispatch_fn (validation/guards/provenance/trace run unchanged). Else dispatch
+        # normally (the per-agent, per-kind backend).
+        disp_fn = None
+        if agent_id in batched_outputs:
+            _o = batched_outputs[agent_id]
+            # Const dispatch_fn: returns the batched output verbatim. It IGNORES the harness
+            # repair prompt — so a batched output that fails schema/guard validation is retried
+            # with the same value and (correctly) abstains after max_repair, never accepted. The
+            # tradeoff: a batched agent cannot self-correct via prompt-repair the way a per-agent
+            # claude call can; bad batched output → honest abstain, not a fix-up.
+            disp_fn = lambda contract, inputs, ctx, _o=_o: _o  # noqa: E731
+
         res = harness.run(
             agent_id,
             agent_inputs,
             engagement_id=eid,
             ctx=ctx,
             registry=registry,
+            dispatch_fn=disp_fn,
         )
 
         agent_statuses.append({
