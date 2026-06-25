@@ -85,6 +85,58 @@ class TestScratchBucket(unittest.TestCase):
         self.assertTrue(any(e["event"] == "delete" and e["id"] == name for e in events))
 
 
+class TestUserdataRender(unittest.TestCase):
+    """Gap 1 — the recipe-driven GPU userdata renders to the proven S3-staged pattern (no git clone)."""
+
+    _JOB = {"job_id": "sapphire-qmodels-tool-abc", "tool_id": "boltz2",
+            "inputs": {"target_seq": "MKVLA", "smiles": "CCO", "name": "tsc2_x"}}
+
+    def test_build_inputs_is_valid_complexes(self):
+        cx = json.loads(L._build_inputs(self._JOB))
+        self.assertEqual(cx[0]["protein_seq"], "MKVLA")
+        self.assertEqual(cx[0]["smiles"], "CCO")
+
+    def test_userdata_stages_via_presigned_get_not_git_clone(self):
+        ud = L._render_tool_userdata(self._JOB, L._placeholder_urls(L._gpu_recipe("boltz2")))
+        self.assertNotIn("git clone", ud)                      # the Gate-1 root cause is gone
+        self.assertIn("boltz_runner.py", ud)                   # code staged
+        self.assertIn("complexes.json", ud)                    # inputs staged
+        self.assertIn("geturl get:boltz_runner.py", ud)        # via presigned GET
+        self.assertIn("pip install", ud)
+        self.assertIn("boltz", ud)                             # the dep
+        self.assertIn("python boltz_runner.py complexes.json", ud)  # the run
+        self.assertIn("export BOLTZ_OUT=", ud)                 # out env
+        self.assertIn("put:results.json", ud)                  # result uploaded (presigned PUT)
+        self.assertIn("shutdown -h now", ud)                   # parachute + final
+        self.assertIn("sleep 3600", ud)                        # 60-min hard cap
+
+    def test_unwired_tool_userdata_is_a_clear_stub(self):
+        eng = tempfile.mkdtemp()
+        prev = (L._RUN_DIR, L._JOBS_DIR, L._LEDGER)
+        L._RUN_DIR, L._JOBS_DIR, L._LEDGER = (
+            __import__("pathlib").Path(eng), __import__("pathlib").Path(eng) / "jobs",
+            __import__("pathlib").Path(eng) / "ledger.jsonl")
+        try:
+            job = L.submit_job({"id": "esm2"}, {"x": 1}, mode="dry-run")  # esm2 has no recipe yet
+            self.assertIn("no GPU recipe", job["userdata"])   # clear stub, not a crash
+            self.assertNotIn("python boltz_runner", job["userdata"])
+        finally:
+            L._RUN_DIR, L._JOBS_DIR, L._LEDGER = prev
+
+    def test_dry_run_boltz_renders_real_recipe_userdata(self):
+        eng = tempfile.mkdtemp()
+        prev = (L._RUN_DIR, L._JOBS_DIR, L._LEDGER)
+        from pathlib import Path
+        L._RUN_DIR, L._JOBS_DIR, L._LEDGER = Path(eng), Path(eng) / "jobs", Path(eng) / "ledger.jsonl"
+        try:
+            job = L.submit_job({"id": "boltz2"}, {"target_seq": "MKVLA", "smiles": "CCO"}, mode="dry-run")
+            self.assertEqual(job["status"], "dry-run-validated")
+            self.assertIn("python boltz_runner.py complexes.json", job["userdata"])
+            self.assertNotIn("git clone", job["userdata"])
+        finally:
+            L._RUN_DIR, L._JOBS_DIR, L._LEDGER = prev
+
+
 class TestPresign(unittest.TestCase):
     """Presigned URL generation (Gap 4b) — boto3 signs locally (no network), offline-safe."""
 

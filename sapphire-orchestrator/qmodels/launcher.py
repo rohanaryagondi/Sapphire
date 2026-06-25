@@ -119,27 +119,79 @@ shutdown -h now
 """
 
 
-def _render_tool_userdata(job: dict, bucket: str, max_minutes: int = 60) -> str:
-    """Template for a real Q-Models eval (DRY-RUN ONLY in this overnight run — not executed live).
-    A live GPU run would clone q-models, set up the env, run eval_script on the inputs, upload result."""
-    import base64
-    eval_script = (job.get("eval_script") or "aws/<tool>_eval.py")
-    # SECURITY: base64-encode inputs so no user JSON ever reaches a shell with metacharacters
-    # (base64 alphabet is shell-safe). The instance decodes it back to JSON.
-    inputs_b64 = base64.b64encode(json.dumps(job.get("inputs", {})).encode()).decode()
-    return f"""#!/bin/bash
+def _build_inputs(job: dict) -> str:
+    """The inputs JSON the eval reads, built by the tool's recipe (offline, pure)."""
+    recipe = _gpu_recipe(job.get("tool_id"))
+    return json.dumps(recipe["inputs_fn"](job.get("inputs", {})))
+
+
+def _url_keys(recipe: dict) -> list:
+    """The presigned-URL keys the userdata needs: GET each code file + the inputs JSON; PUT the
+    result + the progress log."""
+    return ([f"get:{fn}" for fn in recipe["code"]]
+            + [f"get:{recipe['inputs_name']}", f"put:{recipe['result']}", "put:progress.log"])
+
+
+def _placeholder_urls(recipe: dict) -> dict:
+    """Stand-in URLs for dry-run rendering (real presigned URLs are minted in _launch_live)."""
+    return {k: "PRESIGNED-AT-LAUNCH" for k in _url_keys(recipe)}
+
+
+# The proven GPU userdata pattern (ported from q-models/aws/boltz_validation_userdata.sh):
+# hard-cap timer · exec>log · 30s log uploader · wait_apt · stage code+inputs via presigned GET
+# (NO git clone of the retired repo) · per-model venv+deps · run · presigned-PUT result · shutdown.
+_USERDATA_TMPL = r'''#!/bin/bash
+( sleep __SECS__ && shutdown -h now ) &      # hard cap (parachute)
+exec > /var/log/userdata.log 2>&1
 set -x
-shutdown -h +{max_minutes} &   # parachute
-cd /home/ec2-user || cd /home/ubuntu
-git clone --depth 1 https://github.com/rohanaryagondi/Q-Models.git qm 2>/dev/null || true
-cd qm
-python3 -m pip install -q -r requirements.txt || true
-echo {inputs_b64} | base64 -d > /tmp/inputs.json
-python3 {shlex.quote(eval_script)} --inputs /tmp/inputs.json --out /tmp/result.json || \
-  echo '{{"job":"{job['job_id']}","error":"eval failed"}}' > /tmp/result.json
-aws s3 cp /tmp/result.json s3://{bucket}/{job['job_id']}/result.json --region {REGION} || true
-shutdown -h now
-"""
+date; echo "===== sapphire-qmodels GPU job __JOB__ ====="
+mkdir -p /home/ubuntu/work && cd /home/ubuntu/work
+cat > urls.json <<'URL_EOF'
+__URLS__
+URL_EOF
+geturl() { python3 -c "import json,sys; print(json.load(open('urls.json')).get(sys.argv[1],''))" "$1"; }
+( while :; do U=$(geturl put:progress.log); [ -n "$U" ] && curl -fsS -X PUT --upload-file /var/log/userdata.log "$U" >/dev/null 2>&1; sleep 30; done ) &
+LOG_PID=$!
+wait_apt() { for i in $(seq 1 90); do sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || return 0; sleep 5; done; }
+wait_apt; sudo apt-get update -y || true
+wait_apt; sudo apt-get install -y python3-venv python3-pip curl jq || true
+__STAGE__
+python3 -m venv venv && source venv/bin/activate
+pip install --upgrade pip --timeout 600 --retries 5
+pip install --no-cache-dir --timeout 600 --retries 5 __DEPS__
+export __OUTENV__=/home/ubuntu/work/out
+mkdir -p "$__OUTENV__"
+nvidia-smi --query-gpu=name,memory.total --format=csv,noheader || echo "no nvidia-smi"
+__RUN__ 2>&1 || echo "RUN_FAILED rc=$?"
+RES="$__OUTENV__/__RESULT__"
+PUT=$(geturl put:__RESULT__)
+if [ -f "$RES" ] && [ -n "$PUT" ]; then curl -fsS --retry 5 -X PUT --upload-file "$RES" "$PUT" && echo UPLOAD_OK || echo UPLOAD_FAIL; else echo "NO_RESULT at $RES"; fi
+PL=$(geturl put:progress.log); [ -n "$PL" ] && curl -fsS -X PUT --upload-file /var/log/userdata.log "$PL"
+kill $LOG_PID 2>/dev/null || true
+sync; sleep 10; shutdown -h now
+'''
+
+
+def _render_tool_userdata(job: dict, urls: dict, max_minutes: int = 60) -> str:
+    """Render the GPU userdata for a tool job to the proven pattern, consuming the tool's recipe.
+    Pure render — `urls` carries the presigned GET/PUT URLs (real in live, placeholders in dry-run).
+    Stages code+inputs from S3 via presigned GET (NO git clone), installs the recipe deps, runs the
+    recipe command, and presigned-PUTs the result. Raises for an unwired tool (never guesses)."""
+    recipe = _gpu_recipe(job.get("tool_id"))
+    stage = "\n".join(
+        f'curl -fsS --retry 5 --retry-delay 5 -o {shlex.quote(fn)} "$(geturl get:{fn})" || echo "STAGE_FAIL {fn}"'
+        for fn in list(recipe["code"].keys()) + [recipe["inputs_name"]]
+    )
+    deps = " ".join(shlex.quote(d) for d in recipe["deps"])
+    return (_USERDATA_TMPL
+            .replace("__SECS__", str(int(max_minutes) * 60))
+            .replace("__JOB__", str(job.get("job_id", "")))
+            .replace("__URLS__", json.dumps(urls))
+            .replace("__STAGE__", stage)
+            .replace("__DEPS__", deps)
+            .replace("__OUTENV__", recipe["out_env"])
+            .replace("__RUN__", recipe["run"])
+            .replace("__RESULT__", recipe["result"]))
 
 
 # ---------------- job lifecycle ----------------
@@ -165,9 +217,18 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
         "instance_type": itype, "inputs": inputs, "created": _now(),
         "est_usd": round(_estimate_usd(itype, max_minutes), 4),
     }
-    # render userdata
-    job["userdata"] = (_render_smoke_userdata(job_id, bucket, max_minutes) if kind == "smoke"
-                       else _render_tool_userdata(job, bucket, max_minutes))
+    # render userdata. smoke → fixed template; tool → recipe-driven, with PLACEHOLDER presigned
+    # URLs for dry-run validation (_launch_live re-renders with real presigned URLs). An unwired
+    # tool renders a clear no-recipe stub (dry-run validates as "not wired", never crashes).
+    if kind == "smoke":
+        job["userdata"] = _render_smoke_userdata(job_id, bucket, max_minutes)
+    else:
+        try:
+            recipe = _gpu_recipe(job.get("tool_id"))
+            job["userdata"] = _render_tool_userdata(job, _placeholder_urls(recipe), max_minutes)
+        except SafetyRefusal as e:
+            job["userdata"] = f"# no GPU recipe for tool {job.get('tool_id')!r} — not wired for live launch\n# {e}\n"
+            job["note"] = f"unwired tool (dry-run only): {e}"
 
     over_budget = job["est_usd"] > BUDGET_CAP_USD
 
