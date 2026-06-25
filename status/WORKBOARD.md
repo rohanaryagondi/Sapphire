@@ -13,7 +13,6 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ---
 
 ## rohan  (`@rohanaryagondi`) — lead + approver
-> **⏱ Head Claude pacing-check (2026-06-25, ~03:30):** Tracks A (#57) + B (#56) ✅ merged. **Track D (TSC2 capture) has had no push for ~65 min and no HELP.** Rohan Claude: if you're mid-capture (slow live run), ignore this. If BLOCKED, raise it in `dev/HELP.md` now. If your loop went idle, resume: capture the TSC2 scenario → verify it replays in the front end → open the PR. Plenty of runway to 08:30, but keep moving. Track E (robyn seam) after D.
 > **🌙 OVERNIGHT DEMO SHIFT (2026-06-25, report by 08:30):** get a real, reproducible **TSC2** demo working — in-session live EMET · all-haiku · full scope. Rohan Claude builds **B (finish dispatch-opt) → A (live-emet-session-reuse) → D (capture TSC2 scenario) → E (robyn_scs firm seam)**; Head Claude audits/merges. Plan: [overnight-demo-shift](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md).
 > **Overnight shift (2026-06-23→24): ✅ COMPLETE** — all 3 worker tasks merged: H (#22), K1 (#24), K2 (#26).
 > Backend is now end-to-end-capable: front door serves the live firm (K1) + agents read their corpora at run
@@ -22,7 +21,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 | Task id | Status | Goal | Branch / PR | Area |
 |---|---|---|---|---|
 | `live-emet-session-reuse` | ✅ **MERGED (#57) — keystone, live-acceptance PASSED** | In-session EMET orchestration so a logged-in BenchSci session is reused → live PMIDs in the external plane; honest-abstain kept for no-session; shared-profile fallback if blocked. | `rohan/live-emet-session-reuse` | [runtime-harness](runtime-harness.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
-| `tsc2-demo-scenario` | **🌙 assigned → Rohan Claude (after A+B)** | Capture the real TSC2 run as a deterministic scenario (instant $0 replay) + a demo-script note. | `rohan/tsc2-demo-scenario` | [engine](engine.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
+| `tsc2-demo-scenario` | ✅ **MERGED (#61) — DEMO COMPLETE** | Capture the real TSC2 run as a deterministic scenario (instant $0 replay) + a demo-script note. | `rohan/tsc2-demo-scenario` | [engine](engine.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
 | `robyn-scs-firm-seam` | **🌙 assigned → Rohan Claude (last/if time)** | Wire vendored+endpoint-wired robyn_scs into the firm as a Bucket-1 tool seam (heavy deps in tool; honest fire-when-relevant). | `rohan/robyn-scs-firm-seam` | [tools](tools.md) · [**plan**](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md) |
 | `cheap-live-runs` | ✅ **merged (#52)** | **Standard.** Make a live run usable + cheap: (1) wire `emet_handler` into `run_live`'s live ctx (lazy) so a logged-in EMET session is actually used — or abstain honestly + HELP if session-reuse needs a design call; (2) `CLAUDE_MODEL`→`--model` pass-through in `dispatch_claude` + a **"Live (cheap)"** front-end profile (haiku and/or mock personas, real facts). Engine stays stdlib; data boundary intact. | `rohan/cheap-live-runs` | [frontend-loka](frontend-loka.md) · [**brief**](../docs/superpowers/plans/2026-06-24-cheap-live-runs.md) |
 | `dispatch-optimization` | ✅ **merged (#56)** | **Standard→Feature.** Keep Claude agents warm + stop re-reading context: spike+baseline (token/latency) → Opt1 sub-agents stop loading CLAUDE.md (cache-friendly prefix) → Opt2 batch-per-bucket (flagged) → Opt3 warm stream-json worker (per-agent context reset, cold fallback). All behind `dispatch_claude`; outputs/guards/provenance unchanged; subscription, no API. | `rohan/dispatch-optimization` | [runtime-harness](runtime-harness.md) · [**brief**](../docs/superpowers/plans/2026-06-24-dispatch-optimization.md) |
@@ -88,6 +87,8 @@ Pulled from `status/OVERALL.md` open items. To assign: move a row into a person'
 ## Recently merged
 | Task id | Owner | Merged | Ledger |
 |---|---|---|---|
+| `tsc2-demo-scenario` (DEMO COMPLETE) | rohan | 2026-06-25 | PR #61 |
+| `dispatch-optimization` | rohan | 2026-06-25 | PR #56 |
 | `dispatch-optimization` (Opt-1+2) | rohan | 2026-06-25 | PR #56 |
 | `live-emet-session-reuse` (KEYSTONE) | rohan | 2026-06-25 | PR #57 |
 | `cheap-live-runs` (live-EMET wiring + haiku profile) | rohan | 2026-06-25 | PR #52 |
