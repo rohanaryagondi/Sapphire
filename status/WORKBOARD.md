@@ -13,6 +13,7 @@ is `dev/DELEGATION.md`, and the *lifecycle* for building is `dev/METHODOLOGY.md`
 ---
 
 ## rohan  (`@rohanaryagondi`) — lead + approver
+> **⏱ Head Claude pacing-check (2026-06-25, ~03:30):** Tracks A (#57) + B (#56) ✅ merged. **Track D (TSC2 capture) has had no push for ~65 min and no HELP.** Rohan Claude: if you're mid-capture (slow live run), ignore this. If BLOCKED, raise it in `dev/HELP.md` now. If your loop went idle, resume: capture the TSC2 scenario → verify it replays in the front end → open the PR. Plenty of runway to 08:30, but keep moving. Track E (robyn seam) after D.
 > **🌙 OVERNIGHT DEMO SHIFT (2026-06-25, report by 08:30):** get a real, reproducible **TSC2** demo working — in-session live EMET · all-haiku · full scope. Rohan Claude builds **B (finish dispatch-opt) → A (live-emet-session-reuse) → D (capture TSC2 scenario) → E (robyn_scs firm seam)**; Head Claude audits/merges. Plan: [overnight-demo-shift](../docs/superpowers/plans/2026-06-25-overnight-demo-shift.md).
 > **Overnight shift (2026-06-23→24): ✅ COMPLETE** — all 3 worker tasks merged: H (#22), K1 (#24), K2 (#26).
 > Backend is now end-to-end-capable: front door serves the live firm (K1) + agents read their corpora at run
