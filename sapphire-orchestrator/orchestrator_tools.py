@@ -15,6 +15,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -337,6 +339,83 @@ def cmd_qmodels(args) -> dict:
         return {"ok": False, "tool_id": tool_id, "provenance": "unavailable", "error": str(exc)}
 
 
+# ── subcommand: semantic (cheap haiku scientific agents) ─────────────────────
+
+SEMANTIC_AGENTS = {
+    "mechanism":    "molecular & cell-biology mechanism specialist (CNS / mTOR pathway)",
+    "pathway":      "pathway & network specialist who judges pleiotropy and hub-ness (does the gene do many things?)",
+    "toxicity":     "drug-safety / target-based-toxicity specialist",
+    "expression":   "tissue-expression specialist (is the gene expressed in CNS / the relevant cell type?)",
+    "essentiality": "functional-genomics specialist (is knockdown lethal or broadly fitness-affecting?)",
+    "genetics":     "human-genetics specialist (disease association + gnomAD constraint / LoF-intolerance)",
+}
+_SEM_FOCUS = {
+    "mechanism":    "Does modulating this gene plausibly produce the hypothesized effect? Is the mechanism coherent?",
+    "pathway":      "How pleiotropic is this gene (GO breadth, # pathways, hub-ness)? Broad pleiotropy = knockdown collateral risk.",
+    "toxicity":     "What target-based toxicity risk would modulating this gene carry?",
+    "expression":   "Is this gene expressed in the relevant CNS tissue / cell type? An expression gap means the mechanism can't operate.",
+    "essentiality": "Is this gene pan-essential (knockdown lethal or broadly fitness-affecting)? Essentiality = poor knockdown target.",
+    "genetics":     "Human-genetic + constraint evidence (disease association, gnomAD pLI / LoF-intolerance).",
+}
+
+
+def _extract_json_obj(text):
+    """Best-effort: parse a JSON object out of a possibly-noisy string."""
+    text = (text or "").strip()
+    try:
+        return json.loads(text)
+    except Exception:
+        pass
+    m = re.search(r"\{[\s\S]*\}", text)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except Exception:
+            return None
+    return None
+
+
+def cmd_semantic(args) -> dict:
+    """Spawn a cheap claude-haiku semantic scientific agent to analyse ONE dimension for a gene. The
+    orchestrator decides which agents/genes to call. This is REAL LLM reasoning (labelled semantic-haiku —
+    inference, not a cited DB fact); it weighs evidence FOR vs AGAINST and abstains rather than fabricate."""
+    agent = (getattr(args, "agent", "") or "").strip().lower()
+    role = SEMANTIC_AGENTS.get(agent)
+    if not role:
+        return {"ok": False, "error": f"unknown semantic agent '{agent}'", "available": list(SEMANTIC_AGENTS)}
+    gene = (getattr(args, "gene", "") or "").strip()
+    question = (getattr(args, "question", "") or "").strip()
+    context = (getattr(args, "context", "") or "").strip()[:1800]  # public cited facts only
+    prompt = (
+        f"You are a {role} on a CNS drug-discovery team. Analyse ONLY your dimension for gene {gene}.\n"
+        f"Team question: {question or 'rank genes that rescue the TSC2-KO / mTORC1-hyperactivation phenotype'}\n"
+        f"Your focus: {_SEM_FOCUS.get(agent, '')}\n"
+        + (f"Cited evidence available (public, from EMET): {context}\n" if context else "")
+        + "Weigh evidence FOR vs AGAINST honestly. If unsure or lacking evidence, say so (verdict=neutral, "
+          "confidence=low) — do NOT fabricate. Public identifiers only. Respond with STRICT JSON only, no prose:\n"
+        '{"agent":"' + agent + '","gene":"' + gene + '","verdict":"favorable|risk|neutral",'
+        '"finding":"<2-3 sentence assessment>","confidence":"high|medium|low"}'
+    )
+    claude = os.environ.get("SAPPHIRE_CLAUDE_BIN", "/Users/rohanaryagondi/.local/bin/claude")
+    try:
+        proc = subprocess.run([claude, "-p", prompt, "--model", "claude-haiku-4-5", "--output-format", "json"],
+                              capture_output=True, text=True, timeout=120)
+    except Exception as exc:
+        return {"ok": False, "agent": agent, "gene": gene, "provenance": "semantic-haiku",
+                "error": f"haiku call failed: {exc}"}
+    raw = (proc.stdout or "").strip()
+    result_text = raw
+    env = _extract_json_obj(raw)
+    if isinstance(env, dict) and "result" in env:
+        result_text = env.get("result", raw)
+    finding = _extract_json_obj(result_text)
+    if not isinstance(finding, dict):
+        finding = {"finding": (result_text or "(no output)")[:400], "verdict": "neutral", "confidence": "low"}
+    finding.update({"ok": True, "agent": agent, "gene": gene,
+                    "provenance": "semantic-haiku", "model": "claude-haiku-4-5"})
+    return finding
+
+
 # ── subcommand: catalog (tool/model discovery) ───────────────────────────────
 
 def cmd_catalog(args) -> dict:
@@ -347,7 +426,8 @@ def cmd_catalog(args) -> dict:
         {"tool": "moat", "purpose": "Quiver internal moat — rescue (opposite) / similar genes for a target; curated predictions where available.", "call": "moat --gene G --direction opposite|similar [--k N]"},
         {"tool": "emet", "purpose": "Captured BenchSci literature (real PMIDs) for a gene; --live queues a Chrome-worker BenchSci query.", "call": "emet --gene G [--live]"},
         {"tool": "boltz", "purpose": "Boltz-2 structure + binding / druggability for a gene+ligand (REAL, ~80s, ~$0.02).", "call": "boltz --gene G --ligand DRUG"},
-        {"tool": "qmodels", "purpose": "Call a Q-Model from the catalog below by id.", "call": "qmodels --tool ID --inputs '<json>'"},
+        {"tool": "qmodels", "purpose": "Call a Q-Model from the catalog below by id (live-local real; GPU via --gpu-live on AWS).", "call": "qmodels --tool ID --inputs '<json>' [--gpu-live]"},
+        {"tool": "semantic", "purpose": "Spawn a cheap claude-haiku semantic scientific agent to analyse ONE dimension for a gene — YOU decide which to call.", "call": "semantic --agent <mechanism|pathway|toxicity|expression|essentiality|genetics> --gene G [--context '<facts>']"},
         {"tool": "catalog", "purpose": "This list — discover available tools + models.", "call": "catalog"},
     ]
     models = []
@@ -409,11 +489,17 @@ def main() -> None:
     q.add_argument("--gpu-live", action="store_true",
                    help="For a GPU model (esm2/boltz2/balm): ACTUALLY launch on AWS (real cost ~$0.13, auto-teardown, every guard). Default off → honest gpu-disabled.")
 
+    s = sub.add_parser("semantic", help="Spawn a cheap claude-haiku semantic scientific agent for one dimension")
+    s.add_argument("--agent", required=True, help="dimension: " + " | ".join(SEMANTIC_AGENTS))
+    s.add_argument("--gene", required=True, help="gene symbol (public)")
+    s.add_argument("--question", default="", help="the team question for context")
+    s.add_argument("--context", default="", help="cited public facts (e.g. EMET evidence) for the agent to weigh")
+
     sub.add_parser("catalog", help="List all tools + Q-Models (discover what's available + what's runnable)")
 
     args = ap.parse_args()
     dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz,
-                "qmodels": cmd_qmodels, "catalog": cmd_catalog}
+                "qmodels": cmd_qmodels, "semantic": cmd_semantic, "catalog": cmd_catalog}
     result = dispatch[args.cmd](args)
     print(json.dumps(result, default=str, ensure_ascii=False))
 

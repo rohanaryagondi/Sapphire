@@ -192,6 +192,18 @@
       traceList.appendChild(el);
       traceList.scrollTop = traceList.scrollHeight;
 
+    } else if (data.type === 'tool_result') {
+      const el = document.createElement('div');
+      el.className = 'trace-top';
+      el.innerHTML =
+        '<span class="tt-status" style="color:#2ea043">✓</span>' +
+        '<div class="tt-body">' +
+          (data.label ? '<div class="tt-name" style="color:var(--ink-3);font-size:10px">' + escHtml(data.label) + '</div>' : '') +
+          '<div class="tt-detail" style="color:var(--ink-2);white-space:pre-wrap;margin-top:2px">' + escHtml((data.summary || '').slice(0, 400)) + '</div>' +
+        '</div>';
+      traceList.appendChild(el);
+      traceList.scrollTop = traceList.scrollHeight;
+
     } else if (data.type === 'text') {
       const text = (data.text || '').trim();
       if (!text) return;

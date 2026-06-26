@@ -60,6 +60,67 @@ def _parse_json_block(text: str) -> dict | None:
     return None
 
 
+def _label_for(cmd_str: str, tool_name: str) -> str:
+    """Rich live-trace label for an orchestrator Bash tool call — names the sub-tool + key args."""
+    c = cmd_str.lower()
+
+    def arg(flag: str) -> str:
+        m = re.search(flag + r"\s+([A-Za-z0-9_.:\-]+)", cmd_str)
+        return m.group(1) if m else ""
+
+    if "semantic" in c:
+        a, g = arg("--agent"), arg("--gene")
+        return f"→ semantic agent: {a or '?'}({g})" if (a or g) else "→ semantic agent"
+    if "emet" in c:
+        g = arg("--gene")
+        return f"→ EMET ({g}{', live' if '--live' in c else ''})" if g else "→ EMET"
+    if "boltz" in c:
+        g, l = arg("--gene"), arg("--ligand")
+        return f"→ Boltz ({g}{'/' + l if l else ''})" if g else "→ Boltz"
+    if "qmodels" in c:
+        t = arg("--tool")
+        return f"→ Q-Model: {t}{' [AWS]' if '--gpu-live' in c else ''}" if t else "→ Q-Models"
+    if "catalog" in c:
+        return "→ catalog (discover tools)"
+    if "moat" in c:
+        g, d = arg("--gene"), arg("--direction")
+        return f"→ moat ({g}{', ' + d if d else ''})" if g else "→ moat"
+    return f"→ {tool_name}"
+
+
+def _summarize_result(text: str) -> str:
+    """One-line summary of a tool's JSON stdout for the live trace (so the user sees what it produced)."""
+    text = (text or "").strip()
+    d = None
+    try:
+        d = json.loads(text)
+    except Exception:
+        m = re.search(r'\{[\s\S]*\}', text)
+        if m:
+            try:
+                d = json.loads(m.group(0))
+            except Exception:
+                d = None
+    if not isinstance(d, dict):
+        return text[:180]
+    if d.get("ok") is False or d.get("error"):
+        return f"⚠ {d.get('error') or d.get('note') or 'failed'}"[:170]
+    if "verdict" in d:                                            # semantic agent
+        return f"{d.get('verdict')} ({d.get('confidence', '?')}) — {str(d.get('finding', ''))[:150]}"
+    if isinstance(d.get("genes"), list):                         # moat
+        names = [str(g.get('gene', g) if isinstance(g, dict) else g) for g in d["genes"][:6]]
+        return f"{len(d['genes'])} genes: {', '.join(names)}"
+    if "evidence" in d:                                          # emet
+        return f"found={d.get('found', d.get('ok'))}, {len(d.get('evidence') or [])} cited claim(s)"
+    if "binding_confidence" in d:                                # boltz
+        return f"binding_confidence={d.get('binding_confidence')} ({d.get('provenance', '')})"
+    if "qmodels" in d and "tools" in d:                          # catalog
+        return f"{len(d.get('tools', []))} tools, {len(d.get('qmodels', []))} models"
+    if "out" in d:                                               # qmodels call
+        return f"{d.get('provenance', '')}: {str(d.get('out'))[:150]}"
+    return ", ".join(f"{k}={str(v)[:40]}" for k, v in list(d.items())[:4])[:180]
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "SapphireOrchUI/1.0"
     protocol_version = "HTTP/1.1"
@@ -141,6 +202,7 @@ class Handler(BaseHTTPRequestHandler):
                     bufsize=1,
                     env=env,
                 )
+                tool_labels: dict = {}   # tool_use_id → label, to caption each result
                 for line in proc.stdout:
                     line = line.strip()
                     if not line:
@@ -161,14 +223,8 @@ class Handler(BaseHTTPRequestHandler):
                                 tool_name = block.get("name", "")
                                 tool_input = block.get("input", {})
                                 cmd_str = str(tool_input.get("command", ""))
-                                if "moat" in cmd_str.lower():
-                                    label = "→ moat"
-                                elif "emet" in cmd_str.lower():
-                                    label = "→ emet"
-                                elif "boltz" in cmd_str.lower():
-                                    label = "→ boltz"
-                                else:
-                                    label = f"→ {tool_name}"
+                                label = _label_for(cmd_str, tool_name)
+                                tool_labels[block.get("id", "")] = label
                                 with lock:
                                     evq.append(_sse("trace", {
                                         "type": "tool_call",
@@ -184,6 +240,24 @@ class Handler(BaseHTTPRequestHandler):
                                             "type": "text",
                                             "text": text[:2000],
                                         }))
+
+                    elif ev_type == "user":
+                        # tool results come back as a user turn — surface what each tool PRODUCED
+                        msg = ev.get("message", {})
+                        for block in (msg.get("content") or []):
+                            if not isinstance(block, dict) or block.get("type") != "tool_result":
+                                continue
+                            content = block.get("content", "")
+                            if isinstance(content, list):
+                                content = " ".join(b.get("text", "") for b in content if isinstance(b, dict))
+                            summary = _summarize_result(str(content))
+                            label = tool_labels.get(block.get("tool_use_id", ""), "✓ result")
+                            with lock:
+                                evq.append(_sse("trace", {
+                                    "type": "tool_result",
+                                    "label": label,
+                                    "summary": summary,
+                                }))
 
                     elif ev_type == "result":
                         result_text = ev.get("result", "")
