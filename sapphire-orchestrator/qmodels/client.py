@@ -120,11 +120,13 @@ class QModelsClient:
         except Exception as e:
             return {"ok": False, "tool_id": tool["id"], "provenance": "gpu-async",
                     "note": f"launcher unavailable: {e}", "out": "(launcher missing)"}
-        job = launcher.submit_job(tool, inputs)
-        return {"ok": True, "tool_id": tool["id"], "provenance": "gpu-async",
-                "model": tool.get("label") or tool.get("name"),
+        mode = os.environ.get("QMODELS_GPU_MODE", "dry-run")  # 'live' actually launches AWS; 'dry-run' renders the plan
+        job = launcher.submit_job(tool, inputs, mode=mode)
+        return {"ok": True, "tool_id": tool["id"], "provenance": ("gpu-live" if mode == "live" else "gpu-dry-run"),
+                "model": tool.get("label") or tool.get("name"), "mode": mode,
                 "job_id": job.get("job_id"), "status": job.get("status", "submitted"),
-                "out": f"GPU job {job.get('status', 'submitted')} ({job.get('job_id')}) — poll for result"}
+                "out": f"GPU job {job.get('status', 'submitted')} ({job.get('job_id')}, mode={mode})"
+                       + (" — poll for result" if mode == "live" else " — dry-run only, no AWS launched")}
 
     def poll(self, job_id: str) -> dict:
         try:

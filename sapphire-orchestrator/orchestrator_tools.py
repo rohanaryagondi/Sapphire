@@ -168,9 +168,22 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 150) -> dict:
         tasks.mkdir(parents=True, exist_ok=True)
         results.mkdir(parents=True, exist_ok=True)
         tid = f"{g}_{int(_time.time() * 1000)}"
+        # Default query asks for FULL breadth + balanced for-vs-against evidence (see emet-prompting skill),
+        # not just papers — so the worker leverages EMET's genetics/expression/perturbation/pathway/clinical
+        # surface and surfaces the risks (pleiotropy, inflammation, toxicity, essentiality, expression gap).
+        default_q = (
+            f"Run the Target Validation workflow for {g} in tuberous sclerosis, thinking=Thorough, high-stringency. "
+            f"Does knocking down {g} rescue the TSC2-KO / mTORC1-hyperactivation phenotype? Use your FULL toolset, "
+            f"not just literature: genetic association (GWAS/ClinVar/OpenTargets), CNS/neuron expression "
+            f"(GTEx/Protein Atlas/single-cell), perturbation & dependency (DepMap/CRISPR screens), pathway position "
+            f"& pleiotropy (Reactome/STRING + GO breadth), and clinical/safety (FAERS). Give evidence FOR and "
+            f"AGAINST {g} — explicitly check pleiotropy, inflammation/immune liability, toxicity, essentiality "
+            f"(is knockdown lethal?), expression gaps, and gnomAD constraint. Flag contradictions. Cite every claim "
+            f"(PMID/DOI/DB record)."
+        )
         task = {
             "id": tid, "candidate": g,
-            "query": query or f"Evidence that {g} reverses/rescues the TSC2-KO (mTORC1-hyperactivation) phenotype — cite PMIDs.",
+            "query": query or default_q,
             "created": _time.strftime("%Y-%m-%dT%H:%M:%SZ", _time.gmtime()),
         }
         (tasks / f"{tid}.json").write_text(json.dumps(task), encoding="utf-8")
@@ -308,10 +321,15 @@ def cmd_qmodels(args) -> dict:
         inputs = json.loads(args.inputs) if getattr(args, "inputs", None) else {}
     except Exception:
         inputs = {}
-    # SAFETY: default GPU launcher OFF for the demo so a qmodels call can NEVER launch AWS — GPU
-    # tools then return an honest "gpu-disabled (gated)" instead of even a dry-run job. Explicit
-    # QMODELS_GPU=on still opts in. (Set before the import: client.py reads QMODELS_GPU at import.)
-    os.environ.setdefault("QMODELS_GPU", "off")
+    # AWS opt-in. Default: GPU launcher OFF so a qmodels call can NEVER launch AWS — GPU tools return an
+    # honest "gpu-disabled (gated)". With --gpu-live the orchestrator ACTUALLY launches on AWS for a GPU
+    # model (real cost ~$0.13, auto-teardown) — behind the launcher's every guard (account-gate==255493511886,
+    # create-only+ledger, $0.50 budget cap, triple-teardown). (Env set before the import: client.py reads it.)
+    if getattr(args, "gpu_live", False):
+        os.environ["QMODELS_GPU"] = "on"
+        os.environ["QMODELS_GPU_MODE"] = "live"
+    else:
+        os.environ.setdefault("QMODELS_GPU", "off")
     try:
         from qmodels.client import QModelsClient  # noqa: PLC0415
         return QModelsClient().call(tool_id, inputs)
@@ -388,6 +406,8 @@ def main() -> None:
     q = sub.add_parser("qmodels", help="Call a Q-Model via the launchpad (real for live-local; honest-degrades)")
     q.add_argument("--tool", required=True, help="Q-Model tool id (e.g. chemberta2, boltz2, esm2)")
     q.add_argument("--inputs", default="", help="JSON inputs for the tool")
+    q.add_argument("--gpu-live", action="store_true",
+                   help="For a GPU model (esm2/boltz2/balm): ACTUALLY launch on AWS (real cost ~$0.13, auto-teardown, every guard). Default off → honest gpu-disabled.")
 
     sub.add_parser("catalog", help="List all tools + Q-Models (discover what's available + what's runnable)")
 

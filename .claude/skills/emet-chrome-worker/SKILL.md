@@ -30,7 +30,11 @@ internal Quiver scores or candidate ids.
    and tell the user to re-authenticate. NEVER auto-login.
 3. Set thinking level to **Thorough**. Type the task's `query` into the TipTap input (`.tiptap` wrapper),
    submit with the up-arrow send button (`.lucide-arrow-up`) — Enter does not submit. Wait for the agentic
-   Research Plan to finish.
+   Research Plan to finish. **Use EMET's full breadth, not just papers** — if the task `query` is thin, follow
+   the **`emet-prompting`** skill: name a workflow (Target Validation / Safety Assessment / Pathway Analysis),
+   pull genetic + expression + perturbation/dependency (DepMap/CRISPR) + pathway + clinical evidence, and ask
+   for evidence FOR **and** AGAINST (pleiotropy, inflammation, toxicity, essentiality, expression gap,
+   constraint). Capture the risk/against findings into `evidence` too — they matter as much as the supporting ones.
 4. **Capture every claim with its PMID/source** (inline `[PMID …]` + the Sources panel). Drop uncited
    claims — never paraphrase or invent a citation. You may model the scrape on `emet/capture.py`
    (`parse_emet_html`) — capture the full text + the `a[href*="pubmed.ncbi.nlm.nih.gov"]` links.
