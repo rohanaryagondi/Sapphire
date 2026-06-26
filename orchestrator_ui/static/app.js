@@ -1,8 +1,8 @@
 /* orchestrator_ui/static/app.js
    Vanilla JS — consumes the SSE stream from POST /api/run and renders:
-   - LEFT panel: live tool calls + reasoning (streaming)
-   - CENTER: ranked genes table + synthesis (on result)
-   - RIGHT panel: plan steps + gene summary (on result)
+   - LEFT panel: agent/tool outputs — each tool_result (streaming)
+   - CENTER: plan + ranked genes table + synthesis (on result)
+   - RIGHT panel: live trace — tool calls + step-by-step reasoning (streaming)
 */
 
 (function () {
@@ -14,17 +14,15 @@
   const chatCol     = document.getElementById('chatCol');
   const emptyState  = document.getElementById('emptyState');
   const resultsArea = document.getElementById('resultsArea');
-  const traceList   = document.getElementById('traceList');
+  const traceList   = document.getElementById('traceList');     // RIGHT pane — the live trace
   const traceStatus = document.getElementById('traceStatus');
+  const outputsList   = document.getElementById('outputsList'); // LEFT pane — agent/tool outputs
+  const outputsStatus = document.getElementById('outputsStatus');
   const liveLabel   = document.getElementById('liveLabel');
   const liveBadge   = document.getElementById('liveBadge');
   const planSteps   = document.getElementById('planSteps');
   const rankedGenes = document.getElementById('rankedGenes');
   const synthesis   = document.getElementById('synthesis');
-  const rightStatus = document.getElementById('rightStatus');
-  const rightHint   = document.getElementById('rightHint');
-  const rightPlan   = document.getElementById('rightPlan');
-  const rightGeneList = document.getElementById('rightGeneList');
   const suggestions = document.getElementById('suggestions');
 
   // ── Panel toggle buttons ───────────────────────────────────────────────────
@@ -79,9 +77,7 @@
     resultsArea.style.display = 'none';
     chatCol.classList.add('active');
     traceList.innerHTML = '<div class="hint">Running orchestrator…</div>';
-    rightHint.style.display = 'block';
-    rightPlan.innerHTML = '';
-    rightGeneList.innerHTML = '';
+    outputsList.innerHTML = '<div class="hint">Agent &amp; tool outputs will appear here…</div>';
     rankedGenes.innerHTML = '';
     synthesis.innerHTML = '';
 
@@ -169,18 +165,13 @@
 
   // ── Append a trace item to the LEFT panel ────────────────────────────────
   function appendTrace(data) {
-    // Remove "Running orchestrator…" hint on first real event
-    const hint = traceList.querySelector('.hint');
-    if (hint) hint.remove();
-
     if (data.type === 'tool_call') {
+      // RIGHT pane (trace) — what the orchestrator is about to do
+      removeHint(traceList);
       const el = document.createElement('div');
       el.className = 'trace-top';
       const label = data.label || ('→ ' + data.tool);
-      let inputPreview = '';
-      if (data.input && data.input.command) {
-        inputPreview = data.input.command;
-      }
+      const inputPreview = (data.input && data.input.command) ? data.input.command : '';
       el.innerHTML =
         '<span class="tt-status">⚡</span>' +
         '<div class="tt-body">' +
@@ -192,21 +183,11 @@
       traceList.appendChild(el);
       traceList.scrollTop = traceList.scrollHeight;
 
-    } else if (data.type === 'tool_result') {
-      const el = document.createElement('div');
-      el.className = 'trace-top';
-      el.innerHTML =
-        '<span class="tt-status" style="color:#2ea043">✓</span>' +
-        '<div class="tt-body">' +
-          (data.label ? '<div class="tt-name" style="color:var(--ink-3);font-size:10px">' + escHtml(data.label) + '</div>' : '') +
-          '<div class="tt-detail" style="color:var(--ink-2);white-space:pre-wrap;margin-top:2px">' + escHtml((data.summary || '').slice(0, 400)) + '</div>' +
-        '</div>';
-      traceList.appendChild(el);
-      traceList.scrollTop = traceList.scrollHeight;
-
     } else if (data.type === 'text') {
+      // RIGHT pane (trace) — the orchestrator's reasoning / thinking
       const text = (data.text || '').trim();
       if (!text) return;
+      removeHint(traceList);
       const el = document.createElement('div');
       el.className = 'trace-top';
       el.innerHTML =
@@ -216,7 +197,26 @@
         '</div>';
       traceList.appendChild(el);
       traceList.scrollTop = traceList.scrollHeight;
+
+    } else if (data.type === 'tool_result') {
+      // LEFT pane (outputs) — the specific output this agent/tool returned
+      removeHint(outputsList);
+      const el = document.createElement('div');
+      el.className = 'trace-top';
+      el.innerHTML =
+        '<span class="tt-status" style="color:#2ea043">✓</span>' +
+        '<div class="tt-body">' +
+          (data.label ? '<div class="tt-name" style="color:var(--purple)">' + escHtml(data.label) + '</div>' : '') +
+          '<div class="tt-detail" style="color:var(--ink-2);white-space:pre-wrap;margin-top:3px">' + escHtml((data.summary || '').slice(0, 600)) + '</div>' +
+        '</div>';
+      outputsList.appendChild(el);
+      outputsList.scrollTop = outputsList.scrollHeight;
     }
+  }
+
+  function removeHint(panel) {
+    const h = panel.querySelector('.hint');
+    if (h) h.remove();
   }
 
   // ── Render the final result in CENTER and RIGHT ───────────────────────────
@@ -277,65 +277,21 @@
         '</div>';
     }
 
-    // --- RIGHT PANEL: plan + gene summary ---
-    rightHint.style.display = 'none';
-
-    if (steps.length) {
-      let html = '<div style="padding:12px 16px 0">';
-      html += '<div class="src-section" style="padding:0 0 7px">Plan</div>';
-      html += '<ol style="margin:0;padding-left:20px;font-size:12px;color:var(--ink-2);line-height:1.7">';
-      steps.forEach(function (s) {
-        html += '<li style="margin:3px 0">' + escHtml(String(s)) + '</li>';
-      });
-      html += '</ol></div>';
-      rightPlan.innerHTML = html;
-    }
-
-    if (genes.length) {
-      let html = '<div style="padding:12px 16px 0">';
-      html += '<div class="src-section" style="padding:0 0 7px">Genes (' + genes.length + ')</div>';
-      genes.forEach(function (g) {
-        const confClass = g.confidence === 'high' ? 'conf-high'
-          : g.confidence === 'medium' ? 'conf-medium' : 'conf-low';
-        html += '<div class="src-row">';
-        html += '<div class="src-meta" style="margin-bottom:4px">';
-        html += '<span class="rg-rank" style="font-family:var(--mono);font-size:11px;color:var(--ink-3)">#' + escHtml(String(g.rank || '')) + '</span> ';
-        html += '<span class="rg-gene" style="font-family:var(--mono);font-weight:600;color:var(--purple)">' + escHtml(String(g.gene || '')) + '</span>';
-        html += ' <span class="conf ' + confClass + '">' + escHtml(String(g.confidence || '')) + '</span>';
-        html += '</div>';
-        if (g.mechanism) {
-          html += '<div class="src-text" style="font-size:11px">' + escHtml(String(g.mechanism)) + '</div>';
-        }
-        html += '</div>';
-      });
-      html += '</div>';
-      rightGeneList.innerHTML = html;
-    }
+    // (Plan + ranked genes render in the CENTER; the RIGHT pane is the live trace, the LEFT pane the
+    //  per-agent/tool outputs — both stream during the run.)
   }
 
   // ── Status helpers ────────────────────────────────────────────────────────
   function setStatus(s) {
-    if (s === 'running') {
-      traceStatus.textContent = 'running';
-      liveLabel.textContent = 'Running';
-      liveBadge.className = 'live-badge';
-      rightStatus.textContent = 'running';
-    } else if (s === 'done') {
-      traceStatus.textContent = 'done';
-      liveLabel.textContent = 'Done';
-      liveBadge.className = 'live-badge';
-      rightStatus.textContent = 'done';
-    } else if (s === 'error') {
-      traceStatus.textContent = 'error';
-      liveLabel.textContent = 'Error';
-      liveBadge.className = 'live-badge';
-      rightStatus.textContent = 'error';
-    } else {
-      traceStatus.textContent = 'idle';
-      liveLabel.textContent = 'Ready';
-      liveBadge.className = 'live-badge';
-      rightStatus.textContent = 'idle';
-    }
+    const label = (s === 'running') ? 'running'
+      : (s === 'done') ? 'done'
+      : (s === 'error') ? 'error' : 'idle';
+    traceStatus.textContent = label;
+    if (outputsStatus) outputsStatus.textContent = label;
+    liveLabel.textContent = (s === 'running') ? 'Running'
+      : (s === 'done') ? 'Done'
+      : (s === 'error') ? 'Error' : 'Ready';
+    liveBadge.className = 'live-badge';
   }
 
   function done() {

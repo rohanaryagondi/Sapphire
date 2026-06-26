@@ -61,16 +61,16 @@
   <!-- ── WORKSPACE (3-pane) ───────────────────────────────────── -->
   <div class="workspace">
 
-    <!-- LEFT PANE — Orchestrator Trace: live tool calls + reasoning -->
-    <aside class="panel left open" id="leftPanel" role="complementary" aria-label="Orchestrator Trace">
+    <!-- LEFT PANE — Agent & Tool Outputs: the specific output each agent/tool returned -->
+    <aside class="panel left open" id="leftPanel" role="complementary" aria-label="Agent and Tool Outputs">
       <div class="panel-inner">
         <div class="panel-head">
-          <span>Orchestrator Trace</span>
-          <span class="head-sub" id="traceStatus">idle</span>
+          <span>Agent &amp; Tool Outputs</span>
+          <span class="head-sub" id="outputsStatus">idle</span>
         </div>
-        <div class="panel-scroll" id="traceList">
-          <div class="hint">Tool calls and reasoning stream here as the LLM orchestrator works —
-            moat queries, EMET lookups, and step-by-step scientific reasoning in real time.</div>
+        <div class="panel-scroll" id="outputsList">
+          <div class="hint">Each agent/tool's specific output lands here — moat genes, EMET evidence,
+            semantic-agent verdicts, Boltz binding — as the orchestrator calls them.</div>
         </div>
       </div>
     </aside>
@@ -141,18 +141,16 @@
       </div>
     </main>
 
-    <!-- RIGHT PANE — Plan & Results summary -->
-    <aside class="panel right open" id="rightPanel" role="complementary" aria-label="Plan and Results">
+    <!-- RIGHT PANE — Orchestrator Trace: live flow (tool calls + step-by-step reasoning) -->
+    <aside class="panel right open" id="rightPanel" role="complementary" aria-label="Orchestrator Trace">
       <div class="panel-inner">
         <div class="panel-head">
-          <span>Plan &amp; Results</span>
-          <span class="head-sub" id="rightStatus">idle</span>
+          <span>Orchestrator Trace</span>
+          <span class="head-sub" id="traceStatus">idle</span>
         </div>
-        <div class="panel-scroll" id="rightScroll">
-          <div class="hint" id="rightHint">The orchestrator's plan and ranked results appear here
-            once the run completes.</div>
-          <div id="rightPlan"></div>
-          <div id="rightGeneList"></div>
+        <div class="panel-scroll" id="traceList">
+          <div class="hint">The orchestrator's live flow streams here — each tool call and its
+            step-by-step reasoning, in real time.</div>
         </div>
       </div>
     </aside>
