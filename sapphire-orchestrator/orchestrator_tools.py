@@ -230,9 +230,16 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 0) -> dict:
             "query": query or default_q,
             "created": _time.strftime("%Y-%m-%dT%H:%M:%SZ", _time.gmtime()),
         }
-        (tasks / f"{tid}.json").write_text(json.dumps(task), encoding="utf-8")
+        tfile = tasks / f"{tid}.json"
+        tfile.write_text(json.dumps(task), encoding="utf-8")
         rfile = results / f"{tid}.json"
-        deadline = _time.time() + timeout_s
+        # grab-detection: the worker removes/moves the task file when it picks it up. If it hasn't grabbed
+        # within the grace window, it isn't looping — bail fast so we don't hang the full timeout (the caller
+        # falls back to captured). If it HAS grabbed, wait the full timeout for the (slow) real result.
+        grab_grace = int(os.environ.get("SAPPHIRE_EMET_GRAB_GRACE", "45"))
+        start = _time.time()
+        deadline = start + timeout_s
+        grabbed = False
         while _time.time() < deadline:
             if rfile.exists():
                 env = json.loads(rfile.read_text(encoding="utf-8"))
@@ -243,10 +250,19 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 0) -> dict:
                     "source": "live Chrome-Claude worker",
                     "captured_at": env.get("captured_at"),
                 }
+            if not grabbed and not tfile.exists():
+                grabbed = True   # worker picked it up — now wait for the real (slow) result
+            if not grabbed and (_time.time() - start) > grab_grace:
+                return {
+                    "gene": g, "found": False, "evidence": [], "worker_active": False,
+                    "note": f"live EMET worker did not pick up the task within {grab_grace}s — not looping; fall back to captured.",
+                }
             _time.sleep(2)
         return {
-            "gene": g, "found": False, "evidence": [],
-            "note": "no live EMET worker responded within timeout — start the Chrome-Claude worker (skill: emet-chrome-worker).",
+            "gene": g, "found": False, "evidence": [], "worker_active": grabbed,
+            "note": ("worker picked up the task but did not finish within the timeout"
+                     if grabbed else
+                     "no live EMET worker responded — start the Chrome-Claude worker (skill: emet-chrome-worker)."),
         }
     except Exception as exc:
         return {"gene": g, "found": False, "evidence": [], "error": str(exc)}
