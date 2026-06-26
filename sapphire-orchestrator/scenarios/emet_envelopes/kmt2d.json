@@ -1,0 +1,15 @@
+{
+  "candidate": "KMT2D",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[KMT2D] Mechanistically contradictory + dangerously constrained -> predicted to WORSEN. KMT2D drives SMG1 (an mTOR-kinase antagonist) expression via H3K4Me1 deposition; KMT2D knockdown would lower SMG1 and thereby increase mTOR activity.",
+      "source": "KMT2D-SMG1 H3K4Me1 study (2025)",
+      "id_or_url": "PMID:40577529"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

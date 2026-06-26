@@ -1,0 +1,15 @@
+{
+  "candidate": "ACTR3",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[ACTR3] EXCLUSION - universal pan-essential / knockdown lethal. Expressed in all 54 GTEx tissues and all 1,673 CCLE lines, pLI=1.000; Arp3 knockdown impairs cytokinesis and endocytosis globally; actin remodelling is downstream, not an mTOR driver.",
+      "source": "CCLE/DepMap; GTEx; gnomAD",
+      "id_or_url": "CCLE+gnomAD:ACTR3-pan-essential"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

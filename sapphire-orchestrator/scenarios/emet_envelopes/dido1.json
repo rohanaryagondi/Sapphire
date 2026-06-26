@@ -1,0 +1,15 @@
+{
+  "candidate": "DIDO1",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[DIDO1] EXCLUDE - no mTOR connection. pLI=1.000, LOEUF=0.244; H3K4me3 reader / RNA splicing; myeloproliferative-neoplasm disease gene; no TSC2/mTOR link.",
+      "source": "gnomAD; OpenTargets",
+      "id_or_url": "gnomAD:DIDO1"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

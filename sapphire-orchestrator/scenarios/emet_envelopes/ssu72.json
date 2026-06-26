@@ -1,0 +1,15 @@
+{
+  "candidate": "SSU72",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[SSU72] NO LINK / possible artifact. pLI=0.017 (tolerant), ~38 TPM average in brain, but no TSC2/mTOR connection in STRING, Reactome, or any literature found - may represent a screen artifact or off-target.",
+      "source": "STRING/Reactome (no mTOR link found)",
+      "id_or_url": "STRING:SSU72-no-link"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

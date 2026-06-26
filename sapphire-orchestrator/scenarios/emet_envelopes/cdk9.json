@@ -1,0 +1,20 @@
+{
+  "candidate": "CDK9",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[CDK9] PRIORITY 1 - strongest mechanistic rescue case. CDK9 is the P-TEFb kinase driving RNA Pol II pause-release; CDK9 physically associates with mTOR-pathway components (Beauchamp et al. 2019, Blood).",
+      "source": "Beauchamp et al., Blood 2019",
+      "id_or_url": "PMID:30587525"
+    },
+    {
+      "claim": "[CDK9] Mechanistic cross-talk supporting rescue: mTOR controls P-TEFb activity (mTOR phosphorylates CDK9-Thr186), so the CDK9-mTOR axis is bidirectional.",
+      "source": "Besnard et al. (mTOR-CDK9/P-TEFb)",
+      "id_or_url": "PMID:27978436"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

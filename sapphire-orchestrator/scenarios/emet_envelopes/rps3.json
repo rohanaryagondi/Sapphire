@@ -1,0 +1,15 @@
+{
+  "candidate": "RPS3",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[RPS3] ABSOLUTE EXCLUSION - pan-essential / knockdown lethal. CCLE log2=11.88 (highest in panel; expressed in 1,654/1,673 lines), GTEx max brain TPM=175, pLI=1.000, LOEUF=0.244; ribosomal-protein knockdown would collapse translation.",
+      "source": "CCLE/DepMap; GTEx; gnomAD",
+      "id_or_url": "CCLE+gnomAD:RPS3-pan-essential"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

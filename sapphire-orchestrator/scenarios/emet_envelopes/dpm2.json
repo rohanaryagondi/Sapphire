@@ -1,0 +1,15 @@
+{
+  "candidate": "DPM2",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[DPM2] NO MECHANISM. The most gnomAD-tolerant gene in the panel (pLI=0.011, LOEUF=1.190) but with no TSC2/mTOR mechanistic basis; biallelic mutations cause CDG-Ih (OpenTargets genetic score 0.819).",
+      "source": "gnomAD; OpenTargets",
+      "id_or_url": "gnomAD+OpenTargets:DPM2"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

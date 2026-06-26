@@ -1,0 +1,15 @@
+{
+  "candidate": "SMARCE1",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[SMARCE1] Predicted to WORSEN. In clear cell meningioma, SMARCE1 LOSS activates mTOR; therefore SMARCE1 knockdown would worsen mTORC1 hyperactivation. pLI=1.000, LOEUF=0.376; Coffin-Siris syndrome gene.",
+      "source": "SMARCE1 meningioma / mTOR activation studies",
+      "id_or_url": "PMID:39577862; PMID:25857641"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}

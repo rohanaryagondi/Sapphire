@@ -1,0 +1,15 @@
+{
+  "candidate": "MTOR",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[MTOR] Positive control performs as expected -> RESCUE. STRING shows direct experimental interactions with RPTOR, RICTOR, RRAGA, RPS6KB1, AKT1, EIF4EBP1, RHEB (all 0.999); OpenTargets places MTOR at the top for the TSC association. Knockdown/inhibition normalizes mTORC1 hyperactivation.",
+      "source": "STRING (MTOR interactome); OpenTargets",
+      "id_or_url": "STRING:MTOR"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T03:57:51Z",
+  "source": "live worker (batch)"
+}
