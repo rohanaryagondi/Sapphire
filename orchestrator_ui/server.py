@@ -11,6 +11,7 @@ Routes:
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import mimetypes
 import re
@@ -93,16 +94,7 @@ def _label_for(cmd_str: str, tool_name: str) -> str:
 def _summarize_result(text: str) -> str:
     """One-line summary of a tool's JSON stdout for the live trace (so the user sees what it produced)."""
     text = (text or "").strip()
-    d = None
-    try:
-        d = json.loads(text)
-    except Exception:
-        m = re.search(r'\{[\s\S]*\}', text)
-        if m:
-            try:
-                d = json.loads(m.group(0))
-            except Exception:
-                d = None
+    d = _parse_obj(text)
     if not isinstance(d, dict):
         return text[:200]
     if d.get("ok") is False or d.get("error"):
@@ -149,16 +141,24 @@ def _summarize_result(text: str) -> str:
 
 
 def _parse_obj(text: str):
+    """Parse a dict out of tool output — accepts JSON *and* Python-repr (None/True/single-quotes),
+    since tool_result content sometimes arrives as a Python dict repr rather than strict JSON."""
     text = (text or "").strip()
-    try:
-        return json.loads(text)
-    except Exception:
-        m = re.search(r'\{[\s\S]*\}', text)
-        if m:
-            try:
-                return json.loads(m.group(0))
-            except Exception:
-                return None
+    frag = text
+    m = re.search(r'\{[\s\S]*\}', text)
+    if m:
+        frag = m.group(0)
+    for candidate in (text, frag):
+        try:
+            return json.loads(candidate)
+        except Exception:
+            pass
+        try:
+            v = ast.literal_eval(candidate)   # handles Python repr: None, True/False, single quotes
+            if isinstance(v, dict):
+                return v
+        except Exception:
+            pass
     return None
 
 
