@@ -813,4 +813,62 @@
       chatInput.dispatchEvent(new Event("input"));
     });
   });
+
+  // ============================================================================
+  // REPLAY MODE — static snapshot (no server / no engine)
+  // ============================================================================
+  // When a captured run is embedded as window.SAPPHIRE_REPLAY = {query, events[], status},
+  // render it through the SAME handlers (handleProgress / renderEvidence / attachAgentSources /
+  // renderAnswer) the live SSE stream uses — so the self-contained docs/demo snapshot opens via
+  // file:// with zero deps. Completely inert in the live app (the global is never defined there).
+  (function initReplay() {
+    const rep = window.SAPPHIRE_REPLAY;
+    if (!rep || !Array.isArray(rep.events)) return;
+    lastQuery = rep.query || "";
+    try { profileSel.value = "replay"; syncBadge(); } catch (e) {}
+    // mimic send()'s UI activation
+    emptyState.style.display = "none";
+    threadInner.style.minHeight = "unset";
+    msgList.style.display = "flex";
+    chatCol.classList.add("active");
+    activated = true;
+    msgList.appendChild(el("div", "msg-user",
+      `<div class="user-bubble">${esc(rep.query || "(replay captured run)")}</div>`));
+    const loadEl = el("div", "msg-ai",
+      `<div class="typing"><span class="t-dot"></span><span class="t-dot"></span><span class="t-dot"></span>` +
+      `<span class="t-label">convening the firm…</span></div>`);
+    msgList.appendChild(loadEl);
+    resetTrace(); resetWing();
+    traceStatus.textContent = "running";
+
+    let result = null;
+    rep.events.forEach(function (fr) {
+      if (!fr) return;
+      const event = fr.event, data = fr.data;
+      if (event === "progress") {
+        handleProgress(data);
+        const lbl = loadEl.querySelector(".t-label");
+        if (lbl) lbl.textContent = typingLabel(data);
+        if (data.stage === "plan" && data.phase === "done") renderPlanSteps(loadEl, data);
+      } else if (event === "result") {
+        result = data;
+        renderEvidence(result); attachAgentSources(result); renderAnswer(result, loadEl);
+      } else if (event === "done") {
+        traceStatus.textContent = result ? "complete" : "done";
+        if (result && result.engagement_id) traceMeta.textContent = result.engagement_id;
+      }
+    });
+    // A replay captures the final result, not the live progress stream, so the trace tree is
+    // empty here — say so honestly and point to the :8101 snapshot for a full live trace.
+    if (traceTree && !traceTree.children.length) {
+      traceTree.appendChild(el("div", "hint",
+        "Frozen replay — the dossier, evidence, agent wing and the roundtable spread are all shown. " +
+        "The step-by-step trace streams only during a live run (see the :8101 orchestrator snapshot)."));
+      traceStatus.textContent = "replay";
+    }
+    // read-only: disable the composer in a saved snapshot
+    busy = true;
+    if (chatInput) { chatInput.placeholder = "Saved run — read-only snapshot"; chatInput.disabled = true; }
+    if (sendBtn) sendBtn.disabled = true;
+  })();
 })();

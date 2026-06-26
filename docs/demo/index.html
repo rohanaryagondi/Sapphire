@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — saved demo results</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%234d7cfe'/%3E%3Cstop offset='1' stop-color='%23a07cff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='url(%23g)'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.32'/%3E%3C/svg%3E">
+<style>
+  :root { --blue:#4d7cfe; --purple:#a07cff; --ink:#1a1d24; --ink-2:#4a5160; --ink-3:#8a90a0;
+          --bg:#f7f8fc; --card:#fff; --line:#e7e9f2; --mono:ui-monospace,SFMono-Regular,Menlo,monospace; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif; }
+  .wrap { max-width:920px; margin:0 auto; padding:48px 24px 64px; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+  header svg { width:34px; height:34px; }
+  h1 { font-size:25px; margin:0; letter-spacing:-.01em; }
+  .lede { color:var(--ink-2); margin:14px 0 4px; font-size:15.5px; }
+  .lede b { color:var(--ink); }
+  .note { display:inline-block; margin:18px 0 26px; padding:9px 14px; border-radius:10px;
+          background:rgba(77,124,254,.07); border:1px solid rgba(77,124,254,.22);
+          color:var(--ink-2); font-size:13px; }
+  .note b { color:var(--blue); }
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  @media (max-width:720px){ .cards{ grid-template-columns:1fr; } }
+  .card { display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line);
+          border-radius:14px; overflow:hidden; text-decoration:none; color:inherit;
+          transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+  .card:hover { transform:translateY(-3px); box-shadow:0 12px 30px rgba(40,50,90,.13); border-color:#c9d2f0; }
+  .shot { aspect-ratio:16/10; background:#0d1020 center/cover no-repeat; border-bottom:1px solid var(--line); }
+  .card-body { padding:16px 18px 18px; }
+  .tag { display:inline-block; font:600 10.5px/1 var(--mono); letter-spacing:.04em; text-transform:uppercase;
+         color:var(--blue); background:rgba(77,124,254,.10); padding:4px 8px; border-radius:6px; margin-bottom:9px; }
+  .card h2 { font-size:16.5px; margin:0 0 6px; }
+  .card p { margin:0; color:var(--ink-2); font-size:13.5px; }
+  .card .open { margin-top:12px; font-weight:600; color:var(--blue); font-size:13.5px; }
+  .card .open::after { content:" →"; }
+  .meta { margin-top:30px; color:var(--ink-3); font-size:12.5px; line-height:1.7; }
+  .meta a { color:var(--blue); text-decoration:none; } .meta a:hover{ text-decoration:underline; }
+  .meta code { font-family:var(--mono); font-size:11.5px; background:#eef0f7; padding:1px 5px; border-radius:4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <defs><linearGradient id="gem" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#4d7cfe"/><stop offset="1" stop-color="#a07cff"/></linearGradient></defs>
+      <polygon points="16,2 30,12 25,30 7,30 2,12" fill="url(#gem)"/>
+      <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".34"/>
+      <polygon points="16,14 30,12 25,30 16,22" fill="white" opacity=".10"/>
+      <polygon points="16,14 16,22 7,30 2,12" fill="black" opacity=".13"/>
+    </svg>
+    <h1>Sapphire — saved demo results</h1>
+  </header>
+
+  <p class="lede">Two views of the same CNS decision firm, answering a <b>TSC2</b> question.
+    Each is a <b>real captured run</b>, frozen and replayed read-only.</p>
+
+  <div class="note">📸 <b>Just open the files</b> — these are self-contained snapshots: no server, no
+    model, no setup. Double-click either card. (To run them <i>live</i>, see the README.)</div>
+
+  <div class="cards">
+
+    <a class="card" href="8101_tsc2_run.html">
+      <div class="shot" style="background-image:url('8101_tsc2_run.png')"></div>
+      <div class="card-body">
+        <span class="tag">:8101 · live LLM orchestrator</span>
+        <h2>Rank 15 genes by TSC2-KO rescue</h2>
+        <p>A <code style="font-family:var(--mono)">claude -p</code> agent decides the flow and calls the
+          tools live — Quiver moat → EMET → ESM → parallel semantic agents → synthesis. Real moat
+          (cosine distance), real EMET PMIDs, ESM down-weighted. MTOR #1, divergences flagged.</p>
+        <div class="open">Open the saved run</div>
+      </div>
+    </a>
+
+    <a class="card" href="8099_console.html">
+      <div class="shot" style="background-image:url('8099_console.png')"></div>
+      <div class="card-body">
+        <span class="tag">:8099 · the full firm</span>
+        <h2>Is TSC2 a viable target?</h2>
+        <p>The deterministic console: a 17-agent wing, 70 cited facts (8 🔒 moat + 62 🌐 external),
+          VETO / DIVERGENCE flags, and the 5-partner roundtable spread — no forced consensus.
+          A frozen real engagement, replayed $0.</p>
+        <div class="open">Open the saved run</div>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="meta">
+    <p><b>What you're seeing.</b> Facts are cited and provenance-marked verbatim
+       (● real · ◆ captured · 🧪 simulated) — never relabeled, never fabricated. The :8101 run weighs
+       evidence FOR vs AGAINST; the :8099 firm surfaces the spread rather than forcing a verdict.</p>
+    <p><b>Run it live or set up the Chrome-Claude EMET worker:</b>
+       see <a href="README.md">README.md</a>. Full write-up of the :8101 run:
+       <a href="8101_tsc2_run.md">8101_tsc2_run.md</a>.</p>
+  </div>
+
+</div>
+</body>
+</html>

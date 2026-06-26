@@ -348,4 +348,43 @@
       .replace(/"/g, '&quot;');
   }
 
+  // ── Replay mode (static snapshot, no server / no claude) ───────────────────
+  // When a captured run is embedded as window.SAPPHIRE_REPLAY = {query, events[], status},
+  // render it immediately through the SAME appendTrace/renderResult handlers the live SSE
+  // stream uses — so the self-contained docs/demo snapshot opens via file:// with zero deps.
+  // Completely inert in the live app (the global is never defined there).
+  (function initReplay() {
+    const rep = window.SAPPHIRE_REPLAY;
+    if (!rep || !Array.isArray(rep.events)) return;
+    running = true;
+    if (sendBtn) sendBtn.disabled = true;
+    emptyState.style.display = 'none';
+    chatCol.classList.add('active');
+    resultsArea.style.display = 'block';
+    traceList.innerHTML = '';
+    outputsList.innerHTML = '';
+    if (rep.query) {
+      queryEcho.innerHTML = '<div class="run-query">' +
+        '<span style="display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);font-weight:600;margin-bottom:5px">Question</span>' +
+        escHtml(rep.query) + '</div>';
+    }
+    planSteps.innerHTML = '';
+    rep.events.forEach(function (e) {
+      if (!e || !e.data) return;
+      if (e.event === 'trace') appendTrace(e.data);
+      else if (e.event === 'result') renderResult(e.data);
+    });
+    setStatus(rep.status || 'done');
+    running = false;
+    // Read-only: the composer is disabled in a saved snapshot.
+    if (chatInput) {
+      chatInput.value = '';
+      chatInput.placeholder = 'Saved run — read-only snapshot';
+      chatInput.disabled = true;
+    }
+    // scroll panels back to the top so a viewer starts at the beginning of the run
+    if (traceList) traceList.scrollTop = 0;
+    if (outputsList) outputsList.scrollTop = 0;
+  })();
+
 })();

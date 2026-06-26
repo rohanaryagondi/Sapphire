@@ -12,12 +12,25 @@ writes the report. Two surfaces:
 | **`:8099` — Console** | `frontend2/` | Deterministic console — replays pre-captured scenario runs. Always works, $0, no live deps. | $0 |
 | **`:8101` — Orchestrator** | `orchestrator_ui/` | **Live** LLM orchestrator: a real `claude -p` agent that decides the flow, calls the tools, reasons as the team, and streams its trace. | subscription |
 
-A saved snapshot of the current state of each is in this folder: **`8101_tsc2_run.png`** + **`8101_tsc2_run.md`**
-(the live TSC2 15-gene blind ranking) and **`8099_console.png`**.
+## ⚡ Just want to see the results? (no setup)
+
+**Open [`index.html`](index.html)** in any browser — or open either saved run directly. They are
+**self-contained static snapshots** (CSS + JS + the captured run all inlined): no server, no model,
+no dependencies. Double-click and it renders.
+
+| Open this | What it shows |
+|---|---|
+| **[`index.html`](index.html)** | Landing page → both saved runs. |
+| **[`8101_tsc2_run.html`](8101_tsc2_run.html)** | :8101 live orchestrator — the 15-gene TSC2-KO rescue ranking, with the live trace, expandable tool sources, and the EMET-focused synthesis. A real `claude -p` run, replayed read-only. |
+| **[`8099_console.html`](8099_console.html)** | :8099 console — the full firm on "Is TSC2 viable?": 17-agent wing, 70 cited facts, VETO/DIVERGENCE flags, the 5-partner spread. A frozen real engagement, replayed $0. |
+
+Each snapshot is a **real captured run** (built by `_build/build_demo_snapshot.py` from the captured
+SSE events in `*.events.json` — same render code the live UI uses). The `.png`s are thumbnails;
+[`8101_tsc2_run.md`](8101_tsc2_run.md) is the full write-up. Everything below is for running it **live**.
 
 ---
 
-## Quick start
+## Quick start (run it live)
 
 ```bash
 # :8099 — deterministic console (no external deps)
