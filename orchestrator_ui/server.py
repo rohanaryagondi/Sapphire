@@ -148,6 +148,70 @@ def _summarize_result(text: str) -> str:
     return ", ".join(f"{k}={str(v)[:40]}" for k, v in list(d.items())[:4])[:200]
 
 
+def _parse_obj(text: str):
+    text = (text or "").strip()
+    try:
+        return json.loads(text)
+    except Exception:
+        m = re.search(r'\{[\s\S]*\}', text)
+        if m:
+            try:
+                return json.loads(m.group(0))
+            except Exception:
+                return None
+    return None
+
+
+def _format_full(text: str) -> str:
+    """The FULL, untruncated content of a tool/agent output — the actual information sources — for the
+    expandable LEFT-pane dropdown. Renders every claim/gene/neighbor, not a summary."""
+    d = _parse_obj(text)
+    if not isinstance(d, dict):
+        return (text or "").strip()[:8000]
+    L = []
+    prov = d.get("provenance")
+    if isinstance(d.get("evidence"), list):                       # EMET — the cited claims, in full
+        L.append(f"EMET — {len(d['evidence'])} cited claim(s)  ({prov or ''})")
+        for e in d["evidence"]:
+            if isinstance(e, dict):
+                cid = e.get("id_or_url") or e.get("source") or ""
+                L.append(f"• {e.get('claim', e)}" + (f"   [{cid}]" if cid else ""))
+            else:
+                L.append(f"• {e}")
+    elif isinstance(d.get("rescuers"), list):                     # moat rescue list, in full
+        L.append(f"Quiver moat — {len(d['rescuers'])} rescue genes  (cosine_distance: smaller = stronger)")
+        for r in d["rescuers"]:
+            L.append(f"• {r.get('gene')} — rank {r.get('rank')}, cosine_distance {r.get('cosine_distance')}")
+        for c in (d.get("rescue_compounds") or []):
+            L.append(f"  drug-lead: {c.get('compound', c) if isinstance(c, dict) else c}")
+    elif isinstance(d.get("probe"), list):                        # moat probe, in full
+        L.append(f"Quiver moat probe — {len(d['probe'])} genes")
+        for p in d["probe"]:
+            tail = f" (rank {p.get('moat_rank')}, cosine_distance {p.get('cosine_distance')})" if p.get("in_moat") else ""
+            L.append(f"• {p.get('gene')} — {p.get('role')}{tail}")
+    elif isinstance(d.get("neighbors"), list):                    # ESM, in full
+        L.append(f"ESM-2 embedding similarity to {d.get('target')}  ({prov or ''})")
+        for n in d["neighbors"]:
+            L.append(f"• {n.get('gene')} — {n.get('similarity')}")
+    elif "verdict" in d:                                          # semantic agent, in full
+        L.append(f"{d.get('agent', 'semantic')}({d.get('gene', '')}) — VERDICT: {d.get('verdict')} (confidence {d.get('confidence')})")
+        L.append(str(d.get("finding", "")))
+    elif "qmodels" in d and "tools" in d:                         # catalog, in full
+        L.append("TOOLS:")
+        for t in d.get("tools", []):
+            L.append(f"• {t.get('tool')} — {t.get('purpose', '')}")
+        L.append("MODELS:")
+        for m in d.get("qmodels", []):
+            L.append(f"• {m.get('id')} ({m.get('status')}) — {m.get('task', '')}")
+    elif isinstance(d.get("facts"), list):                        # boltz seam
+        L.append(f"{d.get('candidate', '')}  ({prov or ''})")
+        for f in d["facts"]:
+            L.append(f"• {f.get('value', f) if isinstance(f, dict) else f}")
+    else:
+        return json.dumps(d, indent=2)[:8000]
+    return "\n".join(L)[:8000]
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "SapphireOrchUI/1.0"
     protocol_version = "HTTP/1.1"
@@ -278,12 +342,14 @@ class Handler(BaseHTTPRequestHandler):
                             if isinstance(content, list):
                                 content = " ".join(b.get("text", "") for b in content if isinstance(b, dict))
                             summary = _summarize_result(str(content))
+                            full = _format_full(str(content))
                             label = tool_labels.get(block.get("tool_use_id", ""), "✓ result")
                             with lock:
                                 evq.append(_sse("trace", {
                                     "type": "tool_result",
                                     "label": label,
                                     "summary": summary,
+                                    "full": full,
                                 }))
 
                     elif ev_type == "result":

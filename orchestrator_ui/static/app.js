@@ -204,16 +204,37 @@
       traceList.scrollTop = traceList.scrollHeight;
 
     } else if (data.type === 'tool_result') {
-      // LEFT pane (outputs) — the specific output this agent/tool returned
+      // LEFT pane (outputs) — expandable: summary always shown, FULL sources on click
       removeHint(outputsList);
       const el = document.createElement('div');
-      el.className = 'trace-top';
+      el.className = 'trace-top output-item';
+      const full = data.full || '';
+      const summary = data.summary || '';
+      const hasFull = full && full.trim() !== summary.trim();
       el.innerHTML =
         '<span class="tt-status" style="color:#2ea043">✓</span>' +
         '<div class="tt-body">' +
-          (data.label ? '<div class="tt-name" style="color:var(--purple)">' + escHtml(data.label) + '</div>' : '') +
-          '<div class="tt-detail" style="color:var(--ink-2);white-space:pre-wrap;margin-top:3px">' + escHtml((data.summary || '').slice(0, 600)) + '</div>' +
+          '<div class="oi-head" style="cursor:' + (hasFull ? 'pointer' : 'default') + ';display:flex;align-items:flex-start;gap:6px">' +
+            '<span class="oi-chev" style="color:var(--ink-3);font-size:9px;margin-top:3px;width:8px;flex:none;' + (hasFull ? '' : 'visibility:hidden') + '">▶</span>' +
+            '<div style="flex:1;min-width:0">' +
+              (data.label ? '<div class="tt-name" style="color:var(--purple)">' + escHtml(data.label) + (hasFull ? ' <span style="color:var(--ink-3);font-weight:400;font-size:10px">· click to expand</span>' : '') + '</div>' : '') +
+              '<div class="tt-detail" style="color:var(--ink-2);white-space:pre-wrap;margin-top:3px">' + escHtml(summary) + '</div>' +
+            '</div>' +
+          '</div>' +
+          (hasFull
+            ? '<div class="oi-full" style="display:none;white-space:pre-wrap;font-family:var(--mono);font-size:10.5px;line-height:1.55;color:var(--ink-2);margin-top:7px;padding:9px 11px;background:rgba(124,108,255,.06);border-radius:7px;border-left:2px solid var(--purple);max-height:360px;overflow:auto">' + escHtml(full) + '</div>'
+            : '') +
         '</div>';
+      if (hasFull) {
+        const head = el.querySelector('.oi-head');
+        const body = el.querySelector('.oi-full');
+        const chev = el.querySelector('.oi-chev');
+        head.addEventListener('click', function () {
+          const open = body.style.display === 'none';
+          body.style.display = open ? 'block' : 'none';
+          chev.textContent = open ? '▼' : '▶';
+        });
+      }
       outputsList.appendChild(el);
       outputsList.scrollTop = outputsList.scrollHeight;
     }
