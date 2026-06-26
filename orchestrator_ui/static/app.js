@@ -265,7 +265,9 @@
     if (genes.length) {
       let html = '<div class="ranked-genes">';
       html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">EMET evidence (primary) · Quiver moat corroboration · LLM reasoning</span></div>';
-      html += '<table class="rg-table"><thead><tr>';
+      html += '<table class="rg-table">';
+      html += '<colgroup><col class="c-rank"><col class="c-gene"><col class="c-moat"><col class="c-emet"><col class="c-esm"><col class="c-mech"><col class="c-conf"></colgroup>';
+      html += '<thead><tr>';
       html += '<th>#</th><th>Gene</th><th>Quiver moat</th><th>EMET</th><th>ESM</th><th>Mechanism</th><th>Conf</th>';
       html += '</tr></thead><tbody>';
       genes.forEach(function (g) {
@@ -285,13 +287,14 @@
         const sup = String(g.emet_support || '').toLowerCase();
         const supClass = sup === 'strong' ? 'conf-high' : sup === 'moderate' ? 'conf-medium'
           : (sup === 'weak' || sup === 'none') ? 'conf-low' : '';
-        const verdict = g.verdict ? '<span class="rg-verdict" style="font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--purple);margin-right:5px">' + escHtml(String(g.verdict)) + '</span>' : '';
+        const vkey = String(g.verdict || '').toLowerCase().replace(/[^a-z]/g, '');
+        const verdict = g.verdict ? '<span class="rg-verdict rg-v-' + vkey + '">' + escHtml(String(g.verdict)) + '</span> ' : '';
         html += '<tr class="rg-row">';
         html += '<td class="rg-rank">' + escHtml(String(g.rank || '')) + '</td>';
         html += '<td class="rg-gene">' + escHtml(String(g.gene || '')) + '</td>';
-        html += '<td class="rg-moat" style="font-family:var(--mono);font-size:10px;white-space:nowrap">' + escHtml(moat) + '</td>';
-        html += '<td>' + (sup ? '<span class="conf ' + supClass + '">' + escHtml(sup) + '</span>' : '–') + '</td>';
-        html += '<td style="font-family:var(--mono);font-size:10px;color:var(--ink-3);white-space:nowrap">' + escHtml(String(g.esm_signal || '–')) + '</td>';
+        html += '<td class="rg-moat">' + escHtml(moat) + '</td>';
+        html += '<td class="rg-emet">' + (sup ? '<span class="conf ' + supClass + '">' + escHtml(sup) + '</span>' : '–') + '</td>';
+        html += '<td class="rg-esm">' + escHtml(String(g.esm_signal || '–')) + '</td>';
         html += '<td class="rg-mech">' + verdict + escHtml(String(g.mechanism || ''))
           + (cites ? '<div class="rg-cites">' + cites + '</div>' : '') + '</td>';
         html += '<td class="rg-conf"><span class="conf ' + confClass + '">' + escHtml(String(g.confidence || '')) + '</span></td>';
@@ -303,12 +306,21 @@
 
     // --- SYNTHESIS callout (center) ---
     if (data.synthesis) {
-      const confClass = data.confidence === 'high' ? 'conf-high'
-        : data.confidence === 'medium' ? 'conf-medium' : 'conf-low';
+      // Bold the gene symbols in the prose so the dense synthesis is scannable (genes from the ranked
+      // list, longest-first to avoid partial overlaps). escHtml first; gene symbols are alnum so the
+      // escaping never touches them, and the only injected markup is our own <b>.
+      let synthHtml = escHtml(String(data.synthesis));
+      (data.ranked_genes || []).map(function (g) { return String(g.gene || ''); })
+        .filter(Boolean).sort(function (a, b) { return b.length - a.length; })
+        .forEach(function (gn) {
+          synthHtml = synthHtml.replace(
+            new RegExp('\\b' + gn.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'g'),
+            '<b class="syn-gene">' + gn + '</b>');
+        });
       synthesis.innerHTML =
         '<div class="synthesis">' +
-          '<div class="synthesis-lbl">Synthesis</div>' +
-          '<div class="synthesis-rec">' + escHtml(String(data.synthesis)) + '</div>' +
+          '<div class="synthesis-lbl">Synthesis — the recommendation</div>' +
+          '<div class="synthesis-rec">' + synthHtml + '</div>' +
           (data.confidence
             ? '<div class="synthesis-conf">Confidence: <b>' + escHtml(String(data.confidence)) + '</b></div>'
             : '') +
