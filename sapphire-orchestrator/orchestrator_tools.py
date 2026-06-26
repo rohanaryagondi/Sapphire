@@ -130,13 +130,10 @@ def cmd_moat(args) -> dict:
             for r in similar_raw
         ]
 
-        # MAXIMISE the moat: it ALSO holds COMPOUND neighbours — drugs whose EP-signature OPPOSES the
-        # perturbation (rescue candidates / drug-repurposing leads) or MIMICS it (exacerbators). The
-        # orchestrator should see these too, not just genes (e.g. TSC2 → Isorhamnetin, Momelotinib, …).
-        rescue_cpd_raw = client.neighbors(gene, effect="opposite", ref_type="compound", k=k)
-        exac_cpd_raw = client.neighbors(gene, effect="similar", ref_type="compound", k=5)
-        rescue_compounds = [{"compound": r["ref"], "rank": r["rank"]} for r in rescue_cpd_raw]
-        exacerbate_compounds = [{"compound": r["ref"], "rank": r["rank"]} for r in exac_cpd_raw]
+        # The moat ALSO holds COMPOUND neighbours (drug-repurposing leads), but those are ONLY relevant to
+        # a drug/therapeutic question — for a gene-rescue ranking they are NOISE. So compounds are OPT-IN
+        # via --compounds; a plain gene query returns gene-gene data only.
+        want_compounds = getattr(args, "compounds", False)
 
         # For the rescue direction, PREFER Quiver's curated validated predictions (the <gene>_rescue
         # dossier) over the raw moat top — these align with the captured EMET evidence, so the
@@ -145,17 +142,21 @@ def cmd_moat(args) -> dict:
         if curated:
             rescuers = curated
 
-        return {
+        out = {
             "gene": gene,
             "available": True,
             "direction": direction,
             "rescuers": rescuers,
             "similar": similar,
-            "rescue_compounds": rescue_compounds,          # drugs predicted to REVERSE the KO signature (repurposing leads)
-            "exacerbate_compounds": exacerbate_compounds,  # drugs predicted to WORSEN it
             "curated_predictions": bool(curated),
             "provenance": "moat-real",
         }
+        if want_compounds:
+            out["rescue_compounds"] = [{"compound": r["ref"], "rank": r["rank"]}
+                                       for r in client.neighbors(gene, effect="opposite", ref_type="compound", k=k)]
+            out["exacerbate_compounds"] = [{"compound": r["ref"], "rank": r["rank"]}
+                                           for r in client.neighbors(gene, effect="similar", ref_type="compound", k=5)]
+        return out
 
     except Exception as exc:
         return {
@@ -296,6 +297,73 @@ def _captured_emet(gene: str):
     return None
 
 
+def _emet_paths():
+    root = Path(__file__).resolve().parents[1]
+    qroot = Path(os.environ.get("SAPPHIRE_EMET_QUEUE", str(root / "RohanOnly" / "emet_queue")))
+    tasks = qroot / "tasks"; results = qroot / "results"
+    tasks.mkdir(parents=True, exist_ok=True); results.mkdir(parents=True, exist_ok=True)
+    return tasks, results
+
+
+def _emet_batch_query(genes, perturbation="TSC2"):
+    gl = ", ".join(genes)
+    return (f"For the {perturbation}-KO / mTORC1-hyperactivation phenotype, assess these genes as KNOCKDOWN "
+            f"rescue candidates IN ONE RESEARCH PASS: {gl}. For EACH gene give evidence FOR rescue AND evidence "
+            f"AGAINST (pleiotropy, toxicity, essentiality / is knockdown lethal, CNS expression gaps, gnomAD "
+            f"constraint). Use your FULL toolset — genetics, expression, perturbation/dependency, pathway, clinical "
+            f"— not just literature. Thorough, high-stringency. TAG every claim with its gene in square brackets, "
+            f"e.g. '[BCL2] ...'. Cite each claim (PMID/DOI/DB record).")
+
+
+def _batch_store(perturbation):
+    root = Path(__file__).resolve().parents[1]
+    d = root / "scenarios" / "emet_batches"; d.mkdir(parents=True, exist_ok=True)
+    return d / f"{(perturbation or 'tsc2').lower()}.json"
+
+
+def _emet_batch_assemble_captured(genes):
+    ev = []
+    for g in genes:
+        cap = _captured_emet(g)
+        if cap and cap.get("evidence"):
+            for e in cap["evidence"]:
+                ev.append({"gene": g, **(e if isinstance(e, dict) else {"claim": str(e)})})
+    return ev
+
+
+def _emet_batch_live(genes, perturbation, query, timeout_s=0):
+    """ONE worker task covering ALL genes — far faster than per-gene. Falls back to assembled captured."""
+    import time as _t  # noqa: PLC0415
+    if not timeout_s:
+        timeout_s = int(os.environ.get("SAPPHIRE_EMET_BATCH_TIMEOUT", os.environ.get("SAPPHIRE_EMET_TIMEOUT", "900")))
+    tasks, results = _emet_paths()
+    tid = f"BATCH_{int(_t.time() * 1000)}"
+    (tasks / f"{tid}.json").write_text(json.dumps({
+        "id": tid, "candidate": "BATCH", "genes": genes,
+        "query": query or _emet_batch_query(genes, perturbation),
+        "created": _t.strftime("%Y-%m-%dT%H:%M:%SZ", _t.gmtime()),
+    }), encoding="utf-8")
+    tfile = tasks / f"{tid}.json"; rfile = results / f"{tid}.json"
+    grab_grace = int(os.environ.get("SAPPHIRE_EMET_GRAB_GRACE", "90"))
+    start = _t.time(); deadline = start + timeout_s; grabbed = False
+    while _t.time() < deadline:
+        if rfile.exists():
+            env = json.loads(rfile.read_text(encoding="utf-8"))
+            return {"batch": True, "genes": genes, "found": True, "evidence": env.get("evidence", []),
+                    "provenance": "emet-live", "source": "live Chrome worker (batch)",
+                    "captured_at": env.get("captured_at")}
+        if not grabbed and not tfile.exists():
+            grabbed = True
+        if not grabbed and (_t.time() - start) > grab_grace:
+            break
+        _t.sleep(2)
+    ev = _emet_batch_assemble_captured(genes)
+    return {"batch": True, "genes": genes, "found": bool(ev), "evidence": ev, "provenance": "emet-captured",
+            "note": ("worker grabbed the batch but didn't finish in time — captured fallback" if grabbed
+                     else "worker not looping — captured fallback"),
+            "source": "assembled from captured envelopes"}
+
+
 def cmd_emet(args) -> dict:
     """EMET evidence for a gene. With --live (or SAPPHIRE_EMET_LIVE=1) the connected Chrome-Claude worker
     runs a REAL BenchSci query (the task is queued and we wait for its cited envelope); captured evidence is
@@ -303,6 +371,26 @@ def cmd_emet(args) -> dict:
     gene = (args.gene or "").strip()
     live = (getattr(args, "live", False)
             or os.environ.get("SAPPHIRE_EMET_LIVE", "").lower() in ("1", "on", "true"))
+
+    # BATCH: one EMET pass over many genes (far faster than per-gene). `emet --gene TSC2 --batch G1,G2,...`
+    batch = getattr(args, "batch", None)
+    if batch:
+        genes = [g.strip().upper() for g in batch.split(",") if g.strip()]
+        pert = gene or "TSC2"
+        if live:
+            return _emet_batch_live(genes, pert, getattr(args, "query", None))
+        store = _batch_store(pert)
+        if store.exists():
+            try:
+                d = json.loads(store.read_text(encoding="utf-8"))
+                return {"batch": True, "genes": genes, "found": bool(d.get("evidence")),
+                        "evidence": d.get("evidence", []), "provenance": "emet-captured",
+                        "source": "saved batch envelope"}
+            except Exception:
+                pass
+        ev = _emet_batch_assemble_captured(genes)
+        return {"batch": True, "genes": genes, "found": bool(ev), "evidence": ev, "provenance": "emet-captured"}
+
     try:
         if live:
             # PREFER the live worker — queue the task and wait for its result (this is what reaches your
@@ -533,12 +621,16 @@ def main() -> None:
     m.add_argument("--k", type=int, default=10, help="Max rows to return (default 10)")
     m.add_argument("--probe", default=None,
                    help="CSV of genes to check against --gene: each returned as rescue-direction / exacerbate-direction / absent (one call for a whole candidate list)")
+    m.add_argument("--compounds", action="store_true",
+                   help="ALSO return drug rescue/exacerbate compounds (drug-repurposing leads). OFF by default — only for a drug/therapeutic question, NOT a gene-rescue ranking.")
 
     e = sub.add_parser("emet", help="Load captured EMET evidence (envelope or rescue-dossier); --live queues a Chrome-worker task")
     e.add_argument("--gene", required=True, help="Gene symbol to look up (e.g. TSC2)")
     e.add_argument("--live", action="store_true",
                    help="If no captured evidence, queue a live EMET task for the Chrome-Claude worker")
     e.add_argument("--query", default=None, help="EMET query text (for --live)")
+    e.add_argument("--batch", default=None,
+                   help="CSV of genes for ONE fast EMET pass (with --gene as the perturbation, e.g. --gene TSC2 --batch BCL2,CDK9,MTOR,...). Far faster than per-gene; add --live for the worker.")
 
     b = sub.add_parser(
         "boltz", help="Boltz structure/binding (REAL, ~$0.02, ~80 s): --gene G --ligand DRUG | --protein SEQ --ligand SMILES"
