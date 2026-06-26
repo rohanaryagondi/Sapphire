@@ -264,9 +264,9 @@
     const genes = data.ranked_genes || [];
     if (genes.length) {
       let html = '<div class="ranked-genes">';
-      html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">Quiver moat · EMET PMIDs · LLM reasoning</span></div>';
+      html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">Quiver moat (primary) · EMET support · LLM reasoning</span></div>';
       html += '<table class="rg-table"><thead><tr>';
-      html += '<th>#</th><th>Gene</th><th>Moat Rank</th><th>Mechanism</th><th>Citations</th><th>Conf</th>';
+      html += '<th>#</th><th>Gene</th><th>Quiver moat</th><th>EMET support</th><th>Mechanism</th><th>Conf</th>';
       html += '</tr></thead><tbody>';
       genes.forEach(function (g) {
         const confClass = g.confidence === 'high' ? 'conf-high'
@@ -274,14 +274,25 @@
         const cites = (g.citations || []).map(function (c) {
           return '<span class="rg-cite">' + escHtml(String(c)) + '</span>';
         }).join('');
-        const moatRank = g.moat_rank != null ? String(g.moat_rank) : '–';
+        // Quiver moat cell — rank + cosine_distance (the primary signal)
+        let moat = '–';
+        if (g.moat_rank != null) {
+          moat = 'rank ' + g.moat_rank + (g.moat_cosine_distance != null ? ' · d ' + g.moat_cosine_distance : '');
+        } else if (g.verdict === 'not-a-moat-prediction') {
+          moat = 'not predicted';
+        }
+        // EMET support badge
+        const sup = String(g.emet_support || '').toLowerCase();
+        const supClass = sup === 'strong' ? 'conf-high' : sup === 'moderate' ? 'conf-medium'
+          : (sup === 'weak' || sup === 'none') ? 'conf-low' : '';
+        const verdict = g.verdict ? '<span class="rg-verdict" style="font-size:9px;text-transform:uppercase;letter-spacing:.04em;color:var(--purple);margin-right:5px">' + escHtml(String(g.verdict)) + '</span>' : '';
         html += '<tr class="rg-row">';
         html += '<td class="rg-rank">' + escHtml(String(g.rank || '')) + '</td>';
         html += '<td class="rg-gene">' + escHtml(String(g.gene || '')) + '</td>';
-        html += '<td class="rg-moat">' + escHtml(moatRank) + '</td>';
-        html += '<td class="rg-mech">' + escHtml(String(g.mechanism || ''))
+        html += '<td class="rg-moat" style="font-family:var(--mono);font-size:10px;white-space:nowrap">' + escHtml(moat) + '</td>';
+        html += '<td>' + (sup ? '<span class="conf ' + supClass + '">' + escHtml(sup) + '</span>' : '–') + '</td>';
+        html += '<td class="rg-mech">' + verdict + escHtml(String(g.mechanism || ''))
           + (cites ? '<div class="rg-cites">' + cites + '</div>' : '') + '</td>';
-        html += '<td></td>';
         html += '<td class="rg-conf"><span class="conf ' + confClass + '">' + escHtml(String(g.confidence || '')) + '</span></td>';
         html += '</tr>';
       });

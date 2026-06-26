@@ -35,10 +35,18 @@ You decide whether enrichment helps. The PRIMARY gene/protein-specific signal he
 `python sapphire-orchestrator/orchestrator_tools.py semantic --agent <mechanism|pathway|toxicity|expression|essentiality|genetics> --gene <GENE> --context "<the EMET cited facts for this gene>"`
 Each returns a `verdict` (favorable | risk | neutral) + `finding` + `confidence` (provenance `semantic-haiku` — LLM reasoning, NOT a cited DB fact). Feed the verdicts into Step 5, then STOP (don't exceed 2 rounds).
 
-**Step 5 — Reason as the scientific team**
-Combine everything you gathered: (a) Quiver moat signal — use the **cosine_distance** (smaller = stronger), not just the ordinal rank, and the direction (rescue vs exacerbate); (b) EMET evidence per gene (the specific for-vs-against data); (c) ESM/other model enrichment; (d) the semantic-agent verdicts; and (e) your own knowledge of the relevant biology/pathway for THIS question.
-For each gene/candidate: assess the plausible mechanism for the question asked, **weigh evidence FOR vs AGAINST** (supporting mechanism/genetics/expression vs. the risks surfaced — pleiotropy, inflammation, toxicity, essentiality, expression gap, constraint), assign confidence (high/medium/low) reflecting BOTH sides, and cite the supporting PMIDs. A candidate with strong moat signal but serious against-evidence (pan-essential, not expressed in the relevant tissue, etc.) ranks lower — say why. This works for any CNS question: a ranking question → rank the candidates; a single-target question ("is X viable") → a go/caution/no-go call with the same for-vs-against rigor.
-**USE every signal you spent a tool call on — never call a tool and then ignore its output.** If you ran ESM, explicitly reference the embedding-proximity for your top candidates (it's a supporting signal: a gene close to the target in ESM space *and* with a pathway link is a stronger story; one that is ESM-distant with no pathway link is a weaker rescue claim — but ESM similarity alone never makes the call). If a moat↔literature contradiction stands (strong moat rank, no published mechanism), label it **DIVERGENCE** (often the alpha — Quiver sees what the literature can't), don't bury it.
+**Step 5 — Reason as the scientific team (MOAT-FIRST — this is the core recalibration)**
+**The Quiver moat is the PRIMARY signal and the product's edge — it is Quiver's proprietary bet on which knockdowns rescue. RANK PRIMARILY BY THE MOAT: the rescue-direction genes ordered by `cosine_distance` (smaller = stronger; rank 1 = strongest).** That moat order is the backbone of the answer.
+
+Then use everything else to **ENRICH each moat prediction** — the question is "how much does the evidence SUPPORT this Quiver prediction?", not "what does the literature rank highest":
+- **EMET = the corroboration overlay.** Rate each prediction's `emet_support`: strong / moderate / weak / none. Strong support → high confidence in that moat call; **no support → a DIVERGENCE** (Quiver flags a rescuer the literature hasn't caught — often the alpha, NOT a reason to demote it). EMET sets/adjusts CONFIDENCE; it does **NOT reorder** the moat ranking. (Still take EMET seriously — if EMET actively CONTRADICTS a moat prediction with a hard liability, e.g. pan-essential / not expressed in CNS, drop that gene's confidence and say why. EMET is enrichment, not noise.)
+- **ESM + semantic agents** = further enrichment of the same kind (supporting context, never the primary ranker).
+
+**Hard rules of the recalibration:**
+- Do NOT let a weak-moat gene with lots of literature leapfrog a strong-moat gene — a rank-42 gene with great papers stays BELOW a rank-2 gene.
+- A strong-moat gene with NO literature is a high-value DIVERGENCE, ranked by its moat strength — surface it, don't bury it.
+- Genes **ABSENT from the moat are NOT Quiver predictions** — list them BELOW the moat-ranked set and say so (e.g. a positive control like MTOR is the on-target pathway hub the moat doesn't profile as a neighbor; a literature-only gene isn't Quiver's bet).
+For each gene still weigh FOR vs AGAINST and cite PMIDs; for a single-target question, lead with the moat's read on that target, enriched by EMET.
 
 **Step 6 — Output the final JSON**
 After your reasoning, output EXACTLY one fenced JSON block (```json ... ```) shaped like:
@@ -52,7 +60,8 @@ After your reasoning, output EXACTLY one fenced JSON block (```json ... ```) sha
       "gene": "GENE_SYMBOL",
       "moat_rank": 1,
       "moat_cosine_distance": 0.16,
-      "verdict": "rescue | partial | no-effect | worsen | divergence",
+      "emet_support": "strong | moderate | weak | none",
+      "verdict": "rescue | partial | no-effect | worsen | divergence | not-a-moat-prediction",
       "mechanism": "the concrete mechanistic call — which pathway step, why KD helps/doesn't",
       "evidence_for": "the strongest supporting evidence WITH SPECIFICS (mechanism + genetics + expression/dependency numbers)",
       "evidence_against": "the risks WITH SPECIFICS (pleiotropy / pan-essentiality / CNS-expression gap / toxicity / constraint)",
@@ -61,11 +70,11 @@ After your reasoning, output EXACTLY one fenced JSON block (```json ... ```) sha
       "confidence": "high"
     }
   ],
-  "synthesis": "A RICH 4-6 sentence read of the landscape: the clear hit(s) and why, the partial/conditional ones, the DIVERGENCES (strong moat, no literature mechanism) called out as such, and the clearly-against tail. Reference the moat cosine_distance + ESM where they sharpen the call.",
+  "synthesis": "A RICH 4-6 sentence MOAT-FIRST read: the top Quiver moat predictions in moat order and how strongly EMET supports each; call out the high-value DIVERGENCES (strong moat, weak/no literature — Quiver's alpha); note any moat prediction EMET contradicts (and why its confidence drops); and separately note moat-absent genes (controls / literature-only). Reference cosine_distance + emet_support.",
   "confidence": "medium"
 }
 ```
-Fill EVERY field for each gene — `evidence_for` AND `evidence_against` are required (the for-vs-against spread is the product). Use the moat `cosine_distance` (smaller = stronger) to order within a rank tier, not just the ordinal rank.
+**ORDER `ranked_genes` BY THE MOAT** — rescue-direction genes by `cosine_distance` (smaller = stronger) first; moat-absent genes go LAST (with verdict `not-a-moat-prediction`); the exacerbate-direction gene(s) at the very bottom. `emet_support` + `evidence_for` + `evidence_against` are required for every gene — EMET enriches the moat call, it does not set the order.
 
 ## Hard rules (never violate)
 1. **Public identifiers only leave to tools** — only gene symbols, PMIDs, DOIs, published SMILES go to EMET/Boltz/ESM/web. The moat `cosine_distance` (and any internal EP/CRISPR score) is INTERNAL: use it in your reasoning + the final report, but NEVER pass it to a tool. Never send patient data or candidate IDs anywhere.
