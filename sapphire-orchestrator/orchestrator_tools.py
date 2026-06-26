@@ -254,39 +254,69 @@ def cmd_emet(args) -> dict:
 
 # ── subcommand: boltz ────────────────────────────────────────────────────────
 
+def _load_boltz_pairs() -> dict:
+    """Known gene → (public protein sequence + ligand SMILES) pairs for the demo (real public IDs,
+    captured from UniProt/PubChem). Lets the orchestrator call Boltz with just `--gene G --ligand DRUG`."""
+    try:
+        p = Path(__file__).resolve().parent / "scenarios" / "boltz_pairs.json"
+        return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    except Exception:
+        return {}
+
+
 def cmd_boltz(args) -> dict:
-    """Run a Boltz structure+binding prediction. ~$0.02, ~80 s. REAL — opt-in only."""
-    if not os.environ.get("BOLTZ_API_KEY"):
-        return {
-            "status": "not_run",
-            "reason": (
-                "BOLTZ_API_KEY not set — Boltz enrichment skipped. "
-                "Set $BOLTZ_API_KEY to opt in (~$0.02, ~80 s)."
-            ),
-            "binding_confidence": None,
-            "provenance": "boltz",
-        }
+    """Boltz-2 structure + binding prediction (REAL, ~$0.02, ~80 s). Resolve `--gene G --ligand DRUG`
+    to a public sequence + SMILES (scenarios/boltz_pairs.json), or take raw `--protein SEQ --ligand SMILES`.
+    The API key is read from RohanOnly/boltz_api.env by the seam — no env var needed. Honest-degrades."""
+    gene = (getattr(args, "gene", "") or "").strip().upper()
+    ligand = (getattr(args, "ligand", "") or "").strip()
+    protein = (getattr(args, "protein", "") or "").strip()
+    ligand_smiles = None
+
+    if gene and not protein:
+        rec = _load_boltz_pairs().get(gene)
+        if not rec:
+            return {"status": "not_run", "gene": gene, "provenance": "boltz",
+                    "reason": f"No embedded public sequence for {gene} — supply --protein <seq> --ligand <SMILES>."}
+        protein = rec.get("target_sequence", "")
+        ligands = {k.lower(): v for k, v in (rec.get("ligands") or {}).items()}
+        ligand_smiles = ligands.get(ligand.lower()) or (ligand or None)  # known drug name → SMILES, else raw
+    elif ligand:
+        ligand_smiles = ligand  # raw SMILES alongside a raw --protein
+
+    if not protein:
+        return {"status": "not_run", "provenance": "boltz",
+                "reason": "No protein sequence — supply --gene <known gene> or --protein <sequence>."}
 
     try:
         from tools.boltz_seam import findings  # noqa: PLC0415
-
-        result = findings(protein=args.protein, ligand=args.ligand)
-        return result
-
+        inputs = {"candidate": gene or "target", "target_sequence": protein}
+        if ligand_smiles:
+            inputs["ligand_smiles"] = ligand_smiles
+        return findings(inputs)   # reads the key from RohanOnly/boltz_api.env; honest KNOWN_UNKNOWN on failure
     except ImportError:
-        return {
-            "status": "not_run",
-            "reason": "boltz_seam not importable in this environment — honest abstain.",
-            "binding_confidence": None,
-            "provenance": "boltz",
-        }
+        return {"status": "not_run", "provenance": "boltz", "reason": "boltz_seam not importable."}
     except Exception as exc:
-        return {
-            "status": "error",
-            "reason": str(exc),
-            "binding_confidence": None,
-            "provenance": "boltz",
-        }
+        return {"status": "error", "provenance": "boltz", "reason": str(exc)}
+
+
+def cmd_qmodels(args) -> dict:
+    """Call a Q-Model via the launchpad client. REAL for live-local tools when the local Explorer
+    endpoint is up; honest-degrades (not reachable / GPU not launched / deprecated) otherwise."""
+    tool_id = (getattr(args, "tool", "") or "").strip()
+    try:
+        inputs = json.loads(args.inputs) if getattr(args, "inputs", None) else {}
+    except Exception:
+        inputs = {}
+    # SAFETY: default GPU launcher OFF for the demo so a qmodels call can NEVER launch AWS — GPU
+    # tools then return an honest "gpu-disabled (gated)" instead of even a dry-run job. Explicit
+    # QMODELS_GPU=on still opts in. (Set before the import: client.py reads QMODELS_GPU at import.)
+    os.environ.setdefault("QMODELS_GPU", "off")
+    try:
+        from qmodels.client import QModelsClient  # noqa: PLC0415
+        return QModelsClient().call(tool_id, inputs)
+    except Exception as exc:
+        return {"ok": False, "tool_id": tool_id, "provenance": "unavailable", "error": str(exc)}
 
 
 # ── CLI entrypoint ────────────────────────────────────────────────────────────
@@ -314,13 +344,18 @@ def main() -> None:
     e.add_argument("--query", default=None, help="EMET query text (for --live)")
 
     b = sub.add_parser(
-        "boltz", help="Run Boltz structure/binding (REAL, ~$0.02, ~80 s)"
+        "boltz", help="Boltz structure/binding (REAL, ~$0.02, ~80 s): --gene G --ligand DRUG | --protein SEQ --ligand SMILES"
     )
-    b.add_argument("--protein", required=True, help="Protein sequence (public identifier)")
-    b.add_argument("--ligand", required=True, help="Ligand SMILES (public identifier)")
+    b.add_argument("--gene", default="", help="Gene with a known public sequence (e.g. BCL2) — resolves protein + ligand")
+    b.add_argument("--protein", default="", help="Raw protein sequence (public) — alternative to --gene")
+    b.add_argument("--ligand", default="", help="Ligand: a known drug name (e.g. venetoclax) or a raw SMILES")
+
+    q = sub.add_parser("qmodels", help="Call a Q-Model via the launchpad (real for live-local; honest-degrades)")
+    q.add_argument("--tool", required=True, help="Q-Model tool id (e.g. chemberta2, boltz2, esm2)")
+    q.add_argument("--inputs", default="", help="JSON inputs for the tool")
 
     args = ap.parse_args()
-    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz}
+    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz, "qmodels": cmd_qmodels}
     result = dispatch[args.cmd](args)
     print(json.dumps(result, default=str, ensure_ascii=False))
 

@@ -15,8 +15,10 @@ This returns Quiver's internal EP-signature data: genes whose knock-down opposes
 Run: `python sapphire-orchestrator/orchestrator_tools.py emet --gene <GENE>`
 This returns pre-captured literature evidence from BenchSci (real PMIDs). If found=true, you have real cited evidence. Cite each claim with its PMID/DOI. If found=false, note honestly that EMET abstains for this gene.
 
-**Step 4 — Decide whether to call Boltz or Q-Models**
-ONLY call Boltz if: (a) a protein sequence and ligand SMILES are available in the question AND (b) binding prediction would materially change the ranking. It costs ~$0.02 and takes ~80s. For gene-ranking questions without explicit sequences, skip it and note why.
+**Step 4 — Enrich (optional): Boltz druggability + Q-Models**
+You decide whether enrichment helps. These are REAL tool calls:
+- **Boltz (structural tractability / druggability):** `python sapphire-orchestrator/orchestrator_tools.py boltz --gene <GENE> --ligand <DRUG>`. The tool resolves known gene→sequence and drug→SMILES pairs (public identifiers) — e.g. `--gene BCL2 --ligand venetoclax` — and returns a real binding_confidence (~$0.02, ~80s). For a rescue-gene ranking, if a TOP-RANKED gene has a known small-molecule modulator (BCL2/venetoclax is the clean case), call Boltz to add a **structural-tractability / "is it actually druggable" annotation**. This is a feasibility signal, NOT a re-ranker — note it alongside the gene. Skip genes with no known ligand (or supply `--protein <seq> --ligand <SMILES>` for a custom pair).
+- **Q-Models:** `python sapphire-orchestrator/orchestrator_tools.py qmodels --tool <id> --inputs '<json>'` (e.g. chemberta2). Real for live-local tools when the local Explorer endpoint is up; GPU tools are gated (return "gpu-disabled" — no AWS launch). Call only if a model prediction would materially help; otherwise note it's available but not needed.
 
 **Step 5 — Reason as the scientific team**
 Combine: (a) Quiver moat rescue rank + cosine score, (b) EMET literature evidence for each gene, (c) your knowledge of the mechanism (TSC2/mTORC1/tuberous sclerosis pathway).
