@@ -18,6 +18,7 @@ Extract the target gene symbol(s) from the question. For rescue questions ("gene
 Run: `python sapphire-orchestrator/orchestrator_tools.py moat --gene <GENE> --direction opposite --k 10`
 This returns Quiver's internal EP-signature data: genes whose knock-down opposes the TSC2-KO phenotype (the rescue direction). These are proprietary Quiver predictions. Cite them by ordinal rank: "(Quiver moat, rank N, rescue-direction)".
 **If the user gives you a SPECIFIC gene list to rank** (e.g. 16 named genes incl. a control + an exacerbation gene), also run `moat --gene <GENE> --probe G1,G2,…,Gn` — it returns each gene's moat relationship in ONE call: **rescue-direction** (a rescue candidate), **exacerbate-direction** (the moat predicts it WORSENS the phenotype — a strong AGAINST signal), or **absent** (moat is silent → weight EMET + semantic agents more for that gene). This is the moat half of the for-vs-against evidence.
+The moat call also returns **`rescue_compounds`** (drugs whose signature REVERSES the perturbation — real drug-repurposing leads, e.g. TSC2 → Isorhamnetin, Momelotinib) and **`exacerbate_compounds`**. Surface the top rescue_compounds in your synthesis as a "repurposing leads" note — this is high-value moat data; don't drop it.
 
 **Step 3 — Load EMET evidence (ALWAYS for covered genes)**
 Run: `python sapphire-orchestrator/orchestrator_tools.py emet --gene <GENE>` for captured evidence.

@@ -130,6 +130,14 @@ def cmd_moat(args) -> dict:
             for r in similar_raw
         ]
 
+        # MAXIMISE the moat: it ALSO holds COMPOUND neighbours — drugs whose EP-signature OPPOSES the
+        # perturbation (rescue candidates / drug-repurposing leads) or MIMICS it (exacerbators). The
+        # orchestrator should see these too, not just genes (e.g. TSC2 → Isorhamnetin, Momelotinib, …).
+        rescue_cpd_raw = client.neighbors(gene, effect="opposite", ref_type="compound", k=k)
+        exac_cpd_raw = client.neighbors(gene, effect="similar", ref_type="compound", k=5)
+        rescue_compounds = [{"compound": r["ref"], "rank": r["rank"]} for r in rescue_cpd_raw]
+        exacerbate_compounds = [{"compound": r["ref"], "rank": r["rank"]} for r in exac_cpd_raw]
+
         # For the rescue direction, PREFER Quiver's curated validated predictions (the <gene>_rescue
         # dossier) over the raw moat top — these align with the captured EMET evidence, so the
         # orchestrator ranks the validated set and its per-gene EMET lookups hit the captured dossier.
@@ -143,6 +151,8 @@ def cmd_moat(args) -> dict:
             "direction": direction,
             "rescuers": rescuers,
             "similar": similar,
+            "rescue_compounds": rescue_compounds,          # drugs predicted to REVERSE the KO signature (repurposing leads)
+            "exacerbate_compounds": exacerbate_compounds,  # drugs predicted to WORSEN it
             "curated_predictions": bool(curated),
             "provenance": "moat-real",
         }
@@ -236,7 +246,7 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 0) -> dict:
         # grab-detection: the worker removes/moves the task file when it picks it up. If it hasn't grabbed
         # within the grace window, it isn't looping — bail fast so we don't hang the full timeout (the caller
         # falls back to captured). If it HAS grabbed, wait the full timeout for the (slow) real result.
-        grab_grace = int(os.environ.get("SAPPHIRE_EMET_GRAB_GRACE", "45"))
+        grab_grace = int(os.environ.get("SAPPHIRE_EMET_GRAB_GRACE", "90"))
         start = _time.time()
         deadline = start + timeout_s
         grabbed = False
