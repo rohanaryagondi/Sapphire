@@ -20,6 +20,7 @@
   const outputsStatus = document.getElementById('outputsStatus');
   const liveLabel   = document.getElementById('liveLabel');
   const liveBadge   = document.getElementById('liveBadge');
+  const queryEcho   = document.getElementById('queryEcho');
   const planSteps   = document.getElementById('planSteps');
   const rankedGenes = document.getElementById('rankedGenes');
   const synthesis   = document.getElementById('synthesis');
@@ -87,11 +88,15 @@
     chatInput.value = '';
     chatInput.style.height = '';
     resultsArea.style.display = 'block';
+    // The question persists in its own element (renderResult never overwrites it).
+    queryEcho.innerHTML = '<div class="run-query">' +
+      '<span style="display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);font-weight:600;margin-bottom:5px">Question</span>' +
+      escHtml(query) + '</div>';
+    // The working banner lives in planSteps — renderResult replaces it with the plan on completion.
     planSteps.innerHTML =
-      '<div class="run-query">' + escHtml(query) + '</div>' +
       '<div class="run-working"><span class="rw-dots"><span></span><span></span><span></span></span>' +
       '<span class="rw-text">Orchestrator working — deciding tool calls, gathering Quiver moat + EMET evidence, ' +
-      'then reasoning as the scientific team. This takes a few minutes; the live trace is streaming on the left →</span></div>';
+      'then reasoning as the scientific team. This takes a few minutes; the live trace is streaming on the right →</span></div>';
 
     // Status
     setStatus('running');

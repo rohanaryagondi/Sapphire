@@ -36,11 +36,26 @@ def _quiver_predictions(gene: str) -> list:
     try:
         from emet.envelopes import load_envelope_for  # noqa: PLC0415
         env = load_envelope_for(f"{gene}_rescue")
+        cands = (env or {}).get("candidates", []) or []
+        if not cands:
+            return []
+        # Attach the REAL moat cosine DISTANCE (smaller = stronger rescue; rank 1 = smallest) for each
+        # curated gene — so the orchestrator can weight by the metric, not just the ordinal rank.
+        cos = {}
+        try:
+            from moat.client import MoatClient  # noqa: PLC0415
+            client = MoatClient()
+            if client.available():
+                for r in client.neighbors(gene.upper(), effect="opposite", ref_type="gene", k=2000):
+                    cos[r["ref"]] = round(float(r["cosine"]), 4)
+        except Exception:
+            pass
         out = []
-        for c in (env or {}).get("candidates", []) or []:
+        for c in cands:
             g = c.get("gene")
             if g:
-                out.append({"gene": g, "rank": c.get("moat_rank"), "cosine": None, "curated": True})
+                out.append({"gene": g, "rank": c.get("moat_rank"),
+                            "cosine_distance": cos.get(g), "curated": True})
         return out
     except Exception:
         return []
@@ -60,22 +75,23 @@ def _moat_probe(perturbation: str, probe_csv: str) -> dict:
                     "note": "moat DB unavailable — honest abstain", "provenance": "moat-real"}
         lut = {}
         for eff in ("opposite", "similar"):
-            for r in client.neighbors(perturbation, effect=eff, ref_type="gene", k=500):
-                lut.setdefault(r["ref"], {"effect": eff, "rank": r["rank"]})
+            for r in client.neighbors(perturbation, effect=eff, ref_type="gene", k=2000):
+                lut.setdefault(r["ref"], {"effect": eff, "rank": r["rank"],
+                                          "cosine_distance": round(float(r["cosine"]), 4)})
         out = []
         for t in targets:
             hit = lut.get(t)
             if hit:
                 out.append({"gene": t, "in_moat": True,
                             "role": "rescue-direction" if hit["effect"] == "opposite" else "exacerbate-direction",
-                            "moat_rank": hit["rank"]})
+                            "moat_rank": hit["rank"], "cosine_distance": hit["cosine_distance"]})
             else:
                 out.append({"gene": t, "in_moat": False,
                             "role": "absent — moat is silent (not in the perturbation's top neighbors); lean on EMET + semantic agents"})
         return {"perturbation": perturbation, "available": True, "probe": out, "provenance": "moat-real",
                 "note": ("rescue-direction = knockdown OPPOSES the perturbation's EP-signature (rescue candidate); "
-                         "exacerbate-direction = knockdown MIMICS/worsens it (bad/perturbative). Ordinal rank only "
-                         "(lower = stronger).")}
+                         "exacerbate-direction = knockdown MIMICS/worsens it (bad/perturbative). cosine_distance: "
+                         "SMALLER = STRONGER (rank 1 = smallest) — weight by it, not rank alone.")}
     except Exception as exc:
         return {"perturbation": perturbation, "available": False, "probe": [], "error": str(exc),
                 "provenance": "moat-real"}
@@ -114,19 +130,11 @@ def cmd_moat(args) -> dict:
         similar_raw = client.neighbors(gene, effect="similar", ref_type="gene", k=5)
 
         rescuers = [
-            {
-                "gene": r["ref"],
-                "rank": r["rank"],
-                "cosine": round(float(r["cosine"]), 4),
-            }
+            {"gene": r["ref"], "rank": r["rank"], "cosine_distance": round(float(r["cosine"]), 4)}
             for r in rescuers_raw
         ]
         similar = [
-            {
-                "gene": r["ref"],
-                "rank": r["rank"],
-                "cosine": round(float(r["cosine"]), 4),
-            }
+            {"gene": r["ref"], "rank": r["rank"], "cosine_distance": round(float(r["cosine"]), 4)}
             for r in similar_raw
         ]
 
@@ -149,6 +157,7 @@ def cmd_moat(args) -> dict:
             "rescuers": rescuers,
             "similar": similar,
             "curated_predictions": bool(curated),
+            "metric": "cosine_distance: SMALLER = STRONGER (nearer in the EP-signature space); rank 1 = smallest. Weight by it, don't use rank alone.",
             "provenance": "moat-real",
         }
         if want_compounds:
@@ -311,14 +320,17 @@ def _emet_batch_query(genes, perturbation="TSC2"):
     # NEUTRAL / BLIND — never reveal which genes are controls, expected rescuers, or expected exacerbators,
     # and don't presuppose any of them rescues. We are EVALUATING the predictions; EMET must assess blind.
     return (f"For the {perturbation}-KO / mTORC1-hyperactivation phenotype, evaluate the following genes BLIND and "
-            f"EQUALLY in one research pass — make NO assumptions about which will or won't matter: {gl}. For EACH "
-            f"gene, what does the evidence indicate about the effect of KNOCKING IT DOWN on this phenotype — would it "
-            f"normalize/rescue it, have no effect, or worsen it? Give the evidence on BOTH sides: support for a "
-            f"rescue/normalizing effect AND evidence it would be ineffective or harmful (pleiotropy, toxicity, "
-            f"essentiality / is knockdown lethal, CNS expression gaps, gnomAD constraint). Use your FULL toolset — "
-            f"genetics, expression, perturbation/dependency (DepMap/CRISPR), pathway, clinical — not just literature. "
-            f"Thorough, high-stringency. TAG every claim with its gene in square brackets, e.g. '[BCL2] ...'. Cite "
-            f"each claim (PMID/DOI/DB record).")
+            f"EQUALLY in one Thorough, high-stringency research pass — make NO assumptions about which will or won't "
+            f"matter: {gl}. For EACH gene determine the effect of KNOCKING IT DOWN (rescue/normalize | no effect | "
+            f"worsen) and give RICH, SPECIFIC evidence on BOTH sides — with the actual numbers, not vague statements:\n"
+            f"  FOR rescue: the precise mechanistic link to the mTORC1/TSC2 pathway (which step), human genetics "
+            f"(GWAS / ClinVar / OpenTargets association score), and perturbation/dependency data (DepMap, CRISPR rescue screens).\n"
+            f"  AGAINST: pleiotropy (GO-term breadth / # of pathways), pan-essentiality (DepMap common-essential — is KD "
+            f"lethal), CNS/neuron expression level (GTEx / Protein Atlas TPM — is it even expressed there), target "
+            f"toxicity, and gnomAD constraint (pLI).\n"
+            f"For each gene give the single STRONGEST piece of evidence, its directionality, and a confidence. TAG every "
+            f"claim with its gene in square brackets, e.g. '[BCL2] ...'. Cite EVERY claim with its specific identifier "
+            f"(PMID / DOI / DB accession) — uncited claims are dropped, never paraphrased.")
 
 
 def _batch_store(perturbation):

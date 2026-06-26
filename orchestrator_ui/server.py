@@ -104,23 +104,48 @@ def _summarize_result(text: str) -> str:
             except Exception:
                 d = None
     if not isinstance(d, dict):
-        return text[:180]
+        return text[:200]
     if d.get("ok") is False or d.get("error"):
-        return f"⚠ {d.get('error') or d.get('note') or 'failed'}"[:170]
+        return f"⚠ {d.get('error') or d.get('note') or 'failed'}"[:180]
+
+    def _g(x):  # gene label from a dict-or-str item
+        return str(x.get("gene", x) if isinstance(x, dict) else x)
+
     if "verdict" in d:                                            # semantic agent
-        return f"{d.get('verdict')} ({d.get('confidence', '?')}) — {str(d.get('finding', ''))[:150]}"
-    if isinstance(d.get("genes"), list):                         # moat
-        names = [str(g.get('gene', g) if isinstance(g, dict) else g) for g in d["genes"][:6]]
-        return f"{len(d['genes'])} genes: {', '.join(names)}"
-    if "evidence" in d:                                          # emet
-        return f"found={d.get('found', d.get('ok'))}, {len(d.get('evidence') or [])} cited claim(s)"
-    if "binding_confidence" in d:                                # boltz
-        return f"binding_confidence={d.get('binding_confidence')} ({d.get('provenance', '')})"
-    if "qmodels" in d and "tools" in d:                          # catalog
-        return f"{len(d.get('tools', []))} tools, {len(d.get('qmodels', []))} models"
-    if "out" in d:                                               # qmodels call
-        return f"{d.get('provenance', '')}: {str(d.get('out'))[:150]}"
-    return ", ".join(f"{k}={str(v)[:40]}" for k, v in list(d.items())[:4])[:180]
+        return f"{d.get('verdict')} ({d.get('confidence', '?')}) — {str(d.get('finding', ''))[:200]}"
+    if isinstance(d.get("neighbors"), list):                      # ESM
+        ns = [f"{n.get('gene')} {n.get('similarity')}" for n in d["neighbors"][:6] if isinstance(n, dict)]
+        return f"ESM nearest to {d.get('target', '?')}: " + ", ".join(ns)
+    if isinstance(d.get("probe"), list):                          # moat --probe
+        p = d["probe"]
+        resc = [x for x in p if str(x.get("role", "")).startswith("rescue")]
+        exac = [x for x in p if "exacerbate" in str(x.get("role", ""))]
+        absent = [x for x in p if not x.get("in_moat")]
+        ex = f" — exacerbate: {', '.join(_g(x) for x in exac)}" if exac else ""
+        return f"{len(p)} probed → {len(resc)} rescue-dir, {len(exac)} exacerbate, {len(absent)} absent{ex}"
+    if isinstance(d.get("rescuers"), list):                       # moat rescue list
+        def cell(r):
+            cd = r.get("cosine_distance")
+            return f"{r.get('gene')} (rank {r.get('rank')}{', d=' + str(cd) if cd is not None else ''})"
+        s = f"{len(d['rescuers'])} rescue genes: " + ", ".join(cell(r) for r in d["rescuers"][:6])
+        if d.get("rescue_compounds"):
+            s += f"  ·  +{len(d['rescue_compounds'])} drug leads"
+        return s
+    if isinstance(d.get("genes"), list) and "evidence" in d:      # EMET batch
+        return f"EMET batch: {len(d['genes'])} genes, {len(d.get('evidence') or [])} cited claims"
+    if isinstance(d.get("genes"), list):
+        return f"{len(d['genes'])} genes: {', '.join(_g(g) for g in d['genes'][:8])}"
+    if "evidence" in d:                                           # EMET single
+        return f"EMET {d.get('candidate', d.get('gene', ''))}: found={d.get('found')}, {len(d.get('evidence') or [])} cited claims"
+    if "binding_confidence" in d:                                 # boltz
+        return f"Boltz binding={d.get('binding_confidence')} ({d.get('provenance', '')})"
+    if isinstance(d.get("facts"), list):                          # boltz seam shape
+        return f"{d.get('candidate', '')}: {len(d['facts'])} fact(s) ({d.get('provenance', '')})"
+    if "qmodels" in d and "tools" in d:                           # catalog
+        return f"catalog: {len(d.get('tools', []))} tools, {len(d.get('qmodels', []))} models"
+    if "out" in d:                                                # qmodels call
+        return f"{d.get('provenance', '')}: {str(d.get('out'))[:160]}"
+    return ", ".join(f"{k}={str(v)[:40]}" for k, v in list(d.items())[:4])[:200]
 
 
 class Handler(BaseHTTPRequestHandler):
