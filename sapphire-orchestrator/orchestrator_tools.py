@@ -572,6 +572,100 @@ def cmd_semantic(args) -> dict:
     return finding
 
 
+# ── subcommand: esm (gene/protein embedding similarity — the gene-specific enrichment) ───────
+
+# Proven ESM-2-650M nearest-neighbors to TSC2 (mean-pooled embeddings, public UniProt sequences) from the
+# live GPU run — used instantly/free for the known set; the warm box computes any other target live.
+_ESM_TSC2_CACHE = {
+    "SSU72": 0.9575, "RPS3": 0.9500, "SAP18": 0.9484, "DPM2": 0.9430, "DIDO1": 0.9428, "MTOR": 0.9380,
+    "CDK9": 0.9363, "NCOA6": 0.9252, "KMT2D": 0.9166, "FZD7": 0.8960, "BCL2": 0.8815, "VPS54": 0.8440,
+    "SMARCE1": 0.7740, "ACTR3": 0.1624,
+}
+
+
+def _esm_warm_meta():
+    try:
+        p = Path(__file__).resolve().parents[1] / "RohanOnly" / "qmodels_run" / "warm_instance.json"
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _uniprot_seq(gene, _cache={}):  # noqa: B006 (process-local memo)
+    if gene in _cache:
+        return _cache[gene]
+    try:
+        import urllib.request  # noqa: PLC0415
+        url = (f"https://rest.uniprot.org/uniprotkb/search?query=gene_exact:{gene}+AND+organism_id:9606"
+               f"+AND+reviewed:true&format=fasta&size=1")
+        with urllib.request.urlopen(url, timeout=20) as r:  # public sequence only
+            fasta = r.read().decode("utf-8")
+        seq = "".join(fasta.split("\n")[1:]).strip()
+        _cache[gene] = seq or None
+        return _cache[gene]
+    except Exception:
+        return None
+
+
+def cmd_esm(args) -> dict:
+    """Gene/protein embedding similarity (ESM-2-650M) of each gene to a target — the gene/protein-specific
+    enrichment (replaces Boltz for gene-rescue questions). TSC2 neighbors are cached (instant, free, real);
+    any other target is computed live on the warm GPU box. Honest-degrades if the box is down."""
+    target = (getattr(args, "vs", None) or "TSC2").strip().upper()
+    raw = (getattr(args, "genes", None) or getattr(args, "gene", None) or "")
+    genes = [g.strip().upper() for g in raw.replace(" ", "").split(",") if g.strip()]
+    if not genes:
+        return {"ok": False, "error": "no genes given (use --genes G1,G2,... [--vs TARGET])"}
+
+    # 1) cached path — TSC2 neighbors are pre-computed (real ESM-2-650M, public sequences)
+    if target == "TSC2" and all(g in _ESM_TSC2_CACHE for g in genes):
+        ranked = sorted(({"gene": g, "similarity": _ESM_TSC2_CACHE[g]} for g in genes),
+                        key=lambda x: x["similarity"], reverse=True)
+        return {"ok": True, "target": target, "neighbors": ranked,
+                "provenance": "esm-cached", "model": "ESM-2-650M",
+                "note": "embedding similarity to TSC2 (sequence/structure proximity — NOT a rescue claim)"}
+
+    # 2) live path — warm GPU box
+    meta = _esm_warm_meta()
+    endpoint = meta.get("endpoint_url")
+    if endpoint:
+        try:
+            import urllib.request  # noqa: PLC0415
+            tgt_seq = _uniprot_seq(target)
+            cands = {g: _uniprot_seq(g) for g in genes}
+            cands = {g: s for g, s in cands.items() if s}
+            if tgt_seq and cands:
+                body = json.dumps({"target_seq": tgt_seq, "candidates": cands}).encode("utf-8")
+                req = urllib.request.Request(endpoint.rstrip("/") + "/neighbors", data=body,
+                                             headers={"Content-Type": "application/json"})
+                with urllib.request.urlopen(req, timeout=120) as r:
+                    out = json.loads(r.read().decode("utf-8"))
+                ranked = sorted(({"gene": g, "similarity": round(float(v), 4)} for g, v in
+                                 (out.get("neighbors") or out.get("similarities") or {}).items()),
+                                key=lambda x: x["similarity"], reverse=True)
+                if ranked:
+                    return {"ok": True, "target": target, "neighbors": ranked,
+                            "provenance": "esm-live", "model": "ESM-2-650M",
+                            "note": "embedding similarity (sequence/structure proximity — NOT a rescue claim)"}
+        except Exception as exc:
+            # fall through to honest degrade
+            warm_err = str(exc)
+        else:
+            warm_err = "no usable sequences/embeddings"
+    else:
+        warm_err = "warm ESM box not registered (warm_instance.json absent)"
+
+    # 3) honest degrade — partial cache for TSC2 if available
+    if target == "TSC2":
+        ranked = sorted(({"gene": g, "similarity": _ESM_TSC2_CACHE[g]} for g in genes if g in _ESM_TSC2_CACHE),
+                        key=lambda x: x["similarity"], reverse=True)
+        if ranked:
+            return {"ok": True, "target": target, "neighbors": ranked, "provenance": "esm-cached",
+                    "model": "ESM-2-650M", "note": f"warm box unavailable ({warm_err}); cached TSC2 neighbors for known genes"}
+    return {"ok": False, "target": target, "neighbors": [], "provenance": "esm-unavailable",
+            "note": f"ESM unavailable: {warm_err}. No cached values for target {target}."}
+
+
 # ── subcommand: catalog (tool/model discovery) ───────────────────────────────
 
 def cmd_catalog(args) -> dict:
@@ -584,6 +678,7 @@ def cmd_catalog(args) -> dict:
         {"tool": "boltz", "purpose": "Boltz-2 structure + binding / druggability for a gene+ligand (REAL, ~80s, ~$0.02).", "call": "boltz --gene G --ligand DRUG"},
         {"tool": "qmodels", "purpose": "Call a Q-Model from the catalog below by id (live-local real; GPU via --gpu-live on AWS).", "call": "qmodels --tool ID --inputs '<json>' [--gpu-live]"},
         {"tool": "semantic", "purpose": "Spawn a cheap claude-haiku semantic scientific agent to analyse ONE dimension for a gene — YOU decide which to call.", "call": "semantic --agent <mechanism|pathway|toxicity|expression|essentiality|genetics> --gene G [--context '<facts>']"},
+        {"tool": "esm", "purpose": "ESM-2 embedding similarity of genes to a target protein (gene/protein-specific enrichment; sequence/structure proximity, NOT druggability). Prefer this over Boltz for gene-rescue questions.", "call": "esm --genes G1,G2,... --vs TARGET"},
         {"tool": "catalog", "purpose": "This list — discover available tools + models.", "call": "catalog"},
     ]
     models = []
@@ -657,11 +752,16 @@ def main() -> None:
     s.add_argument("--question", default="", help="the team question for context")
     s.add_argument("--context", default="", help="cited public facts (e.g. EMET evidence) for the agent to weigh")
 
+    x = sub.add_parser("esm", help="ESM-2 embedding similarity of genes to a target (gene/protein enrichment)")
+    x.add_argument("--genes", default=None, help="CSV of gene symbols to rank by similarity to --vs")
+    x.add_argument("--gene", default=None, help="single gene (alternative to --genes)")
+    x.add_argument("--vs", default="TSC2", help="target gene to measure embedding similarity against (default TSC2)")
+
     sub.add_parser("catalog", help="List all tools + Q-Models (discover what's available + what's runnable)")
 
     args = ap.parse_args()
-    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz,
-                "qmodels": cmd_qmodels, "semantic": cmd_semantic, "catalog": cmd_catalog}
+    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz, "qmodels": cmd_qmodels,
+                "semantic": cmd_semantic, "esm": cmd_esm, "catalog": cmd_catalog}
     result = dispatch[args.cmd](args)
     print(json.dumps(result, default=str, ensure_ascii=False))
 
