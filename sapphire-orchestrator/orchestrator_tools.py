@@ -228,13 +228,14 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 0) -> dict:
         # surface and surfaces the risks (pleiotropy, inflammation, toxicity, essentiality, expression gap).
         default_q = (
             f"Run the Target Validation workflow for {g} in tuberous sclerosis, thinking=Thorough, high-stringency. "
-            f"Does knocking down {g} rescue the TSC2-KO / mTORC1-hyperactivation phenotype? Use your FULL toolset, "
-            f"not just literature: genetic association (GWAS/ClinVar/OpenTargets), CNS/neuron expression "
-            f"(GTEx/Protein Atlas/single-cell), perturbation & dependency (DepMap/CRISPR screens), pathway position "
-            f"& pleiotropy (Reactome/STRING + GO breadth), and clinical/safety (FAERS). Give evidence FOR and "
-            f"AGAINST {g} — explicitly check pleiotropy, inflammation/immune liability, toxicity, essentiality "
-            f"(is knockdown lethal?), expression gaps, and gnomAD constraint. Flag contradictions. Cite every claim "
-            f"(PMID/DOI/DB record)."
+            f"What does the evidence indicate about the effect of KNOCKING DOWN {g} on the TSC2-KO / "
+            f"mTORC1-hyperactivation phenotype — would it normalize/rescue it, have no effect, or worsen it? Assess "
+            f"neutrally, no assumptions. Use your FULL toolset, not just literature: genetic association "
+            f"(GWAS/ClinVar/OpenTargets), CNS/neuron expression (GTEx/Protein Atlas/single-cell), perturbation & "
+            f"dependency (DepMap/CRISPR screens), pathway position & pleiotropy (Reactome/STRING + GO breadth), and "
+            f"clinical/safety (FAERS). Give evidence on BOTH sides — support for a rescue effect AND evidence it would "
+            f"be ineffective or harmful (pleiotropy, inflammation, toxicity, essentiality / is knockdown lethal, "
+            f"expression gaps, gnomAD constraint). Flag contradictions. Cite every claim (PMID/DOI/DB record)."
         )
         task = {
             "id": tid, "candidate": g,
@@ -307,12 +308,17 @@ def _emet_paths():
 
 def _emet_batch_query(genes, perturbation="TSC2"):
     gl = ", ".join(genes)
-    return (f"For the {perturbation}-KO / mTORC1-hyperactivation phenotype, assess these genes as KNOCKDOWN "
-            f"rescue candidates IN ONE RESEARCH PASS: {gl}. For EACH gene give evidence FOR rescue AND evidence "
-            f"AGAINST (pleiotropy, toxicity, essentiality / is knockdown lethal, CNS expression gaps, gnomAD "
-            f"constraint). Use your FULL toolset — genetics, expression, perturbation/dependency, pathway, clinical "
-            f"— not just literature. Thorough, high-stringency. TAG every claim with its gene in square brackets, "
-            f"e.g. '[BCL2] ...'. Cite each claim (PMID/DOI/DB record).")
+    # NEUTRAL / BLIND — never reveal which genes are controls, expected rescuers, or expected exacerbators,
+    # and don't presuppose any of them rescues. We are EVALUATING the predictions; EMET must assess blind.
+    return (f"For the {perturbation}-KO / mTORC1-hyperactivation phenotype, evaluate the following genes BLIND and "
+            f"EQUALLY in one research pass — make NO assumptions about which will or won't matter: {gl}. For EACH "
+            f"gene, what does the evidence indicate about the effect of KNOCKING IT DOWN on this phenotype — would it "
+            f"normalize/rescue it, have no effect, or worsen it? Give the evidence on BOTH sides: support for a "
+            f"rescue/normalizing effect AND evidence it would be ineffective or harmful (pleiotropy, toxicity, "
+            f"essentiality / is knockdown lethal, CNS expression gaps, gnomAD constraint). Use your FULL toolset — "
+            f"genetics, expression, perturbation/dependency (DepMap/CRISPR), pathway, clinical — not just literature. "
+            f"Thorough, high-stringency. TAG every claim with its gene in square brackets, e.g. '[BCL2] ...'. Cite "
+            f"each claim (PMID/DOI/DB record).")
 
 
 def _batch_store(perturbation):
