@@ -266,7 +266,7 @@
       let html = '<div class="ranked-genes">';
       html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">EMET evidence (primary) · Quiver moat corroboration · LLM reasoning</span></div>';
       html += '<table class="rg-table"><thead><tr>';
-      html += '<th>#</th><th>Gene</th><th>Quiver moat</th><th>EMET support</th><th>Mechanism</th><th>Conf</th>';
+      html += '<th>#</th><th>Gene</th><th>Quiver moat</th><th>EMET</th><th>ESM</th><th>Mechanism</th><th>Conf</th>';
       html += '</tr></thead><tbody>';
       genes.forEach(function (g) {
         const confClass = g.confidence === 'high' ? 'conf-high'
@@ -291,6 +291,7 @@
         html += '<td class="rg-gene">' + escHtml(String(g.gene || '')) + '</td>';
         html += '<td class="rg-moat" style="font-family:var(--mono);font-size:10px;white-space:nowrap">' + escHtml(moat) + '</td>';
         html += '<td>' + (sup ? '<span class="conf ' + supClass + '">' + escHtml(sup) + '</span>' : '–') + '</td>';
+        html += '<td style="font-family:var(--mono);font-size:10px;color:var(--ink-3);white-space:nowrap">' + escHtml(String(g.esm_signal || '–')) + '</td>';
         html += '<td class="rg-mech">' + verdict + escHtml(String(g.mechanism || ''))
           + (cites ? '<div class="rg-cites">' + cites + '</div>' : '') + '</td>';
         html += '<td class="rg-conf"><span class="conf ' + confClass + '">' + escHtml(String(g.confidence || '')) + '</span></td>';
