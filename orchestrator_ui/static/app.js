@@ -82,9 +82,20 @@
     rightHint.style.display = 'block';
     rightPlan.innerHTML = '';
     rightGeneList.innerHTML = '';
-    planSteps.innerHTML = '';
     rankedGenes.innerHTML = '';
     synthesis.innerHTML = '';
+
+    // Clear the input IMMEDIATELY (so it's obvious the query was sent) and show a WORKING state in
+    // the center — the orchestrator is a real claude -p agent that takes a few minutes, so without
+    // this the centre looks dead even though the live trace is streaming on the left.
+    chatInput.value = '';
+    chatInput.style.height = '';
+    resultsArea.style.display = 'block';
+    planSteps.innerHTML =
+      '<div class="run-query">' + escHtml(query) + '</div>' +
+      '<div class="run-working"><span class="rw-dots"><span></span><span></span><span></span></span>' +
+      '<span class="rw-text">Orchestrator working — deciding tool calls, gathering Quiver moat + EMET evidence, ' +
+      'then reasoning as the scientific team. This takes a few minutes; the live trace is streaming on the left →</span></div>';
 
     // Status
     setStatus('running');
