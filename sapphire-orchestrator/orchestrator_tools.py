@@ -46,11 +46,50 @@ def _quiver_predictions(gene: str) -> list:
         return []
 
 
+def _moat_probe(perturbation: str, probe_csv: str) -> dict:
+    """For a perturbation (e.g. TSC2), report each PROBED gene's moat relationship to it:
+    rescue-direction (opposite EP-signature), exacerbate-direction (similar), or absent. Lets the
+    orchestrator check a specific candidate list (incl. controls/exacerbation genes) in ONE call.
+    Ordinal rank only — internal cosines stay inside the moat (never cross to the reasoner)."""
+    targets = [g.strip().upper() for g in (probe_csv or "").split(",") if g.strip()]
+    try:
+        from moat.client import MoatClient  # noqa: PLC0415
+        client = MoatClient()
+        if not client.available():
+            return {"perturbation": perturbation, "available": False, "probe": [],
+                    "note": "moat DB unavailable — honest abstain", "provenance": "moat-real"}
+        lut = {}
+        for eff in ("opposite", "similar"):
+            for r in client.neighbors(perturbation, effect=eff, ref_type="gene", k=500):
+                lut.setdefault(r["ref"], {"effect": eff, "rank": r["rank"]})
+        out = []
+        for t in targets:
+            hit = lut.get(t)
+            if hit:
+                out.append({"gene": t, "in_moat": True,
+                            "role": "rescue-direction" if hit["effect"] == "opposite" else "exacerbate-direction",
+                            "moat_rank": hit["rank"]})
+            else:
+                out.append({"gene": t, "in_moat": False,
+                            "role": "absent — moat is silent (not in the perturbation's top neighbors); lean on EMET + semantic agents"})
+        return {"perturbation": perturbation, "available": True, "probe": out, "provenance": "moat-real",
+                "note": ("rescue-direction = knockdown OPPOSES the perturbation's EP-signature (rescue candidate); "
+                         "exacerbate-direction = knockdown MIMICS/worsens it (bad/perturbative). Ordinal rank only "
+                         "(lower = stronger).")}
+    except Exception as exc:
+        return {"perturbation": perturbation, "available": False, "probe": [], "error": str(exc),
+                "provenance": "moat-real"}
+
+
 def cmd_moat(args) -> dict:
-    """Query the Quiver internal moat for rescue / similar genes."""
+    """Query the Quiver internal moat for rescue / similar genes (or --probe a specific gene list)."""
     gene = (args.gene or "").strip().upper()
     direction = args.direction  # "opposite" (rescuers) or "similar"
     k = int(args.k)
+
+    probe = getattr(args, "probe", None)
+    if probe:
+        return _moat_probe(gene, probe)
 
     try:
         from moat.client import MoatClient  # noqa: PLC0415
@@ -420,7 +459,7 @@ def cmd_catalog(args) -> dict:
     one for any question (this is what makes it flexible — e.g. map 'use ESM' → esm2). Honest about
     what's runnable now vs gated."""
     core = [
-        {"tool": "moat", "purpose": "Quiver internal moat — rescue (opposite) / similar genes for a target; curated predictions where available.", "call": "moat --gene G --direction opposite|similar [--k N]"},
+        {"tool": "moat", "purpose": "Quiver internal moat — rescue (opposite) / exacerbate (similar) genes for a target; or --probe a specific gene list (each → rescue/exacerbate/absent).", "call": "moat --gene G --direction opposite|similar [--k N]  |  moat --gene G --probe GENE1,GENE2,..."},
         {"tool": "emet", "purpose": "Captured BenchSci literature (real PMIDs) for a gene; --live queues a Chrome-worker BenchSci query.", "call": "emet --gene G [--live]"},
         {"tool": "boltz", "purpose": "Boltz-2 structure + binding / druggability for a gene+ligand (REAL, ~80s, ~$0.02).", "call": "boltz --gene G --ligand DRUG"},
         {"tool": "qmodels", "purpose": "Call a Q-Model from the catalog below by id (live-local real; GPU via --gpu-live on AWS).", "call": "qmodels --tool ID --inputs '<json>' [--gpu-live]"},
@@ -466,6 +505,8 @@ def main() -> None:
         help="'opposite' = rescue direction (default); 'similar' = EP-signature mimics",
     )
     m.add_argument("--k", type=int, default=10, help="Max rows to return (default 10)")
+    m.add_argument("--probe", default=None,
+                   help="CSV of genes to check against --gene: each returned as rescue-direction / exacerbate-direction / absent (one call for a whole candidate list)")
 
     e = sub.add_parser("emet", help="Load captured EMET evidence (envelope or rescue-dossier); --live queues a Chrome-worker task")
     e.add_argument("--gene", required=True, help="Gene symbol to look up (e.g. TSC2)")
