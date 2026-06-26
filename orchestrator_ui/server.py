@@ -71,6 +71,8 @@ def _label_for(cmd_str: str, tool_name: str) -> str:
     if "semantic" in c:
         a, g = arg("--agent"), arg("--gene")
         return f"→ semantic agent: {a or '?'}({g})" if (a or g) else "→ semantic agent"
+    if re.search(r"\.py esm\b|\besm --", c):
+        return f"→ ESM (vs {arg('--vs') or 'TSC2'})"
     if "emet" in c:
         g = arg("--gene")
         return f"→ EMET ({g}{', live' if '--live' in c else ''})" if g else "→ EMET"
