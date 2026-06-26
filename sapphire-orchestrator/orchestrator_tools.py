@@ -153,14 +153,17 @@ def _rescue_evidence_for_gene(gene: str) -> list:
         return []
 
 
-def _emet_live_queue(gene: str, query, timeout_s: int = 150) -> dict:
+def _emet_live_queue(gene: str, query, timeout_s: int = 0) -> dict:
     """Live EMET via the persistent Chrome-Claude worker: drop a task on the file queue
     (RohanOnly/emet_queue/tasks/) and poll for the worker's result (results/<id>.json).
 
     The worker (skill: emet-chrome-worker) runs the BenchSci query in the user's AUTHENTICATED
-    Chrome and writes back the envelope. Honest-degrades to found:False if no worker responds.
+    Chrome and writes back the envelope. A real Thorough BenchSci run takes minutes, so we wait up to
+    SAPPHIRE_EMET_TIMEOUT seconds (default 600). Honest-degrades to found:False if no worker responds.
     """
     import time as _time  # noqa: PLC0415
+    if not timeout_s:
+        timeout_s = int(os.environ.get("SAPPHIRE_EMET_TIMEOUT", "600"))
     g = (gene or "").strip()
     try:
         root = Path(__file__).resolve().parents[1]
@@ -210,61 +213,55 @@ def _emet_live_queue(gene: str, query, timeout_s: int = 150) -> dict:
         return {"gene": g, "found": False, "evidence": [], "error": str(exc)}
 
 
+def _captured_emet(gene: str):
+    """Captured EMET evidence for a gene (envelope, then rescue-dossier). Returns the dict or None."""
+    from emet.envelopes import load_envelope_for  # noqa: PLC0415
+    env = load_envelope_for(gene)
+    if env is not None:
+        return {
+            "gene": gene, "found": True, "candidate": env.get("candidate", gene),
+            "verdict": env.get("verdict"), "evidence": env.get("evidence", []),
+            "notes": env.get("notes", ""), "captured_at": env.get("captured_at"),
+            "provenance": "emet-captured", "source": "captured envelope",
+        }
+    rescue_ev = _rescue_evidence_for_gene(gene)
+    if rescue_ev:
+        return {"gene": gene, "found": True, "evidence": rescue_ev,
+                "provenance": "emet-captured", "source": "rescue-dossier (captured)"}
+    return None
+
+
 def cmd_emet(args) -> dict:
-    """Load the pre-captured EMET envelope for a gene (public PMIDs)."""
+    """EMET evidence for a gene. With --live (or SAPPHIRE_EMET_LIVE=1) the connected Chrome-Claude worker
+    runs a REAL BenchSci query (the task is queued and we wait for its cited envelope); captured evidence is
+    the fallback if the worker doesn't respond. Without --live, captured-first (honest abstain if none)."""
     gene = (args.gene or "").strip()
-
+    live = (getattr(args, "live", False)
+            or os.environ.get("SAPPHIRE_EMET_LIVE", "").lower() in ("1", "on", "true"))
     try:
-        from emet.envelopes import load_envelope_for  # noqa: PLC0415
+        if live:
+            # PREFER the live worker — queue the task and wait for its result (this is what reaches your
+            # connected Chrome-Claude). Fall back to captured only if the worker doesn't answer in time.
+            res = _emet_live_queue(gene, getattr(args, "query", None))
+            if res.get("found") and res.get("evidence"):
+                return res
+            cap = _captured_emet(gene)
+            if cap:
+                cap["live_attempted"] = True
+                cap["note"] = "live Chrome worker did not respond in time — fell back to captured evidence"
+                return cap
+            return res  # honest: live attempted, no worker result, no capture either
 
-        env = load_envelope_for(gene)
-        if env is not None:
-            return {
-                "gene": gene,
-                "found": True,
-                "candidate": env.get("candidate", gene),
-                "verdict": env.get("verdict"),
-                "evidence": env.get("evidence", []),   # each has claim + id_or_url
-                "notes": env.get("notes", ""),
-                "captured_at": env.get("captured_at"),
-                "provenance": env.get("provenance", "emet-live"),
-            }
-
-        # Gene-specific evidence captured INSIDE a <target>_rescue dossier (the curated rescue-gene
-        # literature): so `emet --gene DCTN6` surfaces DCTN6's evidence from the TSC2_rescue envelope
-        # instead of abstaining (and the orchestrator no longer needs to fall back to live PubMed).
-        rescue_ev = _rescue_evidence_for_gene(gene)
-        if rescue_ev:
-            return {
-                "gene": gene,
-                "found": True,
-                "evidence": rescue_ev,
-                "provenance": "emet-live",
-                "source": "rescue-dossier (captured)",
-            }
-
-        # Live EMET via the persistent Chrome-Claude worker (opt-in: --live). Drops a task on the
-        # file queue and waits for the worker to run the BenchSci query in the authenticated browser.
-        if getattr(args, "live", False):
-            return _emet_live_queue(gene, getattr(args, "query", None))
-
+        cap = _captured_emet(gene)
+        if cap:
+            return cap
         return {
-            "gene": gene,
-            "found": False,
-            "evidence": [],
-            "note": (
-                f"No captured EMET evidence for '{gene}' — EMET abstains honestly. "
-                "Pass --live (with the Chrome-Claude worker running) for a live BenchSci query."
-            ),
+            "gene": gene, "found": False, "evidence": [],
+            "note": (f"No captured EMET evidence for '{gene}' — EMET abstains honestly. "
+                     "Pass --live (with the Chrome-Claude worker running) for a live BenchSci query."),
         }
-
     except Exception as exc:
-        return {
-            "gene": gene,
-            "found": False,
-            "evidence": [],
-            "error": str(exc),
-        }
+        return {"gene": gene, "found": False, "evidence": [], "error": str(exc)}
 
 
 # ── subcommand: boltz ────────────────────────────────────────────────────────

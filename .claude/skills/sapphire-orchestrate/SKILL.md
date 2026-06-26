@@ -17,7 +17,8 @@ Run: `python sapphire-orchestrator/orchestrator_tools.py moat --gene <GENE> --di
 This returns Quiver's internal EP-signature data: genes whose knock-down opposes the TSC2-KO phenotype (the rescue direction). These are proprietary Quiver predictions. Cite them as "(Quiver moat, rank N, cosine C)".
 
 **Step 3 — Load EMET evidence (ALWAYS for covered genes)**
-Run: `python sapphire-orchestrator/orchestrator_tools.py emet --gene <GENE>` (add `--live` to queue a live BenchSci run via the Chrome worker).
+Run: `python sapphire-orchestrator/orchestrator_tools.py emet --gene <GENE>` for captured evidence.
+**LIVE EMET (a Chrome worker is connected):** call `emet --gene <GENE> --live` for your **TOP 1–3 candidates** — this sends a REAL BenchSci query to the user's connected Chrome-Claude worker and waits for its cited result. A live Thorough run takes **minutes each**, so use `--live` ONLY for your top candidates and plain `emet` (captured) for the rest — say in the trace which genes you're sending live and why. (If the worker doesn't answer in time, the tool falls back to captured automatically and tells you.)
 This returns BenchSci evidence (real PMIDs). EMET is NOT just a paper search — it spans genetics, expression, perturbation/CRISPR, pathways, structure, and clinical data (~70 sources). When you write a live query, follow the **`emet-prompting`** skill: demand FULL breadth (genetic/expression/dependency/pathway/clinical, not just literature) AND **evidence FOR vs AGAINST** — explicitly weigh the risks that sink a target: pleiotropy ("does it do a billion things?"), inflammation/immune liability, toxicity, essentiality (is knockdown lethal?), expression gaps (is it even expressed in CNS?), and gnomAD constraint. If found=true, cite each claim (PMID/DOI) and carry the AGAINST findings forward too; if found=false, note honestly that EMET abstains.
 
 **Step 4 — Enrich (optional): Boltz druggability + Q-Models**
