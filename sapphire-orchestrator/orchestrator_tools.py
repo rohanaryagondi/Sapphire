@@ -640,9 +640,15 @@ def cmd_esm(args) -> dict:
                                              headers={"Content-Type": "application/json"})
                 with urllib.request.urlopen(req, timeout=120) as r:
                     out = json.loads(r.read().decode("utf-8"))
-                ranked = sorted(({"gene": g, "similarity": round(float(v), 4)} for g, v in
-                                 (out.get("neighbors") or out.get("similarities") or {}).items()),
-                                key=lambda x: x["similarity"], reverse=True)
+                # the box returns {"ranked":[{"gene","cosine"}]} (list); accept dict forms too
+                raw_rank = out.get("ranked") or out.get("neighbors") or out.get("similarities") or []
+                if isinstance(raw_rank, dict):
+                    raw_rank = [{"gene": g, "cosine": v} for g, v in raw_rank.items()]
+                ranked = sorted(
+                    ({"gene": r.get("gene"),
+                      "similarity": round(float(r.get("cosine", r.get("similarity", 0))), 4)}
+                     for r in raw_rank if isinstance(r, dict) and r.get("gene")),
+                    key=lambda x: x["similarity"], reverse=True)
                 if ranked:
                     return {"ok": True, "target": target, "neighbors": ranked,
                             "provenance": "esm-live", "model": "ESM-2-650M",
