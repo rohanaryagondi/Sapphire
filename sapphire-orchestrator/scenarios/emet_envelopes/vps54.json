@@ -1,0 +1,15 @@
+{
+  "candidate": "VPS54",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[VPS54] GARP complex / retrograde Golgi trafficking — VERDICT: VERY LIKELY INEFFECTIVE - no mechanistic link to mTORC1. VPS54 tethers retrograde endosome-to-TGN vesicle traffic as part of the GARP complex; essentially no published mechanistic link to mTORC1.",
+      "source": "GARP retrograde trafficking",
+      "id_or_url": "PMID:26539077"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

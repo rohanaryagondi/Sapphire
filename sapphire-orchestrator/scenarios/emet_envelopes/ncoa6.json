@@ -1,0 +1,15 @@
+{
+  "candidate": "NCOA6",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[NCOA6] Nuclear receptor coactivator 6 / PRIP — VERDICT: INEFFECTIVE for mTOR rescue (may modulate NLRP3 inflammasome). NCOA6 has at most an indirect PI3K/AKT/mTOR transcriptional link and is highly constrained; judged ineffective for mTOR rescue (separate NLRP3-inflammasome effect possible).",
+      "source": "NCOA6 PI3K/AKT/mTOR; gnomAD",
+      "id_or_url": "gnomAD:NCOA6"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

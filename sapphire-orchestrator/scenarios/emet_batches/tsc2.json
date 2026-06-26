@@ -1,0 +1,83 @@
+{
+  "perturbation": "TSC2",
+  "evidence": [
+    {
+      "claim": "[MTOR] mTOR kinase (the direct target) — VERDICT: UNAMBIGUOUSLY RESCUE - canonical on-target (severe constraint is the main concern). MTOR is the canonical on-target node; knockdown/inhibition unambiguously normalizes the TSC2-KO/mTORC1 phenotype (STRING direct interactions with RPTOR/RICTOR/RHEB/RPS6KB1/EIF4EBP1 ~0.999); severe gene constraint (pLI~1.0) is the primary tolerability concern.",
+      "source": "STRING (MTOR interactome); gnomAD",
+      "id_or_url": "STRING:MTOR"
+    },
+    {
+      "claim": "[CDK9] Cyclin-dependent kinase 9 / P-TEFb / transcription elongation — VERDICT: MOST PLAUSIBLE RESCUE CANDIDATE - direct mTORC1 pathway intersection, with caveats. CDK9/P-TEFb directly intersects the mTORC1 pathway (transcription elongation control); the blind pass ranks CDK9 the most plausible knockdown-rescue candidate, with on-target toxicity caveats.",
+      "source": "CDK9-mTOR pathway intersection",
+      "id_or_url": "PMID:31300006"
+    },
+    {
+      "claim": "[FZD7] Frizzled class receptor 7 / WNT receptor — VERDICT: PLAUSIBLE PARTIAL RESCUE (context-dependent; potentially worsening via WNT). FZD7 activates Wnt->Dvl->beta-catenin and Wnt->PI3K->mTOR; Wnt/mTOR crosstalk is bidirectional, so FZD7 knockdown could partially dampen mTOR drive in some contexts but may also worsen.",
+      "source": "Wnt/mTOR bidirectional crosstalk",
+      "id_or_url": "PMID:27531477"
+    },
+    {
+      "claim": "[BCL2] Anti-apoptotic regulator / autophagy gate — VERDICT: INEFFECTIVE to WORSENING. BCL2 is a downstream anti-apoptotic effector; mTORC1 suppresses autophagy and BCL2-BECN1-mTOR autophagy crosstalk is extensive, so BCL2 knockdown does not address upstream mTORC1 and may worsen.",
+      "source": "BCL2-BECN1-mTOR autophagy crosstalk",
+      "id_or_url": "PMID:34161185"
+    },
+    {
+      "claim": "[VPS54] GARP complex / retrograde Golgi trafficking — VERDICT: VERY LIKELY INEFFECTIVE - no mechanistic link to mTORC1. VPS54 tethers retrograde endosome-to-TGN vesicle traffic as part of the GARP complex; essentially no published mechanistic link to mTORC1.",
+      "source": "GARP retrograde trafficking",
+      "id_or_url": "PMID:26539077"
+    },
+    {
+      "claim": "[KMT2D] H3K4 methyltransferase / MLL4 complex — VERDICT: INEFFECTIVE TO POTENTIALLY WORSENING - extreme constraint, indirect link. KMT2D and mTOR co-mutate in cancer; KMT2D is extremely constrained, and its loss can derepress mTOR (knockdown may worsen rather than rescue).",
+      "source": "KMT2D/mTOR co-mutation",
+      "id_or_url": "PMID:30641523"
+    },
+    {
+      "claim": "[DPM2] Dolichol-phosphate mannose synthase regulatory subunit — VERDICT: INEFFECTIVE - no mTORC1 mechanistic connection. DPM2 is the most gnomAD-tolerant gene in the panel but has no TSC2/mTORC1 mechanistic basis; any ER-stress-mediated effect is speculative.",
+      "source": "gnomAD constraint; OpenTargets (CDG-Ih)",
+      "id_or_url": "gnomAD+OpenTargets:DPM2"
+    },
+    {
+      "claim": "[RPS3] 40S ribosomal protein S3 — VERDICT: STRONGLY WORSENING - essential ribosome component. RPS3 is an essential ribosomal protein and a downstream effector of mTORC1-driven translation; knockdown would strongly worsen/collapse translation, not rescue. Also has extra-ribosomal DNA-damage/NF-kB roles.",
+      "source": "RPS3 extra-ribosomal functions",
+      "id_or_url": "PMID:32507070"
+    },
+    {
+      "claim": "[SSU72] RNA Pol II CTD phosphatase — VERDICT: INEFFECTIVE - unrelated to mTOR; insertional oncogenesis risk. SSU72 is an RNA Pol II CTD phosphatase facilitating reinitiation/termination; no TSC2/mTOR link in STRING/Reactome/literature.",
+      "source": "RNA Pol II CTD phosphatase",
+      "id_or_url": "PMID:15125841"
+    },
+    {
+      "claim": "[DIDO1] Death inducer-obliterator 1 / chromatin factor — VERDICT: INEFFECTIVE - chromatin regulator; no mTOR basis. DIDO1 is a highly constrained H3K4me3 reader / splicing factor with obesity-linked biology and no TSC2/mTOR mechanistic connection.",
+      "source": "gnomAD; OpenTargets",
+      "id_or_url": "gnomAD:DIDO1"
+    },
+    {
+      "claim": "[ACTR3] Arp3 / Arp2/3 branched-actin nucleation — VERDICT: WORSENING - essential cytoskeletal gene. ACTR3 (Arp3) is a pan-essential cytoskeletal nucleator; knockdown impairs cytokinesis/endocytosis globally with no mTOR rescue mechanism (knockdown lethal).",
+      "source": "CCLE/DepMap; gnomAD",
+      "id_or_url": "CCLE+gnomAD:ACTR3-essential"
+    },
+    {
+      "claim": "[NCOA6] Nuclear receptor coactivator 6 / PRIP — VERDICT: INEFFECTIVE for mTOR rescue (may modulate NLRP3 inflammasome). NCOA6 has at most an indirect PI3K/AKT/mTOR transcriptional link and is highly constrained; judged ineffective for mTOR rescue (separate NLRP3-inflammasome effect possible).",
+      "source": "NCOA6 PI3K/AKT/mTOR; gnomAD",
+      "id_or_url": "gnomAD:NCOA6"
+    },
+    {
+      "claim": "[SMARCE1] SWI/SNF (BAF) chromatin remodeler subunit — VERDICT: INEFFECTIVE; potential independent oncogenic risk. In clear-cell meningioma SMARCE1 LOSS activates mTOR, so SMARCE1 knockdown would tend to worsen mTOR; highly constrained tumor-suppressor context.",
+      "source": "SMARCE1 meningioma / mTOR",
+      "id_or_url": "PMID:39577862"
+    },
+    {
+      "claim": "[SAP18] Sin3A-associated protein 18 / ASAP splicing complex — VERDICT: INEFFECTIVE - no mTOR basis; high brain expression = toxicity concern. SAP18 is a splicing/transcription factor with no mTOR mechanistic basis and very high CNS expression, so knockdown raises neurotoxicity/confounding concerns rather than rescue.",
+      "source": "GTEx (CNS expression); STRING",
+      "id_or_url": "GTEx:SAP18"
+    },
+    {
+      "claim": "[PSMD13] 26S proteasome regulatory subunit (Rpn9) — VERDICT: WORSENING - pan-essential proteasome component. PSMD13 (Rpn9) is a pan-essential 26S proteasome subunit; mTORC1 hyperactivation already stresses proteostasis, so PSMD13 knockdown worsens proteostatic collapse rather than rescuing.",
+      "source": "26S proteasome / proteostasis",
+      "id_or_url": "UniProt:PSMD13-RPN9"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker blind batch"
+}

@@ -1,0 +1,15 @@
+{
+  "candidate": "FZD7",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[FZD7] Frizzled class receptor 7 / WNT receptor — VERDICT: PLAUSIBLE PARTIAL RESCUE (context-dependent; potentially worsening via WNT). FZD7 activates Wnt->Dvl->beta-catenin and Wnt->PI3K->mTOR; Wnt/mTOR crosstalk is bidirectional, so FZD7 knockdown could partially dampen mTOR drive in some contexts but may also worsen.",
+      "source": "Wnt/mTOR bidirectional crosstalk",
+      "id_or_url": "PMID:27531477"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

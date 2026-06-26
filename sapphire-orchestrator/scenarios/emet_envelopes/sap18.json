@@ -1,0 +1,15 @@
+{
+  "candidate": "SAP18",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[SAP18] Sin3A-associated protein 18 / ASAP splicing complex — VERDICT: INEFFECTIVE - no mTOR basis; high brain expression = toxicity concern. SAP18 is a splicing/transcription factor with no mTOR mechanistic basis and very high CNS expression, so knockdown raises neurotoxicity/confounding concerns rather than rescue.",
+      "source": "GTEx (CNS expression); STRING",
+      "id_or_url": "GTEx:SAP18"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

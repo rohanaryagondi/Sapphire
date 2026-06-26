@@ -1,0 +1,15 @@
+{
+  "candidate": "SMARCE1",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[SMARCE1] SWI/SNF (BAF) chromatin remodeler subunit — VERDICT: INEFFECTIVE; potential independent oncogenic risk. In clear-cell meningioma SMARCE1 LOSS activates mTOR, so SMARCE1 knockdown would tend to worsen mTOR; highly constrained tumor-suppressor context.",
+      "source": "SMARCE1 meningioma / mTOR",
+      "id_or_url": "PMID:39577862"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

@@ -1,0 +1,15 @@
+{
+  "candidate": "DPM2",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[DPM2] Dolichol-phosphate mannose synthase regulatory subunit — VERDICT: INEFFECTIVE - no mTORC1 mechanistic connection. DPM2 is the most gnomAD-tolerant gene in the panel but has no TSC2/mTORC1 mechanistic basis; any ER-stress-mediated effect is speculative.",
+      "source": "gnomAD constraint; OpenTargets (CDG-Ih)",
+      "id_or_url": "gnomAD+OpenTargets:DPM2"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

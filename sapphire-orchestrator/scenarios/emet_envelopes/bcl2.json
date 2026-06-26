@@ -1,0 +1,15 @@
+{
+  "candidate": "BCL2",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[BCL2] Anti-apoptotic regulator / autophagy gate — VERDICT: INEFFECTIVE to WORSENING. BCL2 is a downstream anti-apoptotic effector; mTORC1 suppresses autophagy and BCL2-BECN1-mTOR autophagy crosstalk is extensive, so BCL2 knockdown does not address upstream mTORC1 and may worsen.",
+      "source": "BCL2-BECN1-mTOR autophagy crosstalk",
+      "id_or_url": "PMID:34161185"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

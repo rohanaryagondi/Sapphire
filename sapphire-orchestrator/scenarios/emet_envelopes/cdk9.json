@@ -1,0 +1,15 @@
+{
+  "candidate": "CDK9",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[CDK9] Cyclin-dependent kinase 9 / P-TEFb / transcription elongation — VERDICT: MOST PLAUSIBLE RESCUE CANDIDATE - direct mTORC1 pathway intersection, with caveats. CDK9/P-TEFb directly intersects the mTORC1 pathway (transcription elongation control); the blind pass ranks CDK9 the most plausible knockdown-rescue candidate, with on-target toxicity caveats.",
+      "source": "CDK9-mTOR pathway intersection",
+      "id_or_url": "PMID:31300006"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

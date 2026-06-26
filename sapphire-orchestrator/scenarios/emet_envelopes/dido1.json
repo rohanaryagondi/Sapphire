@@ -1,0 +1,15 @@
+{
+  "candidate": "DIDO1",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[DIDO1] Death inducer-obliterator 1 / chromatin factor — VERDICT: INEFFECTIVE - chromatin regulator; no mTOR basis. DIDO1 is a highly constrained H3K4me3 reader / splicing factor with obesity-linked biology and no TSC2/mTOR mechanistic connection.",
+      "source": "gnomAD; OpenTargets",
+      "id_or_url": "gnomAD:DIDO1"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

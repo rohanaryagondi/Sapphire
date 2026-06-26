@@ -1,0 +1,15 @@
+{
+  "candidate": "RPS3",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[RPS3] 40S ribosomal protein S3 — VERDICT: STRONGLY WORSENING - essential ribosome component. RPS3 is an essential ribosomal protein and a downstream effector of mTORC1-driven translation; knockdown would strongly worsen/collapse translation, not rescue. Also has extra-ribosomal DNA-damage/NF-kB roles.",
+      "source": "RPS3 extra-ribosomal functions",
+      "id_or_url": "PMID:32507070"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

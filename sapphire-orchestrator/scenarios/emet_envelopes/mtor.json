@@ -1,0 +1,15 @@
+{
+  "candidate": "MTOR",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[MTOR] mTOR kinase (the direct target) — VERDICT: UNAMBIGUOUSLY RESCUE - canonical on-target (severe constraint is the main concern). MTOR is the canonical on-target node; knockdown/inhibition unambiguously normalizes the TSC2-KO/mTORC1 phenotype (STRING direct interactions with RPTOR/RICTOR/RHEB/RPS6KB1/EIF4EBP1 ~0.999); severe gene constraint (pLI~1.0) is the primary tolerability concern.",
+      "source": "STRING (MTOR interactome); gnomAD",
+      "id_or_url": "STRING:MTOR"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

@@ -1,0 +1,15 @@
+{
+  "candidate": "ACTR3",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[ACTR3] Arp3 / Arp2/3 branched-actin nucleation — VERDICT: WORSENING - essential cytoskeletal gene. ACTR3 (Arp3) is a pan-essential cytoskeletal nucleator; knockdown impairs cytokinesis/endocytosis globally with no mTOR rescue mechanism (knockdown lethal).",
+      "source": "CCLE/DepMap; gnomAD",
+      "id_or_url": "CCLE+gnomAD:ACTR3-essential"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

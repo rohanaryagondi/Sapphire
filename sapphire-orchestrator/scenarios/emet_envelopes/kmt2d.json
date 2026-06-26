@@ -1,0 +1,15 @@
+{
+  "candidate": "KMT2D",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[KMT2D] H3K4 methyltransferase / MLL4 complex — VERDICT: INEFFECTIVE TO POTENTIALLY WORSENING - extreme constraint, indirect link. KMT2D and mTOR co-mutate in cancer; KMT2D is extremely constrained, and its loss can derepress mTOR (knockdown may worsen rather than rescue).",
+      "source": "KMT2D/mTOR co-mutation",
+      "id_or_url": "PMID:30641523"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}

@@ -1,0 +1,15 @@
+{
+  "candidate": "SSU72",
+  "emet_workflow": "Target Validation",
+  "verdict": "flag",
+  "evidence": [
+    {
+      "claim": "[SSU72] RNA Pol II CTD phosphatase — VERDICT: INEFFECTIVE - unrelated to mTOR; insertional oncogenesis risk. SSU72 is an RNA Pol II CTD phosphatase facilitating reinitiation/termination; no TSC2/mTOR link in STRING/Reactome/literature.",
+      "source": "RNA Pol II CTD phosphatase",
+      "id_or_url": "PMID:15125841"
+    }
+  ],
+  "provenance": "emet-live",
+  "captured_at": "2026-06-26T04:03:02Z",
+  "source": "live worker (blind batch)"
+}
