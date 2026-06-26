@@ -319,6 +319,41 @@ def cmd_qmodels(args) -> dict:
         return {"ok": False, "tool_id": tool_id, "provenance": "unavailable", "error": str(exc)}
 
 
+# ── subcommand: catalog (tool/model discovery) ───────────────────────────────
+
+def cmd_catalog(args) -> dict:
+    """List EVERY tool + Q-Model the orchestrator can call, so it can DISCOVER and pick the right
+    one for any question (this is what makes it flexible — e.g. map 'use ESM' → esm2). Honest about
+    what's runnable now vs gated."""
+    core = [
+        {"tool": "moat", "purpose": "Quiver internal moat — rescue (opposite) / similar genes for a target; curated predictions where available.", "call": "moat --gene G --direction opposite|similar [--k N]"},
+        {"tool": "emet", "purpose": "Captured BenchSci literature (real PMIDs) for a gene; --live queues a Chrome-worker BenchSci query.", "call": "emet --gene G [--live]"},
+        {"tool": "boltz", "purpose": "Boltz-2 structure + binding / druggability for a gene+ligand (REAL, ~80s, ~$0.02).", "call": "boltz --gene G --ligand DRUG"},
+        {"tool": "qmodels", "purpose": "Call a Q-Model from the catalog below by id.", "call": "qmodels --tool ID --inputs '<json>'"},
+        {"tool": "catalog", "purpose": "This list — discover available tools + models.", "call": "catalog"},
+    ]
+    models = []
+    try:
+        reg = json.loads((Path(__file__).resolve().parent / "qmodels" / "registry.json").read_text(encoding="utf-8"))
+        for m in reg.get("models", []):
+            st = str(m.get("status", "")); tier = str(m.get("tier", ""))
+            runs_now = st in ("live-local", "live")
+            note = ("runs now (local-cpu)" if st == "live-local" else
+                    "runs now" if st == "live" else
+                    "GPU — gated off by default (set QMODELS_GPU=on + run the launcher to enable)"
+                    if (tier.startswith("gpu") or st == "gpu-unproven") else
+                    f"{st} — not callable")
+            models.append({"id": m.get("id"), "name": m.get("name"), "task": m.get("task"),
+                           "status": st, "inputs": m.get("inputs", []), "outputs": m.get("outputs", []),
+                           "runnable_now": runs_now, "note": note})
+    except Exception as exc:
+        models = [{"error": str(exc)}]
+    return {"tools": core, "qmodels": models,
+            "hint": ("For an embedding / nearest-gene question, esm2 (task=embedding, outputs embedding+nn_recall) "
+                     "is the model — currently GPU-gated. live-local/live models run now; GPU models are gated for "
+                     "safety. If a needed model is gated, call it anyway and report HONESTLY that it's gated — never fabricate its output.")}
+
+
 # ── CLI entrypoint ────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -354,8 +389,11 @@ def main() -> None:
     q.add_argument("--tool", required=True, help="Q-Model tool id (e.g. chemberta2, boltz2, esm2)")
     q.add_argument("--inputs", default="", help="JSON inputs for the tool")
 
+    sub.add_parser("catalog", help="List all tools + Q-Models (discover what's available + what's runnable)")
+
     args = ap.parse_args()
-    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz, "qmodels": cmd_qmodels}
+    dispatch = {"moat": cmd_moat, "emet": cmd_emet, "boltz": cmd_boltz,
+                "qmodels": cmd_qmodels, "catalog": cmd_catalog}
     result = dispatch[args.cmd](args)
     print(json.dumps(result, default=str, ensure_ascii=False))
 
