@@ -264,7 +264,7 @@
     const genes = data.ranked_genes || [];
     if (genes.length) {
       let html = '<div class="ranked-genes">';
-      html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">Quiver moat (primary) · EMET support · LLM reasoning</span></div>';
+      html += '<div class="rg-lbl">Ranked Rescue Genes <span class="rg-sub">EMET evidence (primary) · Quiver moat corroboration · LLM reasoning</span></div>';
       html += '<table class="rg-table"><thead><tr>';
       html += '<th>#</th><th>Gene</th><th>Quiver moat</th><th>EMET support</th><th>Mechanism</th><th>Conf</th>';
       html += '</tr></thead><tbody>';

@@ -543,20 +543,17 @@ def _extract_json_obj(text):
     return None
 
 
-def cmd_semantic(args) -> dict:
-    """Spawn a cheap claude-haiku semantic scientific agent to analyse ONE dimension for a gene. The
-    orchestrator decides which agents/genes to call. This is REAL LLM reasoning (labelled semantic-haiku —
-    inference, not a cited DB fact); it weighs evidence FOR vs AGAINST and abstains rather than fabricate."""
-    agent = (getattr(args, "agent", "") or "").strip().lower()
+def _run_semantic(agent: str, gene: str, question: str = "", context: str = "") -> dict:
+    """Run ONE claude-haiku semantic agent. Real LLM reasoning (provenance semantic-haiku)."""
+    agent = (agent or "").strip().lower()
     role = SEMANTIC_AGENTS.get(agent)
     if not role:
         return {"ok": False, "error": f"unknown semantic agent '{agent}'", "available": list(SEMANTIC_AGENTS)}
-    gene = (getattr(args, "gene", "") or "").strip()
-    question = (getattr(args, "question", "") or "").strip()
-    context = (getattr(args, "context", "") or "").strip()[:1800]  # public cited facts only
+    gene = (gene or "").strip()
+    context = (context or "").strip()[:1800]  # public cited facts only
     prompt = (
         f"You are a {role} on a CNS drug-discovery team. Analyse ONLY your dimension for gene {gene}.\n"
-        f"Team question: {question or 'rank genes that rescue the TSC2-KO / mTORC1-hyperactivation phenotype'}\n"
+        f"Team question: {(question or '').strip() or 'rank genes that rescue the TSC2-KO / mTORC1-hyperactivation phenotype'}\n"
         f"Your focus: {_SEM_FOCUS.get(agent, '')}\n"
         + (f"Cited evidence available (public, from EMET): {context}\n" if context else "")
         + "Weigh evidence FOR vs AGAINST honestly. If unsure or lacking evidence, say so (verdict=neutral, "
@@ -572,16 +569,36 @@ def cmd_semantic(args) -> dict:
         return {"ok": False, "agent": agent, "gene": gene, "provenance": "semantic-haiku",
                 "error": f"haiku call failed: {exc}"}
     raw = (proc.stdout or "").strip()
-    result_text = raw
     env = _extract_json_obj(raw)
-    if isinstance(env, dict) and "result" in env:
-        result_text = env.get("result", raw)
+    result_text = env.get("result", raw) if isinstance(env, dict) and "result" in env else raw
     finding = _extract_json_obj(result_text)
     if not isinstance(finding, dict):
         finding = {"finding": (result_text or "(no output)")[:400], "verdict": "neutral", "confidence": "low"}
     finding.update({"ok": True, "agent": agent, "gene": gene,
                     "provenance": "semantic-haiku", "model": "claude-haiku-4-5"})
     return finding
+
+
+def cmd_semantic(args) -> dict:
+    """Cheap claude-haiku semantic scientific agent(s). Single: --agent/--gene/--context. PARALLEL batch:
+    --batch '[{"agent","gene","context"}, …]' runs them all CONCURRENTLY (one wave, ~one agent's wall-time)."""
+    batch = getattr(args, "batch", None)
+    if batch:
+        try:
+            items = json.loads(batch)
+            assert isinstance(items, list)
+        except Exception as exc:
+            return {"ok": False, "error": f"--batch must be a JSON list of {{agent,gene,context}}: {exc}"}
+        from concurrent.futures import ThreadPoolExecutor  # noqa: PLC0415
+        q = (getattr(args, "question", "") or "")
+        with ThreadPoolExecutor(max_workers=min(8, max(1, len(items)))) as ex:
+            results = list(ex.map(
+                lambda it: _run_semantic(it.get("agent"), it.get("gene"),
+                                         it.get("question", q), it.get("context", "")),
+                items))
+        return {"ok": True, "batch": True, "n": len(results), "results": results, "provenance": "semantic-haiku"}
+    return _run_semantic(getattr(args, "agent", ""), getattr(args, "gene", ""),
+                         getattr(args, "question", ""), getattr(args, "context", ""))
 
 
 # ── subcommand: esm (gene/protein embedding similarity — the gene-specific enrichment) ───────
@@ -764,11 +781,13 @@ def main() -> None:
     q.add_argument("--gpu-live", action="store_true",
                    help="For a GPU model (esm2/boltz2/balm): ACTUALLY launch on AWS (real cost ~$0.13, auto-teardown, every guard). Default off → honest gpu-disabled.")
 
-    s = sub.add_parser("semantic", help="Spawn a cheap claude-haiku semantic scientific agent for one dimension")
-    s.add_argument("--agent", required=True, help="dimension: " + " | ".join(SEMANTIC_AGENTS))
-    s.add_argument("--gene", required=True, help="gene symbol (public)")
+    s = sub.add_parser("semantic", help="Cheap claude-haiku semantic agent(s); --batch runs many in PARALLEL")
+    s.add_argument("--agent", help="dimension: " + " | ".join(SEMANTIC_AGENTS))
+    s.add_argument("--gene", help="gene symbol (public)")
     s.add_argument("--question", default="", help="the team question for context")
     s.add_argument("--context", default="", help="cited public facts (e.g. EMET evidence) for the agent to weigh")
+    s.add_argument("--batch", default=None,
+                   help="JSON list of {agent,gene,context} — runs them all CONCURRENTLY (fast). e.g. '[{\"agent\":\"mechanism\",\"gene\":\"CDK9\",\"context\":\"...\"}]'")
 
     x = sub.add_parser("esm", help="ESM-2 embedding similarity of genes to a target (gene/protein enrichment)")
     x.add_argument("--genes", default=None, help="CSV of gene symbols to rank by similarity to --vs")

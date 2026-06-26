@@ -103,6 +103,10 @@ def _summarize_result(text: str) -> str:
     def _g(x):  # gene label from a dict-or-str item
         return str(x.get("gene", x) if isinstance(x, dict) else x)
 
+    if isinstance(d.get("results"), list) and d.get("batch"):     # parallel semantic batch
+        rs = d["results"]
+        return f"{len(rs)} semantic verdicts: " + ", ".join(
+            f"{r.get('agent')}({r.get('gene')})={r.get('verdict')}" for r in rs[:6] if isinstance(r, dict))
     if "verdict" in d:                                            # semantic agent
         return f"{d.get('verdict')} ({d.get('confidence', '?')}) — {str(d.get('finding', ''))[:200]}"
     if isinstance(d.get("neighbors"), list):                      # ESM
@@ -193,6 +197,11 @@ def _format_full(text: str) -> str:
         L.append(f"ESM-2 embedding similarity to {d.get('target')}  ({prov or ''})")
         for n in d["neighbors"]:
             L.append(f"• {n.get('gene')} — {n.get('similarity')}")
+    elif isinstance(d.get("results"), list) and d.get("batch"):   # parallel semantic batch, in full
+        L.append(f"{len(d['results'])} semantic-agent verdicts (run in parallel):")
+        for r in d["results"]:
+            if isinstance(r, dict):
+                L.append(f"• {r.get('agent')}({r.get('gene')}) — {r.get('verdict')} ({r.get('confidence')}): {str(r.get('finding', ''))}")
     elif "verdict" in d:                                          # semantic agent, in full
         L.append(f"{d.get('agent', 'semantic')}({d.get('gene', '')}) — VERDICT: {d.get('verdict')} (confidence {d.get('confidence')})")
         L.append(str(d.get("finding", "")))
