@@ -26,6 +26,24 @@ if str(_HERE) not in sys.path:
 
 # ── subcommand: moat ─────────────────────────────────────────────────────────
 
+def _quiver_predictions(gene: str) -> list:
+    """Quiver's CURATED rescue predictions for <gene>, from the <gene>_rescue dossier `candidates`
+    (each {gene, moat_rank}). Returns [{gene, rank, cosine, curated}] or []. These are the validated
+    predictions that align with the captured EMET evidence — preferred over the raw moat top for the
+    rescue direction so the orchestrator ranks the validated set. Never raises."""
+    try:
+        from emet.envelopes import load_envelope_for  # noqa: PLC0415
+        env = load_envelope_for(f"{gene}_rescue")
+        out = []
+        for c in (env or {}).get("candidates", []) or []:
+            g = c.get("gene")
+            if g:
+                out.append({"gene": g, "rank": c.get("moat_rank"), "cosine": None, "curated": True})
+        return out
+    except Exception:
+        return []
+
+
 def cmd_moat(args) -> dict:
     """Query the Quiver internal moat for rescue / similar genes."""
     gene = (args.gene or "").strip().upper()
@@ -71,12 +89,20 @@ def cmd_moat(args) -> dict:
             for r in similar_raw
         ]
 
+        # For the rescue direction, PREFER Quiver's curated validated predictions (the <gene>_rescue
+        # dossier) over the raw moat top — these align with the captured EMET evidence, so the
+        # orchestrator ranks the validated set and its per-gene EMET lookups hit the captured dossier.
+        curated = _quiver_predictions(gene) if direction == "opposite" else []
+        if curated:
+            rescuers = curated
+
         return {
             "gene": gene,
             "available": True,
             "direction": direction,
             "rescuers": rescuers,
             "similar": similar,
+            "curated_predictions": bool(curated),
             "provenance": "moat-real",
         }
 
