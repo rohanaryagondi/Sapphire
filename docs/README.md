@@ -19,6 +19,10 @@ top-level [`CLAUDE.md`](../CLAUDE.md); for the deepest system walkthrough read
 4. [`ARCHITECTURE.md`](ARCHITECTURE.md) — **consolidated end-to-end architecture** (contracts → harness → agents → engagement loop → memory/self-improvement → console).
 5. [`reports/HANDOFF.md`](reports/HANDOFF.md) — vision, decisions + rationale, status. (Live state: [`status/OVERALL.md`](../status/OVERALL.md); north star: [`VISION.md`](VISION.md).)
 
+> **Building toward the future state?** [`plan/`](plan/README.md) is the **living architecture blueprint** —
+> the end-to-end target flow, the tool-seam pattern, the ASO Design worked example, and the open decisions.
+> (`ARCHITECTURE.md` = current state; `plan/` = where we're going.)
+
 ## 2. Build phases (what's done)
 | Phase | What | Status |
 |---|---|---|
