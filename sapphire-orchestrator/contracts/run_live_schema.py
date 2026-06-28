@@ -78,6 +78,7 @@ RUN_LIVE_SCHEMA = {
                 "modality": {"type": "string"},
                 "agents": {"type": "array"},
                 "panel": {"type": "array"},
+                "class": {"type": "string"},
             },
         },
         "priors": {"type": "array"},

@@ -1868,5 +1868,158 @@ class TestLiveProgress(unittest.TestCase):
         self.assertLess(first_progress, close_idx)
 
 
+class TestPhaseADoD(unittest.TestCase):
+    """Phase A Definition of Done checks:
+    1. run_live output shape matches canned path (round1 + round2 + spread).
+    2. All 13 semantic agents dispatch.
+    3. A VETO fact provably forces adjudication.
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _run(self, query="Is TSC2 a viable target in tuberous sclerosis?", ctx=None):
+        return run_live(query, ctx=ctx or _build_ctx())
+
+    # DoD check 1: run_live shape matches canned path
+    def test_consult_has_round2_and_spread(self):
+        """run_live must return consult with round1, round2, and spread (matching canned shape)."""
+        result = self._run()
+        consult = result["consult"]
+        self.assertIn("round1", consult, "consult missing round1")
+        self.assertIn("round2", consult, "consult missing round2 — Phase A not done")
+        self.assertIn("spread", consult, "consult missing spread — Phase A not done")
+        # round2 is a list of rebuttal entries
+        self.assertIsInstance(consult["round2"], list)
+        # spread has the expected subkeys
+        spread = consult["spread"]
+        for key in ("conviction_range", "stance_mix", "moved_in_round2", "convergent_gate"):
+            self.assertIn(key, spread, f"spread missing key {key!r}")
+
+    def test_round2_entries_have_revised_and_shift(self):
+        """round2 entries must carry revised (bool) and shift (str)."""
+        result = self._run()
+        round2 = result["consult"]["round2"]
+        self.assertTrue(len(round2) > 0, "round2 must be non-empty")
+        for entry in round2:
+            self.assertIn("persona", entry)
+            self.assertIn("revised", entry)
+            self.assertIn("conviction", entry)
+            self.assertIn("shift", entry)
+            self.assertIsInstance(entry["revised"], bool)
+
+    # DoD check 2: all 13 semantic agents dispatch
+    def test_all_13_semantic_agents_dispatch(self):
+        """All 13 semantic agents must appear in discover.agents."""
+        SEMANTIC_13 = {
+            "fda-institutional-memory", "patent-ip", "global-regulatory-divergence",
+            "dea-scheduling", "clinical-trial-registry", "post-market-safety",
+            "financial", "payer", "manufacturing-cmc", "patient-advocacy",
+            "kol-social", "policy-legislative", "reputational",
+        }
+        result = self._run()
+        dispatched_ids = {a["id"] for a in result["discover"]["agents"]}
+        missing = SEMANTIC_13 - dispatched_ids
+        self.assertEqual(
+            missing, set(),
+            f"These semantic agents did not dispatch: {missing}. "
+            f"Got: {sorted(dispatched_ids)}"
+        )
+
+    # DoD check 3: VETO fact forces adjudication
+    def test_veto_fact_forces_adjudication(self):
+        """When a Bucket-1 agent returns a VETO fact, consult must carry adjudication
+        with veto_facts surfaced. This proves the VETO-as-gate path fires."""
+        # Build a ctx that injects a VETO fact from fda-institutional-memory.
+        ctx = _build_ctx()
+
+        _original_runner = ctx["runner"]
+        def _veto_runner(cmd):
+            # Detect if this is the fda-institutional-memory call by schema content
+            schema_str = ""
+            for i, tok in enumerate(cmd):
+                if tok == "--json-schema" and i + 1 < len(cmd):
+                    schema_str = cmd[i + 1]
+                    break
+            prompt_str = ""
+            for i, tok in enumerate(cmd):
+                if tok == "-p" and i + 1 < len(cmd):
+                    prompt_str = cmd[i + 1]
+                    break
+            # If fda-institutional-memory is in the prompt, return a VETO fact.
+            if "fda-institutional-memory" in prompt_str or "fda" in prompt_str.lower():
+                obj = {
+                    "candidate": "TSC2",
+                    "facts": [
+                        {"value": "Prior CRL on mTOR inhibitor class for CNS (2019)",
+                         "source": "FDA.gov", "tier": "T1", "flag": "VETO",
+                         "provenance": "fda-primary"}
+                    ],
+                    "provenance": "fda-primary",
+                }
+                return types.SimpleNamespace(
+                    stdout=json.dumps({"structured_output": obj}),
+                    returncode=0, stderr=""
+                )
+            return _original_runner(cmd)
+
+        ctx["runner"] = _veto_runner
+
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
+
+        # VETO must be in discover.flags
+        veto_flags = result["discover"]["flags"]["VETO"]
+        self.assertTrue(len(veto_flags) >= 1,
+                        f"Expected ≥1 VETO flag; got {veto_flags}")
+
+        # consult must carry adjudication when veto_flags is non-empty
+        consult = result["consult"]
+        self.assertIn("adjudication", consult,
+                      "consult missing 'adjudication' key when VETO facts present")
+        adj = consult["adjudication"]
+        self.assertIn("veto_facts", adj)
+        self.assertEqual(adj["n_veto"], len(veto_flags))
+        self.assertGreater(adj["n_veto"], 0)
+
+    def test_plan_has_capability_class(self):
+        """The plan must carry a 'class' field ∈ {diligence, design, experiment}."""
+        result = self._run()
+        plan = result["plan"]
+        self.assertIn("class", plan, "plan missing 'class' field — Phase A not done")
+        self.assertIn(plan["class"], {"diligence", "design", "experiment"},
+                      f"plan.class must be one of diligence/design/experiment; got {plan['class']!r}")
+
+    def test_plan_class_design_for_design_query(self):
+        """A query containing 'design' should yield plan.class == 'design'."""
+        result = run_live(
+            "Design an ASO targeting TSC2 for tuberous sclerosis.",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "design")
+
+    def test_plan_class_experiment_for_experiment_query(self):
+        """A query containing an experiment keyword should yield plan.class == 'experiment'."""
+        result = run_live(
+            "Validate TSC2 as a target in vivo in a mouse model.",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "experiment")
+
+    def test_plan_class_default_diligence(self):
+        """A generic diligence query should default to plan.class == 'diligence'."""
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "diligence")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

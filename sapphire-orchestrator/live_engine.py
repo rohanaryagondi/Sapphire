@@ -46,6 +46,18 @@ _BUCKET1_AGENTS = [
     "clinical-trial-registry",
     "post-market-safety",
     "payer",
+    # DEA scheduling classification — controlled-substance regulatory constraint.
+    "dea-scheduling",
+    # Manufacturing / CMC readiness — supply chain and formulation feasibility.
+    "manufacturing-cmc",
+    # Patient advocacy landscape — patient community sentiment and unmet need.
+    "patient-advocacy",
+    # KOL / social signal — expert opinion and pre-publication intelligence.
+    "kol-social",
+    # Policy / legislative environment — congressional and regulatory policy trends.
+    "policy-legislative",
+    # Reputational risk screen — press, litigation, and ESG signal.
+    "reputational",
     "financial",
     # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
     # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
@@ -680,6 +692,17 @@ def run_live(
     # -----------------------------------------------------------------------
     # 5. Bucket 2 — persona partners (one harness.run per seated persona)
     # -----------------------------------------------------------------------
+    # VETO gate: when VETO facts are present, surface them as first-class
+    # adjudication input into every persona's round-1 dispatch, and record a
+    # trace landmark so the gate is auditable mid-run.
+    veto_is_active = bool(veto_flags)
+    if veto_is_active:
+        trace.record(eid, {
+            "type": "veto_gate",
+            "veto_facts": veto_flags,
+            "n_veto": len(veto_flags),
+        })
+
     round1: list[dict] = []
 
     for p in panel:
@@ -687,9 +710,13 @@ def run_live(
         lens = p.get("lens", "")
 
         # Build a compact dossier field list for the partner to reference.
-        dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[
-            :10
-        ]
+        dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+        # VETO gate: when active, prepend VETO-adjudication markers so the
+        # persona receives the gate condition as first-class input (capped to 12).
+        if veto_is_active:
+            veto_markers = ["[VETO ADJUDICATION] " + v[:80] for v in veto_flags]
+            dossier_fields = (veto_markers + dossier_fields)[:12]
 
         if "company-partner" not in known_ids:
             continue
@@ -699,13 +726,17 @@ def run_live(
                                  "phase": "start", "round": 1})
         _t0 = time.monotonic()
 
+        persona_inputs: dict = {
+            "persona": persona_name,
+            "lens": lens,
+            "dossier_fields": dossier_fields,
+        }
+        if veto_is_active:
+            persona_inputs["veto_adjudication"] = veto_flags
+
         res = harness.run(
             "company-partner",
-            {
-                "persona": persona_name,
-                "lens": lens,
-                "dossier_fields": dossier_fields,
-            },
+            persona_inputs,
             engagement_id=eid,
             ctx={**ctx, "dossier_fields": dossier_fields},
             registry=registry,
@@ -737,6 +768,126 @@ def run_live(
             "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
             "elapsed_s": _elapsed,
         })
+
+    # -----------------------------------------------------------------------
+    # 5b. Bucket 2 — Round 2 (rebuttal) + spread
+    # -----------------------------------------------------------------------
+    # Compact round-1 summary threaded into each persona's round-2 prompt so
+    # they can revise or reaffirm in light of their peers' initial verdicts.
+    round1_verdicts = [
+        {
+            "persona": v.get("persona", ""),
+            "stance": v.get("stance", "hold"),
+            "conviction": v.get("conviction", 0),
+            "rationale": (v.get("rationale") or "")[:150],
+        }
+        for v in round1
+        if isinstance(v, dict)
+    ]
+
+    round2: list[dict] = []
+
+    for p in panel:
+        persona_name = p.get("persona", "")
+        lens = p.get("lens", "")
+
+        dossier_fields_r2 = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+        if "company-partner" not in known_ids:
+            continue
+
+        # Locate this persona's round-1 entry for comparison (revised detection).
+        r1_verdict = next(
+            (v for v in round1 if v.get("persona") == persona_name), {}
+        )
+        r1_stance = r1_verdict.get("stance", "hold")
+        r1_conviction = r1_verdict.get("conviction", 0)
+
+        # Live progress: round-2 rebuttal starting (distinct phase name — must not
+        # collide with "start"/"done" so the existing stage-order test keeps passing).
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name,
+            "phase": "rebuttal_start", "round": 2,
+        })
+        _t0 = time.monotonic()
+
+        res = harness.run(
+            "company-partner",
+            {
+                "persona": persona_name,
+                "lens": lens,
+                "dossier_fields": dossier_fields_r2,
+                "round1_verdicts": round1_verdicts,
+            },
+            engagement_id=eid,
+            ctx={**ctx, "dossier_fields": dossier_fields_r2},
+            registry=registry,
+        )
+
+        _elapsed = round(time.monotonic() - _t0, 2)
+
+        if res.ok and res.output:
+            r2_stance = res.output.get("stance", "hold")
+            r2_conviction = res.output.get("conviction", 0)
+            r2_rationale = res.output.get("rationale", "")
+        else:
+            r2_stance = r1_stance
+            r2_conviction = r1_conviction
+            r2_rationale = f"abstained ({res.error or 'unknown'})"
+
+        revised = (r2_conviction != r1_conviction or r2_stance != r1_stance)
+        shift = r2_rationale[:200]
+
+        rebuttal_entry: dict = {
+            "persona": persona_name,
+            "revised": revised,
+            "conviction": r2_conviction,
+            "shift": shift,
+        }
+        round2.append(rebuttal_entry)
+
+        # Live progress: rebuttal landed (distinct phase so stage-order filters are unaffected).
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name,
+            "phase": "rebuttal_done", "round": 2,
+            "revised": revised, "conviction": r2_conviction,
+            "elapsed_s": _elapsed,
+        })
+
+    # Spread computation — based on round-1 convictions and stances.
+    r1_convictions = [
+        v.get("conviction", 0)
+        for v in round1
+        if isinstance(v, dict) and isinstance(v.get("conviction"), int)
+    ]
+    r1_stances = [v.get("stance", "hold") for v in round1 if isinstance(v, dict)]
+    stance_mix = {s: r1_stances.count(s) for s in sorted(set(r1_stances))}
+    moved_in_r2 = [r["persona"].split(",")[0] for r in round2 if r.get("revised")]
+
+    _r1_no_go = r1_stances.count("no_go")
+    _r1_pass = r1_stances.count("pass")
+    _r1_conditional = r1_stances.count("conditional")
+    if _r1_no_go > 0 and _r1_pass == 0:
+        _consensus_label = "no_go"
+        _dissent_label = ""
+    elif _r1_pass > len(r1_stances) // 2:
+        _consensus_label = "majority pass"
+        _dissent_label = f"{_r1_conditional} conditional, {_r1_no_go} no_go"
+    else:
+        _consensus_label = ""
+        _dissent_label = f"{_r1_conditional} conditional, {_r1_no_go} no_go"
+
+    spread: dict = {
+        "consensus": _consensus_label,
+        "dissent": _dissent_label,
+        "convergent_gate": "VETO" if veto_flags else "",
+        "conviction_range": (
+            f"{min(r1_convictions)}-{max(r1_convictions)} / 5"
+            if r1_convictions else "-"
+        ),
+        "stance_mix": stance_mix,
+        "moved_in_round2": moved_in_r2,
+    }
 
     # -----------------------------------------------------------------------
     # 6. Synthesis — deterministic assembly
@@ -830,12 +981,22 @@ def run_live(
     # -----------------------------------------------------------------------
     # 7. Assemble and return
     # -----------------------------------------------------------------------
+    consult: dict = {"round1": round1, "round2": round2, "spread": spread}
+    # VETO gate adjudication: surfaced in the consult output when active so the
+    # front door / LOKA adapter can render the gate prominently.
+    if veto_is_active:
+        consult["adjudication"] = {
+            "veto_facts": veto_flags,
+            "n_veto": len(veto_flags),
+            "mode": "active",
+        }
+
     return {
         "query": query,
         "plan": public_plan,
         "priors": priors,
         "discover": discover,
-        "consult": {"round1": round1},
+        "consult": consult,
         "synthesize": syn,
         "engagement_id": eid,
         "reflection": reflection,
