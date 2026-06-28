@@ -1,4 +1,0 @@
-{"event":"run_init","ts":"2026-06-21T04:50:51Z","note":"create-only; teardown by ledger id only"}
-{"ts": "2026-06-21T05:15:27.420798+00:00", "event": "create", "resource": "instance", "id": "i-020f68795ea74a1be", "job": "smoke", "instance_type": "t3.micro"}
-{"ts": "2026-06-21T05:18:42.378272+00:00", "event": "terminate", "resource": "instance", "id": "i-020f68795ea74a1be"}
-{"ts": "2026-06-25T15:03:45.184549+00:00", "event": "create", "resource": "volume", "id": "vol-0372a48d8defda8e6", "name": "Sapphire", "az": "us-east-1b", "size_gb": 50, "volume_type": "gp3", "purpose": "qmodels-warm-weights-cache", "note": "persistent warm Q-Models weights cache; create-only, NOT torn down by runs; teardown by ledgered id only"}
