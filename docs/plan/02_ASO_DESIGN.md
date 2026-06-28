@@ -81,3 +81,38 @@ trusts. No duplicate truth.
    (Auto-firing could spend AWS on every diligence query — probably gate it behind an explicit class.)
 5. **Chemistry scope** — v1 = DNA gapmer 20-mers (as templated). Other chemistries/lengths later.
 6. **OligoWalk in the cloud** — RNAstructure is a biocontainer; confirm it runs headless in the chosen tier.
+
+## 7. Build plan v1 (step 3) 🔵
+Decisions baked in: **bundled-EC2** (D3 ✅) · **artifact registry** for assets (D4 ✅) · **explicit design
+ask only** (D5 ✅).
+
+**Phase 1 — the image.** Build one tagged `Sapphire` AMI/container that holds the whole pipeline: R + the
+`.Rmd` scripts (02/06/07), OligoWalk (RNAstructure biocontainer), bowtie2 + samtools + the spliced/unspliced
+transcriptome indices, the NCBI `datasets` CLI, the GBR `aso_tox_gbr_model.pkl`, and a single
+`run_aso_design.sh GENE` entrypoint that runs 00→07 end-to-end and writes `top_candidates.csv` +
+`full_annotation.csv`. Pin everything; this is the heavy part but it's built once.
+
+**Phase 2 — the seam** (`sapphire-orchestrator/tools/aso_design_seam.py`, kind `aws-async`). Reuse the
+**Q-Models launcher** verbatim: account-gate → launch the tagged box (create-only + ledger) → stage the
+gene symbol (public ID only) → run `run_aso_design.sh` → retrieve `top_candidates.csv` →
+**teardown by ledgered id** → ledger the cost. Dry-run by default; live behind every existing safety guard.
+
+**Phase 3 — output + the loop.** Write the asset bundle to **`RohanOnly/assets/aso-design/<run_ref>/`**
+(registry, D4); the dossier carries a *reference* + the shortlist + **per-candidate facts** (each candidate's
+tox + off-target + ΔG) that **re-enter Bucket 1** — `aso-tox` is already step 05, so its tox annotation is
+the same model the firm trusts. Schema: the design-asset bundle from [`01 §2(d)`](01_TOOL_SEAM_PATTERN.md).
+
+**Phase 4 — activation.** Control activates `aso-design` only when the engagement class includes `design`
+AND the ask is an explicit ASO-design request for a gene (D5). Never auto-fires on diligence.
+
+**Phase 5 — guardrails + honesty.** Per-engagement **cost cap** + the cost ledger + idle/hard-cap watchdogs.
+If AWS/creds/refs unavailable → **abstain with reason**, never fabricate candidates. Capture ONE real gene
+run as a scenario so the canned path demos it $0.
+
+**DoD:** one real end-to-end run for a gene (e.g. SCN9A) produces ~20 cited candidates with tox/off-target/ΔG;
+EC2 teardown verified + ledgered; assets in the registry; the shortlist + per-candidate facts appear in a
+`run_live` dossier; honest-abstain path tested; captured scenario added.
+**Gates:** suite green · independent review · provenance + no secrets (only public IDs leave) · **Gate 5: the
+real AWS run + verified teardown** (this is the proof, like the Q-Models smoke test).
+**Risks:** ~3 hr / real-$ per run (mitigate: cost cap + explicit-ask gate); OligoWalk headless in-image;
+reference-data size drives EC2 storage; AMI maintenance over time.
