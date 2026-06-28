@@ -22,7 +22,13 @@ are unguarded and you will violate the rules below — so don't skip it.
    rejects commits without it.
 5. **Never use `--no-verify`** (or otherwise disable/edit the hooks). Bypassing a guardrail is the most
    serious violation here — it defeats the whole model. If a hook blocks something you believe is legitimate,
-   stop and ask rohan; do not route around it.
+   stop and ask rohan; do not route around it. **The approver (rohan) no longer needs `--no-verify` for
+   post-merge main bookkeeping** — the `pre-push` hook now includes an approver carve-out that lets rohan
+   push to `main` directly (Gate 1 still runs when Python files are included), so `--no-verify` is
+   genuinely forbidden for everyone, including rohan. That carve-out is **convenience, not enforcement**:
+   it keys on a local, spoofable `git config` handle, so it does not actually stop a contributor from
+   pushing to main — `dev/audit-history.sh` is the detective backstop that flags any non-PR commit on
+   main (a spoofed direct push) after the fact.
 6. **Never touch the approver's machinery**: `.github/CODEOWNERS`, `.githooks/`, `dev/PR_REVIEW.md`,
    `dev/run-tests.sh`, `dev/audit-history.sh`, `dev/setup-contributor.sh`. If a change there is needed,
    propose it in a PR and let rohan decide.

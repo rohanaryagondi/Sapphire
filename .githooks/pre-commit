@@ -11,7 +11,7 @@ set -euo pipefail
 # Files allowed to contain secret-pattern regexes (the scanners themselves).
 ALLOW_RE='^(\.githooks/pre-commit|dev/audit-history\.sh)$'
 # "Safe" patterns: no biological-sequence false positives (proteins/DNA are pure letters).
-SECRET_RE='gh[pousr]_[A-Za-z0-9]{20,}|BEGIN ([A-Z]+ )?PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}|aws_secret_access_key[[:space:]]*=[[:space:]]*[A-Za-z0-9/+]{40}'
+SECRET_RE='gh[pousr]_[A-Za-z0-9]{20,}|BEGIN ([A-Z]+ )?PRIVATE KEY|xox[baprs]-[A-Za-z0-9-]{10,}|aws_secret_access_key[[:space:]]*=[[:space:]]*[A-Za-z0-9/+]{40}|sk_bc_ws_live_[A-Za-z0-9_-]{10,}'
 # AWS access-key IDs: word-bounded AND must contain a digit — a protein like AKIARPKKRAETIRFSQHAV
 # (pure letters, embedded in a longer run) must NOT trip this. Checked separately below.
 has_aws_key() { printf '%s' "$1" | grep -oE '\bAKIA[A-Z0-9]{16}\b' | grep -qE '[0-9]'; }

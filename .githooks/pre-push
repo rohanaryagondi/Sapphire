@@ -41,8 +41,37 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   branch="${remote_ref#refs/heads/}"
   [ -z "$branch" ] && continue
 
-  # 1. never push (create/update/delete) a protected branch
+  # 1. never push (create/update/delete) a protected branch.
+  #    Approver carve-out: rohan may push to main for post-merge bookkeeping.
+  #    Gate 1 still runs when Python files are included in the push (same check as
+  #    feature branches).  All contributor protections (hayes/gavin) are unchanged.
+  #    RESIDUAL RISK (by design): `$handle` is a local `git config sapphire.handle` value, and
+  #    git hooks are advisory (bypassable with --no-verify), so a contributor COULD set
+  #    handle=rohan and push straight to main — this hook cannot truly prevent that locally.
+  #    The real enforcement is the DETECTIVE backstop `dev/audit-history.sh`, which flags any
+  #    commit that landed on main without a PR ("(#NN)") marker. This carve-out exists only to
+  #    remove the structural need for `--no-verify` on legitimate approver bookkeeping.
   if [[ "$branch" =~ $PROTECTED_RE ]]; then
+    if [[ "$handle" == "rohan" ]]; then
+      # Compute the base for the diff (same logic as the Gate-1 check below).
+      _base="$remote_sha"
+      if [[ "$_base" == "$ZERO" ]]; then
+        _base="$(git rev-parse --verify --quiet origin/main || true)"
+      fi
+      if [[ -n "$_base" ]] && git rev-parse --verify --quiet "$_base" >/dev/null 2>&1; then
+        _changed="$(git diff --name-only "$_base" "$local_sha" 2>/dev/null || true)"
+      else
+        _changed="$(git show --name-only --format='' "$local_sha" 2>/dev/null || true)"
+      fi
+      if printf '%s\n' "$_changed" | grep -qE '\.py$'; then
+        echo "  • rohan pushing to '$branch' — Python changed, running Gate 1 (dev/run-tests.sh)…" >&2
+        root="$(git rev-parse --show-toplevel)"
+        if ! bash "$root/dev/run-tests.sh" >&2; then
+          block "the test suite is RED. Fix it before pushing (Gate 1 must be green)."
+        fi
+      fi
+      continue  # approver carve-out: allow rohan's push to main (no Python → free)
+    fi
     block "direct pushes to '$branch' are forbidden. Open a PR from your <handle>/<slug> branch."
   fi
 
