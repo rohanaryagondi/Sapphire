@@ -3,6 +3,28 @@
 *One screen: where the build is. Updated 2026-06-24. Detail in the per-area docs; assignments in
 [`WORKBOARD.md`](WORKBOARD.md).*
 
+## ⏳ Current wave — live handoff (read FIRST if you're a fresh Head Claude)
+*Updated 2026-06-28.* Next-build wave specced in [`dev/work-orders/`](../dev/work-orders/README.md)
+(WO-2..WO-5) toward the blueprint in [`docs/plan/`](../docs/plan/README.md). **In flight right now:**
+
+- **WO-2 Phase A — BUILT, AWAITING GATE → PR #113** (branch `rohan/front-door`). `run_live` made whole
+  (round-2 + spread + the 6 missing semantic agents + VETO gate + capability-class); suite **714 green**.
+  Gate it the normal way (isolated worktree, independent review + Gate-5) and merge if clean. It was built by
+  a Head-Claude subagent before the builder/approver role split — treat it as a normal contributor PR.
+- **Open decision for the human:** gate+merge PR #113 now (recommended — done + green) **vs** clean-slate and
+  let a Rohan Claude *builder* redo WO-2. After Phase A: Phase B (front-door wiring) + WO-3/WO-4/WO-5.
+- **Only ONE live feature branch: `rohan/front-door` (PR #113).** The ~25 other un-merged `rohan/*` branches
+  (`book-*`, `assign-*`, `help-*`, demo branches) are HISTORICAL — ignore them.
+- **Discovery caveat:** a pushed branch with NO PR is invisible to `gh pr list`. Always also run
+  `git branch -r --no-merged origin/main` before concluding "nothing to do."
+- **Leftover local worktrees** (`/tmp/demo-polish`, `/tmp/design-fold`, `/tmp/orch-8101`, `/tmp/wo2-frontdoor`)
+  are this session's; `git worktree remove` them when not needed. The :8101 demo + openable snapshots live on
+  `rohan/orchestrator-8101` (pushed) — keep as demo assets.
+- **Does NOT transfer to a fresh session:** any armed Monitors / `/loop` heartbeat from the prior session —
+  re-arm your own sweep if you want autonomous watching.
+- **Recent harness merges:** #110 (harness hardening), #111 (docs/plan blueprint + work orders), #112
+  (session prompts in `dev/CONTRIBUTORS.md`). Decisions D5/D7/D8 resolved (see `docs/plan/03`).
+
 ## Headline
 The two-bucket firm runs end-to-end. Phases 1–6 are done. **381 tests green.** Fact sources are largely
 **live/real** (EMET, personas, Q-Models, internal moat, ASO-tox). The **front door now serves the live
