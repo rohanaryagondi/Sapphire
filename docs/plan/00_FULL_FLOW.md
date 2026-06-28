@@ -65,14 +65,17 @@ propose the experiment that resolves the remaining uncertainty.* Everything belo
 
 ## 2. The layers (what each is, status, where it lives)
 
-### 2.1 Front door — Loka scaffold + the consoles 🟡
-The user-facing surface. Per the sprint deck, **Loka is the front-end / orchestrator scaffold** the Quiver
-tools plug into. Today there are *three* live paths and they have not converged — this is the keystone:
-- canned `orchestrator.run(sid)` (deterministic scenarios; :8099 console) 🟢
-- harnessed `live_engine.run_live(query)` (the guard-enforced live firm) 🟡 — offline-verified, partially wired
-- `claude -p` console (`orchestrator_ui/`, the :8101 live orchestrator) 🟡
-**Target:** one live path behind the front door; the others retire or become explicit demo modes.
-→ decision in [`03_OPEN_DECISIONS.md`](03_OPEN_DECISIONS.md) §D1.
+### 2.1 Front door — our consoles (Loka = data + designs, not the scaffold) 🟡
+The user-facing surface is **our own consoles** (`frontend2/` :8099 · `orchestrator_ui/` :8101). **Decided
+(D8): we do NOT build on Loka's code** — Loka's app is a private single-agent Chainlit PoC that our firm
+already supersets. Loka contributes the moat **data** (wired, `moat-real`) and reusable **designs** (the 4
+perturbation workflows, the scratchpad pattern, the LLM-judge eval), not the front-end we build on.
+Today there are *three* live paths and they have not converged — the keystone:
+- canned `orchestrator.run(sid)` (deterministic scenarios; :8099) 🟢
+- harnessed `live_engine.run_live(query)` (guard-enforced live firm) 🟡 — offline-verified, partially wired
+- `claude -p` console (`orchestrator_ui/` :8101) 🟡
+**Target (D1, leaning):** collapse to the one harnessed path behind our console; the others become explicit
+demo modes. → [`03_OPEN_DECISIONS.md`](03_OPEN_DECISIONS.md) §D1/§D8.
 
 ### 2.2 Control — Engagement Lead 🟢
 `sapphire-orchestrator/orchestrator.py`. Triage → scope → engagement plan. The plan must now also
