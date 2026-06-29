@@ -146,7 +146,8 @@ def _error_envelope(query: str, exc: Exception) -> dict:
 
 def run(query: str, *, mock: bool = True, sequences: list | None = None,
         model: str | None = None, on_progress=None, simulate: bool = False,
-        emet_envelopes: dict | None = None) -> dict:
+        emet_envelopes: dict | None = None, plan_mode: str = "off",
+        approved_plan: list | None = None) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
 
     `emet_envelopes` is the front end's REAL-EMET path (the session-bridge). When a dict is
@@ -197,7 +198,9 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
         envelopes = _resolve_emet_envelopes(query, emet_envelopes)
         result = run_live(query, sequences=sequences,
                           ctx=_ctx_with_session_emet(mock, envelopes),
-                          on_progress=on_progress)
+                          on_progress=on_progress,
+                          plan_mode=plan_mode,
+                          approved_plan=approved_plan)
     except Exception as exc:  # defensive — run_live is designed not to raise
         result = _error_envelope(query, exc)
     finally:
@@ -222,6 +225,94 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
         result["_emet_session"] = sorted(envelopes.keys())  # type: ignore[name-defined]
     except Exception:
         result["_emet_session"] = []
+    return result
+
+
+def plan(query: str, *, mock: bool = True, simulate: bool = False,
+         model: str | None = None, emet_envelopes: dict | None = None) -> dict:
+    """Compute the PROPOSED Bucket-1 plan for `query` WITHOUT running any fact agents.
+
+    This is the "Plan first / review" seam: it calls ``run_live(plan_mode="llm+approve")``,
+    which returns immediately with ``plan_pending_approval=True`` and (when the planning LLM
+    is reachable) an LLM-pruned ``smart_plan`` of selected/dropped agents + rationale. The UI
+    renders this as a review step; the user approves/edits, then ``run(approved_plan=[ids])``
+    runs EXACTLY the approved agents.
+
+    Honest degrade (no claude CLI — Demo/Simulate offline): ``smart_plan`` raises and the
+    engine returns a deterministic plan-only envelope. We then surface the FULL deterministic
+    Bucket-1 roster (``_BUCKET1_AGENTS``) as the proposed plan, labelled ``plan_source:
+    "deterministic"`` — every agent selected, no fabricated rationale. The normalised
+    ``agents`` list is always present so the UI never has to special-case the two paths.
+
+    Returns the run_live plan envelope plus a normalised ``agents`` list of
+    ``{id, role, why, selected}`` (one entry per proposed Bucket-1 agent). Never raises.
+    """
+    _prev_model = os.environ.get("CLAUDE_MODEL")
+    _prev_sim = os.environ.get("SAPPHIRE_SIMULATE_MODELS")
+    try:
+        _ensure_engine_on_path()
+        if model:
+            os.environ["CLAUDE_MODEL"] = model
+        if simulate:
+            os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        from live_engine import run_live, _BUCKET1_AGENTS
+        envelopes = _resolve_emet_envelopes(query, emet_envelopes)
+        result = run_live(query, ctx=_ctx_with_session_emet(mock, envelopes),
+                          plan_mode="llm+approve")
+        # Resolve role labels (public identifiers only) for nicer rendering.
+        roles: dict = {}
+        try:
+            from harness.contracts import load_registry
+            roles = {a["id"]: a.get("role", "")
+                     for a in load_registry().get("agents", [])}
+        except Exception:
+            roles = {}
+        sp = (result or {}).get("smart_plan") or {}
+        selected = sp.get("selected_agents") or []
+        if selected:
+            agents = [
+                {"id": a.get("id", ""), "role": roles.get(a.get("id", ""), ""),
+                 "why": a.get("why", ""), "selected": True}
+                for a in selected if a.get("id")
+            ]
+            # Also surface the LLM-dropped agents (deselected by default) so the
+            # reviewer can re-add one if they disagree with the prune.
+            for a in sp.get("dropped_agents") or []:
+                if a.get("id"):
+                    agents.append({"id": a["id"], "role": roles.get(a["id"], ""),
+                                   "why": a.get("why", ""), "selected": False})
+        else:
+            # Deterministic fallback — the full Bucket-1 roster, all selected.
+            # Label it honestly even if run_live reported plan_source="llm" (the
+            # planner ran but pruned nothing / returned an empty selection).
+            agents = [
+                {"id": aid, "role": roles.get(aid, ""), "why": "", "selected": True}
+                for aid in _BUCKET1_AGENTS
+            ]
+        result = dict(result or {})
+        result["agents"] = agents
+        if not selected:
+            result["plan_source"] = "deterministic"
+        result.setdefault("plan_pending_approval", True)
+    except Exception as exc:  # run_live is contracted not to raise; last-resort net
+        result = {
+            "query": query,
+            "plan": {},
+            "agents": [],
+            "plan_pending_approval": True,
+            "plan_source": "error",
+            "_via": "bridge-error",
+            "_bridge_error": f"{type(exc).__name__}: {exc}",
+        }
+    finally:
+        if _prev_model is None:
+            os.environ.pop("CLAUDE_MODEL", None)
+        else:
+            os.environ["CLAUDE_MODEL"] = _prev_model
+        if _prev_sim is None:
+            os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+        else:
+            os.environ["SAPPHIRE_SIMULATE_MODELS"] = _prev_sim
     return result
 
 

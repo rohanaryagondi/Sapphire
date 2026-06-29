@@ -351,6 +351,81 @@ class TestStoreAPI(unittest.TestCase):
         self.assertEqual(len(convs), 1)
         self.assertEqual(convs[0]["id"], cid)
 
+    # ---------------------------------------------------------------------- #
+    # GET /api/conversations/<id> — server-layer result enrichment (restore)   #
+    # ---------------------------------------------------------------------- #
+
+    def test_conversation_detail_enriches_runs_with_result(self):
+        """After a run, GET detail must attach each run's parsed `result` so the client can
+        restore the fully-rendered turn. The store list keeps result_json out (it's large);
+        the SERVER re-attaches it per run via store.get_run — this is the P1 restore fix."""
+        with _ServerHarness() as h:
+            raw = h.post_run({"query": "Is TSC2 viable?", "profile": "demo"})
+            result = [d for e, d in _parse_sse(raw) if e == "result"][0]
+            cid = result["_conversation_id"]
+            status, detail_body, _ = h.get(f"/api/conversations/{cid}")
+        self.assertEqual(status, 200)
+        detail = json.loads(detail_body)
+        self.assertTrue(detail["runs"], "at least one run must be present")
+        run = detail["runs"][0]
+        self.assertIn("result", run,
+                      "each run in the detail response must carry its parsed result")
+        self.assertIsInstance(run["result"], dict)
+        # The restored result is the full run_live contract, not a stub.
+        self.assertIn("discover", run["result"])
+        self.assertIn("dossier", run["result"]["discover"])
+        self.assertIn("consult", run["result"])
+        self.assertIn("synthesize", run["result"])
+
+    # ---------------------------------------------------------------------- #
+    # POST /api/run?mode=plan — the plan-review seam (Plan mode)               #
+    # ---------------------------------------------------------------------- #
+
+    def test_plan_mode_returns_proposed_plan_json(self):
+        """POST /api/run?mode=plan returns a JSON plan envelope (NOT an SSE stream) with a
+        non-empty proposed Bucket-1 agent list and plan_pending_approval — running zero agents."""
+        with _ServerHarness() as h:
+            status, body, headers = h.post_json(
+                "/api/run?mode=plan",
+                {"query": "Is TSC2 a tractable CNS target?", "profile": "demo"},
+            )
+        self.assertEqual(status, 200)
+        self.assertIn("application/json", headers.get("Content-Type", ""),
+                      "plan mode must return JSON, not text/event-stream")
+        data = json.loads(body)
+        self.assertTrue(data.get("plan_pending_approval"),
+                        "plan envelope must be marked pending approval")
+        self.assertIsInstance(data.get("agents"), list)
+        self.assertTrue(data["agents"], "proposed plan must list Bucket-1 agents")
+        # Every agent entry is normalised {id, selected, ...}; the moat agent is always proposed.
+        ids = {a["id"] for a in data["agents"]}
+        self.assertIn("internal-science-lead", ids)
+        for a in data["agents"]:
+            self.assertIn("id", a)
+            self.assertIn("selected", a)
+
+    def test_approved_plan_restricts_bucket1_agents(self):
+        """POST /api/run with approved_plan=[ids] runs ONLY those Bucket-1 fact agents.
+
+        Proves the second half of the Plan-mode loop: the firm convenes exactly the approved
+        agents (plus any deterministic downstream agents), not the full roster."""
+        with _ServerHarness() as h:
+            raw = h.post_run({
+                "query": "Which genes rescue the TSC2 phenotype the most?",
+                "profile": "demo",
+                "approved_plan": ["internal-science-lead", "emet-runner"],
+            })
+        result = [d for e, d in _parse_sse(raw) if e == "result"][0]
+        ran = {a["id"] for a in result["discover"]["agents"]}
+        self.assertIn("internal-science-lead", ran)
+        self.assertIn("emet-runner", ran)
+        # The big semantic roster must NOT have run (e.g. the payer / patent agents).
+        self.assertNotIn("patent-ip", ran,
+                         "approved_plan must exclude non-approved Bucket-1 agents")
+        self.assertNotIn("payer", ran)
+        self.assertLess(len(ran), 10,
+                        "approved_plan should run a small subset, not the full ~23-agent roster")
+
 
 if __name__ == "__main__":
     unittest.main()

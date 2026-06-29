@@ -81,9 +81,12 @@ export interface RunResult {
   reflection?: { engagement_id: string; written: number; records: unknown[] };
   _via?: string;
   _mock?: boolean;
+  _model?: string;
   _simulated?: boolean;
   _replay?: boolean;
   _elapsed_s?: number;
+  plan_source?: string;
+  [k: string]: unknown;
 }
 
 /* ── SSE progress event (the live trace) — forwarded verbatim from the engine ── */
@@ -124,6 +127,7 @@ export interface OpenEvent {
 }
 
 /* ── persistence: a saved conversation (sibling backend contract) ───────────── */
+/* The LIST item shape — GET /api/conversations → { conversations: Conversation[] }. */
 export interface Conversation {
   id: string;
   title: string;
@@ -131,17 +135,53 @@ export interface Conversation {
   starred?: boolean;
   created_at?: string;
   updated_at?: string;
-  // a full conversation (GET /api/conversations/<id>) may inline its turns
-  turns?: ConversationTurn[];
   [k: string]: unknown;
 }
 
-export interface ConversationTurn {
+/* A persisted message (GET /api/conversations/<id> → messages[]). */
+export interface ConversationMessage {
+  id: string;
+  role: "user" | "assistant" | "system" | string;
+  content: string;
+  created_at?: string;
+}
+
+/* A persisted RUN — one saved firm convening. The server enriches each run with the
+   parsed `result` (the full run_live dict the SSE result frame carried) so the client can
+   restore the fully-rendered turn. `result` is absent only if the row's JSON failed to load. */
+export interface ConversationRun {
+  id: string;
+  message_id?: string | null;
   query: string;
-  profile?: string;
-  model?: string;
-  result?: RunResult;
-  trace?: ProgressEvent[];
+  via?: string;
+  created_at?: string;
+  result?: RunResult | null;
+}
+
+/* The DETAIL shape — GET /api/conversations/<id> → { conversation, messages, runs }. */
+export interface ConversationDetail {
+  conversation: Conversation;
+  messages: ConversationMessage[];
+  runs: ConversationRun[];
+}
+
+/* ── plan mode: the proposed Bucket-1 plan (POST /api/run?mode=plan) ─────────── */
+export interface PlanAgent {
+  id: string;
+  role?: string;
+  why?: string;
+  selected: boolean;
+}
+
+export interface PlanEnvelope {
+  query: string;
+  plan?: Plan;
+  agents: PlanAgent[];
+  plan_source?: string;
+  plan_pending_approval?: boolean;
+  engagement_id?: string;
+  _via?: string;
+  _bridge_error?: string;
 }
 
 /* ── top-bar selectors ──────────────────────────────────────────────────────── */

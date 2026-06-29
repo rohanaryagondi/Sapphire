@@ -9,14 +9,17 @@ import { create } from "zustand";
 import {
   createConversation,
   deleteConversation,
+  fetchPlan,
   getConversation,
   listConversations,
   patchConversation,
   runFirm,
 } from "./api";
+import { traceFromResult } from "./restore";
 import type {
   Conversation,
   ModelChoice,
+  PlanEnvelope,
   ProgressEvent,
   Profile,
   RunResult,
@@ -70,6 +73,18 @@ interface FirmState {
   paletteOpen: boolean;
   setPaletteOpen: (open: boolean) => void;
 
+  // plan mode (review-before-run)
+  planMode: boolean;
+  setPlanMode: (on: boolean) => void;
+  pendingPlan: PlanEnvelope | null;
+  planLoading: boolean;
+  planError: string | null;
+  requestPlan: (query: string) => Promise<void>;
+  togglePlanAgent: (id: string) => void;
+  setAllPlanAgents: (selected: boolean) => void;
+  cancelPlan: () => void;
+  approvePlan: () => Promise<void>;
+
   // history
   conversations: Conversation[];
   persistenceAvailable: boolean;
@@ -83,7 +98,7 @@ interface FirmState {
   removeConversation: (id: string) => Promise<void>;
 
   // run
-  submit: (query: string) => Promise<void>;
+  submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
 }
 
 let _seq = 0;
@@ -114,6 +129,59 @@ export const useFirm = create<FirmState>((set, get) => ({
   paletteOpen: false,
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
 
+  planMode: false,
+  setPlanMode: (planMode) => set({ planMode }),
+  pendingPlan: null,
+  planLoading: false,
+  planError: null,
+
+  requestPlan: async (query) => {
+    const q = query.trim();
+    const { profile, model, running, planLoading } = get();
+    if (!q || running || planLoading) return;
+    set({ planLoading: true, planError: null, pendingPlan: null });
+    const plan = await fetchPlan({ query: q, profile, model });
+    if (!plan) {
+      set({ planLoading: false, planError: "Could not compute a plan — run directly instead." });
+      return;
+    }
+    set({ planLoading: false, pendingPlan: plan });
+  },
+
+  togglePlanAgent: (id) =>
+    set((s) => {
+      if (!s.pendingPlan) return {};
+      return {
+        pendingPlan: {
+          ...s.pendingPlan,
+          agents: s.pendingPlan.agents.map((a) =>
+            a.id === id ? { ...a, selected: !a.selected } : a,
+          ),
+        },
+      };
+    }),
+
+  setAllPlanAgents: (selected) =>
+    set((s) => {
+      if (!s.pendingPlan) return {};
+      return {
+        pendingPlan: {
+          ...s.pendingPlan,
+          agents: s.pendingPlan.agents.map((a) => ({ ...a, selected })),
+        },
+      };
+    }),
+
+  cancelPlan: () => set({ pendingPlan: null, planError: null }),
+
+  approvePlan: async () => {
+    const plan = get().pendingPlan;
+    if (!plan) return;
+    const approvedPlan = plan.agents.filter((a) => a.selected).map((a) => a.id);
+    set({ pendingPlan: null, planError: null });
+    await get().submit(plan.query, { approvedPlan });
+  },
+
   conversations: [],
   persistenceAvailable: false,
   historyQuery: "",
@@ -131,23 +199,49 @@ export const useFirm = create<FirmState>((set, get) => ({
       activeConversationId: null,
       selection: { kind: "none" },
       inspectorTab: "monitor",
+      pendingPlan: null,
+      planError: null,
     });
   },
 
   openConversation: async (id) => {
-    const conv = await getConversation(id);
-    set({ activeConversationId: id });
-    if (!conv) return;
-    const turns: Turn[] = (conv.turns ?? []).map((t, i) => ({
-      id: `${id}_${i}`,
-      query: t.query,
-      profile: (t.profile as Profile) ?? "demo",
-      model: (t.model as ModelChoice) ?? "default",
-      status: "complete" as TurnStatus,
-      trace: t.trace ?? [],
-      result: t.result,
-      startedAt: 0,
-    }));
+    if (get().running) return;
+    const detail = await getConversation(id);
+    set({
+      activeConversationId: id,
+      pendingPlan: null,
+      planError: null,
+      selection: { kind: "none" },
+    });
+    if (!detail) {
+      // backend returned nothing (404 / offline) — show an empty restored thread
+      set({ turns: [], inspectorTab: "monitor" });
+      return;
+    }
+    // Map each persisted RUN → a fully-rendered, complete Turn. The result dict the
+    // server re-attached carries the dossier (both planes), roundtable spread, synthesis
+    // and flags; we synthesise a static trace so the Monitor/Investigate render too.
+    const runs = detail.runs ?? [];
+    const turns: Turn[] = runs.map((r, i) => {
+      const result = (r.result ?? undefined) as RunResult | undefined;
+      return {
+        id: `${id}_${r.id ?? i}`,
+        query: r.query,
+        profile: (result?._replay
+          ? "replay"
+          : result?._simulated
+            ? "simulate"
+            : result?._mock === false
+              ? "live"
+              : "demo") as Profile,
+        model: ((result?._model as string) || "default") as ModelChoice,
+        status: "complete" as TurnStatus,
+        trace: traceFromResult(result),
+        result,
+        via: r.via,
+        startedAt: 0,
+      };
+    });
     set({ turns, selection: { kind: "none" }, inspectorTab: "monitor" });
   },
 
@@ -174,10 +268,11 @@ export const useFirm = create<FirmState>((set, get) => ({
     await deleteConversation(id);
   },
 
-  submit: async (query) => {
+  submit: async (query, opts) => {
     const q = query.trim();
     const { profile, running } = get();
     if (running || (!q && profile !== "replay")) return;
+    const approvedPlan = opts?.approvedPlan;
 
     const turn: Turn = {
       id: uid("turn"),
@@ -224,7 +319,13 @@ export const useFirm = create<FirmState>((set, get) => ({
     let finalResult: RunResult | undefined;
     try {
       await runFirm(
-        { query: q, profile, model: get().model, conversation_id: convId ?? undefined },
+        {
+          query: q,
+          profile,
+          model: get().model,
+          conversation_id: convId ?? undefined,
+          approved_plan: approvedPlan,
+        },
         {
           onOpen: (ev) => patchTurn({ via: ev.via }),
           onProgress: (ev) => pushTrace(ev),
