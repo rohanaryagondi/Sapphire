@@ -27,6 +27,18 @@ A `sapphire-dev-reviewer` (NOT the implementer) reads the change's diff and retu
 - Every new fact-emitting path uses an **allowed** provenance label from `contracts/provenance.py`; no unlisted labels.
 - Public-identifiers-only boundary respected.
 
+## Gate 3.5 — Doc presence (automated, warn-mode rollout)
+`dev/check-docs.sh` runs automatically on every non-trivial push (via the pre-push hook).
+**Mechanically enforced (presence/freshness only):**
+- Runtime `.py` changed → `dev/LEDGER.md` must appear in the same commit range.
+- `harness/agents.json` changed → a paired `architecture/**/*.md` spec must also change (and vice versa).
+- State-changing change (runtime/agent/new tool) → a `status/` file must be updated.
+- Feature-tier change (>3 `.py` files) → a `WO-<id>`, `plans/<slug>`, or `dev/work-orders/` file must be referenced/changed.
+**Trivial exemption:** commits tagged `[trivial]` in their subject, or `--tier trivial`, are fully exempt. Docs-only changes are also auto-exempt.
+**NOT enforced (reviewer-judged):** the accuracy or completeness of what the ledger/status docs say. A green doc-check is not a substitute for reviewer judgment.
+**WO/WORKBOARD reference convention:** a `WO-<id>` in any commit subject, OR a `plans/<slug>` path, OR a changed `dev/work-orders/` file satisfies Rule 4. Contributors picking work off `status/WORKBOARD.md` should include the task id in their commit message (e.g. `WO-4` for this thread).
+**Current mode:** warn (exit 0). Flip to block: `export SAPPHIRE_DOCGATE=block`.
+
 ## Gate 4 — Stdlib-runtime + verbatim-vendor check
 - The engine gained no third-party import: grep the runtime (`live_engine.py`, `harness/`, `moat/`, `orchestrator.py`, seams) — only stdlib + first-party. Third-party deps stay in `_build/` or tool subprocesses.
 - If vendored/proprietary logic was integrated, it is **character-for-character identical** to the source, locked by a golden-value test, with the original artifact preserved and the dependency version pinned.
