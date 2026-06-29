@@ -611,6 +611,18 @@ class TestAdaptiveRegression(unittest.TestCase):
         )
         # _via must be the same.
         self.assertEqual(result_no_adaptive["_via"], result_adaptive_false["_via"])
+        # synthesize must be the same (recommendation/confidence are derived from same dossier).
+        self.assertEqual(
+            result_no_adaptive["synthesize"],
+            result_adaptive_false["synthesize"],
+            "synthesize differs between adaptive=False and no-adaptive-param runs"
+        )
+        # plan_source must be the same (both use deterministic plan).
+        self.assertEqual(
+            result_no_adaptive.get("plan_source"),
+            result_adaptive_false.get("plan_source"),
+            "plan_source differs between adaptive=False and no-adaptive-param runs"
+        )
 
     def tearDown(self):
         os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)

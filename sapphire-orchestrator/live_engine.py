@@ -1028,6 +1028,12 @@ def run_live(
                         pass
 
                 # Mark entity as covered so it is not re-surfaced in later rounds.
+                # Intentional trade-off: the entity is marked covered even when budget
+                # depleted mid-dispatch (e.g. 2 of 4 targets fired before budget hit 0).
+                # The remaining (entity, target_id) pairs become unreachable — they are
+                # not in visited (so no guard fires) but budget=0 prevents any dispatch.
+                # This is by design: once budget is exhausted, further coverage of that
+                # entity is deferred to a future engagement (the spec allows this).
                 already_covered_adaptive.add(_entity)
 
             if not _any_dispatched_this_round:
