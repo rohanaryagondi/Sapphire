@@ -213,10 +213,22 @@ class Handler(BaseHTTPRequestHandler):
             scenario = (body.get("scenario") or _DEFAULT_REPLAY).strip()
             model = (body.get("model") or "").strip()
             conversation_id = (body.get("conversation_id") or "").strip() or None
+            # approved_plan (Plan-mode approval step): when present, run ONLY these
+            # Bucket-1 agent ids. Tolerate a non-list (ignore it) — the engine filters.
+            ap = body.get("approved_plan")
+            approved_plan = [str(x) for x in ap] if isinstance(ap, list) else None
+            # mode=plan → compute the proposed plan (zero agents) and return JSON, NOT SSE.
+            mode = ""
+            if "?" in self.path:
+                from urllib.parse import parse_qs
+                mode = (parse_qs(self.path.split("?", 1)[1]).get("mode", [""])[0] or "").strip()
             if not query and profile != "replay":
                 return self._send_json(400, {"error": "empty query"})
+            if mode == "plan":
+                return self._serve_plan(query, profile, model)
             self._stream_run(query, profile, scenario, model,
-                             conversation_id=conversation_id)
+                             conversation_id=conversation_id,
+                             approved_plan=approved_plan)
         elif path == "/api/conversations":
             try:
                 import store as _store_mod
@@ -271,8 +283,30 @@ class Handler(BaseHTTPRequestHandler):
         return self._send_json(404, {"error": "not found"})
 
     # ------------------------------------------------------- SSE streaming
+    def _serve_plan(self, query: str, profile: str, model: str = "") -> None:
+        """POST /api/run?mode=plan → the PROPOSED Bucket-1 plan as JSON (zero agents run).
+
+        Returns ``{query, plan, agents:[{id,role,why,selected}], plan_source,
+        plan_pending_approval, engagement_id, _via}``. The client renders this as a review
+        step; on approval it re-POSTs /api/run with ``approved_plan=[ids]``. Honest-degrade:
+        without the planning LLM the agents list is the full deterministic roster (labelled)."""
+        kwargs = _profile_kwargs(profile)
+        # Plan never needs the live-EMET/persona models — drop simulate to keep it fast/cheap.
+        kwargs.pop("simulate", None)
+        try:
+            envelope = bridge.plan(query, mock=kwargs.get("mock", True),
+                                   model=(model or None))
+        except Exception as exc:  # bridge.plan is contracted not to raise; last-resort net
+            return self._send_json(200, {
+                "query": query, "plan": {}, "agents": [],
+                "plan_pending_approval": True, "plan_source": "error",
+                "_via": "bridge-error", "_bridge_error": f"{type(exc).__name__}: {exc}",
+            })
+        return self._send_json(200, envelope)
+
     def _stream_run(self, query: str, profile: str, scenario: str, model: str = "",
-                    conversation_id: "str | None" = None) -> None:
+                    conversation_id: "str | None" = None,
+                    approved_plan: "list | None" = None) -> None:
         """Run the firm and stream progress + result as SSE.
 
         The run executes on a worker thread; its ``on_progress`` callback (fired on that
@@ -310,6 +344,7 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = bridge.run(query, on_progress=on_progress,
                                         model=(model or None),
+                                        approved_plan=approved_plan,
                                         **_profile_kwargs(profile))
                 _cache_result(result)  # so GET /api/runs/<engagement_id> can return it
                 evq.put(("result", result))
@@ -385,12 +420,26 @@ class Handler(BaseHTTPRequestHandler):
             return self._send_json(500, {"error": str(exc)})
 
     def _serve_conversation_detail(self, conv_id: str) -> None:
-        """GET /api/conversations/<id> → full {conversation, messages, runs} dict or 404."""
+        """GET /api/conversations/<id> → full {conversation, messages, runs} dict or 404.
+
+        Each run is ENRICHED here (server layer, not the store) with its parsed ``result``
+        (the full ``run_live`` dict the SSE ``result`` frame originally carried) so the client
+        can restore the fully-rendered run — dossier, roundtable spread, synthesis, flags — plus
+        a static agent roster for the Monitor. The store keeps ``result_json`` out of its list
+        response (it's large; see ``store.get_conversation``); we re-attach it per run by id via
+        ``store.get_run`` so a restored conversation renders identically to a live one."""
         try:
             import store as _store_mod
             conv = _store_mod.get_conversation(conv_id)
             if conv is None:
                 return self._send_json(404, {"error": "not found"})
+            for run in conv.get("runs", []):
+                try:
+                    full = _store_mod.get_run(run.get("id", ""))
+                    if full is not None:
+                        run["result"] = full.get("result_json")
+                except Exception:
+                    run["result"] = None  # honest: render the turn shell, never crash
             return self._send_json(200, conv)
         except Exception as exc:
             return self._send_json(500, {"error": str(exc)})

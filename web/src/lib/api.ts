@@ -9,8 +9,10 @@
    ============================================================================ */
 import type {
   Conversation,
+  ConversationDetail,
   ModelChoice,
   OpenEvent,
+  PlanEnvelope,
   Profile,
   ProgressEvent,
   RunResult,
@@ -22,6 +24,7 @@ export interface RunRequest {
   model: ModelChoice;
   conversation_id?: string;
   scenario?: string;
+  approved_plan?: string[];
 }
 
 export interface RunCallbacks {
@@ -51,6 +54,7 @@ export async function runFirm(req: RunRequest, cb: RunCallbacks): Promise<void> 
       model: modelId(req.model),
       conversation_id: req.conversation_id,
       scenario: req.scenario,
+      approved_plan: req.approved_plan,
     }),
     signal: cb.signal,
   });
@@ -58,6 +62,31 @@ export async function runFirm(req: RunRequest, cb: RunCallbacks): Promise<void> 
     throw new Error(`HTTP ${resp.status}`);
   }
   await consumeSSE(resp.body, cb);
+}
+
+/** POST /api/run?mode=plan — fetch the PROPOSED Bucket-1 plan (runs zero agents).
+ *  Returns a normalised PlanEnvelope, or null on a network/HTTP failure (the caller
+ *  degrades to a direct run). */
+export async function fetchPlan(
+  req: Pick<RunRequest, "query" | "profile" | "model">,
+): Promise<PlanEnvelope | null> {
+  try {
+    const resp = await fetch("/api/run?mode=plan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: req.query,
+        profile: req.profile,
+        model: modelId(req.model),
+      }),
+    });
+    if (!resp.ok) return null;
+    const data = (await safeJSON(resp)) as PlanEnvelope | null;
+    if (!data || !Array.isArray(data.agents)) return null;
+    return data;
+  } catch {
+    return null;
+  }
 }
 
 async function consumeSSE(body: ReadableStream<Uint8Array>, cb: RunCallbacks) {
@@ -187,13 +216,15 @@ export async function createConversation(
   }
 }
 
-export async function getConversation(id: string): Promise<Conversation | null> {
+export async function getConversation(
+  id: string,
+): Promise<ConversationDetail | null> {
   try {
     const resp = await fetch(`/api/conversations/${encodeURIComponent(id)}`, {
       method: "GET",
     });
     if (!resp.ok) return null;
-    return (await safeJSON(resp)) as Conversation | null;
+    return (await safeJSON(resp)) as ConversationDetail | null;
   } catch {
     return null;
   }

@@ -2,6 +2,7 @@
 import { TopBar } from "@/components/topbar";
 import { HistoryRail } from "@/components/history-rail";
 import { ChatThread } from "@/components/chat-thread";
+import { PlanReview } from "@/components/plan-review";
 import { Composer } from "@/components/composer";
 import { Inspector } from "@/components/inspector";
 import { CommandPalette } from "@/components/command-palette";
@@ -24,6 +25,7 @@ export default function Home() {
         {/* center — chat thread + composer */}
         <main className="flex min-w-0 flex-1 flex-col bg-[var(--color-bg)]">
           <ChatThread />
+          <PlanReview />
           <Composer />
         </main>
 
