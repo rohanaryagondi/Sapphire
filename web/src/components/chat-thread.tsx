@@ -46,11 +46,11 @@ function Banner({
   tone,
   children,
 }: {
-  tone: "sim" | "partial" | "error";
+  tone: "sim" | "mock" | "partial" | "error";
   children: React.ReactNode;
 }) {
   const style =
-    tone === "sim"
+    tone === "sim" || tone === "mock"
       ? "border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.06)] text-[#e3b341]"
       : tone === "error"
         ? "border-[rgba(248,81,73,0.30)] bg-[rgba(248,81,73,0.06)] text-[#ff7b72]"
@@ -60,10 +60,21 @@ function Banner({
       className={`flex items-start gap-2 rounded-[var(--radius)] border px-3 py-2 text-[12px] leading-snug ${style}`}
     >
       {tone === "error" && <AlertCircle className="mt-0.5 size-3.5 shrink-0" />}
-      {tone === "sim" && <FlaskConical className="mt-0.5 size-3.5 shrink-0" />}
+      {(tone === "sim" || tone === "mock") && (
+        <FlaskConical className="mt-0.5 size-3.5 shrink-0" />
+      )}
       <span>{children}</span>
     </div>
   );
+}
+
+/** A Demo/mock/generic-fallback run is illustrative, not a real analysis. */
+function isMockRun(turn: Turn): boolean {
+  const r = turn.result;
+  if (!r) return false;
+  if (r._simulated) return false; // the simulate banner already covers this
+  const via = String(turn.via ?? r._via ?? "").toLowerCase();
+  return turn.profile === "demo" || r._mock === true || /fallback|canned|mock/.test(via);
 }
 
 function TurnView({ turn }: { turn: Turn }) {
@@ -88,6 +99,14 @@ function TurnView({ turn }: { turn: Turn }) {
           <Banner tone="error">
             The firm could not be convened ({turn.error || "unknown error"}). No answer is
             fabricated.
+          </Banner>
+        )}
+
+        {isMockRun(turn) && (
+          <Banner tone="mock">
+            <b>Illustrative mock output.</b> This is canned/Demo-profile data, not a
+            real analysis — facts may be placeholders. Switch to the{" "}
+            <b>Simulate</b> profile for real moat / EMET / seam data.
           </Banner>
         )}
 

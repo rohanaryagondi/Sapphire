@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { cn, provKind, provMarker, tierClass, type ProvKind } from "@/lib/utils";
+import { cn, provKind, provMarker, tierClass, type MockLabel, type ProvKind } from "@/lib/utils";
 import type { FlagKind, Plane } from "@/lib/types";
 
 const base =
@@ -20,6 +20,22 @@ export function ProvChip({ prov, via }: { prov?: string; via?: string }) {
     <span className={cn(base, provStyle[kind])} title={`provenance: ${prov}`}>
       <span className="text-[8px] leading-none">{provMarker(kind)}</span>
       {prov}
+    </span>
+  );
+}
+
+/* ── mock / simulated / illustrative badge — an unmistakable "not real" marker ── */
+export function MockBadge({ label }: { label: MockLabel }) {
+  return (
+    <span
+      className={cn(
+        base,
+        "border-[rgba(210,153,34,0.55)] bg-[rgba(210,153,34,0.16)] text-[#e3b341] uppercase tracking-wide",
+      )}
+      title="Not a real result — illustrative/mock output, kept labeled."
+    >
+      <span className="text-[8px] leading-none">🧪</span>
+      {label}
     </span>
   );
 }
