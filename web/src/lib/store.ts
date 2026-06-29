@@ -201,6 +201,7 @@ export const useFirm = create<FirmState>((set, get) => ({
       inspectorTab: "monitor",
       pendingPlan: null,
       planError: null,
+      historyQuery: "", // #16 — a fresh chat clears the history search filter
     });
   },
 
