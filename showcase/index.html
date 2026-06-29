@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sapphire — UI Showcase</title>
+<style>
+  :root{--bg:#0a0a0c;--card:#111114;--bd:#26262c;--ink:#e7e7ea;--mut:#8a8a93;--accent:#7c5cff;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif;line-height:1.5}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 80px}
+  h1{font-size:26px;font-weight:650;letter-spacing:.2px;display:flex;align-items:center;gap:10px;margin:0 0 6px}
+  .sub{color:var(--mut);font-size:14px;margin:0 0 36px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);margin:40px 0 14px;font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .grid.cols4{grid-template-columns:repeat(4,1fr)}
+  .card{background:var(--card);border:1px solid var(--bd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:.15s}
+  .card:hover{border-color:#3a3a44}
+  .thumb{aspect-ratio:16/10;background:#000;border-bottom:1px solid var(--bd);overflow:hidden}
+  .thumb img{width:100%;height:100%;object-fit:cover;object-position:top left}
+  .body{padding:14px 16px}
+  .title{font-weight:600;font-size:15px;margin:0 0 4px}
+  .title .lead{color:var(--accent);font-size:11px;font-weight:600;margin-left:6px}
+  .desc{color:var(--mut);font-size:13px;margin:0 0 12px}
+  .links{display:flex;gap:8px;flex-wrap:wrap}
+  a.btn{appearance:none;text-decoration:none;border:1px solid var(--bd);background:transparent;color:var(--ink);padding:6px 12px;border-radius:8px;font-size:12.5px}
+  a.btn:hover{border-color:var(--accent);background:rgba(124,92,255,.14)}
+  a.btn.primary{background:rgba(124,92,255,.16);border-color:var(--accent)}
+  .note{color:var(--mut);font-size:12.5px;margin-top:8px}
+  .concepts .body{padding:12px 14px}
+  .concepts .title{font-size:13.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>◆ Sapphire — UI Showcase</h1>
+  <p class="sub">Open and show the Sapphire interface without running anything. The two flagship apps are captured as self-contained snapshots (real populated UI); the four design concepts are live static mockups.</p>
+
+  <h2>Flagship apps — snapshots (real populated UI)</h2>
+  <div class="grid">
+    <div class="card">
+      <a class="thumb" href="app-snapshots/web-linear-vercel.png"><img src="app-snapshots/web-linear-vercel.png" alt="Linear/Vercel app"></a>
+      <div class="body">
+        <p class="title">Linear / Vercel <span class="lead">★ the build</span></p>
+        <p class="desc">The product front end — history rail, live trace Monitor, two-plane cited dossier, roundtable spread, plan mode. Captured on a TSC2 rescue run.</p>
+        <div class="links">
+          <a class="btn primary" href="app-snapshots/web-linear-vercel.png">View (PNG)</a>
+          <a class="btn" href="app-snapshots/web-linear-vercel.mhtml">Open page (.mhtml · Chrome/Edge)</a>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <a class="thumb" href="app-snapshots/web-perplexity.png"><img src="app-snapshots/web-perplexity.png" alt="Perplexity app"></a>
+      <div class="body">
+        <p class="title">Perplexity · citation-forward</p>
+        <p class="desc">Alternate direction — numbered inline citations, plane tabs, a source grid, the same engine. Comparison candidate.</p>
+        <div class="links">
+          <a class="btn primary" href="app-snapshots/web-perplexity.png">View (PNG)</a>
+          <a class="btn" href="app-snapshots/web-perplexity.mhtml">Open page (.mhtml · Chrome/Edge)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Design concepts — live static mockups (open in any browser)</h2>
+  <div class="grid cols4 concepts">
+    <div class="card"><div class="body"><p class="title">Linear / Vercel</p><div class="links"><a class="btn" href="concepts/linear-vercel.html">Open</a></div></div></div>
+    <div class="card"><div class="body"><p class="title">Claude · editorial</p><div class="links"><a class="btn" href="concepts/claude-editorial.html">Open</a></div></div></div>
+    <div class="card"><div class="body"><p class="title">Perplexity · citation</p><div class="links"><a class="btn" href="concepts/perplexity-citation.html">Open</a></div></div></div>
+    <div class="card"><div class="body"><p class="title">ChatGPT · minimal</p><div class="links"><a class="btn" href="concepts/chatgpt-minimal.html">Open</a></div></div></div>
+  </div>
+
+  <p class="note">The flagship apps are real React/Next apps — to run them <em>live</em> (interactive, real data), see <code>showcase/README.md</code>. The <code>.png</code> opens anywhere; the <code>.mhtml</code> opens the full rendered page in Chrome/Edge. The four concepts are fully interactive static HTML.</p>
+</div>
+</body>
+</html>

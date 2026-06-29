@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — CNS Drug Discovery Console</title>
+<style>
+/* ─── Reset & Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f9f9f8;
+  --surface: #ffffff;
+  --surface2: #f5f4f2;
+  --surface3: #eeede9;
+  --border: #e3e2de;
+  --border-light: #eceae5;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --text-tertiary: #9a9a9a;
+  --accent: #1a73e8;
+  --accent-dim: #e8f0fe;
+  --green: #1a7f4e;
+  --green-bg: #ecfdf5;
+  --amber: #b45309;
+  --amber-bg: #fffbeb;
+  --red: #dc2626;
+  --red-bg: #fef2f2;
+  --purple: #6d28d9;
+  --purple-bg: #f5f3ff;
+  --tier1: #1a7f4e;
+  --tier2: #1a73e8;
+  --tier3: #9a9a9a;
+  --internal-bg: #fef3c7;
+  --internal-border: #fcd34d;
+  --internal-text: #92400e;
+  --external-bg: #eff6ff;
+  --external-border: #93c5fd;
+  --external-text: #1e40af;
+  --rail-w: 240px;
+  --inspector-w: 340px;
+  --font: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --radius: 8px;
+  --radius-sm: 5px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.10);
+}
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text-primary); font-size: 13.5px; line-height: 1.55; }
+
+/* ─── Layout Shell ──────────────────────────────────────────────────────────── */
+#shell { display: flex; height: 100vh; overflow: hidden; }
+
+/* ─── Left Rail: History ────────────────────────────────────────────────────── */
+#rail {
+  width: var(--rail-w); flex-shrink: 0;
+  background: var(--surface); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.rail-header {
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--border-light);
+  display: flex; align-items: center; gap: 8px;
+}
+.logo {
+  font-size: 15px; font-weight: 700; letter-spacing: -.4px;
+  color: var(--text-primary); display: flex; align-items: center; gap: 6px;
+}
+.logo-gem { font-size: 18px; }
+.rail-meta { font-size: 10.5px; color: var(--text-tertiary); font-weight: 500; letter-spacing: .3px; text-transform: uppercase; margin-top: 1px; }
+.rail-section { padding: 8px 8px 4px; }
+.rail-section-label { font-size: 10px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--text-tertiary); padding: 0 6px; margin-bottom: 4px; }
+.rail-item {
+  display: flex; flex-direction: column; padding: 8px 10px;
+  border-radius: var(--radius-sm); cursor: pointer; margin-bottom: 1px;
+  transition: background .12s;
+}
+.rail-item:hover { background: var(--surface2); }
+.rail-item.active { background: var(--accent-dim); }
+.rail-item-title { font-size: 12.5px; font-weight: 500; color: var(--text-primary); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rail-item.active .rail-item-title { color: var(--accent); }
+.rail-item-meta { font-size: 10.5px; color: var(--text-tertiary); margin-top: 2px; }
+.rail-footer {
+  margin-top: auto; padding: 10px 8px;
+  border-top: 1px solid var(--border-light);
+}
+.profile-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer;
+  transition: background .12s;
+}
+.profile-btn:hover { background: var(--surface2); }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #6d28d9, #1a73e8);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: white; flex-shrink: 0;
+}
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-size: 12px; font-weight: 600; }
+.profile-role { font-size: 10.5px; color: var(--text-tertiary); }
+
+/* ─── Center: Chat ──────────────────────────────────────────────────────────── */
+#center { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+#chat-header {
+  height: 44px; flex-shrink: 0;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px; padding: 0 16px;
+}
+.header-title { font-size: 13px; font-weight: 600; color: var(--text-primary); flex: 1; }
+.model-pill {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; font-size: 11px; font-weight: 500; color: var(--text-secondary);
+  cursor: pointer; transition: border-color .12s;
+}
+.model-pill:hover { border-color: var(--accent); color: var(--accent); }
+.model-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.header-btn {
+  width: 28px; height: 28px; border-radius: var(--radius-sm);
+  border: 1px solid var(--border); background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; cursor: pointer; color: var(--text-secondary);
+  transition: background .12s, border-color .12s;
+}
+.header-btn:hover { background: var(--surface2); border-color: var(--text-secondary); }
+
+#chat-scroll { flex: 1; overflow-y: auto; padding: 20px 0; }
+#chat-scroll::-webkit-scrollbar { width: 5px; }
+#chat-scroll::-webkit-scrollbar-track { background: transparent; }
+#chat-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.thread { max-width: 780px; margin: 0 auto; padding: 0 20px; }
+
+/* User turn */
+.user-turn { margin-bottom: 22px; }
+.user-query {
+  font-size: 17px; font-weight: 600; line-height: 1.4;
+  color: var(--text-primary); letter-spacing: -.2px;
+}
+.turn-meta { margin-top: 5px; font-size: 11px; color: var(--text-tertiary); display: flex; align-items: center; gap: 10px; }
+.turn-meta-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+
+/* Firm status banner */
+.firm-status-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  margin-bottom: 14px; font-size: 11.5px;
+}
+.status-dot-pulse {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+  flex-shrink: 0; animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(26,127,78,.4); } 50% { opacity: .9; box-shadow: 0 0 0 4px rgba(26,127,78,0); } }
+.status-text { color: var(--text-secondary); flex: 1; }
+.status-text strong { color: var(--text-primary); }
+.trace-toggle-btn {
+  font-size: 11px; font-weight: 500; color: var(--accent); cursor: pointer;
+  padding: 2px 8px; border-radius: 4px; border: 1px solid var(--external-border);
+  background: var(--external-bg); transition: background .12s;
+}
+.trace-toggle-btn:hover { background: var(--accent-dim); }
+
+/* Answer block */
+.answer-block { margin-bottom: 18px; }
+
+/* Synthesis prose */
+.synthesis-prose {
+  font-size: 14px; line-height: 1.72; color: var(--text-primary);
+  margin-bottom: 16px;
+}
+.synthesis-prose p { margin-bottom: 10px; }
+.synthesis-prose p:last-child { margin-bottom: 0; }
+
+/* Inline citation */
+.cite {
+  display: inline-flex; align-items: center;
+  font-size: 10px; font-weight: 700; min-width: 16px; height: 16px;
+  padding: 0 4px;
+  background: var(--accent-dim); color: var(--accent);
+  border-radius: 3px; vertical-align: super;
+  cursor: pointer; text-decoration: none;
+  transition: background .1s; margin: 0 1px;
+  font-family: var(--mono);
+}
+.cite:hover { background: #c7dcf8; }
+
+/* ─── Dossier Section ────────────────────────────────────────────────────────── */
+.section-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px; margin-top: 20px;
+}
+.section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.section-divider { flex: 1; height: 1px; background: var(--border-light); }
+.section-count {
+  font-size: 10px; color: var(--text-tertiary); font-weight: 500;
+  background: var(--surface2); border: 1px solid var(--border);
+  padding: 1px 7px; border-radius: 10px;
+}
+
+/* Plane tabs */
+.plane-tabs { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.plane-tab {
+  flex: 1; padding: 6px 10px; font-size: 11.5px; font-weight: 500;
+  cursor: pointer; text-align: center; transition: background .12s;
+  color: var(--text-secondary); background: var(--surface);
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+}
+.plane-tab:hover { background: var(--surface2); }
+.plane-tab.active { background: var(--surface2); color: var(--text-primary); font-weight: 600; }
+.plane-tab + .plane-tab { border-left: 1px solid var(--border); }
+.plane-badge { font-size: 9.5px; padding: 1px 5px; border-radius: 3px; font-weight: 700; }
+.plane-badge.int { background: var(--internal-bg); color: var(--internal-text); }
+.plane-badge.ext { background: var(--external-bg); color: var(--external-text); }
+
+/* Fact rows */
+.facts-list { display: flex; flex-direction: column; gap: 6px; }
+.fact-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 12px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; transition: border-color .12s, box-shadow .12s;
+}
+.fact-row:hover { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.fact-row.internal-fact { border-left: 3px solid var(--internal-border); }
+.fact-row.external-fact { border-left: 3px solid var(--external-border); }
+.fact-tier {
+  font-size: 9.5px; font-weight: 700; padding: 2px 6px;
+  border-radius: 3px; flex-shrink: 0; margin-top: 1px; font-family: var(--mono);
+  letter-spacing: .3px;
+}
+.tier-t1 { background: var(--green-bg); color: var(--green); }
+.tier-t2 { background: var(--external-bg); color: var(--external-text); }
+.tier-t3 { background: var(--surface2); color: var(--text-tertiary); }
+.fact-body { flex: 1; min-width: 0; }
+.fact-text { font-size: 13px; line-height: 1.55; color: var(--text-primary); }
+.fact-provenance { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+.prov-chip {
+  font-size: 10px; font-weight: 500; padding: 2px 7px;
+  border-radius: 4px; border: 1px solid var(--border);
+  color: var(--text-secondary); background: var(--surface2);
+  display: flex; align-items: center; gap: 3px;
+}
+.prov-chip.agent-chip { border-color: var(--external-border); background: var(--external-bg); color: var(--external-text); }
+.prov-chip.moat-chip { border-color: var(--internal-border); background: var(--internal-bg); color: var(--internal-text); }
+.fact-cites { margin-top: 4px; display: flex; gap: 3px; flex-wrap: wrap; }
+
+/* Flag chips */
+.flags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.flag-chip {
+  font-size: 10.5px; font-weight: 600; padding: 3px 9px;
+  border-radius: 4px; display: flex; align-items: center; gap: 4px;
+}
+.flag-veto { background: var(--red-bg); color: var(--red); border: 1px solid #fca5a5; }
+.flag-divergence { background: var(--amber-bg); color: var(--amber); border: 1px solid #fcd34d; }
+.flag-gap { background: var(--surface2); color: var(--text-secondary); border: 1px solid var(--border); }
+
+/* ─── Roundtable ─────────────────────────────────────────────────────────────── */
+.roundtable-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 12px; }
+.persona-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 10px 10px 8px;
+  cursor: pointer; transition: border-color .12s, box-shadow .12s;
+}
+.persona-card:hover { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.persona-card.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.persona-name { font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+.persona-role { font-size: 10px; color: var(--text-tertiary); margin-bottom: 7px; line-height: 1.4; }
+.verdict-badge {
+  font-size: 9.5px; font-weight: 700; padding: 2px 7px; border-radius: 3px;
+  display: inline-block;
+}
+.v-conditional { background: var(--amber-bg); color: var(--amber); }
+.v-supportive { background: var(--green-bg); color: var(--green); }
+.v-skeptical { background: var(--red-bg); color: var(--red); }
+.v-neutral { background: var(--surface2); color: var(--text-secondary); }
+.persona-confidence { margin-top: 5px; }
+.conf-bar-track { height: 3px; background: var(--border); border-radius: 2px; }
+.conf-bar-fill { height: 3px; border-radius: 2px; background: var(--accent); }
+.conf-label { font-size: 9.5px; color: var(--text-tertiary); margin-top: 2px; }
+
+.round-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.round-tab {
+  font-size: 11px; font-weight: 500; padding: 4px 12px;
+  border-radius: 20px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-secondary);
+  transition: all .12s;
+}
+.round-tab.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+
+.spread-bar {
+  display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+  margin-bottom: 5px;
+}
+.spread-seg { height: 100%; }
+.spread-legend { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+.spread-item { display: flex; align-items: center; gap: 4px; font-size: 10.5px; color: var(--text-secondary); }
+.spread-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+/* Synthesis banner */
+.synthesis-banner {
+  background: linear-gradient(135deg, #f0f9ff 0%, #f5f3ff 100%);
+  border: 1px solid #c7d2fe; border-radius: var(--radius);
+  padding: 14px 16px; margin-top: 6px;
+}
+.synthesis-banner-header { font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--purple); margin-bottom: 8px; }
+.synthesis-text { font-size: 13px; line-height: 1.65; color: var(--text-primary); }
+
+/* ─── Sources Panel ──────────────────────────────────────────────────────────── */
+.sources-section { margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--border); }
+.sources-section-header { font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.sources-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.source-card {
+  display: flex; gap: 9px; align-items: flex-start;
+  padding: 9px 11px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; transition: border-color .12s;
+}
+.source-card:hover { border-color: var(--accent); }
+.source-num {
+  font-size: 10px; font-weight: 700; color: var(--accent);
+  min-width: 18px; text-align: right; font-family: var(--mono);
+  padding-top: 1px; flex-shrink: 0;
+}
+.source-body { min-width: 0; }
+.source-title { font-size: 12px; font-weight: 500; color: var(--text-primary); line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.source-journal { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; }
+.source-meta { display: flex; gap: 5px; margin-top: 3px; flex-wrap: wrap; }
+.source-tag {
+  font-size: 9.5px; padding: 1px 5px; border-radius: 3px; font-weight: 500;
+}
+.tag-pmid { background: var(--green-bg); color: var(--green); }
+.tag-doi { background: var(--external-bg); color: var(--external-text); }
+.tag-moat { background: var(--internal-bg); color: var(--internal-text); }
+.tag-emet { background: var(--purple-bg); color: var(--purple); }
+
+/* Input bar */
+#input-area {
+  flex-shrink: 0; padding: 12px 20px 14px;
+  background: var(--surface); border-top: 1px solid var(--border);
+}
+.input-wrap { max-width: 780px; margin: 0 auto; }
+.input-box {
+  width: 100%; display: flex; align-items: flex-end; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; transition: border-color .15s, box-shadow .15s;
+}
+.input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.input-textarea {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: var(--font); font-size: 13.5px; color: var(--text-primary);
+  resize: none; min-height: 22px; max-height: 120px; line-height: 1.5;
+}
+.input-textarea::placeholder { color: var(--text-tertiary); }
+.input-actions { display: flex; align-items: center; gap: 5px; padding-bottom: 1px; }
+.input-btn {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  border: none; background: transparent; cursor: pointer;
+  color: var(--text-tertiary); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s, color .12s;
+}
+.input-btn:hover { background: var(--surface3); color: var(--text-secondary); }
+.send-btn {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  border: none; background: var(--text-primary); cursor: pointer;
+  color: white; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s;
+}
+.send-btn:hover { background: #333; }
+.input-hint { font-size: 10.5px; color: var(--text-tertiary); margin-top: 6px; padding: 0 2px; }
+
+/* ─── Right Panel: Trace + Inspector ────────────────────────────────────────── */
+#right-panel {
+  width: var(--inspector-w); flex-shrink: 0;
+  background: var(--surface); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.panel-tabs {
+  display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0;
+}
+.panel-tab {
+  flex: 1; padding: 10px 8px; font-size: 11.5px; font-weight: 600;
+  text-align: center; cursor: pointer; border-bottom: 2px solid transparent;
+  color: var(--text-tertiary); transition: all .12s; letter-spacing: .1px;
+}
+.panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.panel-tab:hover:not(.active) { color: var(--text-secondary); }
+.panel-content { flex: 1; overflow-y: auto; }
+.panel-content::-webkit-scrollbar { width: 4px; }
+.panel-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.panel-inner { padding: 12px 14px; }
+
+/* Trace timeline */
+.trace-timeline { display: flex; flex-direction: column; }
+.trace-group { margin-bottom: 14px; }
+.trace-group-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase;
+  color: var(--text-tertiary); margin-bottom: 5px; padding-left: 20px;
+}
+.trace-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 8px; border-radius: var(--radius-sm); cursor: pointer;
+  transition: background .1s; position: relative;
+}
+.trace-item:hover { background: var(--surface2); }
+.trace-item.active-trace { background: var(--accent-dim); }
+.trace-item::before {
+  content: ''; position: absolute; left: 19px; top: 26px; bottom: -14px;
+  width: 1px; background: var(--border);
+}
+.trace-item:last-child::before { display: none; }
+.trace-icon {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; z-index: 1;
+}
+.ti-done { background: var(--green-bg); color: var(--green); border: 1.5px solid var(--green); }
+.ti-warn { background: var(--amber-bg); color: var(--amber); border: 1.5px solid #fcd34d; }
+.ti-block { background: var(--red-bg); color: var(--red); border: 1.5px solid #fca5a5; }
+.ti-run { background: var(--external-bg); color: var(--accent); border: 1.5px solid var(--external-border); animation: pulse 1.5s infinite; }
+.ti-skip { background: var(--surface2); color: var(--text-tertiary); border: 1.5px solid var(--border); }
+.trace-body { flex: 1; min-width: 0; padding-top: 2px; }
+.trace-name { font-size: 11.5px; font-weight: 600; color: var(--text-primary); }
+.trace-item.active-trace .trace-name { color: var(--accent); }
+.trace-detail { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trace-time { font-size: 10px; color: var(--text-tertiary); font-family: var(--mono); padding-top: 4px; flex-shrink: 0; }
+.trace-flags { display: flex; gap: 3px; margin-top: 3px; }
+.trace-flag { font-size: 9px; padding: 1px 5px; border-radius: 3px; font-weight: 600; }
+.tf-div { background: var(--amber-bg); color: var(--amber); }
+.tf-veto { background: var(--red-bg); color: var(--red); }
+.tf-t1 { background: var(--green-bg); color: var(--green); }
+
+/* Inspector pane */
+.inspector-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 20px; text-align: center; color: var(--text-tertiary);
+}
+.inspector-empty-icon { font-size: 28px; margin-bottom: 10px; opacity: .4; }
+.inspector-empty-text { font-size: 12px; line-height: 1.6; }
+
+.inspector-agent {
+  display: none; /* shown by JS */
+}
+.inspector-agent.visible { display: block; }
+
+.insp-header { padding: 14px 14px 10px; border-bottom: 1px solid var(--border-light); }
+.insp-agent-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+.insp-agent-meta { font-size: 11px; color: var(--text-tertiary); display: flex; gap: 8px; flex-wrap: wrap; }
+.insp-meta-chip {
+  display: flex; align-items: center; gap: 3px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1px 7px; font-size: 10px; font-weight: 500;
+}
+.insp-section { padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
+.insp-section-label { font-size: 10px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 7px; }
+.insp-text { font-size: 12px; line-height: 1.6; color: var(--text-primary); }
+.insp-fact { padding: 7px 9px; background: var(--surface2); border-radius: var(--radius-sm); margin-bottom: 5px; font-size: 11.5px; line-height: 1.5; }
+.insp-fact:last-child { margin-bottom: 0; }
+.prov-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--border-light); font-size: 11.5px; }
+.prov-row:last-child { border-bottom: none; }
+.prov-key { color: var(--text-tertiary); }
+.prov-val { font-weight: 500; color: var(--text-primary); font-family: var(--mono); font-size: 11px; }
+.cite-source-list { display: flex; flex-direction: column; gap: 5px; }
+.cite-source-item { display: flex; gap: 7px; padding: 7px 9px; background: var(--surface2); border-radius: var(--radius-sm); align-items: flex-start; }
+.cite-num { font-size: 10px; font-weight: 700; color: var(--accent); min-width: 16px; font-family: var(--mono); padding-top: 1px; }
+.cite-info { min-width: 0; }
+.cite-title { font-size: 11.5px; font-weight: 500; color: var(--text-primary); }
+.cite-meta-row { font-size: 10.5px; color: var(--text-tertiary); margin-top: 1px; }
+
+/* Persona inspector */
+.persona-insp-verdict {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+}
+.persona-insp-verdict-badge { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 5px; }
+.conf-detail { font-size: 11px; color: var(--text-secondary); }
+.rebuttal-box {
+  background: var(--surface2); border-radius: var(--radius-sm);
+  padding: 8px 10px; font-size: 11.5px; line-height: 1.6; color: var(--text-primary);
+  border-left: 3px solid var(--accent); margin-top: 4px;
+}
+
+/* Empty state */
+.empty-state { padding: 60px 20px; text-align: center; }
+.empty-logo { font-size: 36px; margin-bottom: 14px; }
+.empty-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+.empty-desc { font-size: 13px; color: var(--text-secondary); max-width: 340px; margin: 0 auto 20px; line-height: 1.6; }
+.empty-suggestions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; max-width: 500px; margin: 0 auto; }
+.empty-sug {
+  padding: 10px 12px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; font-size: 12px; color: var(--text-secondary);
+  text-align: left; line-height: 1.5; transition: border-color .12s, box-shadow .12s;
+}
+.empty-sug:hover { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); color: var(--text-primary); }
+.empty-sug strong { display: block; color: var(--text-primary); font-size: 12.5px; margin-bottom: 2px; }
+
+/* Scrollbar global */
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+
+/* Utility */
+.hidden { display: none !important; }
+.text-accent { color: var(--accent); }
+.fw-600 { font-weight: 600; }
+
+/* Annotation tooltip */
+.tooltip-container { position: relative; display: inline; }
+.tooltip-tip {
+  display: none; position: absolute; z-index: 999;
+  bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: var(--text-primary); color: white;
+  font-size: 11px; padding: 6px 10px; border-radius: 5px;
+  white-space: nowrap; pointer-events: none; font-weight: normal;
+  box-shadow: var(--shadow-md);
+}
+.tooltip-container:hover .tooltip-tip { display: block; }
+</style>
+</head>
+<body>
+
+<div id="shell">
+
+  <!-- ════════════════════ LEFT RAIL ════════════════════ -->
+  <nav id="rail">
+    <div class="rail-header">
+      <div>
+        <div class="logo"><span class="logo-gem">💎</span> Sapphire</div>
+        <div class="rail-meta">CNS Drug Discovery Firm</div>
+      </div>
+    </div>
+
+    <div style="padding:8px 8px 4px;">
+      <button onclick="newQuery()" style="width:100%;padding:7px 10px;border-radius:var(--radius-sm);border:1px dashed var(--border);background:transparent;color:var(--text-secondary);font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:var(--font);transition:border-color .12s,background .12s;" onmouseover="this.style.borderColor='var(--accent)';this.style.background='var(--accent-dim)';" onmouseout="this.style.borderColor='var(--border)';this.style.background='transparent';">
+        <span style="font-size:14px;">+</span> New query
+      </button>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-section-label">Today</div>
+      <div class="rail-item active" onclick="showThread()">
+        <div class="rail-item-title">TSC2 phenotype rescue genes</div>
+        <div class="rail-item-meta">22 agents · 14 facts · 5 verdicts</div>
+      </div>
+      <div class="rail-item" onclick="showThread()">
+        <div class="rail-item-title">Nav1.8 selective inhibitor design</div>
+        <div class="rail-item-meta">20 agents · 11 facts · 5 verdicts</div>
+      </div>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-section-label">Yesterday</div>
+      <div class="rail-item">
+        <div class="rail-item-title">KCNQ2 gain-of-function variant landscape</div>
+        <div class="rail-item-meta">18 agents · 9 facts · 4 verdicts</div>
+      </div>
+      <div class="rail-item">
+        <div class="rail-item-title">Rapamycin analog patent freedom-to-operate</div>
+        <div class="rail-item-meta">VETO ⛔ · IP cleared w/ constraints</div>
+      </div>
+      <div class="rail-item">
+        <div class="rail-item-title">ASO targeting SCNA pre-mRNA splicing</div>
+        <div class="rail-item-meta">22 agents · tox: 0.12 (low risk)</div>
+      </div>
+    </div>
+
+    <div class="rail-section">
+      <div class="rail-section-label">Earlier</div>
+      <div class="rail-item">
+        <div class="rail-item-title">PTEN / mTOR crosstalk in TSC cortical neurons</div>
+        <div class="rail-item-meta">4 days ago · DIVERGENCE flag</div>
+      </div>
+      <div class="rail-item">
+        <div class="rail-item-title">GluA1 AMPAr positive modulator selectivity</div>
+        <div class="rail-item-meta">5 days ago · 12 facts</div>
+      </div>
+    </div>
+
+    <div class="rail-footer">
+      <div class="profile-btn">
+        <div class="avatar">RA</div>
+        <div class="profile-info">
+          <div class="profile-name">Rohan Arya Gondi</div>
+          <div class="profile-role">Principal · Quiver Bio</div>
+        </div>
+        <span style="color:var(--text-tertiary);font-size:12px;">⚙</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ════════════════════ CENTER ════════════════════ -->
+  <main id="center">
+    <div id="chat-header">
+      <span class="header-title">TSC2 phenotype rescue</span>
+      <div class="model-pill">
+        <div class="model-dot"></div>
+        claude-opus-4 · sapphire-v3
+      </div>
+      <button class="header-btn" title="Share">↑</button>
+      <button class="header-btn" title="Export">⊞</button>
+    </div>
+
+    <div id="chat-scroll">
+      <div class="thread">
+
+        <!-- ─── EMPTY STATE (shown when no thread) ─────────────────────── -->
+        <div id="empty-state" class="empty-state hidden">
+          <div class="empty-logo">💎</div>
+          <div class="empty-title">Ask Sapphire</div>
+          <div class="empty-desc">Run a two-bucket CNS discovery analysis — cited facts from 22 agents, then a persona roundtable with no forced consensus.</div>
+          <div class="empty-suggestions">
+            <div class="empty-sug"><strong>Gene rescue screen</strong> Which genes rescue the TSC2 phenotype the most?</div>
+            <div class="empty-sug"><strong>Selectivity profile</strong> Nav1.8 vs Nav1.7 inhibitor differentiation — what does the literature say?</div>
+            <div class="empty-sug"><strong>Patent freedom</strong> Freedom-to-operate on rapamycin analogs for pediatric TSC?</div>
+            <div class="empty-sug"><strong>Clinical landscape</strong> Active Phase II/III trials targeting mTORC1 in TSC as of 2026?</div>
+          </div>
+        </div>
+
+        <!-- ─── ACTIVE THREAD ─────────────────────────────────────────── -->
+        <div id="thread-content">
+
+          <!-- User turn -->
+          <div class="user-turn">
+            <div class="user-query">Which genes rescue the TSC2 phenotype most strongly, and what's the internal evidence vs. public literature?</div>
+            <div class="turn-meta">
+              <span>2026-06-28 · 09:14</span>
+              <span class="turn-meta-dot"></span>
+              <span>Bucket 1: 14 facts · Bucket 2: 5 verdicts</span>
+              <span class="turn-meta-dot"></span>
+              <span style="color:var(--green);">✓ Complete · 48 s</span>
+            </div>
+          </div>
+
+          <!-- Firm status bar -->
+          <div class="firm-status-bar">
+            <div class="status-dot-pulse"></div>
+            <div class="status-text">
+              <strong>22 agents completed.</strong> 14 T1–T2 facts · 2 flags (1 DIVERGENCE, 1 gap) · Roundtable: 4 conditional, 1 skeptical · No vetoes.
+            </div>
+            <button class="trace-toggle-btn" onclick="switchPanel('trace')">View trace →</button>
+          </div>
+
+          <!-- ─── SYNTHESIS ───────────────────────────────────────────── -->
+          <div class="answer-block">
+            <div class="synthesis-prose">
+              <p>
+                The strongest rescue signal in the public literature centers on <strong>DCTN6</strong>, <strong>FZD7</strong>, and canonical <strong>mTOR</strong> pathway restoration. DCTN6 overexpression suppresses TSC2-null mTORC1 hyperactivation in cortical neuron models with the most consistent effect sizes across three independent CRISPR rescue screens <a href="#src1" class="cite tooltip-container">1<span class="tooltip-tip">Henske et al. 2024 — PMID 38291044</span></a><a href="#src2" class="cite tooltip-container">2<span class="tooltip-tip">Crino PV et al. 2023 — PMID 36901882</span></a>. FZD7-mediated Wnt/mTOR crosstalk provides a parallel rescue axis that is independent of direct mTORC1 suppression <a href="#src3" class="cite tooltip-container">3<span class="tooltip-tip">DOI 10.1016/j.celrep.2024.113791</span></a>.
+              </p>
+              <p>
+                <strong>Internal moat data (🔒 Quiver CNS_DFP)</strong> scores DCTN6 at 0.91 rescue efficacy and identifies a novel hit, <strong>RHEB G30S</strong> dominant-negative, not yet in the public literature — this is a <span style="color:var(--amber);font-weight:600;">DIVERGENCE</span>: external screens do not capture this variant because they used full-knockout rather than patient-derived heterozygous iPSCs <a href="#src8" class="cite tooltip-container">🔒<span class="tooltip-tip">Quiver internal moat — CNS_DFP v2.4 (confidential)</span></a>. The moat also confirms MTOR T2446A as a gain-of-function sensitizer to everolimus, consistent with published Phase II data <a href="#src4" class="cite tooltip-container">4<span class="tooltip-tip">Franz DN et al. 2022 — PMID 35840103</span></a>.
+              </p>
+              <p>
+                The clinical-trial registry shows <strong>3 active Phase II studies</strong> using rapamycin analogs in TSC, all with mTORC1 as the primary pharmacological target <a href="#src5" class="cite tooltip-container">5<span class="tooltip-tip">ClinicalTrials.gov NCT05821764 — accessed 2026-06-28</span></a>. DEA scheduling presents no constraint for these gene targets. No IP veto was raised by the Patent agent.
+              </p>
+            </div>
+
+            <!-- Flags -->
+            <div class="flags">
+              <span class="flag-chip flag-divergence">⚠ DIVERGENCE — RHEB G30S: internal hit absent from public screens</span>
+              <span class="flag-chip flag-gap">○ Gap — iPSC patient-line data for FZD7 arm pending</span>
+            </div>
+          </div>
+
+          <!-- ─── DOSSIER ──────────────────────────────────────────────── -->
+          <div class="section-header">
+            <span class="section-label">Bucket 1 — Fact Dossier</span>
+            <span class="section-divider"></span>
+            <span class="section-count">14 facts</span>
+          </div>
+
+          <div class="plane-tabs">
+            <div class="plane-tab active" onclick="switchPlane('ext', this)">
+              <span>🌐 External</span>
+              <span class="plane-badge ext">11 facts</span>
+            </div>
+            <div class="plane-tab" onclick="switchPlane('int', this)">
+              <span>🔒 Internal moat</span>
+              <span class="plane-badge int">3 facts</span>
+            </div>
+          </div>
+
+          <!-- External plane -->
+          <div id="plane-ext" class="facts-list">
+            <div class="fact-row external-fact" onclick="inspectFact('emet')">
+              <span class="fact-tier tier-t1">T1</span>
+              <div class="fact-body">
+                <div class="fact-text">DCTN6 overexpression rescues TSC2-null mTORC1 hyperactivation in three independent cortical neuron CRISPR screens; mean rescue efficacy 0.87 (SD 0.06). <a href="#src1" class="cite">1</a><a href="#src2" class="cite">2</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">EMET Analyst</span>
+                  <span class="prov-chip">live • BenchSci</span>
+                  <span class="prov-chip">Jun 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row external-fact" onclick="inspectFact('emet')">
+              <span class="fact-tier tier-t1">T1</span>
+              <div class="fact-body">
+                <div class="fact-text">FZD7 knockdown suppresses TSC2-null proliferation independently of mTORC1, via β-catenin/YAP axis, confirmed in patient-derived organoids. <a href="#src3" class="cite">3</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">EMET Analyst</span>
+                  <span class="prov-chip">live • PubMed</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row external-fact" onclick="inspectFact('qmodels')">
+              <span class="fact-tier tier-t2">T2</span>
+              <div class="fact-body">
+                <div class="fact-text">MTOR T2446A variant confers 2.3× increased sensitivity to everolimus in TSC2-deficient cells (Q-Models ESM-2 family cluster; score 0.78). <a href="#src4" class="cite">4</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">Q-Models Runner</span>
+                  <span class="prov-chip">live-local • ESM-2</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row external-fact" onclick="inspectFact('clinical')">
+              <span class="fact-tier tier-t2">T2</span>
+              <div class="fact-body">
+                <div class="fact-text">3 active Phase II RCTs (NCT05821764, NCT05490420, NCT06127901) use mTORC1 inhibitors in TSC; primary endpoint mTORC1 activity in cortical tubers. <a href="#src5" class="cite">5</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">Clinical Trial Registry</span>
+                  <span class="prov-chip">accessed Jun 28 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row external-fact" onclick="inspectFact('emet')">
+              <span class="fact-tier tier-t1">T1</span>
+              <div class="fact-body">
+                <div class="fact-text">AKT1S1 (PRAS40) phosphorylation at T246 is a validated downstream readout of TSC2 rescue; shows 91% concordance with cell viability rescue in published screens. <a href="#src6" class="cite">6</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">EMET Analyst</span>
+                  <span class="prov-chip">live • BenchSci</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row external-fact" onclick="inspectFact('emet')">
+              <span class="fact-tier tier-t2">T2</span>
+              <div class="fact-body">
+                <div class="fact-text">No granted US patents on DCTN6 as a TSC rescue target; FZD7 modulation space partially covered by WO2021/187342 (Novartis, expires 2041). <a href="#src7" class="cite">7</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip agent-chip">Patent/IP Agent</span>
+                  <span class="prov-chip">USPTO · EPO</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Internal plane (hidden by default) -->
+          <div id="plane-int" class="facts-list hidden">
+            <div class="fact-row internal-fact" onclick="inspectFact('moat')">
+              <span class="fact-tier tier-t1">T1</span>
+              <div class="fact-body">
+                <div class="fact-text">🔒 Quiver CNS_DFP scores DCTN6 at 0.91 rescue efficacy (heterozygous TSC2+/− iPSC line, n=6); highest of 48 candidates screened. <a class="cite" style="background:var(--internal-bg);color:var(--internal-text);">🔒</a></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip moat-chip">🔒 Internal moat</span>
+                  <span class="prov-chip">moat-real • CNS_DFP v2.4</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row internal-fact" onclick="inspectFact('moat')">
+              <span class="fact-tier tier-t1">T1</span>
+              <div class="fact-body">
+                <div class="fact-text">🔒 RHEB G30S dominant-negative achieves 0.84 rescue score in patient-iPSC model — NOT present in any public screen (screens used full KO, not heterozygous cells). <span class="flag-chip flag-divergence" style="display:inline-flex;font-size:9.5px;padding:1px 6px;margin-left:4px;">DIVERGENCE</span></div>
+                <div class="fact-provenance">
+                  <span class="prov-chip moat-chip">🔒 Internal moat</span>
+                  <span class="prov-chip">moat-real · proprietary</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="fact-row internal-fact" onclick="inspectFact('moat')">
+              <span class="fact-tier tier-t2">T2</span>
+              <div class="fact-body">
+                <div class="fact-text">🔒 Internal OPAL functional assay confirms MTOR T2446A sensitivity to everolimus; aligns with external literature T2 (no contradiction). Score: 0.79.</div>
+                <div class="fact-provenance">
+                  <span class="prov-chip moat-chip">🔒 Internal moat</span>
+                  <span class="prov-chip">OPAL assay · Q2 2026</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── ROUNDTABLE ──────────────────────────────────────────── -->
+          <div class="section-header">
+            <span class="section-label">Bucket 2 — Roundtable Spread</span>
+            <span class="section-divider"></span>
+            <span class="section-count">5 personas · 2 rounds</span>
+          </div>
+
+          <div class="round-tabs">
+            <button class="round-tab active" onclick="switchRound('r1', this)">Round 1 — Verdicts</button>
+            <button class="round-tab" onclick="switchRound('r2', this)">Round 2 — Rebuttal</button>
+          </div>
+
+          <div id="roundtable-r1">
+            <div class="roundtable-grid">
+              <div class="persona-card" onclick="inspectPersona('fda')">
+                <div class="persona-name">ex-FDA Reg.</div>
+                <div class="persona-role">Regulatory safety + CMC lens</div>
+                <span class="verdict-badge v-conditional">Conditional</span>
+                <div class="persona-confidence">
+                  <div class="conf-bar-track"><div class="conf-bar-fill" style="width:72%"></div></div>
+                  <div class="conf-label">Confidence 72%</div>
+                </div>
+              </div>
+              <div class="persona-card" onclick="inspectPersona('redteam')">
+                <div class="persona-name">Red Team</div>
+                <div class="persona-role">Adversarial challenge agent</div>
+                <span class="verdict-badge v-skeptical">Skeptical</span>
+                <div class="persona-confidence">
+                  <div class="conf-bar-track"><div class="conf-bar-fill" style="width:55%" style="background:var(--red);"></div></div>
+                  <div class="conf-label">Confidence 55%</div>
+                </div>
+              </div>
+              <div class="persona-card selected" onclick="inspectPersona('payer')">
+                <div class="persona-name">Payer Analyst</div>
+                <div class="persona-role">Reimbursement + HTA view</div>
+                <span class="verdict-badge v-conditional">Conditional</span>
+                <div class="persona-confidence">
+                  <div class="conf-bar-track"><div class="conf-bar-fill" style="width:68%"></div></div>
+                  <div class="conf-label">Confidence 68%</div>
+                </div>
+              </div>
+              <div class="persona-card" onclick="inspectPersona('kol')">
+                <div class="persona-name">KOL / Social</div>
+                <div class="persona-role">Academic + patient opinion</div>
+                <span class="verdict-badge v-supportive">Supportive</span>
+                <div class="persona-confidence">
+                  <div class="conf-bar-track"><div class="conf-bar-fill" style="width:81%"></div></div>
+                  <div class="conf-label">Confidence 81%</div>
+                </div>
+              </div>
+              <div class="persona-card" onclick="inspectPersona('financial')">
+                <div class="persona-name">Financial</div>
+                <div class="persona-role">Market + deal landscape</div>
+                <span class="verdict-badge v-conditional">Conditional</span>
+                <div class="persona-confidence">
+                  <div class="conf-bar-track"><div class="conf-bar-fill" style="width:65%"></div></div>
+                  <div class="conf-label">Confidence 65%</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Spread bar -->
+            <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
+              <div style="font-size:10.5px;font-weight:600;color:var(--text-secondary);margin-bottom:7px;">SPREAD — no forced consensus</div>
+              <div class="spread-bar">
+                <div class="spread-seg" style="width:20%;background:var(--green);"></div>
+                <div class="spread-seg" style="width:60%;background:var(--amber);"></div>
+                <div class="spread-seg" style="width:20%;background:var(--red);"></div>
+              </div>
+              <div class="spread-legend">
+                <div class="spread-item"><div class="spread-dot" style="background:var(--green);"></div>Supportive (1)</div>
+                <div class="spread-item"><div class="spread-dot" style="background:var(--amber);"></div>Conditional (3)</div>
+                <div class="spread-item"><div class="spread-dot" style="background:var(--red);"></div>Skeptical (1)</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="roundtable-r2" class="hidden">
+            <div class="facts-list">
+              <div class="fact-row" style="border-left:3px solid var(--red);">
+                <div class="fact-body">
+                  <div style="font-size:11px;font-weight:700;color:var(--red);margin-bottom:3px;">Red Team → all</div>
+                  <div class="fact-text">The RHEB G30S finding (DIVERGENCE) is compelling but rests on a single internal iPSC line. Until replicated in at least 2 independent patient-derived lines, this cannot be primary evidence for a program decision. I request a fact-request for n≥2 replication data. <a href="#src2" class="cite">2</a></div>
+                </div>
+              </div>
+              <div class="fact-row" style="border-left:3px solid var(--green);">
+                <div class="fact-body">
+                  <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">KOL → Red Team</div>
+                  <div class="fact-text">Single-line discovery is standard for this field — the Henske screens also used n=1 initially. <a href="#src1" class="cite">1</a> The DCTN6 T1 signal is sufficient to advance to validation stage. The question isn't replication before proceeding; it's replication in parallel with lead optimization.</div>
+                </div>
+              </div>
+              <div class="fact-row" style="border-left:3px solid var(--amber);">
+                <div class="fact-body">
+                  <div style="font-size:11px;font-weight:700;color:var(--amber);margin-bottom:3px;">ex-FDA → all</div>
+                  <div class="fact-text">From a regulatory path perspective: DCTN6 and FZD7 are valid targets, but the FZD7/WO2021 IP constraint <a href="#src7" class="cite">7</a> needs formal FTO opinion before IND-enabling studies. The RHEB G30S angle is novel and could be protectable — this is the alpha. Recommend IP filing priority.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Synthesis banner -->
+          <div class="synthesis-banner" style="margin-top:16px;">
+            <div class="synthesis-banner-header">⬡ Synthesis</div>
+            <div class="synthesis-text">
+              DCTN6 is the highest-confidence external rescue target (T1, 3 screens). The internal moat surfaces RHEB G30S as a novel, potentially protectable hit — the DIVERGENCE vs. public screens is explained by assay design (heterozygous vs. full-KO cells), not contradiction. The roundtable spread (4 conditional, 1 skeptical) reflects appropriate uncertainty; the Red Team's replication request is procedurally valid but should not gate DCTN6 lead optimization. Recommended next step: (1) file provisional on RHEB G30S, (2) parallel FZD7 FTO review, (3) expand DCTN6 to n=3 iPSC lines with orthogonal readout.
+            </div>
+          </div>
+
+          <!-- ─── SOURCES ──────────────────────────────────────────────── -->
+          <div class="sources-section">
+            <div class="sources-section-header">
+              <span>📚</span>
+              <span>Sources cited in this analysis</span>
+              <span style="margin-left:auto;font-size:11px;color:var(--text-tertiary);">7 references</span>
+            </div>
+            <div class="sources-grid">
+              <div class="source-card" id="src1" onclick="inspectSource(1)">
+                <div class="source-num">1</div>
+                <div class="source-body">
+                  <div class="source-title">Henske et al. — TSC2 CRISPR rescue screen in cortical neurons</div>
+                  <div class="source-journal">Nat. Neurosci. · 2024</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-pmid">PMID 38291044</span>
+                    <span class="source-tag tag-emet">EMET</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src2" onclick="inspectSource(2)">
+                <div class="source-num">2</div>
+                <div class="source-body">
+                  <div class="source-title">Crino PV et al. — mTORC1 phenotype mapping in TSC iPSC</div>
+                  <div class="source-journal">Brain · 2023</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-pmid">PMID 36901882</span>
+                    <span class="source-tag tag-emet">EMET</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src3" onclick="inspectSource(3)">
+                <div class="source-num">3</div>
+                <div class="source-body">
+                  <div class="source-title">FZD7 / Wnt-YAP axis in TSC2-deficient organoids</div>
+                  <div class="source-journal">Cell Reports · 2024</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-doi">DOI 10.1016/j.celrep.2024.113791</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src4" onclick="inspectSource(4)">
+                <div class="source-num">4</div>
+                <div class="source-body">
+                  <div class="source-title">Franz DN et al. — Everolimus Phase II in TSC with variant stratification</div>
+                  <div class="source-journal">NEJM · 2022</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-pmid">PMID 35840103</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src5" onclick="inspectSource(5)">
+                <div class="source-num">5</div>
+                <div class="source-body">
+                  <div class="source-title">NCT05821764 — Everolimus in pediatric TSC cortical tubers</div>
+                  <div class="source-journal">ClinicalTrials.gov · accessed Jun 2026</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-doi">Phase II · Active</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src6" onclick="inspectSource(6)">
+                <div class="source-num">6</div>
+                <div class="source-body">
+                  <div class="source-title">AKT1S1 pT246 as TSC2 rescue concordance biomarker</div>
+                  <div class="source-journal">J Cell Biol · 2023</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-pmid">PMID 37124491</span>
+                    <span class="source-tag tag-emet">EMET</span>
+                  </div>
+                </div>
+              </div>
+              <div class="source-card" id="src7" onclick="inspectSource(7)">
+                <div class="source-num">7</div>
+                <div class="source-body">
+                  <div class="source-title">WO2021/187342 — FZD7 modulators (Novartis)</div>
+                  <div class="source-journal">USPTO · EPO · expires 2041</div>
+                  <div class="source-meta">
+                    <span class="source-tag tag-doi">Patent/IP Agent</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="height:40px;"></div>
+
+        </div><!-- /thread-content -->
+      </div><!-- /thread -->
+    </div><!-- /chat-scroll -->
+
+    <!-- Input bar -->
+    <div id="input-area">
+      <div class="input-wrap">
+        <div class="input-box">
+          <textarea class="input-textarea" placeholder="Ask a follow-up, or start a new CNS query…" rows="1" oninput="autoResize(this)"></textarea>
+          <div class="input-actions">
+            <button class="input-btn" title="Attach context">📎</button>
+            <button class="send-btn" title="Run Sapphire">↑</button>
+          </div>
+        </div>
+        <div class="input-hint">22 agents · Bucket 1 → Bucket 2 · Results in ~45 s · <strong>claude-opus-4</strong> under the hood</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ════════════════════ RIGHT PANEL ════════════════════ -->
+  <aside id="right-panel">
+    <div class="panel-tabs">
+      <div class="panel-tab active" id="tab-trace" onclick="switchPanel('trace')">Trace</div>
+      <div class="panel-tab" id="tab-inspector" onclick="switchPanel('inspector')">Inspector</div>
+    </div>
+
+    <!-- TRACE PANEL -->
+    <div class="panel-content" id="panel-trace">
+      <div class="panel-inner">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-tertiary);">Live activity feed</div>
+          <div style="font-size:10px;color:var(--green);font-weight:600;">✓ 48 s</div>
+        </div>
+
+        <div class="trace-timeline">
+
+          <div class="trace-group">
+            <div class="trace-group-label">Triage + Plan</div>
+            <div class="trace-item" onclick="inspectTrace('plan')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Engagement Lead</div>
+                <div class="trace-detail">triage → scope → plan · 8 agents queued</div>
+              </div>
+              <div class="trace-time">1.2s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('rm')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Research Manager</div>
+                <div class="trace-detail">completeness gate · no contradiction</div>
+                <div class="trace-flags"><span class="trace-flag tf-div">DIVERGENCE</span></div>
+              </div>
+              <div class="trace-time">2.1s</div>
+            </div>
+          </div>
+
+          <div class="trace-group">
+            <div class="trace-group-label">Bucket 1 — Scientific</div>
+            <div class="trace-item" onclick="inspectTrace('emet')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">EMET Analyst</div>
+                <div class="trace-detail">7 cited facts · BenchSci + PubMed</div>
+                <div class="trace-flags"><span class="trace-flag tf-t1">6×T1</span></div>
+              </div>
+              <div class="trace-time">14.3s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('moat')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Internal Science Lead</div>
+                <div class="trace-detail">moat-real · 3 internal facts</div>
+                <div class="trace-flags"><span class="trace-flag tf-div">DIVERGENCE</span><span class="trace-flag tf-t1">2×T1</span></div>
+              </div>
+              <div class="trace-time">4.8s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('qmodels')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Q-Models Runner</div>
+                <div class="trace-detail">ESM-2 cluster · MTOR T2446A · live-local</div>
+              </div>
+              <div class="trace-time">3.2s</div>
+            </div>
+          </div>
+
+          <div class="trace-group">
+            <div class="trace-group-label">Bucket 1 — Semantic</div>
+            <div class="trace-item" onclick="inspectTrace('patent')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Patent / IP</div>
+                <div class="trace-detail">no veto · FZD7 WO2021 constraint noted</div>
+              </div>
+              <div class="trace-time">5.1s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('clinical')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Clinical Trial Registry</div>
+                <div class="trace-detail">3 active Phase II · NCT IDs captured</div>
+              </div>
+              <div class="trace-time">3.8s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('fda-mem')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">FDA Institutional Memory ⛔</div>
+                <div class="trace-detail">no veto raised</div>
+              </div>
+              <div class="trace-time">2.4s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('dea')">
+              <div class="trace-icon ti-skip">—</div>
+              <div class="trace-body">
+                <div class="trace-name">DEA Scheduling</div>
+                <div class="trace-detail">skipped — no controlled substance</div>
+              </div>
+              <div class="trace-time">0.1s</div>
+            </div>
+            <div class="trace-item" onclick="inspectTrace('payer-sem')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Payer / HTA Semantic</div>
+                <div class="trace-detail">EU HTA precedent · orphan designation</div>
+              </div>
+              <div class="trace-time">2.9s</div>
+            </div>
+          </div>
+
+          <div class="trace-group">
+            <div class="trace-group-label">Bucket 2 — Roundtable</div>
+            <div class="trace-item" onclick="inspectPersona('fda')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">ex-FDA Regulator</div>
+                <div class="trace-detail">Conditional · 72%</div>
+              </div>
+              <div class="trace-time">4.2s</div>
+            </div>
+            <div class="trace-item" onclick="inspectPersona('redteam')">
+              <div class="trace-icon ti-warn">!</div>
+              <div class="trace-body">
+                <div class="trace-name">Adversarial Red Team</div>
+                <div class="trace-detail">Skeptical · RHEB G30S replication request</div>
+              </div>
+              <div class="trace-time">3.9s</div>
+            </div>
+            <div class="trace-item" onclick="inspectPersona('kol')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">KOL / Academic</div>
+                <div class="trace-detail">Supportive · 81%</div>
+              </div>
+              <div class="trace-time">3.1s</div>
+            </div>
+            <div class="trace-item" onclick="inspectPersona('payer')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Payer Analyst</div>
+                <div class="trace-detail">Conditional · HTA pathway question</div>
+              </div>
+              <div class="trace-time">3.4s</div>
+            </div>
+            <div class="trace-item" onclick="inspectPersona('financial')">
+              <div class="trace-icon ti-done">✓</div>
+              <div class="trace-body">
+                <div class="trace-name">Financial Analyst</div>
+                <div class="trace-detail">Conditional · DCTN6 licensing angle</div>
+              </div>
+              <div class="trace-time">3.1s</div>
+            </div>
+          </div>
+
+          <div class="trace-group">
+            <div class="trace-group-label">Synthesis</div>
+            <div class="trace-item active-trace" onclick="inspectTrace('synthesis')">
+              <div class="trace-icon ti-done" style="background:var(--purple-bg);color:var(--purple);border-color:var(--purple);">⬡</div>
+              <div class="trace-body">
+                <div class="trace-name">Roundtable Moderator</div>
+                <div class="trace-detail">spread captured · synthesis written</div>
+              </div>
+              <div class="trace-time">2.8s</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- INSPECTOR PANEL -->
+    <div class="panel-content hidden" id="panel-inspector">
+
+      <!-- Empty state -->
+      <div id="inspector-empty" class="inspector-empty">
+        <div class="inspector-empty-icon">🔍</div>
+        <div class="inspector-empty-text">Click any agent, fact, persona, or source in the trace or dossier to inspect its full output, provenance, and citations.</div>
+      </div>
+
+      <!-- EMET Inspector -->
+      <div id="insp-emet" class="inspector-agent">
+        <div class="insp-header">
+          <div class="insp-agent-name">EMET Analyst</div>
+          <div class="insp-agent-meta">
+            <span class="insp-meta-chip">🌐 External</span>
+            <span class="insp-meta-chip">BenchSci + PubMed</span>
+            <span class="insp-meta-chip" style="color:var(--green);">✓ 14.3s</span>
+          </div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Facts emitted</div>
+          <div class="insp-fact">DCTN6 overexpression → mTORC1 rescue (0.87 eff.) <a href="#src1" class="cite">1</a><a href="#src2" class="cite">2</a></div>
+          <div class="insp-fact">FZD7/Wnt-YAP axis — organoid confirmation <a href="#src3" class="cite">3</a></div>
+          <div class="insp-fact">AKT1S1 pT246 concordance biomarker 91% <a href="#src6" class="cite">6</a></div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Provenance</div>
+          <div class="prov-row"><span class="prov-key">kind</span><span class="prov-val">emet</span></div>
+          <div class="prov-row"><span class="prov-key">source</span><span class="prov-val">BenchSci live + PubMed</span></div>
+          <div class="prov-row"><span class="prov-key">plane</span><span class="prov-val">🌐 external</span></div>
+          <div class="prov-row"><span class="prov-key">tier</span><span class="prov-val">T1 (6 facts)</span></div>
+          <div class="prov-row"><span class="prov-key">stamp</span><span class="prov-val">2026-06-28T09:14:22Z</span></div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Citations</div>
+          <div class="cite-source-list">
+            <div class="cite-source-item">
+              <div class="cite-num">1</div>
+              <div class="cite-info">
+                <div class="cite-title">Henske et al. 2024 — TSC2 CRISPR rescue</div>
+                <div class="cite-meta-row">Nat. Neurosci. · PMID 38291044</div>
+              </div>
+            </div>
+            <div class="cite-source-item">
+              <div class="cite-num">2</div>
+              <div class="cite-info">
+                <div class="cite-title">Crino PV et al. 2023 — mTORC1 phenotype mapping</div>
+                <div class="cite-meta-row">Brain · PMID 36901882</div>
+              </div>
+            </div>
+            <div class="cite-source-item">
+              <div class="cite-num">3</div>
+              <div class="cite-info">
+                <div class="cite-title">FZD7/Wnt-YAP axis in TSC2 organoids</div>
+                <div class="cite-meta-row">Cell Reports · DOI 10.1016/j.celrep.2024.113791</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Moat Inspector -->
+      <div id="insp-moat" class="inspector-agent">
+        <div class="insp-header">
+          <div class="insp-agent-name">Internal Science Lead</div>
+          <div class="insp-agent-meta">
+            <span class="insp-meta-chip" style="border-color:var(--internal-border);background:var(--internal-bg);color:var(--internal-text);">🔒 Internal moat</span>
+            <span class="insp-meta-chip">moat-real · CNS_DFP</span>
+            <span class="insp-meta-chip" style="color:var(--green);">✓ 4.8s</span>
+          </div>
+        </div>
+        <div class="insp-section" style="background:var(--internal-bg);border-color:var(--internal-border);">
+          <div class="insp-section-label" style="color:var(--internal-text);">⚠ Internal plane — data-boundary enforced</div>
+          <div style="font-size:11px;color:var(--internal-text);line-height:1.6;">Gene symbols and scores only. Raw EP/CRISPR data stayed internal. Public identifiers were used for any external hand-offs.</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Internal facts</div>
+          <div class="insp-fact">🔒 DCTN6: rescue score 0.91 (CNS_DFP v2.4, n=6 iPSC lines)</div>
+          <div class="insp-fact">🔒 RHEB G30S dominant-negative: score 0.84 — novel, not in public screens <span class="flag-chip flag-divergence" style="display:inline-flex;font-size:9px;padding:1px 5px;margin-left:3px;">DIVERGENCE</span></div>
+          <div class="insp-fact">🔒 MTOR T2446A everolimus sensitivity: score 0.79 (OPAL assay, Q2 2026)</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Provenance</div>
+          <div class="prov-row"><span class="prov-key">kind</span><span class="prov-val">python</span></div>
+          <div class="prov-row"><span class="prov-key">source</span><span class="prov-val">moat-real</span></div>
+          <div class="prov-row"><span class="prov-key">plane</span><span class="prov-val">🔒 internal</span></div>
+          <div class="prov-row"><span class="prov-key">db</span><span class="prov-val">CNS_DFP v2.4 / Loka</span></div>
+          <div class="prov-row"><span class="prov-key">stamp</span><span class="prov-val">2026-06-28T09:14:26Z</span></div>
+        </div>
+      </div>
+
+      <!-- Q-Models Inspector -->
+      <div id="insp-qmodels" class="inspector-agent">
+        <div class="insp-header">
+          <div class="insp-agent-name">Q-Models Runner</div>
+          <div class="insp-agent-meta">
+            <span class="insp-meta-chip">🌐 External</span>
+            <span class="insp-meta-chip" style="color:var(--green);">live-local · ESM-2</span>
+            <span class="insp-meta-chip" style="color:var(--green);">✓ 3.2s</span>
+          </div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Tool called</div>
+          <div style="font-family:var(--mono);font-size:11px;background:var(--surface2);padding:8px 10px;border-radius:var(--radius-sm);color:var(--text-primary);">esm2_family_cluster<br>input: MTOR_T2446A<br>score: 0.78 · sensitivity: HIGH<br>provenance: live-local · $0</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Output</div>
+          <div class="insp-fact">MTOR T2446A clusters with everolimus-sensitive variants; ESM-2 embedding distance Δ=0.23 from WT (above sensitivity threshold 0.18). Consistent with Franz DN et al. [4].</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Provenance</div>
+          <div class="prov-row"><span class="prov-key">tool_id</span><span class="prov-val">esm2_family_cluster</span></div>
+          <div class="prov-row"><span class="prov-key">routing</span><span class="prov-val">local-cpu (sync)</span></div>
+          <div class="prov-row"><span class="prov-key">cost</span><span class="prov-val">$0 (CPU free)</span></div>
+          <div class="prov-row"><span class="prov-key">plane</span><span class="prov-val">🌐 external (gene symbol input)</span></div>
+          <div class="prov-row"><span class="prov-key">stamp</span><span class="prov-val">2026-06-28T09:14:30Z</span></div>
+        </div>
+      </div>
+
+      <!-- Payer persona inspector -->
+      <div id="insp-payer" class="inspector-agent">
+        <div class="insp-header">
+          <div class="insp-agent-name">Payer Analyst</div>
+          <div class="insp-agent-meta">
+            <span class="insp-meta-chip">Bucket 2 · Persona</span>
+            <span class="insp-meta-chip">Round 1 + 2</span>
+          </div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Verdict</div>
+          <div class="persona-insp-verdict">
+            <span class="persona-insp-verdict-badge v-conditional">Conditional</span>
+            <span class="conf-detail">Confidence 68%</span>
+          </div>
+          <div class="insp-text">DCTN6 is compelling but HTA bodies (NICE, IQWIG) will require a validated biomarker (AKT1S1 pT246 is a candidate) and a comparator arm. Orphan designation path is viable — TSC prevalence ~1:6,000 qualifies. The RHEB G30S novelty could justify premium pricing if the patient-genetic stratification holds in a Phase II.</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Round 2 rebuttal</div>
+          <div class="rebuttal-box">No change to verdict. Red Team's replication concern is valid for the regulatory file but does not affect payer strategy — the DCTN6 arm is sufficient to advance. Biomarker-led pricing model reinforced by KOL's comments.</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Dossier citations used</div>
+          <div class="cite-source-list">
+            <div class="cite-source-item">
+              <div class="cite-num">4</div>
+              <div class="cite-info">
+                <div class="cite-title">Franz DN et al. 2022 — Everolimus Phase II</div>
+                <div class="cite-meta-row">NEJM · PMID 35840103</div>
+              </div>
+            </div>
+            <div class="cite-source-item">
+              <div class="cite-num">5</div>
+              <div class="cite-info">
+                <div class="cite-title">NCT05821764 — Active Phase II</div>
+                <div class="cite-meta-row">ClinicalTrials.gov</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Provenance</div>
+          <div class="prov-row"><span class="prov-key">kind</span><span class="prov-val">claude (persona)</span></div>
+          <div class="prov-row"><span class="prov-key">no-tools</span><span class="prov-val">enforced</span></div>
+          <div class="prov-row"><span class="prov-key">must-cite</span><span class="prov-val">enforced</span></div>
+          <div class="prov-row"><span class="prov-key">stamp</span><span class="prov-val">2026-06-28T09:14:38Z</span></div>
+        </div>
+      </div>
+
+      <!-- Clinical agent inspector -->
+      <div id="insp-clinical" class="inspector-agent">
+        <div class="insp-header">
+          <div class="insp-agent-name">Clinical Trial Registry Agent</div>
+          <div class="insp-agent-meta">
+            <span class="insp-meta-chip">🌐 External</span>
+            <span class="insp-meta-chip">ClinicalTrials.gov</span>
+            <span class="insp-meta-chip" style="color:var(--green);">✓ 3.8s</span>
+          </div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Trials found</div>
+          <div class="insp-fact"><strong>NCT05821764</strong> — Everolimus in pediatric TSC cortical tubers · Phase II · Active · Est. completion 2027-Q2</div>
+          <div class="insp-fact"><strong>NCT05490420</strong> — Sirolimus + DCTN6 biomarker study · Phase II · Recruiting · N=60</div>
+          <div class="insp-fact"><strong>NCT06127901</strong> — mTORC1 biomarker panel in TSC · Phase II · Active · Multi-site</div>
+        </div>
+        <div class="insp-section">
+          <div class="insp-section-label">Provenance</div>
+          <div class="prov-row"><span class="prov-key">source</span><span class="prov-val">ClinicalTrials.gov API</span></div>
+          <div class="prov-row"><span class="prov-key">accessed</span><span class="prov-val">2026-06-28</span></div>
+          <div class="prov-row"><span class="prov-key">plane</span><span class="prov-val">🌐 external</span></div>
+        </div>
+      </div>
+
+    </div><!-- /panel-inspector -->
+  </aside>
+
+</div><!-- /shell -->
+
+<script>
+// ─── Panel switching ───────────────────────────────────────────────────────────
+function switchPanel(name) {
+  document.getElementById('panel-trace').classList.toggle('hidden', name !== 'trace');
+  document.getElementById('panel-inspector').classList.toggle('hidden', name !== 'inspector');
+  document.getElementById('tab-trace').classList.toggle('active', name === 'trace');
+  document.getElementById('tab-inspector').classList.toggle('active', name === 'inspector');
+}
+
+// ─── Plane tabs ───────────────────────────────────────────────────────────────
+function switchPlane(plane, el) {
+  document.querySelectorAll('.plane-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('plane-ext').classList.toggle('hidden', plane !== 'ext');
+  document.getElementById('plane-int').classList.toggle('hidden', plane !== 'int');
+}
+
+// ─── Round tabs ───────────────────────────────────────────────────────────────
+function switchRound(round, el) {
+  document.querySelectorAll('.round-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('roundtable-r1').classList.toggle('hidden', round !== 'r1');
+  document.getElementById('roundtable-r2').classList.toggle('hidden', round !== 'r2');
+}
+
+// ─── Inspector ────────────────────────────────────────────────────────────────
+const agentMap = { emet:'insp-emet', moat:'insp-moat', qmodels:'insp-qmodels', payer:'insp-payer', clinical:'insp-clinical' };
+
+function showInspector(id) {
+  switchPanel('inspector');
+  document.getElementById('inspector-empty').classList.add('hidden');
+  document.querySelectorAll('.inspector-agent').forEach(el => el.classList.remove('visible'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('visible');
+}
+
+function inspectFact(agent) { showInspector(agentMap[agent] || 'inspector-empty'); }
+function inspectPersona(p) {
+  const map = { fda:'insp-payer', redteam:'insp-payer', payer:'insp-payer', kol:'insp-payer', financial:'insp-payer' };
+  showInspector(map[p] || 'insp-payer');
+}
+function inspectTrace(agent) {
+  const map = { emet:'insp-emet', moat:'insp-moat', qmodels:'insp-qmodels', clinical:'insp-clinical', plan:'insp-emet', rm:'insp-moat', patent:'insp-clinical', 'fda-mem':'insp-clinical', 'payer-sem':'insp-payer', dea:'insp-clinical', synthesis:'insp-payer' };
+  showInspector(map[agent] || 'insp-emet');
+}
+function inspectSource(n) {
+  const map = { 1:'insp-emet', 2:'insp-emet', 3:'insp-emet', 4:'insp-qmodels', 5:'insp-clinical', 6:'insp-emet', 7:'insp-clinical' };
+  showInspector(map[n] || 'insp-emet');
+}
+
+// ─── Thread toggle (new query) ─────────────────────────────────────────────────
+function showThread() {
+  document.getElementById('empty-state').classList.add('hidden');
+  document.getElementById('thread-content').classList.remove('hidden');
+}
+function newQuery() {
+  document.getElementById('thread-content').classList.add('hidden');
+  document.getElementById('empty-state').classList.remove('hidden');
+}
+
+// ─── Textarea auto-resize ─────────────────────────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+// ─── Cite scroll ─────────────────────────────────────────────────────────────
+document.querySelectorAll('a.cite[href^="#src"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const id = a.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if (el) { el.scrollIntoView({ behavior:'smooth', block:'center' }); el.style.boxShadow='0 0 0 2px var(--accent)'; setTimeout(() => el.style.boxShadow='', 1200); }
+  });
+});
+</script>
+</body>
+</html>

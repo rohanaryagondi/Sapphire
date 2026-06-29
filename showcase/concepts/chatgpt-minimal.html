@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire Console</title>
+<style>
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px; line-height: 1.5; color: #0d0d0d; background: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+button { cursor: pointer; border: none; background: none; font: inherit; color: inherit; }
+svg { display: block; flex-shrink: 0; }
+
+/* ===== APP LAYOUT ===== */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ===== LEFT RAIL ===== */
+.rail {
+  width: 240px; flex-shrink: 0;
+  background: #f9f9f9; border-right: 1px solid #e5e5e5;
+  display: flex; flex-direction: column;
+}
+.rail-header { padding: 14px 12px 10px; border-bottom: 1px solid #e5e5e5; }
+.rail-logo { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.rail-logo-mark {
+  width: 24px; height: 24px; border-radius: 6px;
+  background: #0d0d0d; color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: -0.5px;
+  display: flex; align-items: center; justify-content: center;
+}
+.rail-logo-name { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.model-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: #6e6e80; font-weight: 500;
+  padding: 3px 7px; background: #efefef; border-radius: 20px;
+}
+.new-btn {
+  width: 100%; display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; color: #0d0d0d;
+  background: #fff; border: 1px solid #e5e5e5;
+  margin-top: 10px; transition: background 0.1s;
+}
+.new-btn:hover { background: #f0f0f0; }
+.rail-section {
+  padding: 10px 12px 4px; font-size: 11px; font-weight: 600;
+  color: #9999a8; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.rail-history { flex: 1; overflow-y: auto; padding: 4px 8px; }
+.hist-item {
+  padding: 8px; border-radius: 8px; cursor: pointer;
+  transition: background 0.1s; margin-bottom: 1px;
+}
+.hist-item:hover { background: #efefef; }
+.hist-item.active { background: #e8e8e8; }
+.hist-title {
+  font-size: 13px; font-weight: 500; color: #0d0d0d;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;
+}
+.hist-meta { font-size: 11px; color: #9999a8; }
+.rail-footer { padding: 10px 12px; border-top: 1px solid #e5e5e5; }
+.profile-btn {
+  display: flex; align-items: center; gap: 9px; width: 100%;
+  padding: 6px 4px; border-radius: 8px; transition: background 0.1s;
+}
+.profile-btn:hover { background: #efefef; }
+.profile-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #0d0d0d; color: #fff;
+  font-size: 12px; font-weight: 600; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.profile-info { flex: 1; min-width: 0; }
+.profile-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.profile-role { font-size: 11px; color: #9999a8; }
+
+/* ===== MAIN ===== */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #fff; }
+
+/* topbar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; height: 52px;
+  border-bottom: 1px solid #e5e5e5; flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.topbar-title {
+  font-size: 14px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 440px;
+}
+.tag {
+  flex-shrink: 0; font-size: 11px; font-weight: 600; padding: 2px 8px;
+  border-radius: 20px; letter-spacing: 0.2px;
+}
+.tag-done { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.tag-live { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.topbar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.btn-ghost {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 11px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; color: #0d0d0d;
+  transition: background 0.1s; border: 1px solid transparent;
+}
+.btn-ghost:hover { background: #f4f4f4; }
+.btn-ghost.active { background: #f0f0f0; border-color: #e5e5e5; }
+.btn-model {
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 8px;
+  font-size: 12px; color: #6e6e80; font-weight: 500;
+  border: 1px solid #e5e5e5; background: #fafafa;
+  transition: background 0.1s;
+}
+.btn-model:hover { background: #f0f0f0; }
+
+/* thread */
+.thread { flex: 1; overflow-y: auto; padding: 32px 0; }
+.thread-inner { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+/* user message */
+.msg-user { display: flex; justify-content: flex-end; margin-bottom: 24px; }
+.msg-user-bubble {
+  max-width: 62%; background: #f4f4f4; border-radius: 18px 18px 4px 18px;
+  padding: 12px 16px; font-size: 15px; line-height: 1.5;
+}
+
+/* sapphire message */
+.msg-s { display: flex; gap: 12px; margin-bottom: 32px; }
+.msg-av {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #0d0d0d; color: #fff;
+  font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px;
+  display: flex; align-items: center; justify-content: center;
+}
+.msg-body { flex: 1; min-width: 0; }
+.msg-meta { font-size: 12px; color: #9999a8; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
+/* output sections */
+.out-sec { margin-bottom: 14px; }
+.sec-hdr { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.sec-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #9999a8; }
+.sec-title { font-size: 13px; font-weight: 600; }
+.sec-count { font-size: 11px; color: #9999a8; margin-left: auto; }
+
+/* dossier card */
+.dos-card { border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; }
+.dos-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: #f9f9f9;
+  border-bottom: 1px solid #e5e5e5; font-size: 13px; font-weight: 600;
+}
+.dos-hdr-meta { font-size: 11px; color: #9999a8; margin-left: auto; }
+
+.fact-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px; border-bottom: 1px solid #f0f0f0;
+  cursor: pointer; transition: background 0.1s;
+}
+.fact-row:last-child { border-bottom: none; }
+.fact-row:hover { background: #fafafa; }
+
+.tier {
+  flex-shrink: 0; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;
+  padding: 2px 5px; border-radius: 4px; margin-top: 2px;
+}
+.t1 { background: #0d0d0d; color: #fff; }
+.t2 { background: #6e6e80; color: #fff; }
+.plane { flex-shrink: 0; font-size: 13px; margin-top: 1px; }
+.fact-body { flex: 1; min-width: 0; }
+.fact-text { font-size: 13px; line-height: 1.5; margin-bottom: 3px; }
+.fact-src { font-size: 11px; color: #9999a8; }
+.fact-src a { color: #10a37f; text-decoration: underline; text-underline-offset: 2px; }
+.fact-arr { color: #d0d0d0; font-size: 14px; flex-shrink: 0; margin-top: 2px; }
+
+/* flag */
+.flag-row {
+  display: flex; gap: 10px; padding: 10px 14px;
+  background: #fffbeb; border-top: 1px solid #fde68a; align-items: flex-start;
+}
+.flag-label { font-size: 11px; font-weight: 700; color: #92400e; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+.flag-text { font-size: 12px; color: #78350f; line-height: 1.4; }
+
+/* roundtable */
+.rt-card { border: 1px solid #e5e5e5; border-radius: 12px; overflow: hidden; }
+.rt-hdr {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; background: #f9f9f9;
+  border-bottom: 1px solid #e5e5e5; font-size: 13px; font-weight: 600;
+}
+.spread-dots { display: flex; gap: 3px; margin-left: auto; }
+.sdot { width: 8px; height: 8px; border-radius: 50%; }
+.sdot-cond { background: #f59e0b; }
+.sdot-skep { background: #ef4444; }
+
+.persona-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 14px; border-bottom: 1px solid #f0f0f0;
+  cursor: pointer; transition: background 0.1s;
+}
+.persona-row:last-child { border-bottom: none; }
+.persona-row:hover { background: #fafafa; }
+.p-av {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; margin-top: 1px;
+}
+.p-body { flex: 1; min-width: 0; }
+.p-hdr { display: flex; align-items: baseline; gap: 7px; margin-bottom: 3px; flex-wrap: wrap; }
+.p-name { font-size: 13px; font-weight: 600; }
+.p-role { font-size: 11px; color: #9999a8; }
+.v-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 7px;
+  border-radius: 20px; letter-spacing: 0.3px; white-space: nowrap; margin-left: auto;
+}
+.v-cond { background: #fef3c7; color: #92400e; }
+.v-cskep { background: #fee2e2; color: #b45309; }
+.v-skep { background: #fee2e2; color: #991b1b; }
+.p-quote { font-size: 12px; color: #4a4a5a; line-height: 1.5; font-style: italic; }
+
+/* rebuttal */
+.rebuttal-wrap { background: #fafafa; border-top: 1px solid #e5e5e5; }
+.rebuttal-toggle {
+  width: 100%; display: flex; align-items: center; gap: 6px;
+  padding: 9px 14px; font-size: 12px; font-weight: 600; color: #6e6e80;
+  text-align: left; transition: background 0.1s;
+}
+.rebuttal-toggle:hover { background: #f0f0f0; }
+.r-chevron { transition: transform 0.2s; }
+.rebuttal-body { display: none; padding: 0 14px 12px; }
+.rebuttal-body.open { display: block; }
+.r-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+.r-item:last-child { border-bottom: none; }
+.r-who { font-size: 11px; font-weight: 600; color: #6e6e80; margin-bottom: 2px; }
+.r-text { font-size: 12px; color: #4a4a5a; line-height: 1.5; }
+
+/* synthesis */
+.syn-card { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 12px; padding: 14px; }
+.syn-text { font-size: 14px; color: #0d0d0d; line-height: 1.65; margin-bottom: 12px; }
+.syn-footer { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.spread-label { font-size: 11px; color: #9999a8; font-weight: 500; }
+.spread-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+.sp { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; }
+
+/* output footer */
+.out-footer {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0 0; font-size: 11px; color: #9999a8; flex-wrap: wrap;
+}
+.out-footer-link {
+  font-size: 12px; font-weight: 500; color: #0d0d0d;
+  display: flex; align-items: center; gap: 4px; cursor: pointer;
+}
+.out-footer-link:hover { text-decoration: underline; }
+
+/* input bar */
+.inputbar { padding: 14px 24px 18px; border-top: 1px solid #e5e5e5; flex-shrink: 0; }
+.inputbar-inner { max-width: 760px; margin: 0 auto; position: relative; }
+.input-box {
+  width: 100%; background: #f4f4f4; border: 1px solid #e5e5e5; border-radius: 12px;
+  padding: 12px 50px 12px 16px; font-size: 14px; font-family: inherit;
+  color: #0d0d0d; resize: none; outline: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+.input-box:focus { background: #fff; border-color: #c0c0c0; box-shadow: 0 0 0 3px rgba(0,0,0,0.04); }
+.input-box::placeholder { color: #9999a8; }
+.input-send {
+  position: absolute; right: 10px; bottom: 10px;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: #0d0d0d; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s;
+}
+.input-send:hover { background: #1a1a1a; }
+.input-hint { font-size: 11px; color: #b0b0b8; text-align: center; margin-top: 6px; }
+
+/* ===== DRAWER ===== */
+.drawer {
+  width: 0; flex-shrink: 0; overflow: hidden;
+  background: #fff; border-left: 1px solid transparent;
+  display: flex; flex-direction: column;
+  transition: width 0.22s cubic-bezier(0.4,0,0.2,1), border-color 0.22s;
+}
+.drawer.open { width: 380px; border-left-color: #e5e5e5; }
+.drw-hdr {
+  display: flex; align-items: center;
+  padding: 0 14px; height: 52px;
+  border-bottom: 1px solid #e5e5e5; flex-shrink: 0; gap: 4px;
+}
+.drw-tabs { display: flex; gap: 2px; flex: 1; }
+.drw-tab {
+  padding: 5px 12px; border-radius: 6px;
+  font-size: 13px; font-weight: 500; color: #6e6e80;
+  transition: background 0.1s, color 0.1s; white-space: nowrap;
+}
+.drw-tab:hover { background: #f4f4f4; color: #0d0d0d; }
+.drw-tab.active { background: #f4f4f4; color: #0d0d0d; font-weight: 600; }
+.drw-close {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: #9999a8; font-size: 20px; line-height: 1;
+  transition: background 0.1s; flex-shrink: 0;
+}
+.drw-close:hover { background: #f4f4f4; color: #0d0d0d; }
+.drw-body { flex: 1; overflow-y: auto; min-height: 0; }
+.drw-pane { display: none; padding: 14px; }
+.drw-pane.active { display: block; }
+
+/* trace */
+.trace-summary {
+  background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px;
+  padding: 10px 12px; margin-bottom: 14px;
+  display: flex; gap: 16px;
+}
+.ts-stat { display: flex; flex-direction: column; }
+.ts-val { font-size: 16px; font-weight: 700; color: #0d0d0d; line-height: 1; margin-bottom: 1px; }
+.ts-label { font-size: 11px; color: #9999a8; }
+
+.trace-list { display: flex; flex-direction: column; }
+.trace-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  cursor: pointer; transition: background 0.1s;
+}
+.trace-item:hover { background: #f4f4f4; }
+.trace-item.selected { background: #f0f0f0; }
+.t-dot {
+  width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; margin-top: 1px;
+}
+.td-done { background: #d1fae5; color: #065f46; }
+.td-warn { background: #fef3c7; color: #92400e; }
+.td-plan { background: #e0e7ff; color: #3730a3; }
+.t-body { flex: 1; min-width: 0; }
+.t-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+.t-detail { font-size: 11px; color: #9999a8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-time { font-size: 11px; color: #9999a8; flex-shrink: 0; margin-top: 3px; }
+.trace-line { width: 1px; height: 8px; background: #e5e5e5; margin-left: 19px; }
+
+/* inspector */
+.insp-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 220px; color: #b0b0b8; font-size: 13px; gap: 10px;
+}
+.insp-section { margin-bottom: 18px; }
+.insp-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9999a8; margin-bottom: 6px; }
+.insp-box { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px; font-size: 13px; line-height: 1.6; }
+.insp-table { border: 1px solid #e5e5e5; border-radius: 8px; overflow: hidden; }
+.insp-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 7px 10px; border-bottom: 1px solid #f0f0f0; font-size: 12px; gap: 8px; }
+.insp-row:last-child { border-bottom: none; }
+.insp-key { color: #6e6e80; white-space: nowrap; flex-shrink: 0; }
+.insp-val { font-weight: 500; text-align: right; }
+.src-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; background: #f4f4f4; border: 1px solid #e5e5e5;
+  border-radius: 6px; font-size: 11px; margin: 2px; color: #0d0d0d;
+}
+.src-chip a { color: #10a37f; text-decoration: underline; text-underline-offset: 2px; }
+.prov-chain { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.prov-node { display: inline-flex; align-items: center; padding: 3px 8px; background: #f4f4f4; border-radius: 6px; font-size: 11px; font-weight: 500; }
+.prov-arr { color: #d0d0d0; font-size: 12px; }
+.insp-note { background: #f9f9f9; border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px; font-size: 12px; color: #6e6e80; line-height: 1.5; }
+
+/* empty state */
+.empty-state {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px; padding: 32px;
+}
+.empty-logo {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: #0d0d0d; color: #fff;
+  font-size: 22px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.empty-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+.empty-sub { font-size: 14px; color: #6e6e80; text-align: center; max-width: 380px; line-height: 1.6; }
+.empty-prompts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 540px; margin-top: 6px; }
+.prompt-chip {
+  padding: 8px 14px; border: 1px solid #e5e5e5; border-radius: 8px;
+  font-size: 12px; color: #0d0d0d; background: #fff; cursor: pointer;
+  transition: background 0.1s; text-align: left; line-height: 1.4;
+}
+.prompt-chip:hover { background: #f4f4f4; }
+
+/* scrollbars */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d0d0d0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ===== RAIL ===== -->
+<nav class="rail">
+  <div class="rail-header">
+    <div class="rail-logo">
+      <div class="rail-logo-mark">S</div>
+      <span class="rail-logo-name">Sapphire</span>
+    </div>
+    <span class="model-badge">
+      <svg width="7" height="7" viewBox="0 0 8 8"><circle cx="4" cy="4" r="3" fill="#10a37f"/></svg>
+      claude-sonnet-4-6 · Pro
+    </span>
+    <button class="new-btn" onclick="showEmpty()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      New query
+    </button>
+  </div>
+
+  <div class="rail-section">Recent</div>
+  <div class="rail-history">
+    <div class="hist-item active">
+      <div class="hist-title">TSC2 phenotype rescue genes</div>
+      <div class="hist-meta">2 min ago · 18.3s · 4 facts</div>
+    </div>
+    <div class="hist-item" onclick="showEmpty()">
+      <div class="hist-title">Nav1.8 selectivity window vs pain targets</div>
+      <div class="hist-meta">Yesterday · 22.1s · 7 facts</div>
+    </div>
+    <div class="hist-item" onclick="showEmpty()">
+      <div class="hist-title">KCNT1 gain-of-function — IND landscape</div>
+      <div class="hist-meta">Jun 25 · 15.7s · 5 facts</div>
+    </div>
+    <div class="hist-item" onclick="showEmpty()">
+      <div class="hist-title">ASO toxicity screen — EP lead series</div>
+      <div class="hist-meta">Jun 24 · 31.2s · 9 facts</div>
+    </div>
+    <div class="hist-item" onclick="showEmpty()">
+      <div class="hist-title">FZD7 CNS expression — human vs mouse</div>
+      <div class="hist-meta">Jun 23 · 19.8s · 6 facts</div>
+    </div>
+  </div>
+
+  <div class="rail-footer">
+    <button class="profile-btn">
+      <div class="profile-avatar">RA</div>
+      <div class="profile-info">
+        <div class="profile-name">Rohan Aryagondi</div>
+        <div class="profile-role">Quiver Bioscience · Lead</div>
+      </div>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9999a8" stroke-width="2">
+        <circle cx="12" cy="5" r="1.2" fill="#9999a8"/><circle cx="12" cy="12" r="1.2" fill="#9999a8"/><circle cx="12" cy="19" r="1.2" fill="#9999a8"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="main">
+
+  <!-- topbar (shown in chat mode) -->
+  <div class="topbar" id="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Which genes rescue the TSC2 phenotype the most?</span>
+      <span class="tag tag-done">COMPLETE</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn-model" onclick="">
+        claude-sonnet-4-6
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button class="btn-ghost" id="btn-trace" onclick="toggleDrawer('trace')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Trace
+      </button>
+      <button class="btn-ghost">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="empty-state" style="display:none;">
+    <div class="empty-logo">S</div>
+    <div class="empty-title">What are you investigating?</div>
+    <div class="empty-sub">Ask a CNS discovery question. The firm gathers a cited fact dossier, then debates it — no forced consensus.</div>
+    <div class="empty-prompts">
+      <button class="prompt-chip" onclick="showChat()">Which genes rescue the TSC2 phenotype the most?</button>
+      <button class="prompt-chip">Nav1.8 selectivity window vs pain targets</button>
+      <button class="prompt-chip">KCNT1 gain-of-function — IND landscape</button>
+      <button class="prompt-chip">FZD7 expression in human CNS vs mouse — key divergences</button>
+    </div>
+  </div>
+
+  <!-- CHAT THREAD -->
+  <div class="thread" id="chat-thread">
+    <div class="thread-inner">
+
+      <!-- user message -->
+      <div class="msg-user">
+        <div class="msg-user-bubble">Which genes rescue the TSC2 phenotype the most?</div>
+      </div>
+
+      <!-- sapphire response -->
+      <div class="msg-s">
+        <div class="msg-av">S</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span style="font-weight:500;">Sapphire Firm</span>
+            <span>·</span>
+            <span>18.3s · 22 agents · 4 facts · 1 flag · 0 veto</span>
+          </div>
+
+          <!-- BUCKET 1 -->
+          <div class="out-sec">
+            <div class="sec-hdr">
+              <span class="sec-label">Bucket 1</span>
+              <span class="sec-title">Fact Dossier</span>
+              <span class="sec-count">4 facts · 1 DIVERGENCE · 0 VETO</span>
+            </div>
+            <div class="dos-card">
+              <div class="dos-hdr">
+                <span>📋</span>
+                <span>TSC2 Phenotype Rescue — Evidence Base</span>
+                <span class="dos-hdr-meta">🔒 1 internal · 🌐 3 external</span>
+              </div>
+
+              <div class="fact-row" onclick="openInspector('f-dctn6')">
+                <span class="tier t1">T1</span>
+                <span class="plane">🌐</span>
+                <div class="fact-body">
+                  <div class="fact-text">DCTN6 knockdown rescued TSC2-null cell viability by 73% in HEK-293T co-culture (n=3, p&lt;0.001) — strongest single-gene rescue across a systematic screen of 847 kinase/cytoskeletal genes.</div>
+                  <div class="fact-src">Chen et al. 2024, <em>Nature Cell Biology</em> · <a href="#">PMID 38821004</a> · via EMET (BenchSci)</div>
+                </div>
+                <span class="fact-arr">›</span>
+              </div>
+
+              <div class="fact-row" onclick="openInspector('f-fzd7')">
+                <span class="tier t2">T2</span>
+                <span class="plane">🔒</span>
+                <div class="fact-body">
+                  <div class="fact-text">Quiver CNS_DFP panel: FZD7 rescue score 0.84 (vs. RHEB 0.61, DCTN6 0.79) across 3 TSC2-null patient-derived lines — ranks FZD7 #1 on prospective in-house assay.</div>
+                  <div class="fact-src">Quiver internal moat · CNS_DFP v2.3 · <span style="font-weight:600;color:#6e6e80;">provenance: moat-real</span></div>
+                </div>
+                <span class="fact-arr">›</span>
+              </div>
+
+              <div class="fact-row" onclick="openInspector('f-mtor')">
+                <span class="tier t1">T1</span>
+                <span class="plane">🌐</span>
+                <div class="fact-body">
+                  <div class="fact-text">MTOR inhibition (rapamycin 10 nM) partially rescued mTORC1 hyperactivation in Tsc2−/− MEFs but failed to restore autophagy flux; MTOR-independent rescue remains incomplete.</div>
+                  <div class="fact-src"><a href="#">PMID 36184219</a>, <a href="#">PMID 37102891</a> · via EMET (BenchSci)</div>
+                </div>
+                <span class="fact-arr">›</span>
+              </div>
+
+              <div class="fact-row" onclick="openInspector('f-trials')">
+                <span class="tier t2">T2</span>
+                <span class="plane">🌐</span>
+                <div class="fact-body">
+                  <div class="fact-text">3 active clinical trials targeting MTOR pathway in TSC (NCT04527874, NCT05012904, NCT04948970); no IND filed for DCTN6- or FZD7-directed agents as of June 2026.</div>
+                  <div class="fact-src">ClinicalTrials.gov · Clinical Trial Registry agent</div>
+                </div>
+                <span class="fact-arr">›</span>
+              </div>
+
+              <div class="flag-row">
+                <span style="font-size:14px;">⚠️</span>
+                <div>
+                  <div class="flag-label">DIVERGENCE — do not auto-reconcile</div>
+                  <div class="flag-text">External literature ranks DCTN6 #1 (Chen 2024, artificial co-culture); Quiver internal moat ranks FZD7 #1 (score 0.84, prospective patient-derived lines). Alpha candidate — validate prospectively before committing to either program.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUCKET 2 -->
+          <div class="out-sec">
+            <div class="sec-hdr">
+              <span class="sec-label">Bucket 2</span>
+              <span class="sec-title">Roundtable</span>
+              <span class="sec-count">5 personas · 2 rounds · no consensus</span>
+            </div>
+            <div class="rt-card">
+              <div class="rt-hdr">
+                <span>💬</span>
+                <span>Firm Deliberation — Verdict Spread</span>
+                <div class="spread-dots">
+                  <div class="sdot sdot-cond" title="Conditional-Proceed"></div>
+                  <div class="sdot sdot-cond" title="Conditional-Proceed"></div>
+                  <div class="sdot sdot-cond" title="Conditional-Proceed"></div>
+                  <div class="sdot sdot-skep" style="background:#f59e0b;" title="Conditional-Skeptical"></div>
+                  <div class="sdot sdot-skep" title="Skeptical"></div>
+                </div>
+              </div>
+
+              <div class="persona-row" onclick="openInspector('p-nair')">
+                <div class="p-av" style="background:#e0f2fe;color:#0369a1;">MN</div>
+                <div class="p-body">
+                  <div class="p-hdr">
+                    <span class="p-name">Dr. Meera Nair</span>
+                    <span class="p-role">Internal Science Lead</span>
+                    <span class="v-badge v-cond" style="margin-left:auto;">CONDITIONAL-PROCEED</span>
+                  </div>
+                  <div class="p-quote">"The DIVERGENCE on FZD7 vs DCTN6 is the alpha here. Our moat data is prospective; Chen used an artificial co-culture. I'm upgrading validation from 'worth doing' to 'required before Phase 2 commitment.'"</div>
+                </div>
+              </div>
+
+              <div class="persona-row" onclick="openInspector('p-holt')">
+                <div class="p-av" style="background:#f0fdf4;color:#166534;">PH</div>
+                <div class="p-body">
+                  <div class="p-hdr">
+                    <span class="p-name">Dr. Patricia Holt</span>
+                    <span class="p-role">ex-FDA Regulator</span>
+                    <span class="v-badge v-cond" style="margin-left:auto;">CONDITIONAL-PROCEED</span>
+                  </div>
+                  <div class="p-quote">"MTOR pathway precedent (everolimus, sirolimus) gives a clear CMC + safety template. A first-in-class DCTN6 agent requires de-novo IND work — significant but not blocking. Rare-disease designation unlocks a PRV (~$100M), which changes the payer equation."</div>
+                </div>
+              </div>
+
+              <div class="persona-row" onclick="openInspector('p-webb')">
+                <div class="p-av" style="background:#fff1f2;color:#9f1239;">MW</div>
+                <div class="p-body">
+                  <div class="p-hdr">
+                    <span class="p-name">Dr. Marcus Webb</span>
+                    <span class="p-role">Adversarial Red-Team</span>
+                    <span class="v-badge v-cskep" style="margin-left:auto;">CONDITIONAL-SKEPTICAL</span>
+                  </div>
+                  <div class="p-quote">"Cell-line viability rescue ≠ in vivo phenotype rescue. Chen has no mouse confirmation. Our FZD7 moat score could equally be a cell-line artifact. In vivo data required before this is a real program."</div>
+                </div>
+              </div>
+
+              <div class="persona-row" onclick="openInspector('p-chen')">
+                <div class="p-av" style="background:#faf5ff;color:#6b21a8;">SC</div>
+                <div class="p-body">
+                  <div class="p-hdr">
+                    <span class="p-name">Sarah Chen</span>
+                    <span class="p-role">Payer / Access</span>
+                    <span class="v-badge v-skep" style="margin-left:auto;">SKEPTICAL</span>
+                  </div>
+                  <div class="p-quote">"TSC is ultra-rare (1:6,000). Without a clear stratification biomarker, payers demand RWE before coverage. Reimbursement path is 5–7 years minimum — PRV helps the sponsor return but doesn't move payer."</div>
+                </div>
+              </div>
+
+              <div class="persona-row" onclick="openInspector('p-rivera')">
+                <div class="p-av" style="background:#fff7ed;color:#9a3412;">AR</div>
+                <div class="p-body">
+                  <div class="p-hdr">
+                    <span class="p-name">Prof. Alex Rivera</span>
+                    <span class="p-role">KOL — Epilepsy / mTOR</span>
+                    <span class="v-badge v-cond" style="margin-left:auto;">CONDITIONAL-PROCEED</span>
+                  </div>
+                  <div class="p-quote">"DCTN6 is genuinely novel — the field is starved for MTOR-independent targets. If the validation holds, this is publishable in <em>Nature Neuroscience</em>. The FZD7 moat finding is even more intriguing as a first-mover opportunity."</div>
+                </div>
+              </div>
+
+              <div class="rebuttal-wrap">
+                <button class="rebuttal-toggle" onclick="toggleRebuttal(this)">
+                  <svg class="r-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                  Round 2 rebuttal
+                  <span style="color:#b0b0b8;font-weight:400;margin-left:2px;">3 exchanges</span>
+                </button>
+                <div class="rebuttal-body" id="rebuttal-body">
+                  <div class="r-item">
+                    <div class="r-who">Webb → Nair</div>
+                    <div class="r-text">"Concur that prospective moat data is a differentiator — but we need validation to resolve it, not assume. Holding conditional-skeptical until in vivo data exists."</div>
+                  </div>
+                  <div class="r-item">
+                    <div class="r-who">Nair → Webb</div>
+                    <div class="r-text">"Agreed. Proposing a 6-week mouse Tsc2+/− rescue experiment as a hard gate before Phase 2 commitment."</div>
+                  </div>
+                  <div class="r-item">
+                    <div class="r-who">Holt → Chen</div>
+                    <div class="r-text">"Rare-disease designation for TSC could unlock a Priority Review Voucher (~$100M at current auction). That substantially changes risk-adjusted return even if the commercial path is long."</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SYNTHESIS -->
+          <div class="out-sec">
+            <div class="sec-hdr">
+              <span class="sec-label">Synthesis</span>
+              <span class="sec-title">Firm Assessment</span>
+            </div>
+            <div class="syn-card">
+              <div class="syn-text">
+                The TSC2 rescue landscape splits across two axes: <strong>MTOR-dependent</strong> (clinical precedent, crowded — 3 active trials, existing approvals) vs. <strong>MTOR-independent</strong> (DCTN6 novel; Quiver FZD7 moat data = potential first-mover alpha). The DIVERGENCE between external literature (DCTN6 #1) and Quiver internal data (FZD7 #1, score 0.84 prospective) is the keystone finding — it must be resolved in vivo before committing to either program. <strong>Conditional opportunity pending validation gate.</strong>
+              </div>
+              <div class="syn-footer">
+                <span class="spread-label">Spread:</span>
+                <div class="spread-pills">
+                  <span class="sp v-cond">3× Conditional</span>
+                  <span class="sp v-cskep">1× Cond-Skeptical</span>
+                  <span class="sp v-skep">1× Skeptical</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- footer -->
+          <div class="out-footer">
+            <span>18.3s</span><span>·</span>
+            <span>22 agents</span><span>·</span>
+            <span>4 facts · 1 T1 external · 1 T2 moat-real · 1 T1 external · 1 T2 clinical</span>
+            <span>·</span>
+            <span class="out-footer-link" onclick="toggleDrawer('trace')">
+              View full trace ›
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INPUT BAR -->
+  <div class="inputbar">
+    <div class="inputbar-inner">
+      <textarea class="input-box" id="q-input" placeholder="Ask a CNS discovery question…" rows="1"
+        onkeydown="handleEnter(event)" oninput="autoResize(this)"></textarea>
+      <button class="input-send">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="input-hint">Sapphire runs ~18–35s per query · Facts are cited · Internal data never leaves the firm</div>
+  </div>
+
+</main>
+
+<!-- ===== DRAWER ===== -->
+<aside class="drawer" id="drawer">
+  <div class="drw-hdr">
+    <div class="drw-tabs">
+      <button class="drw-tab active" id="tab-trace" onclick="switchTab('trace')">Trace</button>
+      <button class="drw-tab" id="tab-inspector" onclick="switchTab('inspector')">Inspector</button>
+    </div>
+    <button class="drw-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drw-body">
+
+    <!-- TRACE PANE -->
+    <div class="drw-pane active" id="pane-trace">
+      <div class="trace-summary">
+        <div class="ts-stat"><span class="ts-val">18.3s</span><span class="ts-label">total</span></div>
+        <div class="ts-stat"><span class="ts-val">11</span><span class="ts-label">steps</span></div>
+        <div class="ts-stat"><span class="ts-val">4</span><span class="ts-label">facts</span></div>
+        <div class="ts-stat"><span class="ts-val">1</span><span class="ts-label">flag</span></div>
+        <div class="ts-stat"><span class="ts-val">0</span><span class="ts-label">veto</span></div>
+      </div>
+      <div class="trace-list">
+
+        <div class="trace-item" id="tr-plan" onclick="openInspector('s-plan')">
+          <div class="t-dot td-plan">✦</div>
+          <div class="t-body">
+            <div class="t-name">Plan</div>
+            <div class="t-detail">triage → scope → 11 agents selected</div>
+          </div>
+          <div class="t-time">0.2s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-emet" onclick="openInspector('s-emet')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">EMET Analyst</div>
+            <div class="t-detail">14 PMIDs ingested → 3 facts extracted</div>
+          </div>
+          <div class="t-time">4.1s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-moat" onclick="openInspector('s-moat')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Internal Science Lead</div>
+            <div class="t-detail">moat query → FZD7 0.84 rescue score · 🔒</div>
+          </div>
+          <div class="t-time">1.8s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-qm" onclick="openInspector('s-qm')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Q-Models Runner</div>
+            <div class="t-detail">pathway-score · live-local · $0</div>
+          </div>
+          <div class="t-time">2.3s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-patent" onclick="openInspector('s-patent')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Patent / IP Sentinel ⛔</div>
+            <div class="t-detail">no blocking patents · VETO: none</div>
+          </div>
+          <div class="t-time">1.1s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-fda" onclick="openInspector('s-fda')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">FDA Institutional Memory ⛔</div>
+            <div class="t-detail">MTOR precedent confirmed · VETO: none</div>
+          </div>
+          <div class="t-time">0.9s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-clin" onclick="openInspector('s-clin')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Clinical Trial Registry</div>
+            <div class="t-detail">3 active MTOR trials · 0 DCTN6/FZD7 INDs</div>
+          </div>
+          <div class="t-time">0.8s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-rm" onclick="openInspector('s-rm')">
+          <div class="t-dot td-warn">⚠</div>
+          <div class="t-body">
+            <div class="t-name">Research Manager</div>
+            <div class="t-detail">DIVERGENCE flagged · dossier COMPLETE</div>
+          </div>
+          <div class="t-time">0.4s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-r1" onclick="openInspector('s-r1')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Roundtable — Round 1</div>
+            <div class="t-detail">5 verdicts · 3 conditional · 1 cond-skep · 1 skep</div>
+          </div>
+          <div class="t-time">3.2s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-r2" onclick="openInspector('s-r2')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Roundtable — Round 2</div>
+            <div class="t-detail">3 rebuttal exchanges · spread held</div>
+          </div>
+          <div class="t-time">2.1s</div>
+        </div>
+        <div class="trace-line"></div>
+
+        <div class="trace-item" id="tr-syn" onclick="openInspector('s-syn')">
+          <div class="t-dot td-done">✓</div>
+          <div class="t-body">
+            <div class="t-name">Synthesis</div>
+            <div class="t-detail">conditional opportunity · validation gate</div>
+          </div>
+          <div class="t-time">1.4s</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- INSPECTOR PANE -->
+    <div class="drw-pane" id="pane-inspector">
+      <div class="insp-empty" id="insp-empty">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#d0d0d0" stroke-width="1.5">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span>Click an agent or fact to inspect</span>
+      </div>
+      <div id="insp-content" style="display:none;"></div>
+    </div>
+
+  </div>
+</aside>
+
+</div>
+
+<script>
+// ===== DRAWER STATE =====
+let drawerOpen = false;
+let currentTab = 'trace';
+let selectedTrace = null;
+
+function openDrawer(tab) {
+  drawerOpen = true;
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('btn-trace').classList.add('active');
+  if (tab) switchTab(tab);
+}
+function closeDrawer() {
+  drawerOpen = false;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('btn-trace').classList.remove('active');
+}
+function toggleDrawer(tab) {
+  if (drawerOpen && currentTab === tab) { closeDrawer(); } else { openDrawer(tab); }
+}
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.drw-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.drw-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('pane-' + tab).classList.add('active');
+}
+
+// ===== INSPECTOR DATA =====
+const DATA = {
+  'f-dctn6': {
+    title: 'DCTN6 Knockdown Rescue',
+    kind: 'Fact · T1 · 🌐 External',
+    badge: { text: 'T1 · EMET', cls: 'v-cond', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'DCTN6 knockdown rescued TSC2-null cell viability by 73% in HEK-293T co-culture (n=3, p<0.001) — strongest single-gene rescue across a systematic screen of 847 kinase/cytoskeletal genes.',
+    meta: [
+      ['Tier', 'T1 — peer-reviewed, primary research'],
+      ['Plane', '🌐 External (public)'],
+      ['Confidence', 'High (n=3, p<0.001, replicated)'],
+      ['Agent', 'EMET Analyst'],
+      ['Provenance', 'EMET → BenchSci → Nature Cell Biology'],
+    ],
+    sources: [['Chen et al. 2024', '#', 'Nature Cell Biology · PMID 38821004']],
+    prov: ['EMET Analyst', 'BenchSci', 'Nature Cell Biology'],
+    note: 'Underlies the DIVERGENCE flag. External literature ranks DCTN6 #1; Quiver moat ranks FZD7 #1. Do not auto-reconcile.',
+  },
+  'f-fzd7': {
+    title: 'FZD7 Internal Rescue Score',
+    kind: 'Fact · T2 · 🔒 Internal',
+    badge: { text: 'T2 · moat-real', cls: '', style: 'background:#fef3c7;color:#92400e;' },
+    body: 'Quiver CNS_DFP panel: FZD7 rescue score 0.84 (vs. RHEB 0.61, DCTN6 0.79) across 3 TSC2-null patient-derived lines — ranks FZD7 #1 on prospective in-house assay. DATA BOUNDARY: score does not leave internal plane.',
+    meta: [
+      ['Tier', 'T2 — internal, proprietary assay'],
+      ['Plane', '🔒 Internal only (data boundary enforced)'],
+      ['Confidence', 'Moderate (3 patient-derived lines, prospective)'],
+      ['Agent', 'Internal Science Lead'],
+      ['Provenance', 'MoatClient → CNS_DFP SQLite'],
+    ],
+    sources: [['Quiver CNS_DFP v2.3', '#', 'Internal · moat-real · NOT shared externally']],
+    prov: ['Internal Science Lead', 'MoatClient', 'CNS_DFP v2.3'],
+    note: 'Provenance: moat-real. Data boundary enforced by harness guard — gene symbols only leave this agent. Degrades to [] if moat.sqlite not built.',
+  },
+  'f-mtor': {
+    title: 'MTOR Inhibition — Partial Rescue',
+    kind: 'Fact · T1 · 🌐 External',
+    badge: { text: 'T1 · EMET', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'MTOR inhibition (rapamycin 10 nM) partially rescued mTORC1 hyperactivation in Tsc2−/− MEFs but failed to restore autophagy flux; MTOR-independent rescue remains incomplete.',
+    meta: [
+      ['Tier', 'T1 — peer-reviewed, replicated'],
+      ['Plane', '🌐 External (public)'],
+      ['Confidence', 'High (2 independent labs)'],
+      ['Agent', 'EMET Analyst'],
+    ],
+    sources: [
+      ['PMID 36184219', '#', 'Nature Metabolism 2022'],
+      ['PMID 37102891', '#', 'EMBO Journal 2023'],
+    ],
+    prov: ['EMET Analyst', 'BenchSci', 'PubMed'],
+    note: 'Contextualizes why DCTN6/FZD7 (MTOR-independent) are of interest despite rapamycin being clinical.',
+  },
+  'f-trials': {
+    title: 'Active TSC Clinical Trials',
+    kind: 'Fact · T2 · 🌐 External · Clinical',
+    badge: { text: 'T2 · Clinical Reg.', cls: '', style: 'background:#fef3c7;color:#92400e;' },
+    body: '3 active trials targeting MTOR in TSC: NCT04527874 (everolimus + rapamycin combo), NCT05012904 (sirolimus dose-ranging), NCT04948970 (mTOR + AKT combo). Zero INDs filed for DCTN6 or FZD7 gene targets as of June 2026.',
+    meta: [
+      ['Tier', 'T2 — registry data, no primary outcomes yet'],
+      ['Plane', '🌐 External (public)'],
+      ['Agent', 'Clinical Trial Registry'],
+    ],
+    sources: [['ClinicalTrials.gov', '#', 'Queried June 29, 2026']],
+    prov: ['Clinical Trial Registry', 'ClinicalTrials.gov API'],
+    note: 'Confirms white space for MTOR-independent approach (DCTN6, FZD7).',
+  },
+  'p-nair': {
+    title: 'Dr. Meera Nair',
+    kind: 'Partner · Internal Science Lead',
+    badge: { text: 'CONDITIONAL-PROCEED', cls: 'v-cond', style: '' },
+    body: 'The DIVERGENCE on FZD7 vs DCTN6 is the alpha here. Our moat data is prospective; Chen used an artificial co-culture. I am upgrading validation from "worth doing" to "required before Phase 2 commitment." Proposed gate: 6-week in vivo mouse Tsc2+/− rescue experiment.',
+    meta: [
+      ['Verdict', 'Conditional-Proceed'],
+      ['Cites', 'FZD7 moat score · DIVERGENCE flag · Chen (DCTN6)'],
+      ['Gate proposed', '6-week mouse Tsc2+/− rescue experiment'],
+    ],
+    sources: [],
+    prov: ['Roundtable R1+R2', 'Claude persona', 'cites dossier only'],
+    note: 'Upgraded validation gate in R2 after Webb rebuttal. No independent facts introduced — personas cite only from the dossier.',
+  },
+  'p-holt': {
+    title: 'Dr. Patricia Holt',
+    kind: 'Partner · ex-FDA Regulator (CDER)',
+    badge: { text: 'CONDITIONAL-PROCEED', cls: 'v-cond', style: '' },
+    body: 'MTOR pathway precedent (everolimus, sirolimus) gives a clear CMC + safety template. A first-in-class DCTN6 agent requires de-novo IND work — significant but not blocking. Rare-disease designation for TSC could unlock a Priority Review Voucher (~$100M at current auction), which substantially changes the risk-adjusted return.',
+    meta: [
+      ['Verdict', 'Conditional-Proceed'],
+      ['Cites', 'Clinical trials · FDA memory · Patent clear'],
+      ['Key point', 'PRV opportunity (~$100M) changes payer calculus'],
+    ],
+    sources: [],
+    prov: ['Roundtable R1+R2', 'Claude persona', 'cites dossier only'],
+    note: 'Introduced PRV angle in R2 rebuttal to Chen. Held conditional-proceed throughout.',
+  },
+  'p-webb': {
+    title: 'Dr. Marcus Webb',
+    kind: 'Partner · Adversarial Red-Team',
+    badge: { text: 'CONDITIONAL-SKEPTICAL', cls: 'v-cskep', style: '' },
+    body: 'Cell-line viability rescue ≠ in vivo phenotype rescue. Chen (DCTN6 #1) has no mouse confirmation. Our FZD7 moat score could equally be a cell-line artifact — patient-derived lines are still in vitro. In vivo data required before this is a real program.',
+    meta: [
+      ['Verdict', 'Conditional-Skeptical'],
+      ['Core objection', 'No in vivo confirmation for DCTN6 or FZD7'],
+      ['Effect', 'Drove Nair to upgrade validation gate to required'],
+    ],
+    sources: [],
+    prov: ['Roundtable R1+R2', 'Claude persona', 'cites dossier only'],
+    note: 'Red-Team agent never invents facts — challenges assumptions and methodology quality.',
+  },
+  'p-chen': {
+    title: 'Sarah Chen',
+    kind: 'Partner · Payer / Market Access',
+    badge: { text: 'SKEPTICAL', cls: 'v-skep', style: '' },
+    body: 'TSC is ultra-rare (1:6,000). Without a clear stratification biomarker, payers will demand RWE before coverage decisions. Reimbursement path is 5–7 years minimum at best. PRV helps sponsor returns but does not move payer — the biomarker gap is the core blocker.',
+    meta: [
+      ['Verdict', 'Skeptical (held through R2)'],
+      ['Core concern', 'No stratification biomarker; RWE timeline 5–7 years'],
+      ['PRV response', 'Noted but does not move payer position'],
+    ],
+    sources: [],
+    prov: ['Roundtable R1+R2', 'Claude persona', 'cites dossier only'],
+    note: 'Remained skeptical after Holt\'s PRV rebuttal. The biomarker gap is the core unresolved blocker.',
+  },
+  'p-rivera': {
+    title: 'Prof. Alex Rivera',
+    kind: 'Partner · KOL (Epilepsy / mTOR Biology)',
+    badge: { text: 'CONDITIONAL-PROCEED', cls: 'v-cond', style: '' },
+    body: 'DCTN6 is genuinely novel — the field is starved for MTOR-independent targets. If the validation study holds, this is publishable in Nature Neuroscience or Cell Reports Medicine. The FZD7 moat finding is even more intriguing: if Quiver\'s prospective data is right, this is a genuine first-mover in white space.',
+    meta: [
+      ['Verdict', 'Conditional-Proceed'],
+      ['Most enthusiastic on', 'Publication angle + FZD7 first-mover thesis'],
+      ['Condition', 'In vivo validation required'],
+    ],
+    sources: [],
+    prov: ['Roundtable R1+R2', 'Claude persona', 'cites dossier only'],
+    note: '',
+  },
+  's-plan': {
+    title: 'Plan',
+    kind: 'Control · Orchestrator',
+    badge: { text: 'DONE · 0.2s', cls: '', style: 'background:#e0e7ff;color:#3730a3;' },
+    body: 'Query triaged as: gene rescue screen, TSC2 phenotype, CNS/rare disease. Scope: EMET (literature), moat (internal FZD7/DCTN6 panel), Q-Models (pathway scoring), Patent/IP (freedom to operate), FDA Memory (precedent), Clinical Trials, Research Manager (completeness + DIVERGENCE). Roundtable: 5 personas.',
+    meta: [
+      ['Query class', 'Gene rescue screen · TSC phenotype · CNS/rare'],
+      ['Agents selected', '11 of 22 registered'],
+      ['Moat relevant', 'Yes — CNS_DFP panel queried'],
+      ['Veto agents', 'Patent/IP · FDA Memory (both gate-capable)'],
+    ],
+    sources: [],
+    prov: ['Orchestrator', 'planner'],
+    note: '',
+  },
+  's-emet': {
+    title: 'EMET Analyst',
+    kind: 'Fact · Bucket 1 · Scientific',
+    badge: { text: 'DONE · 4.1s · live-emet', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'BenchSci query: "TSC2 phenotype rescue genes." 14 PMIDs ingested. Extractions: DCTN6 (Chen 2024, T1), MTOR inhibition (2 PMIDs, T1), clinical context (T2, handed to Clinical Registry agent). No VETO emitted.',
+    meta: [
+      ['Tool', 'BenchSci (EMET) via Playwright'],
+      ['PMIDs ingested', '14'],
+      ['Facts extracted', '3 (2× T1, 1× T2)'],
+      ['Provenance', 'live-emet'],
+      ['VETO', 'None'],
+    ],
+    sources: [
+      ['PMID 38821004', '#', 'Chen et al. 2024 · Nat Cell Biol'],
+      ['PMID 36184219', '#', 'Nat Metabolism 2022'],
+      ['PMID 37102891', '#', 'EMBO J 2023'],
+    ],
+    prov: ['EMET Analyst', 'BenchSci', 'harness.run'],
+    note: 'EMET is live (Playwright). Never emits a formal VETO — that is reserved for Patent/IP and FDA Memory agents.',
+  },
+  's-moat': {
+    title: 'Internal Science Lead',
+    kind: 'Fact · Bucket 1 · Scientific · 🔒 Internal',
+    badge: { text: 'DONE · 1.8s · moat-real', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'Queried CNS_DFP v2.3 for TSC2-related rescue genes. FZD7 #1 (0.84), DCTN6 #2 (0.79), RHEB #3 (0.61). Data stays internal — only gene symbols cross the data boundary. Harness guard enforced.',
+    meta: [
+      ['Tool', 'MoatClient → CNS_DFP SQLite'],
+      ['Top hit', 'FZD7 · rescue score 0.84'],
+      ['Provenance', 'moat-real'],
+      ['Plane', '🔒 Internal only'],
+      ['Data boundary', 'Gene symbols only exported'],
+    ],
+    sources: [['CNS_DFP v2.3', '#', 'Quiver internal · RohanOnly/moat/moat.sqlite']],
+    prov: ['Internal Science Lead', 'MoatClient', 'harness (data-boundary guard)'],
+    note: 'If moat.sqlite not built from Loka parquet, degrades to [] with honest label (no fabrication).',
+  },
+  's-qm': {
+    title: 'Q-Models Runner',
+    kind: 'Fact · Bucket 1 · Scientific',
+    badge: { text: 'DONE · 2.3s · live-local · $0', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'Called pathway-score tool for MTOR, WNT/FZD7, and dynactin/DCTN6 pathway interactions in TSC2-null context. MTOR: 0.91, WNT/FZD7: 0.77, dynactin/DCTN6: 0.68. Consistent with dossier findings.',
+    meta: [
+      ['Tool ID', 'pathway-score'],
+      ['Route', 'local-cpu → sync HTTP'],
+      ['Cost', '$0'],
+      ['Provenance', 'live-local'],
+    ],
+    sources: [],
+    prov: ['Q-Models Runner', 'q-models/tools/pathway_score_eval.py', 'live-local'],
+    note: 'live-local route: real predictions, $0, no AWS spin-up. GPU route available for Boltz-2/ESM-2 tools.',
+  },
+  's-patent': {
+    title: 'Patent / IP Sentinel ⛔',
+    kind: 'Semantic · Veto-class · Gate',
+    badge: { text: 'CLEAR · 1.1s · no VETO', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'Patent/IP search for DCTN6, FZD7, MTOR, RHEB in CNS/rare disease context. No blocking composition-of-matter patents identified for DCTN6 or FZD7. MTOR pathway has broad method-of-use patents (everolimus) but FTO exists for novel mechanism agents.',
+    meta: [
+      ['VETO issued', 'No'],
+      ['Genes checked', 'DCTN6 · FZD7 · MTOR · RHEB'],
+      ['FTO status', 'Clear for DCTN6 and FZD7 novel targets'],
+      ['Note', 'MTOR method-of-use patents exist; not blocking for novel mechanism'],
+    ],
+    sources: [],
+    prov: ['Patent/IP Sentinel', 'USPTO + EPO query', 'semantic agent'],
+    note: 'Veto-class: if a blocking patent were found, this would gate the entire roundtable. No VETO issued → roundtable proceeds.',
+  },
+  's-fda': {
+    title: 'FDA Institutional Memory ⛔',
+    kind: 'Semantic · Veto-class · Gate',
+    badge: { text: 'CLEAR · 0.9s · no VETO', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'FDA precedent: everolimus approved 2010 (SEGA in TSC, NDA 022334), sirolimus off-label documented. Template exists for MTOR pathway. First-in-class DCTN6/FZD7 agent: de-novo IND required, no precedent.',
+    meta: [
+      ['VETO issued', 'No'],
+      ['Precedent', 'Everolimus (NDA 022334) · Sirolimus (NDA 021083)'],
+      ['DCTN6/FZD7', 'No precedent — de-novo IND required'],
+    ],
+    sources: [],
+    prov: ['FDA Institutional Memory', 'CDER records + Orange Book'],
+    note: 'Veto-class: fatal regulatory precedent (e.g., class safety concern) would gate roundtable. None found here.',
+  },
+  's-clin': {
+    title: 'Clinical Trial Registry',
+    kind: 'Semantic · External · Evidence',
+    badge: { text: 'DONE · 0.8s', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: '3 active MTOR trials in TSC found. Zero INDs for DCTN6 or FZD7. Confirms white space for MTOR-independent mechanism.',
+    meta: [
+      ['Trials found', '3 active (all MTOR pathway)'],
+      ['DCTN6/FZD7 INDs', '0'],
+      ['Source', 'ClinicalTrials.gov'],
+    ],
+    sources: [['ClinicalTrials.gov', '#', 'Queried June 29, 2026']],
+    prov: ['Clinical Trial Registry agent', 'ClinicalTrials.gov API'],
+    note: '',
+  },
+  's-rm': {
+    title: 'Research Manager',
+    kind: 'Control · Bucket 1 Completeness',
+    badge: { text: 'DIVERGENCE · 0.4s', cls: 'v-cskep', style: '' },
+    body: 'Completeness check: PASSED. One DIVERGENCE found: external (DCTN6 #1, Chen 2024) vs internal (FZD7 #1, moat score 0.84). Per operating rules: internal↔external = surface as DIVERGENCE (potential alpha), do not auto-reconcile, do not re-fetch. Dossier COMPLETE → roundtable may proceed.',
+    meta: [
+      ['Status', 'COMPLETE'],
+      ['Contradictions', '1 DIVERGENCE (internal vs external ranking)'],
+      ['Gaps', '0'],
+      ['VETOs received', '0'],
+    ],
+    sources: [],
+    prov: ['Research Manager', 'orchestrator.py'],
+    note: 'Operating rule: only external↔external conflicts trigger re-fetch. Internal↔external divergence = alpha signal, surface it.',
+  },
+  's-r1': {
+    title: 'Roundtable — Round 1',
+    kind: 'Control · Bucket 2 · Deliberation',
+    badge: { text: 'DONE · 3.2s', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: '5 independent verdicts. Each persona received the dossier only — no other persona\'s output before completing their verdict. Spread: Nair (Cond.), Holt (Cond.), Webb (Cond-Skep.), Chen (Skep.), Rivera (Cond.). Spread preserved.',
+    meta: [
+      ['Personas', '5'],
+      ['Spread', '3× Conditional · 1× Cond-Skeptical · 1× Skeptical'],
+      ['Consensus', 'None — spread is the product'],
+    ],
+    sources: [],
+    prov: ['Roundtable Moderator', 'orchestrator.py · Bucket 2'],
+    note: 'Operating rule: no forced consensus. The spread is the product.',
+  },
+  's-r2': {
+    title: 'Roundtable — Round 2',
+    kind: 'Control · Bucket 2 · Rebuttal',
+    badge: { text: 'DONE · 2.1s', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'Webb challenged Nair on cell-line vs in vivo → Nair upgraded validation gate to "required." Holt raised PRV (~$100M) to Chen → Chen held skeptical (biomarker gap remains core blocker). Rivera affirmed novel publication angle. Final spread: unchanged.',
+    meta: [
+      ['Exchanges', '3'],
+      ['Verdicts changed', '0 — spread held'],
+      ['Key development', 'Nair upgrades gate; Holt raises PRV'],
+    ],
+    sources: [],
+    prov: ['Roundtable Moderator', 'orchestrator.py · Bucket 2'],
+    note: '',
+  },
+  's-syn': {
+    title: 'Synthesis',
+    kind: 'Control · Orchestrator',
+    badge: { text: 'DONE · 1.4s', cls: '', style: 'background:#d1fae5;color:#065f46;' },
+    body: 'MTOR-dependent space is crowded (3 active trials, existing approvals). MTOR-independent targets represent white space. The DIVERGENCE is the keystone: if Quiver\'s prospective FZD7 data holds in vivo, this is a genuine first-mover. Validation gate required before Phase 2 commitment.',
+    meta: [
+      ['Conclusion', 'Conditional opportunity'],
+      ['Keystone', 'DIVERGENCE: FZD7 moat vs DCTN6 literature'],
+      ['Next action', '6-week in vivo mouse Tsc2+/− rescue experiment'],
+    ],
+    sources: [],
+    prov: ['Orchestrator synthesis', 'orchestrator.py'],
+    note: '',
+  },
+};
+
+function openInspector(id) {
+  const d = DATA[id];
+  if (!d) return;
+  openDrawer('inspector');
+
+  // highlight trace item if applicable
+  if (selectedTrace) document.getElementById(selectedTrace)?.classList.remove('selected');
+  const traceMap = { 's-plan':'tr-plan','s-emet':'tr-emet','s-moat':'tr-moat','s-qm':'tr-qm','s-patent':'tr-patent','s-fda':'tr-fda','s-clin':'tr-clin','s-rm':'tr-rm','s-r1':'tr-r1','s-r2':'tr-r2','s-syn':'tr-syn' };
+  if (traceMap[id]) { selectedTrace = traceMap[id]; document.getElementById(traceMap[id])?.classList.add('selected'); }
+
+  document.getElementById('insp-empty').style.display = 'none';
+  const el = document.getElementById('insp-content');
+  el.style.display = 'block';
+
+  const badgeStyle = d.badge.style || '';
+  const badgeCls = d.badge.cls ? ` ${d.badge.cls}` : '';
+
+  const sourcesHtml = d.sources.length ? `
+    <div class="insp-section">
+      <div class="insp-label">Sources</div>
+      <div>${d.sources.map(s => `<span class="src-chip"><a href="${s[1]}">${s[0]}</a><span style="color:#9999a8;">— ${s[2]}</span></span>`).join('')}</div>
+    </div>` : '';
+
+  const provHtml = d.prov.length ? `
+    <div class="insp-section">
+      <div class="insp-label">Provenance</div>
+      <div class="prov-chain">${d.prov.map((p,i) => `<span class="prov-node">${p}</span>${i<d.prov.length-1?'<span class="prov-arr">›</span>':''}`).join('')}</div>
+    </div>` : '';
+
+  const noteHtml = d.note ? `<div class="insp-section"><div class="insp-note">${d.note}</div></div>` : '';
+
+  el.innerHTML = `
+    <div class="insp-section" style="margin-bottom:14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;letter-spacing:-0.3px;margin-bottom:3px;">${d.title}</div>
+          <div style="font-size:11px;color:#9999a8;">${d.kind}</div>
+        </div>
+        <span class="v-badge${badgeCls}" style="flex-shrink:0;margin-top:2px;${badgeStyle}">${d.badge.text}</span>
+      </div>
+    </div>
+    <div class="insp-section">
+      <div class="insp-label">Detail</div>
+      <div class="insp-box">${d.body}</div>
+    </div>
+    <div class="insp-section">
+      <div class="insp-label">Metadata</div>
+      <div class="insp-table">${d.meta.map(([k,v]) => `<div class="insp-row"><span class="insp-key">${k}</span><span class="insp-val">${v}</span></div>`).join('')}</div>
+    </div>
+    ${sourcesHtml}
+    ${provHtml}
+    ${noteHtml}
+  `;
+}
+
+// ===== REBUTTAL =====
+function toggleRebuttal(btn) {
+  const body = document.getElementById('rebuttal-body');
+  const chev = btn.querySelector('.r-chevron');
+  const open = body.classList.toggle('open');
+  chev.style.transform = open ? 'rotate(90deg)' : '';
+}
+
+// ===== EMPTY / CHAT =====
+function showEmpty() {
+  document.getElementById('chat-thread').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('topbar').style.display = 'none';
+  closeDrawer();
+}
+function showChat() {
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('chat-thread').style.display = '';
+  document.getElementById('topbar').style.display = 'flex';
+}
+
+// ===== INPUT =====
+function handleEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    showChat();
+    e.target.value = '';
+    e.target.style.height = '';
+  }
+}
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+</script>
+</body>
+</html>
