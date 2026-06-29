@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire — Quiver Bioscience</title>
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  --bg:           #faf9f7;
+  --bg-raised:    #f5f2ed;
+  --bg-card:      #ffffff;
+  --bg-sunken:    #ede8e0;
+  --border:       #e3ddd4;
+  --border-mid:   #d4ccbf;
+  --border-str:   #bbb0a2;
+  --text:         #1c1917;
+  --text-2:       #57534e;
+  --text-3:       #a8a29e;
+  --text-4:       #c4bdb5;
+
+  --accent:       #a16207;
+  --accent-bg:    #fefce8;
+  --accent-bdr:   #fde68a;
+
+  --green:        #15803d;
+  --green-bg:     #f0fdf4;
+  --green-bdr:    #bbf7d0;
+
+  --red:          #b91c1c;
+  --red-bg:       #fff1f2;
+  --red-bdr:      #fecdd3;
+
+  --blue:         #1d4ed8;
+  --blue-bg:      #eff6ff;
+  --blue-bdr:     #bfdbfe;
+
+  --moat:         #6d28d9;
+  --moat-bg:      #f5f3ff;
+  --moat-bdr:     #ddd6fe;
+
+  --r-xs: 4px;
+  --r-sm: 7px;
+  --r-md: 11px;
+  --r-lg: 15px;
+
+  --sh-xs: 0 1px 2px rgba(0,0,0,.05);
+  --sh-sm: 0 1px 4px rgba(0,0,0,.07), 0 1px 2px rgba(0,0,0,.04);
+  --sh-md: 0 4px 14px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+
+  --font-serif: 'Georgia', 'Times New Roman', serif;
+  --font-sans:  -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono:  'SF Mono', 'Fira Code', 'Fira Mono', 'Consolas', monospace;
+
+  --rail-w:  216px;
+  --trace-w: 332px;
+  --ease:    180ms ease;
+}
+
+/* ─── RESET ─────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  display: flex;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: var(--font-sans); cursor: pointer; }
+textarea { font-family: var(--font-sans); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   HISTORY RAIL
+═══════════════════════════════════════════════════════════════ */
+.rail {
+  width: var(--rail-w);
+  min-width: var(--rail-w);
+  height: 100%;
+  background: var(--bg-raised);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rail-logo {
+  padding: 18px 16px 15px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.logo-gem {
+  width: 30px; height: 30px;
+  background: var(--text);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.logo-gem svg { display: block; }
+.logo-word { font-size: 14.5px; font-weight: 650; letter-spacing: -0.02em; }
+.logo-sub  { font-size: 10px; color: var(--text-3); letter-spacing: 0.07em; text-transform: uppercase; margin-top: 1px; }
+
+.rail-body { flex: 1; overflow-y: auto; padding: 10px 8px; }
+.rail-body::-webkit-scrollbar { width: 3px; }
+.rail-body::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+.new-btn {
+  width: 100%;
+  padding: 8px 11px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-mid);
+  background: var(--bg-card);
+  color: var(--text-2);
+  font-size: 12.5px;
+  display: flex; align-items: center; gap: 7px;
+  margin-bottom: 14px;
+  transition: background var(--ease), border-color var(--ease);
+}
+.new-btn:hover { background: var(--bg-sunken); border-color: var(--border-str); }
+
+.sec-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 6px 7px;
+}
+
+.h-item {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: 1px;
+  transition: background var(--ease), border-color var(--ease);
+}
+.h-item:hover { background: var(--bg-card); }
+.h-item.active {
+  background: var(--bg-card);
+  border-color: var(--border);
+  box-shadow: var(--sh-xs);
+}
+.h-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.h-dot.live  { background: var(--accent); }
+.h-dot.done  { background: var(--green); }
+.h-dot.old   { background: var(--border-str); }
+.h-title { font-size: 12px; line-height: 1.45; color: var(--text); }
+.h-meta  { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+
+.rail-foot {
+  flex-shrink: 0;
+  padding: 10px 8px 12px;
+  border-top: 1px solid var(--border);
+}
+.profile-row {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--ease);
+}
+.profile-row:hover { background: var(--bg-sunken); }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed 0%, #b45309 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10.5px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+.profile-name { font-size: 12.5px; font-weight: 500; }
+.profile-role { font-size: 10.5px; color: var(--text-3); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN CANVAS
+═══════════════════════════════════════════════════════════════ */
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* header bar */
+.main-bar {
+  flex-shrink: 0;
+  height: 52px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px;
+  gap: 10px;
+}
+.model-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  font-size: 12.5px; color: var(--text);
+  cursor: pointer;
+  transition: border-color var(--ease);
+}
+.model-pill:hover { border-color: var(--border-str); }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+.chevron { opacity: 0.5; }
+.bar-gap { flex: 1; }
+.bar-btn {
+  padding: 5px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  font-size: 12px; color: var(--text-2);
+  transition: all var(--ease);
+}
+.bar-btn:hover { background: var(--bg-raised); border-color: var(--border-str); color: var(--text); }
+.bar-btn.on { background: var(--text); color: #fff; border-color: var(--text); }
+
+/* scroll canvas */
+.canvas {
+  flex: 1;
+  overflow-y: auto;
+  padding: 36px 0 0;
+}
+.canvas::-webkit-scrollbar { width: 5px; }
+.canvas::-webkit-scrollbar-track { background: transparent; }
+.canvas::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 3px; }
+
+.inner { max-width: 704px; margin: 0 auto; padding: 0 28px 40px; }
+
+/* ── chat turns ── */
+.turn { margin-bottom: 26px; }
+.turn-user {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 10px;
+}
+.user-bubble {
+  max-width: 520px;
+  background: var(--text);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 17px 17px 4px 17px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+.turn-assistant { display: flex; align-items: flex-start; gap: 10px; }
+.asst-icon {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 2px;
+}
+.asst-body { flex: 1; min-width: 0; }
+.asst-byline {
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 5px;
+}
+.asst-text { font-size: 14px; line-height: 1.65; color: var(--text); }
+
+/* ── ARTIFACT ── */
+.artifact {
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-card);
+  box-shadow: var(--sh-md);
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.art-bar {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+  display: flex; align-items: center; gap: 10px;
+}
+.art-icon {
+  width: 26px; height: 26px; border-radius: 6px;
+  background: var(--text);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.art-title { font-size: 13px; font-weight: 600; flex: 1; }
+.art-meta  { font-size: 11px; color: var(--text-3); }
+
+.art-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-raised);
+  padding: 0 18px;
+  gap: 2px;
+}
+.atab {
+  font-size: 12.5px; font-weight: 500;
+  color: var(--text-3); padding: 9px 12px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  transition: color var(--ease);
+}
+.atab:hover { color: var(--text); }
+.atab.on { color: var(--text); border-bottom-color: var(--text); }
+
+.art-body { padding: 22px 22px 26px; }
+
+.tab-pane { display: none; }
+.tab-pane.on { display: block; }
+
+/* ── dossier ── */
+.doss-head {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding-bottom: 18px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border);
+}
+.doss-q {
+  font-family: var(--font-serif);
+  font-size: 17px; line-height: 1.45;
+  color: var(--text); flex: 1;
+  font-style: italic;
+}
+.doss-chips {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;
+}
+.dchip {
+  font-size: 10.5px; font-weight: 500;
+  padding: 3px 8px; border-radius: 10px;
+  background: var(--bg-raised); border: 1px solid var(--border);
+  color: var(--text-2); white-space: nowrap;
+}
+.dchip.ok { color: var(--green); border-color: var(--green-bdr); background: var(--green-bg); }
+
+.plane-head {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 10px;
+}
+.plane-badge {
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 6px; border-radius: 9px;
+  letter-spacing: 0.04em;
+}
+.pb-moat { background: var(--moat-bg); color: var(--moat); border: 1px solid var(--moat-bdr); }
+.pb-ext  { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-bdr); }
+.plane-note { font-size: 10px; color: var(--text-4); font-weight: 400; }
+
+.plane-block { margin-bottom: 24px; }
+
+.fact {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 11px 13px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 7px;
+  cursor: pointer;
+  transition: border-color var(--ease), box-shadow var(--ease), background var(--ease);
+}
+.fact:hover { border-color: var(--border-str); box-shadow: var(--sh-xs); }
+.fact.selected { border-color: var(--accent); background: var(--accent-bg); }
+.fact.moat-row { background: var(--moat-bg); border-color: var(--moat-bdr); }
+.fact.moat-row:hover { border-color: var(--moat); }
+.fact.moat-row.selected { border-color: var(--moat); background: #ede8fc; }
+
+.tier {
+  font-size: 9.5px; font-weight: 800;
+  padding: 2px 5px; border-radius: 3px;
+  flex-shrink: 0; margin-top: 2px;
+  letter-spacing: 0.05em;
+}
+.t1 { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-bdr); }
+.t2 { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bdr); }
+.t3 { background: var(--bg-raised); color: var(--text-3); border: 1px solid var(--border); }
+
+.fact-body { flex: 1; min-width: 0; }
+.fact-txt { font-size: 13px; line-height: 1.55; color: var(--text); }
+.fact-src { font-size: 10.5px; color: var(--text-3); margin-top: 3px; }
+.fact-flags { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.flag-chip {
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 6px; border-radius: 3px;
+  letter-spacing: 0.04em;
+}
+.fc-div { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bdr); }
+.fc-vet { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bdr); }
+
+/* ── roundtable ── */
+.rt-intro {
+  font-size: 12px; color: var(--text-3); line-height: 1.55;
+  margin-bottom: 18px; padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.spread-wrap { margin-bottom: 18px; }
+.spread-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 8px;
+}
+.spread-bar {
+  height: 5px; border-radius: 3px; background: var(--bg-sunken);
+  display: flex; overflow: hidden; gap: 1.5px;
+}
+.seg { height: 100%; border-radius: 1px; }
+.spread-key { display: flex; gap: 14px; margin-top: 7px; }
+.sk-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); }
+.sk-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.rt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 18px; }
+.rt-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 13px 14px;
+  cursor: pointer;
+  transition: box-shadow var(--ease), border-color var(--ease);
+}
+.rt-card:hover { box-shadow: var(--sh-sm); border-color: var(--border-str); }
+.rt-card.selected { border-color: var(--accent); }
+.rt-card-head { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.persona-av {
+  width: 22px; height: 22px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.persona-nm { font-size: 12px; font-weight: 600; flex: 1; }
+.verdict {
+  font-size: 9.5px; font-weight: 700;
+  padding: 2px 6px; border-radius: 9px;
+  letter-spacing: 0.04em;
+}
+.v-cond { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bdr); }
+.v-bull { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-bdr); }
+.v-skep { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-bdr); }
+.v-neut { background: var(--bg-raised); color: var(--text-2); border: 1px solid var(--border); }
+.rt-quote { font-size: 12.5px; line-height: 1.55; color: var(--text-2); }
+
+.rebuttal-box {
+  padding: 13px 14px;
+  border-radius: var(--r-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+}
+.rebuttal-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 8px;
+}
+.rebuttal-txt { font-size: 12.5px; line-height: 1.65; color: var(--text-2); }
+
+/* ── synthesis ── */
+.synth-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-raised);
+  padding: 18px 20px;
+}
+.synth-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 6px;
+}
+.synth-prose {
+  font-family: var(--font-serif);
+  font-size: 14.5px; line-height: 1.75;
+  color: var(--text);
+}
+.synth-recs { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.recs-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 10px;
+}
+.rec {
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-bottom: 9px;
+}
+.rec-n {
+  font-size: 10.5px; font-weight: 700; color: var(--text-3);
+  flex-shrink: 0; margin-top: 3px; min-width: 18px;
+}
+.rec-t { font-size: 13px; line-height: 1.55; color: var(--text-2); }
+
+/* ── input ── */
+.input-dock {
+  flex-shrink: 0;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  padding: 14px 28px 18px;
+}
+.input-row {
+  max-width: 704px; margin: 0 auto;
+}
+.input-box {
+  display: flex; align-items: flex-end; gap: 8px;
+  border: 1.5px solid var(--border-mid);
+  border-radius: var(--r-lg);
+  background: var(--bg-raised);
+  padding: 9px 12px;
+  transition: border-color var(--ease), background var(--ease);
+}
+.input-box:focus-within {
+  border-color: var(--border-str);
+  background: var(--bg-card);
+}
+.input-ta {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-size: 14px; line-height: 1.5; resize: none;
+  color: var(--text); min-height: 20px; max-height: 110px;
+}
+.input-ta::placeholder { color: var(--text-3); }
+.send {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--text); border: none;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: opacity var(--ease);
+}
+.send:hover { opacity: .82; }
+.input-hint { font-size: 10.5px; color: var(--text-3); text-align: center; margin-top: 7px; }
+
+/* ── empty state ── */
+.empty-view {
+  flex: 1; overflow-y: auto;
+  display: none;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px 40px; text-align: center;
+}
+.empty-gem {
+  width: 54px; height: 54px; border-radius: 14px;
+  background: var(--bg-raised); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 22px;
+}
+.empty-h {
+  font-family: var(--font-serif);
+  font-size: 24px; font-weight: normal; color: var(--text);
+  margin-bottom: 10px;
+}
+.empty-sub {
+  font-size: 14px; color: var(--text-2);
+  max-width: 380px; line-height: 1.65;
+  margin: 0 auto 30px;
+}
+.sugg-list { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.sugg {
+  padding: 9px 20px; border-radius: 20px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  font-size: 13px; color: var(--text-2);
+  cursor: pointer; max-width: 520px; text-align: center;
+  transition: all var(--ease);
+}
+.sugg:hover { border-color: var(--border-str); background: var(--bg-raised); color: var(--text); }
+
+
+/* ═══════════════════════════════════════════════════════════════
+   TRACE PANEL
+═══════════════════════════════════════════════════════════════ */
+.trace-panel {
+  width: var(--trace-w);
+  min-width: var(--trace-w);
+  height: 100%;
+  border-left: 1px solid var(--border);
+  background: var(--bg-raised);
+  display: flex; flex-direction: column;
+  flex-shrink: 0;
+  transition: width var(--ease);
+}
+
+.tp-bar {
+  flex-shrink: 0;
+  padding: 13px 14px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.tp-title { font-size: 12px; font-weight: 700; flex: 1;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-3); }
+.tp-tabs { display: flex; gap: 2px; }
+.ttab {
+  padding: 4px 10px; border-radius: 13px;
+  font-size: 11.5px; font-weight: 500;
+  color: var(--text-3); border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--ease);
+}
+.ttab.on { background: var(--bg-card); color: var(--text); border-color: var(--border); box-shadow: var(--sh-xs); }
+.ttab:hover:not(.on) { color: var(--text); background: var(--bg-sunken); }
+
+.tp-body { flex: 1; overflow-y: auto; padding: 12px 10px; }
+.tp-body::-webkit-scrollbar { width: 3px; }
+.tp-body::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+/* timeline */
+.timeline { position: relative; }
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 10px; top: 14px; bottom: 10px;
+  width: 1px; background: var(--border);
+}
+.ts-sep {
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--text-3); padding: 10px 4px 5px 24px;
+  position: relative; z-index: 1;
+}
+.ts {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 7px 6px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--ease);
+  margin-bottom: 2px;
+}
+.ts:hover { background: var(--bg-card); border-color: var(--border); }
+.ts.on { background: var(--bg-card); border-color: var(--accent); }
+.ts.on .ts-name { color: var(--accent); }
+.ts-dot-col { width: 20px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 3px; position: relative; z-index: 1; }
+.ts-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid var(--bg-raised);
+}
+.ts-dot.done    { background: var(--green); }
+.ts-dot.running { background: var(--accent); animation: pulse 1.5s ease infinite; }
+.ts-dot.wait    { background: var(--border-str); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+.ts-col { flex: 1; min-width: 0; }
+.ts-name  { font-size: 12px; font-weight: 500; line-height: 1.3; }
+.ts-agent { font-size: 10.5px; color: var(--text-3); margin-top: 1px; }
+.ts-meta  { display: flex; align-items: center; gap: 5px; margin-top: 4px; }
+.ts-time  { font-size: 10px; font-variant-numeric: tabular-nums; color: var(--text-3); }
+.ts-badge {
+  font-size: 9.5px; font-weight: 700;
+  padding: 1px 5px; border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+.tb-ok   { background: var(--green-bg); color: var(--green); }
+.tb-warn { background: var(--accent-bg); color: var(--accent); }
+.tb-veto { background: var(--red-bg);    color: var(--red); }
+
+.ts-foot {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.ts-foot-lbl { font-size: 11px; color: var(--text-3); }
+.ts-foot-val { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.ts-foot-chips { margin-left: auto; display: flex; gap: 4px; }
+.foot-chip {
+  font-size: 9.5px; padding: 2px 6px; border-radius: 4px;
+  font-weight: 600;
+}
+
+/* sources tab */
+.src-lbl {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 9px; padding: 0 2px;
+}
+.src-list { display: flex; flex-direction: column; gap: 6px; }
+.src-pill {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px; border-radius: var(--r-sm);
+  background: var(--blue-bg); border: 1px solid var(--blue-bdr);
+  font-size: 11.5px; color: var(--blue);
+}
+.src-pill.moat { background: var(--moat-bg); border-color: var(--moat-bdr); color: var(--moat); }
+.src-tag {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.06em;
+  padding: 1px 4px; border-radius: 3px;
+  background: rgba(255,255,255,.6); color: inherit; flex-shrink: 0;
+}
+
+/* ── inspector ── */
+.inspector {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  max-height: 0; overflow: hidden;
+  transition: max-height 280ms cubic-bezier(.4,0,.2,1);
+}
+.inspector.open { max-height: 440px; overflow-y: auto; }
+.inspector::-webkit-scrollbar { width: 3px; }
+.inspector::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+.insp-inner { padding: 15px 14px; }
+.insp-head { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 12px; }
+.insp-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--bg-sunken); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.insp-name { font-size: 13px; font-weight: 700; line-height: 1.25; }
+.insp-kind { font-size: 10.5px; color: var(--text-3); margin-top: 2px; }
+.insp-close {
+  margin-left: auto; flex-shrink: 0;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--bg-sunken); border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; color: var(--text-2); line-height: 1;
+  transition: background var(--ease);
+}
+.insp-close:hover { background: var(--border-mid); }
+.insp-sl {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin: 11px 0 5px;
+}
+.insp-out {
+  font-size: 12px; line-height: 1.65; color: var(--text);
+  background: var(--bg-raised); border: 1px solid var(--border);
+  border-radius: var(--r-sm); padding: 9px 11px;
+}
+.insp-srcs { display: flex; flex-direction: column; gap: 5px; }
+.insp-prov { display: flex; gap: 5px; flex-wrap: wrap; }
+.pchip {
+  font-size: 10px; padding: 2px 7px; border-radius: 9px;
+  background: var(--bg-raised); border: 1px solid var(--border); color: var(--text-2);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ HISTORY RAIL ═══════════ -->
+<aside class="rail">
+  <div class="rail-logo">
+    <div class="logo-gem">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
+        <path d="M8.5 2L15 5.75V11.25L8.5 15L2 11.25V5.75L8.5 2Z" fill="white" opacity=".92"/>
+        <path d="M8.5 5.5L12 7.5V11L8.5 13L5 11V7.5L8.5 5.5Z" fill="white" opacity=".28"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-word">Sapphire</div>
+      <div class="logo-sub">Quiver Bioscience</div>
+    </div>
+  </div>
+
+  <div class="rail-body">
+    <button class="new-btn" onclick="showEmpty()">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="5.5" y1="1" x2="5.5" y2="10"/><line x1="1" y1="5.5" x2="10" y2="5.5"/></svg>
+      New query
+    </button>
+    <div class="sec-label">Recent</div>
+
+    <div class="h-item active" onclick="showMain()">
+      <div class="h-dot live"></div>
+      <div>
+        <div class="h-title">TSC2 phenotype rescue genes</div>
+        <div class="h-meta">Today · 27.2 s · 22 agents</div>
+      </div>
+    </div>
+    <div class="h-item">
+      <div class="h-dot done"></div>
+      <div>
+        <div class="h-title">Nav1.8 CNS expression atlas</div>
+        <div class="h-meta">Yesterday · 31.4 s</div>
+      </div>
+    </div>
+    <div class="h-item">
+      <div class="h-dot old"></div>
+      <div>
+        <div class="h-title">CRISPR off-target in cortical organoids</div>
+        <div class="h-meta">Jun 26 · 44.1 s</div>
+      </div>
+    </div>
+    <div class="h-item">
+      <div class="h-dot old"></div>
+      <div>
+        <div class="h-title">Rapamycin resistance in TSC</div>
+        <div class="h-meta">Jun 25 · 19.8 s</div>
+      </div>
+    </div>
+    <div class="h-item">
+      <div class="h-dot old"></div>
+      <div>
+        <div class="h-title">mTORC1 biomarkers for patient stratification</div>
+        <div class="h-meta">Jun 24 · 38.2 s</div>
+      </div>
+    </div>
+    <div class="h-item">
+      <div class="h-dot old"></div>
+      <div>
+        <div class="h-title">KCNQ2 gain-of-function variant spectrum</div>
+        <div class="h-meta">Jun 23 · 22.6 s</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rail-foot">
+    <div class="profile-row">
+      <div class="avatar">RA</div>
+      <div>
+        <div class="profile-name">Rohan Aryagondi</div>
+        <div class="profile-role">Research Director</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+
+<!-- ═══════════ MAIN CANVAS ═══════════ -->
+<main class="main">
+  <div class="main-bar">
+    <div class="model-pill">
+      <div class="live-dot"></div>
+      <span>claude-opus-4 · Sapphire</span>
+      <svg class="chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 4L5 6.5L7.5 4"/></svg>
+    </div>
+    <div class="bar-gap"></div>
+    <button class="bar-btn" onclick="toggleTrace(this)">Trace</button>
+    <button class="bar-btn" id="view-btn" onclick="cycleView(this)">Dossier</button>
+  </div>
+
+  <!-- EMPTY VIEW -->
+  <div class="empty-view" id="empty-view">
+    <div class="empty-gem">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 3L23 8.5V17.5L13 23L3 17.5V8.5L13 3Z" opacity=".5"/>
+        <path d="M13 8L19 11.5V18L13 21.5L7 18V11.5L13 8Z" opacity=".25"/>
+      </svg>
+    </div>
+    <div class="empty-h">Ask the firm anything</div>
+    <div class="empty-sub">Sapphire routes your question through 22 agents — a cited fact dossier from your internal moat, EMET literature, Q-Models, and semantic agents — then a persona roundtable. Under a minute.</div>
+    <div class="sugg-list">
+      <div class="sugg" onclick="showMain()">Which genes rescue the TSC2 phenotype the most?</div>
+      <div class="sugg">What Nav1.8 CNS expression evidence supports a pain indication?</div>
+      <div class="sugg">IND-enabling biomarkers for mTOR pathway drugs in tuberous sclerosis?</div>
+      <div class="sugg">Is there patent risk for DCTN6 as a therapeutic target?</div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEW -->
+  <div class="canvas" id="main-view">
+    <div class="inner">
+
+      <!-- USER TURN -->
+      <div class="turn turn-user">
+        <div class="user-bubble">Which genes rescue the TSC2 phenotype the most?</div>
+      </div>
+
+      <!-- ASSISTANT ACKNOWLEDGEMENT -->
+      <div class="turn turn-assistant">
+        <div class="asst-icon">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5L12 4.75V8.25L6.5 11.5L1 8.25V4.75L6.5 1.5Z" fill="white" opacity=".9"/></svg>
+        </div>
+        <div class="asst-body">
+          <div class="asst-byline">Sapphire · Engagement Lead</div>
+          <div class="asst-text">Running the full firm — pulling your internal moat first, then EMET on BenchSci, Q-Models pathway scores, and four semantic agents (FDA memory, patent, clinical registry, payer). Convening five partners afterward. Report below.</div>
+        </div>
+      </div>
+
+      <!-- ARTIFACT -->
+      <div class="artifact">
+        <div class="art-bar">
+          <div class="art-icon">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5L12 4.75V8.25L6.5 11.5L1 8.25V4.75L6.5 1.5Z" fill="white" opacity=".9"/><path d="M6.5 4.5L10 6.5V9.5L6.5 11L3 9.5V6.5L6.5 4.5Z" fill="white" opacity=".28"/></svg>
+          </div>
+          <div class="art-title">Firm Report — TSC2 Phenotype Rescue</div>
+          <div class="art-meta">22 agents &middot; 27.2 s &middot; Jun 29, 2026</div>
+        </div>
+
+        <div class="art-tabs">
+          <div class="atab on" onclick="switchATab(this,'dossier')">Dossier</div>
+          <div class="atab" onclick="switchATab(this,'roundtable')">Roundtable</div>
+          <div class="atab" onclick="switchATab(this,'synthesis')">Synthesis</div>
+        </div>
+
+        <div class="art-body">
+
+          <!-- ── DOSSIER ── -->
+          <div class="tab-pane on" id="tab-dossier">
+            <div class="doss-head">
+              <div class="doss-q">"Which genes rescue the TSC2 phenotype the most?"</div>
+              <div class="doss-chips">
+                <div class="dchip">8 facts &middot; T1 – T3</div>
+                <div class="dchip">🔒 2 moat &nbsp;·&nbsp; 🌐 6 external</div>
+                <div class="dchip ok">✓ Complete &middot; 0 gaps</div>
+              </div>
+            </div>
+
+            <!-- MOAT PLANE -->
+            <div class="plane-block">
+              <div class="plane-head">
+                <span>🔒 Internal Moat</span>
+                <span class="plane-badge pb-moat">PROPRIETARY</span>
+                <span class="plane-note">data-boundary enforced — never leaves the perimeter</span>
+              </div>
+
+              <div class="fact moat-row" onclick="selectFact(this,'moat')">
+                <div class="tier t1">T1</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>DCTN6</strong> shows the strongest rescue signal in Quiver's internal CRISPR viability screen (Z-score 4.2 ± 0.6, n = 3 biological replicates, FDR &lt; 0.01). Ranked #1 of 1,847 genes tested.</div>
+                  <div class="fact-src">Quiver EP-screen v2.4 · Internal Science Lead · provenance: moat-real</div>
+                  <div class="fact-flags"><span class="flag-chip fc-div">DIVERGENCE — absent from public literature</span></div>
+                </div>
+              </div>
+
+              <div class="fact moat-row" onclick="selectFact(this,'moat')">
+                <div class="tier t1">T1</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>FZD7</strong> rescue confirmed in mTOR-null background (fold-change 2.8×, p = 0.003), implicating Wnt–mTOR crosstalk as a second independent rescue axis.</div>
+                  <div class="fact-src">Quiver EP-CRISPR 2024-Q4 · Internal Science Lead · provenance: moat-real</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- EXTERNAL PLANE -->
+            <div class="plane-block">
+              <div class="plane-head">
+                <span>🌐 External</span>
+                <span class="plane-badge pb-ext">PUBLIC</span>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'emet')">
+                <div class="tier t2">T2</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>RHEB</strong> overexpression rescues mTORC1 activity in TSC2−/− cells by restoring GTP-loading downstream of the TSC1–TSC2 GAP complex.</div>
+                  <div class="fact-src">PMID 38104521 · PMID 37891234 · EMET Analyst · BenchSci confirmed · 2 independent labs</div>
+                </div>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'emet')">
+                <div class="tier t2">T2</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>MTOR</strong> complex re-activation via rapamycin-insensitive mTORC2 partially rescues morphological deficits in TSC2−/− cortical neurons.</div>
+                  <div class="fact-src">PMID 38291847 · EMET Analyst · 47 candidates screened, 4 curated to T2</div>
+                </div>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'qmodels')">
+                <div class="tier t2">T2</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>Q-Models PATHWAY-SCORE:</strong> DCTN6 → mTOR axis 0.83 (top decile); FZD7 → Wnt–mTOR 0.71; RHEB → mTORC1 0.94 (positive control, validates run).</div>
+                  <div class="fact-src">Q-Models · PATHWAY-SCORE tool · provenance: live-local · $0 · CPU</div>
+                </div>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'emet')">
+                <div class="tier t2">T2</div>
+                <div class="fact-body">
+                  <div class="fact-txt"><strong>AKT1</strong> constitutive activation (E17K mutant) rescues TSC2−/− proliferation arrest in vitro; effect is PI3K-priming dependent.</div>
+                  <div class="fact-src">PMID 37654321 · EMET Analyst</div>
+                </div>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'fda-mem')">
+                <div class="tier t3">T3</div>
+                <div class="fact-body">
+                  <div class="fact-txt">No active IND or CTA for <strong>DCTN6</strong> as a therapeutic target. TSC rare-disease indication well-established with FDA-approved mTOR precedents (everolimus 2010, sirolimus 2015).</div>
+                  <div class="fact-src">FDA Institutional Memory · ClinicalTrials.gov snapshot · provenance: semantic</div>
+                </div>
+              </div>
+
+              <div class="fact" onclick="selectFact(this,'patent')">
+                <div class="tier t3">T3</div>
+                <div class="fact-body">
+                  <div class="fact-txt">Patent landscape clear for DCTN6 composition-of-matter and method-of-use in TSC indications (USPTO + EP Register, cutoff Jun 2026). No blocking claims.</div>
+                  <div class="fact-src">Patent/IP Analyst · USPTO full-text · EP Register · Derwent · provenance: semantic</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── ROUNDTABLE ── -->
+          <div class="tab-pane" id="tab-roundtable">
+            <div class="rt-intro">Five partners delivered independent round-1 verdicts, then a moderated round-2 rebuttal. No forced consensus — the spread is the product.</div>
+
+            <div class="spread-wrap">
+              <div class="spread-lbl">Verdict spread</div>
+              <div class="spread-bar">
+                <div class="seg" style="background:var(--green);width:20%"></div>
+                <div class="seg" style="background:var(--accent);width:60%"></div>
+                <div class="seg" style="background:var(--red);width:20%"></div>
+              </div>
+              <div class="spread-key">
+                <div class="sk-item"><div class="sk-dot" style="background:var(--green)"></div>Bullish (1)</div>
+                <div class="sk-item"><div class="sk-dot" style="background:var(--accent)"></div>Conditional (3)</div>
+                <div class="sk-item"><div class="sk-dot" style="background:var(--red)"></div>Skeptical (1)</div>
+              </div>
+            </div>
+
+            <div class="rt-grid">
+              <div class="rt-card" onclick="selectCard(this)">
+                <div class="rt-card-head">
+                  <div class="persona-av" style="background:#dbeafe;color:#1d4ed8">IS</div>
+                  <div class="persona-nm">Internal Science Lead</div>
+                  <div class="verdict v-cond">Conditional</div>
+                </div>
+                <div class="rt-quote">"DCTN6 Z-score is compelling but we need one orthogonal assay — arrayed shRNA or CRISPRa — before lead nomination."</div>
+              </div>
+
+              <div class="rt-card" onclick="selectCard(this)">
+                <div class="rt-card-head">
+                  <div class="persona-av" style="background:#dcfce7;color:#15803d">FDA</div>
+                  <div class="persona-nm">ex-FDA Regulator</div>
+                  <div class="verdict v-cond">Conditional</div>
+                </div>
+                <div class="rt-quote">"Strong mechanistic rationale. TSC rare-disease designation means a known regulatory path. 505(b)(2) plausible if PK is clean."</div>
+              </div>
+
+              <div class="rt-card" onclick="selectCard(this)">
+                <div class="rt-card-head">
+                  <div class="persona-av" style="background:#fee2e2;color:#b91c1c">RT</div>
+                  <div class="persona-nm">Red-Team Analyst</div>
+                  <div class="verdict v-skep">Skeptical</div>
+                </div>
+                <div class="rt-quote">"DCTN6 is unpublished as a TSC target. Single-screen hit. Demand independent replication and mechanism — dynactin's role in mTOR is unclear."</div>
+              </div>
+
+              <div class="rt-card" onclick="selectCard(this)">
+                <div class="rt-card-head">
+                  <div class="persona-av" style="background:#f5f3ff;color:#6d28d9">Rx</div>
+                  <div class="persona-nm">Payer Strategist</div>
+                  <div class="verdict v-neut">Neutral</div>
+                </div>
+                <div class="rt-quote">"TSC2 is orphan-eligible. A PD biomarker differentiating from everolimus unlocks premium pricing — that's the payer thesis."</div>
+              </div>
+
+              <div class="rt-card" onclick="selectCard(this)" style="grid-column:1/3">
+                <div class="rt-card-head">
+                  <div class="persona-av" style="background:#fef7ed;color:#a16207">KOL</div>
+                  <div class="persona-nm">Clinical KOL (TSC)</div>
+                  <div class="verdict v-bull">Bullish</div>
+                </div>
+                <div class="rt-quote">"DCTN6 + FZD7 dual hit is mechanistically coherent — Wnt–mTOR crosstalk in TSC is underexplored. First-mover advantage if replication holds."</div>
+              </div>
+            </div>
+
+            <div class="rebuttal-box">
+              <div class="rebuttal-lbl">Round 2 · Moderated rebuttal</div>
+              <div class="rebuttal-txt"><strong>Red-Team → KOL:</strong> "You're extrapolating Wnt–mTOR from two internal data points." &nbsp;·&nbsp; <strong>KOL:</strong> "Fair — my bullish view is on the genetic rationale, not yet the MOA." &nbsp;·&nbsp; <strong>FDA → Red-Team:</strong> "Replication concern is valid; Quiver can stage-gate to an IND-enabling package without resolving the full mechanism first." &nbsp;·&nbsp; <strong>Internal Science Lead → Red-Team:</strong> "Agreed on the demand for orthogonal data — that's the immediate next step we're proposing."</div>
+            </div>
+          </div>
+
+          <!-- ── SYNTHESIS ── -->
+          <div class="tab-pane" id="tab-synthesis">
+            <div class="synth-card">
+              <div class="synth-lbl">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="6" cy="6" r="4.5"/><line x1="6" y1="3.8" x2="6" y2="6.5"/><circle cx="6" cy="7.8" r=".5" fill="currentColor" stroke="none"/></svg>
+                Synthesis · Orchestrator + Roundtable Moderator
+              </div>
+              <div class="synth-prose">
+                The internal moat surfaces a private signal — DCTN6 (Z-score 4.2, rank 1 of 1,847) and FZD7 — not visible anywhere in the public literature. This is precisely the alpha Quiver's EP-CRISPR platform is designed to generate: the firm is seeing what the field cannot.
+                <br><br>
+                The roundtable spread (3 conditional, 1 skeptical, 1 bullish) reflects appropriate epistemic caution. A single-screen hit on an unpublished target rightly demands replication before capital commitment. The Red-Team objection is not a blocker — it is a design constraint for the next experiment.
+                <br><br>
+                Importantly, the regulatory and payer framing is more favorable than the scientific uncertainty would suggest in isolation. Tuberous sclerosis is an established rare-disease indication with FDA-approved mTOR precedents; the patent landscape is clear for DCTN6; and an orphan premium-pricing thesis exists if a differentiating PD biomarker can be established. The risk-adjusted path is narrow and executable.
+              </div>
+              <div class="synth-recs">
+                <div class="recs-lbl">Recommended next steps</div>
+                <div class="rec"><div class="rec-n">01</div><div class="rec-t">Commission arrayed shRNA or CRISPRa orthogonal validation of DCTN6 in TSC2−/− line (target: 6 weeks, settles the Red-Team objection).</div></div>
+                <div class="rec"><div class="rec-n">02</div><div class="rec-t">File provisional patent application on DCTN6 + FZD7 co-targeting methodology before any external disclosure.</div></div>
+                <div class="rec"><div class="rec-n">03</div><div class="rec-t">Initiate structural biology work to define DCTN6–mTOR interaction and resolve the MOA question raised in round-2 rebuttal.</div></div>
+                <div class="rec"><div class="rec-n">04</div><div class="rec-t">Consult ex-FDA partner on pre-IND meeting strategy contingent on orthogonal assay outcome — do not wait for MOA resolution.</div></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- art-body -->
+      </div><!-- artifact -->
+    </div><!-- inner -->
+  </div><!-- canvas -->
+
+  <!-- INPUT DOCK -->
+  <div class="input-dock">
+    <div class="input-row">
+      <div class="input-box">
+        <textarea class="input-ta" rows="1" placeholder="Ask a follow-up or start a new query…" oninput="autoH(this)"></textarea>
+        <button class="send">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 6.5H1.5"/><path d="M7.5 2.5L11.5 6.5L7.5 10.5"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Sapphire &middot; 22 agents &middot; claude-opus-4 &middot; ~30 s per query</div>
+    </div>
+  </div>
+</main>
+
+
+<!-- ═══════════ TRACE PANEL ═══════════ -->
+<aside class="trace-panel" id="trace-panel">
+  <div class="tp-bar">
+    <div class="tp-title">Run trace</div>
+    <div class="tp-tabs">
+      <div class="ttab on" onclick="switchTTab(this,'tl')">Timeline</div>
+      <div class="ttab" onclick="switchTTab(this,'sr')">Sources</div>
+    </div>
+  </div>
+
+  <div class="tp-body" id="tp-body">
+
+    <!-- TIMELINE TAB -->
+    <div class="tab-pane on" id="trace-tl">
+      <div class="timeline">
+
+        <div class="ts-sep">Control</div>
+
+        <div class="ts done" onclick="openInsp(this,'plan')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Query plan</div>
+            <div class="ts-agent">Engagement Lead &middot; orchestrator</div>
+            <div class="ts-meta"><div class="ts-time">0.3 s</div><div class="ts-badge tb-ok">OK</div></div>
+          </div>
+        </div>
+
+        <div class="ts-sep">Bucket 1 &middot; Facts</div>
+
+        <div class="ts done" onclick="openInsp(this,'moat')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Moat recall</div>
+            <div class="ts-agent">Internal Science Lead &middot; moat-real</div>
+            <div class="ts-meta"><div class="ts-time">0.8 s</div><div class="ts-badge tb-ok">2 T1 facts</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'emet')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">EMET literature</div>
+            <div class="ts-agent">EMET Analyst &middot; BenchSci live</div>
+            <div class="ts-meta"><div class="ts-time">12.4 s</div><div class="ts-badge tb-ok">4 T2 facts</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'qmodels')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Q-Models prediction</div>
+            <div class="ts-agent">Q-Models Runner &middot; live-local CPU</div>
+            <div class="ts-meta"><div class="ts-time">2.1 s</div><div class="ts-badge tb-ok">PATHWAY-SCORE</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'fda-mem')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">FDA institutional memory</div>
+            <div class="ts-agent">FDA Inst. Memory &middot; ⛔ veto-class</div>
+            <div class="ts-meta"><div class="ts-time">1.2 s</div><div class="ts-badge tb-ok">NO VETO</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'patent')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Patent / IP review</div>
+            <div class="ts-agent">Patent Analyst &middot; ⛔ veto-class</div>
+            <div class="ts-meta"><div class="ts-time">0.9 s</div><div class="ts-badge tb-ok">CLEAR</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'complete')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Completeness check</div>
+            <div class="ts-agent">Research Manager &middot; dossier gate</div>
+            <div class="ts-meta"><div class="ts-time">0.4 s</div><div class="ts-badge tb-ok">COMPLETE</div></div>
+          </div>
+        </div>
+
+        <div class="ts-sep">Bucket 2 &middot; Roundtable</div>
+
+        <div class="ts done" onclick="openInsp(this,'r1')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Round 1 &middot; verdicts</div>
+            <div class="ts-agent">5 personas &middot; parallel</div>
+            <div class="ts-meta"><div class="ts-time">4.2 s</div><div class="ts-badge tb-warn">1 skeptical</div></div>
+          </div>
+        </div>
+
+        <div class="ts done" onclick="openInsp(this,'r2')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Round 2 &middot; rebuttal</div>
+            <div class="ts-agent">5 personas &middot; moderated</div>
+            <div class="ts-meta"><div class="ts-time">3.1 s</div><div class="ts-badge tb-ok">SPREAD FINAL</div></div>
+          </div>
+        </div>
+
+        <div class="ts-sep">Synthesis</div>
+
+        <div class="ts done on" onclick="openInsp(this,'synth')">
+          <div class="ts-dot-col"><div class="ts-dot done"></div></div>
+          <div class="ts-col">
+            <div class="ts-name">Synthesis</div>
+            <div class="ts-agent">Orchestrator &middot; Roundtable Moderator</div>
+            <div class="ts-meta"><div class="ts-time">1.8 s</div><div class="ts-badge tb-ok">DONE</div></div>
+          </div>
+        </div>
+
+        <div class="ts-foot">
+          <div class="ts-foot-lbl">Total</div>
+          <div class="ts-foot-val">27.2 s</div>
+          <div class="ts-foot-chips">
+            <div class="foot-chip" style="background:var(--green-bg);color:var(--green);">8 facts</div>
+            <div class="foot-chip" style="background:var(--bg-raised);color:var(--text-2);border:1px solid var(--border);">0 vetoes</div>
+          </div>
+        </div>
+      </div>
+    </div><!-- trace-tl -->
+
+    <!-- SOURCES TAB -->
+    <div class="tab-pane" id="trace-sr">
+      <div class="src-lbl">All sources &middot; 6 external &middot; 2 moat</div>
+      <div class="src-list">
+        <div class="src-pill moat"><span class="src-tag">T1</span> 🔒 Quiver EP-screen v2.4</div>
+        <div class="src-pill moat"><span class="src-tag">T1</span> 🔒 Quiver EP-CRISPR 2024-Q4</div>
+        <div class="src-pill"><span class="src-tag">T2</span> PMID 38104521 &middot; RHEB / TSC2−/−</div>
+        <div class="src-pill"><span class="src-tag">T2</span> PMID 37891234 &middot; TSC1–TSC2 GAP</div>
+        <div class="src-pill"><span class="src-tag">T2</span> PMID 38291847 &middot; mTORC2 rescue</div>
+        <div class="src-pill"><span class="src-tag">T2</span> PMID 37654321 &middot; AKT1 E17K</div>
+        <div class="src-pill"><span class="src-tag">T3</span> ClinicalTrials.gov &middot; TSC INDs</div>
+        <div class="src-pill"><span class="src-tag">T3</span> USPTO / EP Register &middot; DCTN6</div>
+        <div class="src-pill" style="background:var(--blue-bg)"><span class="src-tag">tool</span> Q-Models PATHWAY-SCORE &middot; live-local</div>
+      </div>
+    </div>
+
+  </div><!-- tp-body -->
+
+  <!-- INSPECTOR -->
+  <div class="inspector" id="inspector">
+    <div class="insp-inner" id="insp-inner"><!-- filled by JS --></div>
+  </div>
+</aside>
+
+
+<script>
+/* ── inspector data ──────────────────────────────────────────── */
+const INSP = {
+  plan: {
+    name:'Engagement Lead', icon:'EL',
+    kind:'control · orchestrator · kind: claude',
+    out:'Query parsed: "TSC2 phenotype rescue genes." Scope: CRISPR rescue screen readout + pathway context. Bucket-1 plan: moat → EMET (BenchSci) → Q-Models pathway → FDA memory + patent. Bucket-2: 5-persona roundtable. Estimated 22 agents total.',
+    srcs:[], prov:['orchestrator','plan','0.3 s']
+  },
+  moat: {
+    name:'Internal Science Lead', icon:'IS',
+    kind:'bucket-1 · scientific · kind: python (moat-real)',
+    out:'Pulled 14 records from Quiver EP-CRISPR index. 2 facts meet T1 threshold for TSC2 rescue: DCTN6 (Z 4.2, rank 1/1847) and FZD7 (FC 2.8×, rank 11). DIVERGENCE filed: DCTN6 absent from public literature — confirmed private alpha. Data-boundary enforced; identifiers only transmitted outward.',
+    srcs:['🔒 Quiver EP-screen v2.4','🔒 Quiver EP-CRISPR 2024-Q4'],
+    prov:['moat-real','T1','0.8 s','boundary-enforced']
+  },
+  emet: {
+    name:'EMET Analyst', icon:'EA',
+    kind:'bucket-1 · scientific · kind: emet (BenchSci live, Playwright)',
+    out:'Queried BenchSci for "TSC2 rescue." 47 candidate genes surfaced. Curated to 4 T2 facts meeting ≥ 2 PMID threshold: RHEB, MTOR, AKT1, RAC1. DCTN6 returned 0 PMIDs — confirms moat is generating private alpha. Login escalated via Playwright.',
+    srcs:['PMID 38104521','PMID 37891234','PMID 38291847','PMID 37654321'],
+    prov:['emet-live','T2','12.4 s','BenchSci-Playwright']
+  },
+  qmodels: {
+    name:'Q-Models Runner', icon:'QM',
+    kind:'bucket-1 · scientific · kind: qmodels (live-local, CPU)',
+    out:'Called PATHWAY-SCORE tool. DCTN6 → mTOR axis: 0.83 (top decile); FZD7 → Wnt–mTOR: 0.71; RHEB → mTORC1: 0.94 (positive control validates run). Provenance: live-local, $0, CPU. Result stamped.',
+    srcs:['Q-Models PATHWAY-SCORE · live-local'],
+    prov:['live-local','T2','2.1 s','CPU','$0']
+  },
+  'fda-mem': {
+    name:'FDA Institutional Memory', icon:'⛔',
+    kind:'bucket-1 · semantic · veto-class · kind: claude',
+    out:'No active IND or CTA for DCTN6. TSC2 indication established: FDA approved everolimus (2010) and sirolimus (2015) for TSC manifestations. Rare Pediatric Disease designation precedents exist. NO VETO issued. Roundtable gate: OPEN.',
+    srcs:['ClinicalTrials.gov snapshot','FDA Orange Book','Rare Diseases PDUFA list'],
+    prov:['semantic','T3','1.2 s','no-veto']
+  },
+  patent: {
+    name:'Patent / IP Analyst', icon:'⛔',
+    kind:'bucket-1 · semantic · veto-class · kind: claude',
+    out:'USPTO full-text + EP Register search on DCTN6 as therapeutic target in TSC/mTOR indications. 0 blocking claims found. Freedom-to-operate clear as of Jun 2026. Recommends provisional filing before any external disclosure of the DCTN6 + FZD7 combination. NO VETO. Roundtable gate: OPEN.',
+    srcs:['USPTO full-text search','EP Register','Derwent World Patents Index'],
+    prov:['semantic','T3','0.9 s','no-veto']
+  },
+  complete: {
+    name:'Research Manager', icon:'RM',
+    kind:'control · dossier gate · kind: claude',
+    out:'Dossier review: 8 facts (2 T1, 4 T2, 2 T3). Contradiction check: DCTN6 in moat + absent from EMET → DIVERGENCE filed (not a conflict — expected private alpha). No T2 contradictions. 0 gaps vs. query scope. Both veto-class agents returned NO VETO. DOSSIER COMPLETE — advancing to roundtable.',
+    srcs:[], prov:['orchestrator','gate','0.4 s','COMPLETE']
+  },
+  r1: {
+    name:'Roundtable · Round 1', icon:'R1',
+    kind:'bucket-2 · 5 personas · parallel · kind: claude',
+    out:'Independent verdicts issued: ISL → Conditional; FDA → Conditional; Red-Team → Skeptical; Payer → Neutral; KOL → Bullish. No persona invented new facts. Red-Team filed 1 fact-request (DCTN6 mechanism). Spread: 1B / 3C / 1S. No consensus forced.',
+    srcs:[], prov:['persona','T-verdict','4.2 s','no-tools-enforced']
+  },
+  r2: {
+    name:'Roundtable · Round 2', icon:'R2',
+    kind:'bucket-2 · moderated rebuttal · kind: claude',
+    out:'Rebuttals recorded. Red-Team challenged KOL on mechanism extrapolation; KOL distinguished genetic rationale from MOA confidence; FDA reframed replication as a stage-gate rather than a full blocker; ISL aligned with Red-Team on orthogonal assay priority. No new facts introduced. Spread held: 1B / 3C / 1S. FINAL.',
+    srcs:[], prov:['persona','T-rebuttal','3.1 s','spread-final']
+  },
+  synth: {
+    name:'Synthesis · Orchestrator', icon:'OS',
+    kind:'control · Roundtable Moderator · kind: claude',
+    out:'Integrated moat alpha (DCTN6, FZD7) with external dossier and final roundtable spread. Key finding: private signal not visible to field; favorable regulatory/payer context despite scientific uncertainty; stage-gated risk path is executable. 4 prioritized next steps generated. Report finalized.',
+    srcs:[], prov:['orchestrator','synthesis','1.8 s','DONE']
+  }
+};
+
+/* ── inspector open/close ──────────────────────────────────────── */
+function openInsp(el, key) {
+  document.querySelectorAll('.ts').forEach(s => s.classList.remove('on'));
+  el.classList.add('on');
+  const d = INSP[key]; if (!d) return;
+
+  const srcsHtml = d.srcs.length
+    ? `<div class="insp-sl">Sources</div><div class="insp-srcs">${
+        d.srcs.map(s => `<div class="src-pill ${s.startsWith('🔒')?'moat':''}" style="font-size:11px">${s}</div>`).join('')
+      }</div>` : '';
+
+  const provHtml = `<div class="insp-sl">Provenance</div><div class="insp-prov">${
+    d.prov.map(p => `<div class="pchip">${p}</div>`).join('')
+  }</div>`;
+
+  document.getElementById('insp-inner').innerHTML = `
+    <div class="insp-head">
+      <div class="insp-icon" style="font-size:11px;font-weight:700;color:var(--text-2)">${d.icon}</div>
+      <div><div class="insp-name">${d.name}</div><div class="insp-kind">${d.kind}</div></div>
+      <button class="insp-close" onclick="closeInsp()">&times;</button>
+    </div>
+    <div class="insp-sl">Output</div>
+    <div class="insp-out">${d.out}</div>
+    ${srcsHtml}
+    ${provHtml}
+  `;
+  document.getElementById('inspector').classList.add('open');
+}
+
+function closeInsp() {
+  document.getElementById('inspector').classList.remove('open');
+  document.querySelectorAll('.ts').forEach(s => s.classList.remove('on'));
+}
+
+/* ── fact selection (dossier → inspector) ────────────────────── */
+function selectFact(el, key) {
+  document.querySelectorAll('.fact').forEach(f => f.classList.remove('selected'));
+  el.classList.add('selected');
+  // map to a trace key then open via fake step
+  const map = { moat:'moat', emet:'emet', qmodels:'qmodels', 'fda-mem':'fda-mem', patent:'patent' };
+  if (map[key]) {
+    const d = INSP[map[key]]; if (!d) return;
+    const srcsHtml = d.srcs.length
+      ? `<div class="insp-sl">Sources</div><div class="insp-srcs">${d.srcs.map(s=>`<div class="src-pill ${s.startsWith('🔒')?'moat':''}" style="font-size:11px">${s}</div>`).join('')}</div>` : '';
+    document.getElementById('insp-inner').innerHTML = `
+      <div class="insp-head">
+        <div class="insp-icon" style="font-size:11px;font-weight:700;color:var(--text-2)">${d.icon}</div>
+        <div><div class="insp-name">${d.name}</div><div class="insp-kind">${d.kind}</div></div>
+        <button class="insp-close" onclick="closeInsp()">&times;</button>
+      </div>
+      <div class="insp-sl">Output</div>
+      <div class="insp-out">${d.out}</div>
+      ${srcsHtml}
+      <div class="insp-sl">Provenance</div><div class="insp-prov">${d.prov.map(p=>`<div class="pchip">${p}</div>`).join('')}</div>
+    `;
+    document.getElementById('inspector').classList.add('open');
+  }
+}
+
+function selectCard(el) {
+  document.querySelectorAll('.rt-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+/* ── tab switching ───────────────────────────────────────────── */
+function switchATab(el, id) {
+  document.querySelectorAll('.art-tabs .atab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('#main-view .tab-pane').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
+}
+
+function switchTTab(el, id) {
+  document.querySelectorAll('.tp-tabs .ttab').forEach(t => t.classList.remove('on'));
+  document.querySelectorAll('#tp-body .tab-pane').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('trace-'+id).classList.add('on');
+}
+
+/* ── toggle trace panel ──────────────────────────────────────── */
+function toggleTrace(btn) {
+  const p = document.getElementById('trace-panel');
+  const hidden = p.style.display === 'none';
+  p.style.display = hidden ? 'flex' : 'none';
+  btn.classList.toggle('on', hidden);
+}
+
+/* ── empty / main state ──────────────────────────────────────── */
+function showEmpty() {
+  document.getElementById('main-view').style.display = 'none';
+  document.getElementById('empty-view').style.display = 'flex';
+  document.querySelectorAll('.h-item').forEach(i => i.classList.remove('active'));
+}
+function showMain() {
+  document.getElementById('empty-view').style.display = 'none';
+  document.getElementById('main-view').style.display = 'block';
+  document.querySelectorAll('.h-item').forEach((i,idx) => i.classList.toggle('active', idx===0));
+}
+
+/* ── textarea auto-height ────────────────────────────────────── */
+function autoH(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+}
+
+/* ── boot: open synthesis inspector ─────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  const synthStep = document.querySelector('.ts.on');
+  if (synthStep) {
+    const d = INSP['synth'];
+    document.getElementById('insp-inner').innerHTML = `
+      <div class="insp-head">
+        <div class="insp-icon" style="font-size:11px;font-weight:700;color:var(--text-2)">${d.icon}</div>
+        <div><div class="insp-name">${d.name}</div><div class="insp-kind">${d.kind}</div></div>
+        <button class="insp-close" onclick="closeInsp()">&times;</button>
+      </div>
+      <div class="insp-sl">Output</div>
+      <div class="insp-out">${d.out}</div>
+      <div class="insp-sl">Provenance</div><div class="insp-prov">${d.prov.map(p=>`<div class="pchip">${p}</div>`).join('')}</div>
+    `;
+    document.getElementById('inspector').classList.add('open');
+  }
+});
+</script>
+</body>
+</html>

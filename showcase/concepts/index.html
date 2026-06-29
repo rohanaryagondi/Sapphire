@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sapphire — Design Concepts</title>
+<style>
+  :root { --bg:#0a0a0c; --bar:#111114; --bd:#26262c; --ink:#e7e7ea; --mut:#8a8a93; --accent:#7c5cff; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",sans-serif; }
+  .bar { height:52px; display:flex; align-items:center; gap:6px; padding:0 14px;
+    background:var(--bar); border-bottom:1px solid var(--bd); position:sticky; top:0; z-index:10; }
+  .brand { font-weight:600; letter-spacing:.2px; margin-right:10px; display:flex; align-items:center; gap:8px; }
+  .brand small { color:var(--mut); font-weight:400; }
+  .tab { appearance:none; border:1px solid var(--bd); background:transparent; color:var(--mut);
+    padding:7px 13px; border-radius:8px; font-size:13px; cursor:pointer; transition:.15s;
+    font-family:inherit; display:flex; align-items:center; gap:7px; }
+  .tab:hover { color:var(--ink); border-color:#3a3a44; }
+  .tab.active { color:#fff; background:rgba(124,92,255,.16); border-color:var(--accent); }
+  .tab .dot { width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.7; }
+  .tab.lead .star { color:var(--accent); }
+  .spacer { flex:1; }
+  .hint { color:var(--mut); font-size:12px; }
+  .frame { width:100%; height:calc(100vh - 52px); border:0; display:block; background:#000; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <div class="brand">◆ Sapphire <small>· design concepts</small></div>
+    <button class="tab lead active" data-src="linear-vercel.html"><span class="star">★</span> Linear / Vercel <span class="hint">(build target)</span></button>
+    <button class="tab" data-src="claude-editorial.html"><span class="dot"></span> Claude · editorial</button>
+    <button class="tab" data-src="perplexity-citation.html"><span class="dot"></span> Perplexity · citation</button>
+    <button class="tab" data-src="chatgpt-minimal.html"><span class="dot"></span> ChatGPT · minimal</button>
+    <div class="spacer"></div>
+    <span class="hint">press 1–4 to switch · these are static mockups</span>
+  </div>
+  <iframe id="frame" class="frame" src="linear-vercel.html" title="concept"></iframe>
+<script>
+  const tabs = [...document.querySelectorAll('.tab')];
+  const frame = document.getElementById('frame');
+  function show(i){ tabs.forEach((t,j)=>t.classList.toggle('active', j===i)); frame.src = tabs[i].dataset.src; }
+  tabs.forEach((t,i)=> t.addEventListener('click', ()=>show(i)));
+  window.addEventListener('keydown', e=>{ const n=parseInt(e.key,10); if(n>=1&&n<=tabs.length) show(n-1); });
+</script>
+</body>
+</html>
