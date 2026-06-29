@@ -85,9 +85,8 @@ two-bucket "firm":
   downstream of the future ASO Design tool. Requires scikit-learn==1.8.0 in the tool subprocess only;
   engine remains stdlib-only. Per the 2026-06-19 sprint deck: **Loka is the front-end/orchestrator scaffold**;
   Quiver tools (OPAL, ASO Design, ASO toxicity [this], chronic-tox roadmap, Experiment Design) plug into it.
-- **Tests: 278, all green.**
-- **Still TODO:** wire `run_live` to the front door (`serve.py`/Console still use the canned path); wire
-  ASO Design tool to feed sequences into `aso-tox`; broaden captured scenario coverage.
+- **Tests: 720, all green.**
+- **Still TODO:** wire ASO Design tool to feed sequences into `aso-tox`; broaden captured scenario coverage.
 
 ## Hard rules (non-negotiable)
 - **Data boundary:** Quiver internal EP/CRISPR data + scores NEVER leave to EMET / web / Q-Models. Public
@@ -104,10 +103,11 @@ two-bucket "firm":
   to `[]`/mock if `RohanOnly/moat/moat.sqlite` hasn't been built from the parquet). **ASO tox** = live
   GBR model (`tools/aso_tox/`) — real predictions when ASO sequences present, stubs otherwise.
 - **Two execution paths (important):** (1) **Canned path** `orchestrator.run(sid)` — runs pre-captured
-  scenario JSONs, $0, deterministic; used by `run.py`/`serve.py`/Console today. (2) **Live harnessed
-  path** `live_engine.run_live(query)` — dispatches EVERY agent + persona through `harness.run`
-  (guard-enforced, schema-validated, provenance-stamped, traced); verified OFFLINE with mock backends +
-  REAL moat; **NOT yet wired to the front door** (the keystone remaining task).
+  scenario JSONs, $0, deterministic; still reachable via `GET /api/run?mode=canned` and `run.py`. (2) **Live
+  harnessed path** `live_engine.run_live(query)` — dispatches EVERY agent + persona through `harness.run`
+  (guard-enforced, schema-validated, provenance-stamped, traced); **serves the front door**: `GET /api/run`
+  (default, `via=engine-live`), `POST /api/chat` (converged, `via=engine-live`); `frontend2/` live SSE
+  console renders the streamed trace + spread.
 - **Empirical culture:** *"SOTA on shit is still shit."* Mark `proven` vs `paper-claim`; never oversell a
   mock or a paper benchmark.
 

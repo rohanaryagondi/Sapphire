@@ -1,28 +1,34 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Sapphire bridge — serves the site AND runs the orchestrator LIVE under your Claude subscription.
+Sapphire bridge — serves the site AND runs the in-process harnessed firm for fresh engagements.
 
     python sapphire-orchestrator/serve.py            # http://localhost:8077  (Console = main site)
 
-How "Claude under the hood" works here:
-  - Shipped scenarios (or a query that routes to one) are answered instantly by the deterministic
-    engine (orchestrator.py) — $0, no model call.
-  - A NOVEL query is handed to Claude Code headless (`claude -p ... --json-schema`), which runs on
-    your **subscription** (no API key). Claude acts as the whole firm and returns a structured run;
-    the engine still computes the engagement PLAN deterministically, so the plan is stable and only
-    the facts/verdicts are model-generated.
-  - If the `claude` CLI is missing or errors, the endpoint degrades to a plan-only response, and the
-    static Console (served by any web server) still plays the canned scenarios. So it works anywhere;
-    the bridge just adds the live brain.
+How it works — two primary paths:
+  (a) Fresh engagements (POST /api/chat and GET /api/run default): the query is dispatched
+      IN-PROCESS to `live_engine.run_live` — the fully harnessed firm (guard-enforced,
+      provenance-stamped, traced, via=engine-live). No subprocess needed; this is the real
+      front door. Degrades honestly to a plan-only envelope if run_live raises.
+  (b) Follow-up grounding (POST /api/chat with an existing dossier) and the labeled
+      reconstruction fallback (GET /api/run?mode=claude): these call `claude -p` headless on
+      your **subscription** (no API key). Claude reconstructs facts from training; the UI
+      labels these as "claude-subscription", not live-EMET. If the claude CLI is absent the
+      endpoint degrades to a plan-only response; static hosting still plays canned scenarios.
+
+Canned scenarios ($0 offline): explicitly requested via GET /api/run?mode=canned. Never the
+default and never silently substituted for a fresh query.
 
 Endpoints:
-  GET /api/health            -> {"live": bool, "model": str, "scenarios": [...]}
-  GET /api/run?q=<query>     -> the harnessed firm via live_engine.run_live (default; via=engine-live).
-                                ?mode=canned -> pre-captured scenario ($0 offline, via=canned);
-                                ?mode=claude -> headless-Claude reconstruction (via=claude-subscription).
-                                Output schema: contracts/run_live_schema.md (single source of truth).
-  GET /  (and any path)      -> static files from ../site
+  GET  /api/health            -> {"live": bool, "model": str, "scenarios": [...],
+                                  "subsystems": {"claude", "emet", "qmodels", "moat"}}
+  GET  /api/run?q=<query>     -> the harnessed firm via live_engine.run_live (default; via=engine-live).
+                                  ?mode=canned -> pre-captured scenario ($0 offline, via=canned);
+                                  ?mode=claude -> headless-Claude reconstruction (via=claude-subscription).
+                                  Output schema: contracts/run_live_schema.md (single source of truth).
+  POST /api/chat              -> fresh engagement: in-process live_engine.run_live (via=engine-live);
+                                  follow-up (dossier present, not a new target): grounded claude-p reply.
+  GET  /  (and any path)      -> static files from ../site
 """
 from __future__ import annotations
 
@@ -307,6 +313,16 @@ def _qmodels_status() -> str:
     return "mock"
 
 
+def _moat_status() -> str:
+    """Real moat status: 'real' when the SQLite DB is present and has the neighbors table,
+    'mock' otherwise (honest degrade — DB absent, symlink broken, or any error)."""
+    try:
+        from moat.client import MoatClient
+        return "real" if MoatClient().available() else "mock"
+    except Exception:
+        return "mock"
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=SITE, **k)
@@ -327,7 +343,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"live": have, "model": CLAUDE_MODEL or "subscription default (Opus)",
                                "scenarios": list(SCENARIOS),
                                "subsystems": {"claude": "live" if have else "down",
-                                              "emet": "not-wired", "qmodels": _qmodels_status(), "moat": "mock"}})
+                                              "emet": "not-wired", "qmodels": _qmodels_status(), "moat": _moat_status()}})
         if parsed.path == "/api/tools":
             return self._json({"tools": ENGINE.tools_catalog()})
         if parsed.path == "/api/run":
@@ -368,19 +384,12 @@ class Handler(SimpleHTTPRequestHandler):
         if dossier and not _looks_like_engagement(msg):
             return self._json(_follow_up(msg, dossier, history))
 
-        from orchestrator import DISEASE_TO_SCENARIO
-        sid = DISEASE_TO_SCENARIO.get(ENGINE.triage(msg)["disease"])
-        if sid:
-            run = _stamp(ENGINE.run(sid), "captured")
-            run.update({"via": "engine", "live": False})
-            return self._json({"kind": "run", "run": run, "live": False, "via": "engine"})
-        live = _run_live(msg)
-        if live.get("live") and "discover" in live:
-            return self._json({"kind": "run", "run": live, "live": True,
-                               "via": "claude-subscription", "model": live.get("model")})
-        # live brain unavailable → reply with the engagement plan note
-        return self._json({"kind": "reply", "text": live.get("note", "Live brain unavailable."),
-                           "plan": live.get("plan"), "cites": [], "live": False})
+        # Fresh engagement: dispatch to the harnessed live firm (via=engine-live).
+        # _run_engine_live never raises — it returns an honest plan-only envelope on any error.
+        run = _run_engine_live(msg)
+        return self._json({"kind": "run", "run": run,
+                           "live": run.get("live", False),
+                           "via": run.get("via", "engine-live")})
 
     def log_message(self, fmt, *args):
         if "/api/" in (args[0] if args else ""):
