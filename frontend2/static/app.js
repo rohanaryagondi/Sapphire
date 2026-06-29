@@ -25,6 +25,7 @@
   const chatCol = $("chatCol"), emptyState = $("emptyState"), msgList = $("msgList");
   const chatInput = $("chatInput"), sendBtn = $("sendBtn"), thread = $("thread"), threadInner = $("threadInner");
   const profileSel = $("profile"), liveBadge = $("liveBadge"), liveLabel = $("liveLabel");
+  const modelSel = $("model"), modelBadge = $("modelBadge");
   const traceTree = $("traceTree"), traceStatus = $("traceStatus"), traceMeta = $("traceMeta");
   const agentTree = $("agentTree"), wingMeta = $("wingMeta");
   const evidenceBody = $("evidenceBody"), evidenceMeta = $("evidenceMeta"), rightScroll = $("rightScroll");
@@ -648,7 +649,7 @@
     try {
       const resp = await fetch("/api/run", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: text, profile }),
+        body: JSON.stringify({ query: text, profile, model: modelSel.value }),
       });
       if (!resp.ok || !resp.body) throw new Error("HTTP " + resp.status);
       await readSSE(resp.body, loadEl);
@@ -681,6 +682,13 @@
           if (lbl) lbl.textContent = typingLabel(data);
         } else if (event === "result") {
           result = data;
+          // Show which model was actually used (honest — from result._model, never fabricated).
+          if (result._model) {
+            modelBadge.textContent = "model: " + result._model;
+            modelBadge.style.display = "";
+          } else {
+            modelBadge.style.display = "none";
+          }
           renderEvidence(result);
           attachAgentSources(result);
           renderAnswer(result, loadEl);
