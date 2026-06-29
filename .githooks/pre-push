@@ -109,6 +109,23 @@ while read -r local_ref local_sha remote_ref remote_sha; do
       block "the test suite is RED. Fix it before pushing (Gate 1 must be green)."
     fi
   fi
+
+  # Gate 3.5 — doc-freshness check (warn mode). Prints violations; exit 0 always.
+  # Flip to block mode: export SAPPHIRE_DOCGATE=block
+  if [[ -n "$base" ]] && git rev-parse --verify --quiet "$base" >/dev/null; then
+    doc_range="$base..$local_sha"
+  else
+    doc_range="$local_sha^..$local_sha"
+  fi
+  _docgate_mode="--warn"
+  if [[ "${SAPPHIRE_DOCGATE:-warn}" == "block" ]]; then
+    _docgate_mode=""
+  fi
+  # skip for tag pushes (already handled above, but be explicit)
+  root="$(git rev-parse --show-toplevel)"
+  if [[ -x "$root/dev/check-docs.sh" ]]; then
+    bash "$root/dev/check-docs.sh" $_docgate_mode "$doc_range" >&2 || true
+  fi
 done
 
 exit 0
