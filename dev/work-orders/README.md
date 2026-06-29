@@ -11,6 +11,7 @@ its dependencies, the steps, the Definition of Done, and the gates. Drive each w
 | [WO-3](WO-3-aso-design.md) | ASO Design seam (first design-class tool) | `rohan/aso-design` | [02 §7](../../docs/plan/02_ASO_DESIGN.md) | WO-2 Phase A | P1 |
 | [WO-4](WO-4-experiment-design.md) | Experiment Design (closes the loop) | `rohan/experiment-design` | [05](../../docs/plan/05_EXPERIMENT_DESIGN.md) | WO-2 Phase A | P1 |
 | [WO-5](WO-5-moat-rescue-fix.md) | Moat rescue-ranking fix (port Loka scoring) | `rohan/moat-rescue-fix` | [06](../../docs/plan/06_LOKA_ASSETS.md) | — (parallel) | high value / low cost |
+| [WO-6](WO-6-semantic-agents.md) | Semantic agents → production-grade (corpus + API + spec, per agent, all 13; start w/ scientific cluster) | `rohan/semantic-agents` | — | — (the 13 already dispatch) | **high** |
 
 ## Suggested order
 1. **WO-2 Phase A** first — it unblocks everything (the whole live firm + the `class` field).
