@@ -144,9 +144,11 @@ class TestStoreAPI(unittest.TestCase):
 
     def setUp(self):
         self._tmpdir = tempfile.mkdtemp()
+        self._engagements_dir = tempfile.mkdtemp()
+        self._memory_dir = tempfile.mkdtemp()
         os.environ["SAPPHIRE_STORE_DB"] = str(Path(self._tmpdir) / "sapphire_test.db")
-        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = tempfile.mkdtemp()
-        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._engagements_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._memory_dir
         # Reload store module so it picks up the new SAPPHIRE_STORE_DB.
         import store
         importlib.reload(store)
@@ -156,6 +158,8 @@ class TestStoreAPI(unittest.TestCase):
         os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
         os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
         shutil.rmtree(self._tmpdir, ignore_errors=True)
+        shutil.rmtree(self._engagements_dir, ignore_errors=True)
+        shutil.rmtree(self._memory_dir, ignore_errors=True)
 
     # ---------------------------------------------------------------------- #
     # POST /api/conversations                                                  #
@@ -289,6 +293,15 @@ class TestStoreAPI(unittest.TestCase):
             try:
                 h.delete("/api/conversations/no-such-id")
                 self.fail("should have raised HTTPError 404")
+            except urllib.error.HTTPError as e:
+                self.assertEqual(e.code, 404)
+
+    def test_patch_nonexistent_returns_404(self):
+        """PATCH /api/conversations/nonexistent → 404, not a silent 200."""
+        with _ServerHarness() as h:
+            try:
+                h.patch("/api/conversations/no-such-id", {"title": "ghost"})
+                self.fail("PATCH on missing conv must raise HTTPError 404")
             except urllib.error.HTTPError as e:
                 self.assertEqual(e.code, 404)
 

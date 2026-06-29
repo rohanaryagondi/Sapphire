@@ -241,10 +241,15 @@ class Handler(BaseHTTPRequestHandler):
             conv_id = path[len("/api/conversations/"):]
             try:
                 import store as _store_mod
+                changed = False
                 if "title" in body:
-                    _store_mod.rename_conversation(conv_id, body["title"])
+                    changed = _store_mod.rename_conversation(conv_id, body["title"])
                 elif "starred" in body:
-                    _store_mod.set_starred(conv_id, bool(body["starred"]))
+                    changed = _store_mod.set_starred(conv_id, bool(body["starred"]))
+                else:
+                    changed = True  # no-op PATCH on valid body with no known fields is fine
+                if not changed:
+                    return self._send_json(404, {"error": "not found"})
                 return self._send_json(200, {"ok": True})
             except Exception as exc:
                 return self._send_json(500, {"error": str(exc)})

@@ -82,7 +82,7 @@ def _now() -> str:
     """Current UTC time as ISO-8601 string.
     datetime is imported inside to avoid any top-level side effects."""
     import datetime
-    return datetime.datetime.utcnow().isoformat() + "Z"
+    return datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _new_id() -> str:
