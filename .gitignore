@@ -20,6 +20,7 @@ frontend/.files/
 RohanOnly/
 **/emet_creds.env
 **/emet_profile/
+**/benchsci_profile/
 
 # Isolated playwright venv for EMET auto-login (local-only)
 .emet-venv/

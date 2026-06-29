@@ -39,6 +39,11 @@ ROOT = Path(__file__).resolve().parents[2]            # repo root
 ENVELOPES_DIR = ROOT / "sapphire-orchestrator" / "scenarios" / "emet_envelopes"
 
 EMET_URL = "https://emet.benchsci.com/"
+
+# Default persistent Chromium profile for BenchSci (gitignored under RohanOnly/).
+# Set via $SAPPHIRE_EMET_PROFILE or --profile; this is the fallback when neither is supplied.
+BENCHSCI_PROFILE = ROOT / "RohanOnly" / "benchsci_profile"
+
 _LOGIN_HOSTS = ("id.summit.benchsci.com", "accounts.google.com", "login.microsoftonline",
                 "okta", "auth0", "/login", "duosecurity")
 
@@ -307,6 +312,16 @@ def parse_emet_html(html: str, *, candidate: str, query: str = "",
 # --------------------------------------------------------------------------------------
 # Live driver (Playwright imported lazily — keeps this module's import cheap)
 # --------------------------------------------------------------------------------------
+def _profile_has_session(profile_dir) -> bool:
+    """True when profile_dir exists and is non-empty (has been used before).
+    A missing or empty directory means the user has not yet run `python -m emet.login`.
+    Returns False → honest abstain before launching a browser."""
+    if not profile_dir:
+        return False
+    p = Path(profile_dir)
+    return p.is_dir() and any(True for _ in p.iterdir())
+
+
 def _on_login_page(url: str) -> bool:
     return any(h in (url or "") for h in _LOGIN_HOSTS)
 
@@ -338,17 +353,25 @@ def capture_emet(query: str, candidate: str, *, cdp: str | None = None,
     Returns the §7 envelope, or ``{"login_required": True}`` on a login screen / no usable
     answer within ``timeout_s`` (honest abstain — never fabricated).
     """
+    # Resolve session source BEFORE importing Playwright — the profile check is pure stdlib
+    # and must short-circuit (honest abstain) even when playwright is not installed.
+    cdp = cdp or os.environ.get("SAPPHIRE_EMET_CDP") or None
+    profile = profile or os.environ.get("SAPPHIRE_EMET_PROFILE") or str(BENCHSCI_PROFILE)
+    if not cdp and not _profile_has_session(profile):
+        return {
+            "login_required": True,
+            "reason": (
+                "BenchSci session not found — run the one-time login: "
+                "python -m emet.login"
+            ),
+        }
+
     try:
         from playwright.sync_api import sync_playwright
     except ImportError as exc:                              # pragma: no cover - env-specific
         raise RuntimeError(
             "playwright not installed — run via the .emet-venv "
             "(.emet-venv/bin/python -m emet.capture ...)") from exc
-
-    cdp = cdp or os.environ.get("SAPPHIRE_EMET_CDP") or None
-    profile = profile or os.environ.get("SAPPHIRE_EMET_PROFILE") or None
-    if not cdp and not profile:
-        raise RuntimeError("no EMET session: set SAPPHIRE_EMET_CDP or SAPPHIRE_EMET_PROFILE")
 
     with sync_playwright() as p:
         ctx = None
@@ -495,7 +518,7 @@ def main(argv=None) -> int:
                        headless=not args.headed, timeout_s=args.timeout, save_html=args.save_html)
 
     if env.get("login_required"):
-        reason = env.get("reason", "BenchSci login screen — re-authenticate (bash _build/emet_login.sh)")
+        reason = env.get("reason", "BenchSci login screen — run: python -m emet.login")
         print(f"ABSTAIN: {reason}. No envelope written (never fabricates).", file=sys.stderr)
         return 2
 
