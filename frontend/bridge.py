@@ -116,7 +116,7 @@ def _error_envelope(query: str, exc: Exception) -> dict:
     return {
         "query": query,
         "plan": {"deliverable": "", "disease": "", "modality": "",
-                 "agents": [], "panel": []},
+                 "agents": [], "panel": [], "class": "diligence"},
         "priors": [],
         "discover": {
             "dossier": [],
@@ -125,7 +125,12 @@ def _error_envelope(query: str, exc: Exception) -> dict:
             "status": "bridge-error",
             "agents": [],
         },
-        "consult": {"round1": []},
+        "consult": {
+            "round1": [],
+            "round2": [],
+            "spread": {"conviction_range": [], "stance_mix": {}, "moved_in_round2": 0,
+                       "convergent_gate": ""},
+        },
         "synthesize": {
             "recommendation": "Unavailable — the firm could not be convened (bridge error).",
             "confidence": "none",

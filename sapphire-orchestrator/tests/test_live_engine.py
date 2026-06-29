@@ -1936,25 +1936,25 @@ class TestPhaseADoD(unittest.TestCase):
     # DoD check 3: VETO fact forces adjudication
     def test_veto_fact_forces_adjudication(self):
         """When a Bucket-1 agent returns a VETO fact, consult must carry adjudication
-        with veto_facts surfaced. This proves the VETO-as-gate path fires."""
-        # Build a ctx that injects a VETO fact from fda-institutional-memory.
+        with veto_facts surfaced. This proves the VETO-as-gate MECHANICS fire:
+        - exactly 1 VETO from fda-institutional-memory (narrow mock, not 8 duplicates)
+        - adj["n_veto"] == 1
+        - a 'veto_gate' trace landmark is written mid-run (auditable gate)
+        """
+        # Build a ctx that injects a VETO fact ONLY from fda-institutional-memory.
         ctx = _build_ctx()
 
         _original_runner = ctx["runner"]
         def _veto_runner(cmd):
-            # Detect if this is the fda-institutional-memory call by schema content
-            schema_str = ""
-            for i, tok in enumerate(cmd):
-                if tok == "--json-schema" and i + 1 < len(cmd):
-                    schema_str = cmd[i + 1]
-                    break
+            # Detect if this is the fda-institutional-memory call by prompt content.
+            # Match ONLY on the exact agent id string — do NOT match the broad "fda"
+            # substring which would fire on ~8 agents and yield duplicate veto_facts.
             prompt_str = ""
             for i, tok in enumerate(cmd):
                 if tok == "-p" and i + 1 < len(cmd):
                     prompt_str = cmd[i + 1]
                     break
-            # If fda-institutional-memory is in the prompt, return a VETO fact.
-            if "fda-institutional-memory" in prompt_str or "fda" in prompt_str.lower():
+            if "fda-institutional-memory" in prompt_str:
                 obj = {
                     "candidate": "TSC2",
                     "facts": [
@@ -1973,6 +1973,7 @@ class TestPhaseADoD(unittest.TestCase):
         ctx["runner"] = _veto_runner
 
         result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
+        eid = result["engagement_id"]
 
         # VETO must be in discover.flags
         veto_flags = result["discover"]["flags"]["VETO"]
@@ -1985,8 +1986,27 @@ class TestPhaseADoD(unittest.TestCase):
                       "consult missing 'adjudication' key when VETO facts present")
         adj = consult["adjudication"]
         self.assertIn("veto_facts", adj)
-        self.assertEqual(adj["n_veto"], len(veto_flags))
-        self.assertGreater(adj["n_veto"], 0)
+
+        # Exactly 1 VETO: the narrow mock fires only for fda-institutional-memory.
+        # If this fails (n_veto > 1) the broad "fda" match crept back in.
+        self.assertEqual(adj["n_veto"], 1,
+                         f"Expected exactly 1 VETO (from fda-institutional-memory only); "
+                         f"got {adj['n_veto']}. veto_facts={adj.get('veto_facts')}")
+
+        # Gate mechanics: the 'veto_gate' trace landmark must have been written
+        # mid-run — this proves the gate logic executed, not just that the output
+        # key was decorated after the fact.
+        trace_path = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_path),
+                        f"trace file not found at {trace_path}")
+        with open(trace_path, encoding="utf-8") as fh:
+            trace_records = [json.loads(line) for line in fh if line.strip()]
+        veto_gate_records = [r for r in trace_records if r.get("type") == "veto_gate"]
+        self.assertTrue(
+            len(veto_gate_records) >= 1,
+            f"Expected ≥1 'veto_gate' trace record; got types: "
+            f"{[r.get('type') for r in trace_records]}"
+        )
 
     def test_plan_has_capability_class(self):
         """The plan must carry a 'class' field ∈ {diligence, design, experiment}."""

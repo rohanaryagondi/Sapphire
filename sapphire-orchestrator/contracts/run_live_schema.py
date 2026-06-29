@@ -71,7 +71,7 @@ RUN_LIVE_SCHEMA = {
         "query": {"type": "string"},
         "plan": {
             "type": "object",
-            "required": ["deliverable", "disease", "modality", "agents", "panel"],
+            "required": ["deliverable", "disease", "modality", "agents", "panel", "class"],
             "properties": {
                 "deliverable": {"type": "string"},
                 "disease": {"type": "string"},
@@ -102,9 +102,12 @@ RUN_LIVE_SCHEMA = {
         },
         "consult": {
             "type": "object",
-            "required": ["round1"],
+            "required": ["round1", "round2", "spread"],
             "properties": {
                 "round1": {"type": "array", "items": _VERDICT},
+                "round2": {"type": "array"},
+                "spread": {"type": "object"},
+                "adjudication": {"type": "object"},
             },
         },
         "synthesize": {

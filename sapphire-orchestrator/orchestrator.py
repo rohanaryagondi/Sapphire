@@ -124,7 +124,7 @@ class Orchestrator:
                  else "prioritization")
         difficulty = "deep" if ptype in ("diligence", "portfolio") else "standard"
         # Capability-class: diligence (default) / design / experiment
-        design_keys = ["design ", "engineer", "synthesize", "build a ", "create a ",
+        design_keys = ["design ", "engineer", "synthesize ", "build a ", "create a ",
                        "develop a ", "generate a ", "optimize a "]
         experiment_keys = ["test ", "validate ", "in vivo", "in vitro", "screen ",
                            "assay", "measure", "study "]

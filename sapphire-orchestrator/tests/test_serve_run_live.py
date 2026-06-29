@@ -32,7 +32,8 @@ def _fake_run_live_result() -> dict:
     return {
         "query": "Is TSC2 a viable CNS target?",
         "plan": {"deliverable": "diligence", "disease": "tuberous sclerosis",
-                 "modality": "small molecule", "agents": [], "panel": []},
+                 "modality": "small molecule", "agents": [], "panel": [],
+                 "class": "diligence"},
         "priors": [],
         "discover": {
             "dossier": [{"value": "TSC2 loss activates mTOR", "source": "PMID:1",
@@ -41,8 +42,13 @@ def _fake_run_live_result() -> dict:
             "status": "complete",
             "agents": [{"id": "emet-runner", "status": "ok", "provenance": "emet-live"}],
         },
-        "consult": {"round1": [{"persona": "KOL", "stance": "conditional",
-                                "provenance": "persona-judgment", "status": "ok"}]},
+        "consult": {
+            "round1": [{"persona": "KOL", "stance": "conditional",
+                        "provenance": "persona-judgment", "status": "ok"}],
+            "round2": [],
+            "spread": {"conviction_range": [3, 3], "stance_mix": {}, "moved_in_round2": 0,
+                       "convergent_gate": ""},
+        },
         "synthesize": {"recommendation": "Conditional advance", "confidence": "medium",
                        "proposed_experiment": "Run orthogonal validation.", "entities": {}},
         "engagement_id": "eng_test",
