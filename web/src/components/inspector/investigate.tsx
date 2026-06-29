@@ -3,6 +3,7 @@ import { MousePointerClick } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm, type InspectorSelection } from "@/lib/store";
 import { agentLabel, fmtElapsed, isVetoAgent, stanceKind } from "@/lib/utils";
+import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import {
   Chip,
@@ -150,8 +151,7 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
 }
 
 function VerdictDetail({ turn, persona }: { turn: Turn; persona: string }) {
-  const consult = turn.result?.consult;
-  const round = consult?.round2?.length ? consult.round2 : (consult?.round1 ?? []);
+  const round = finalVerdicts(turn.result);
   const v = round.find((x) => x.persona === persona);
   if (!v) {
     // maybe still running — show trace row

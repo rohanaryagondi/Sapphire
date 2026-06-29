@@ -41,6 +41,10 @@ _AGENT_STATUS = {
         "id": {"type": "string"},
         "status": {"type": "string"},
         "provenance": {"type": "string"},
+        # Optional: per-agent fact count, persisted so a restored run can show each
+        # agent's real contribution (no additionalProperties:false, so older results
+        # without this key still validate).
+        "n_facts": {"type": "integer"},
     },
 }
 

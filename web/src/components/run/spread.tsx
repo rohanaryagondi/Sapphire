@@ -2,6 +2,7 @@
 import { Users } from "lucide-react";
 import type { RunResult, Verdict } from "@/lib/types";
 import { cn, stanceKind } from "@/lib/utils";
+import { finalVerdicts, isRebuttalRound } from "@/lib/verdicts";
 import { Chip, ProvChip } from "@/components/ui/chips";
 import { useFirm } from "@/lib/store";
 
@@ -60,10 +61,10 @@ function VerdictCard({ v, turnId, via }: { v: Verdict; turnId: string; via?: str
 }
 
 export function Spread({ result, turnId }: { result: RunResult; turnId: string }) {
-  const consult = result.consult ?? { round1: [] };
-  const round2 = consult.round2 ?? [];
-  const round = round2.length ? round2 : (consult.round1 ?? []);
-  const label = round2.length ? "round 2 · rebuttal" : "round 1 · independent verdicts";
+  const round = finalVerdicts(result);
+  const label = isRebuttalRound(result)
+    ? "round 2 · rebuttal"
+    : "round 1 · independent verdicts";
   const via = result._via === "replay" || result._replay ? "replay" : undefined;
   if (!round.length) return null;
 

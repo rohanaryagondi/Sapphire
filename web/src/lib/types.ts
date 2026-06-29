@@ -23,6 +23,8 @@ export interface AgentStatus {
   id: string;
   status: string;
   provenance: string;
+  /** per-agent fact count, persisted by the engine (absent on older saved runs) */
+  n_facts?: number;
 }
 
 export interface Verdict {
@@ -34,6 +36,9 @@ export interface Verdict {
   rationale?: string;
   fact_claims?: string[];
   lens?: string;
+  /* round-2 rebuttal deltas (engine emits these on the round-2 entry) */
+  revised?: boolean;
+  shift?: string;
 }
 
 export interface Plan {

@@ -4,6 +4,7 @@ import { Check, ClipboardList, FlagTriangleRight, Sparkles, TriangleAlert } from
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
 import { agentLabel, cn, fmtElapsed, isVetoAgent } from "@/lib/utils";
+import { finalVerdicts } from "@/lib/verdicts";
 import { ProvChip } from "@/components/ui/chips";
 import { buildTrace, type TraceNode, type TraceRow } from "./trace-model";
 
@@ -96,7 +97,13 @@ function AgentRow({ row, turnId }: { row: TraceRow; turnId: string }) {
                 {ok && ev.conviction != null ? ` · conviction ${ev.conviction}` : ""}
               </span>
             ) : (
-              <span>{ok ? `${ev.n_facts ?? 0} fact(s)` : ev.status || "abstained"}</span>
+              <span>
+                {ok
+                  ? ev.n_facts != null
+                    ? `${ev.n_facts} fact(s)`
+                    : "ran"
+                  : ev.status || "abstained"}
+              </span>
             )}
             {ev.provenance && <ProvChip prov={ev.provenance} />}
             {ev.elapsed_s != null && (
@@ -150,6 +157,30 @@ export function Monitor({ turn }: { turn?: Turn }) {
   const flagsEv = m.flags?.ev;
   const synthEv = m.synthesis?.ev;
 
+  // Once the run has a result, the roundtable rows are derived from the SAME
+  // normalised verdicts the spread renders — so the Monitor can never contradict
+  // it (e.g. show "conditional · conviction 3" next to a spread "abstained").
+  // While still streaming (no result yet), fall back to the live trace rows.
+  const verdicts = finalVerdicts(turn.result);
+  const roundtable: TraceRow[] =
+    turn.result && verdicts.length
+      ? verdicts.map((v) => ({
+          agentId: v.persona,
+          started: true,
+          done: true,
+          ev: {
+            stage: "roundtable",
+            phase: "done",
+            agent_id: v.persona,
+            status: v.status,
+            stance: v.stance,
+            conviction: v.conviction,
+            provenance: v.provenance,
+          },
+        }))
+      : m.roundtable;
+  const rtDone = roundtable.filter((r) => r.done).length;
+
   return (
     <div className="space-y-1 p-3">
       <TopStep
@@ -193,14 +224,14 @@ export function Monitor({ turn }: { turn?: Turn }) {
         }
       />
 
-      {m.roundtable.length > 0 && (
+      {roundtable.length > 0 && (
         <div>
           <GroupHeader
             label="Bucket 2 — the roundtable spread"
-            done={m.rtDone}
-            total={m.roundtable.length}
+            done={rtDone}
+            total={roundtable.length}
           />
-          {m.roundtable.map((row) => (
+          {roundtable.map((row) => (
             <AgentRow key={row.agentId} row={row} turnId={turn.id} />
           ))}
         </div>
