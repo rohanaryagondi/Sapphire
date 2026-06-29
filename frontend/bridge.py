@@ -128,7 +128,7 @@ def _error_envelope(query: str, exc: Exception) -> dict:
         "consult": {
             "round1": [],
             "round2": [],
-            "spread": {"conviction_range": [], "stance_mix": {}, "moved_in_round2": 0,
+            "spread": {"conviction_range": "-", "stance_mix": {}, "moved_in_round2": [],
                        "convergent_gate": ""},
         },
         "synthesize": {

@@ -777,7 +777,7 @@ def run_live(
     round1_verdicts = [
         {
             "persona": v.get("persona", ""),
-            "stance": v.get("stance", "hold"),
+            "stance": v.get("stance", "conditional"),
             "conviction": v.get("conviction", 0),
             "rationale": (v.get("rationale") or "")[:150],
         }
@@ -827,7 +827,7 @@ def run_live(
         _elapsed = round(time.monotonic() - _t0, 2)
 
         if res.ok and res.output:
-            r2_stance = res.output.get("stance", "hold")
+            r2_stance = res.output.get("stance", "conditional")
             r2_conviction = res.output.get("conviction", 0)
             r2_rationale = res.output.get("rationale", "")
         else:

@@ -1902,6 +1902,15 @@ class TestPhaseADoD(unittest.TestCase):
         spread = consult["spread"]
         for key in ("conviction_range", "stance_mix", "moved_in_round2", "convergent_gate"):
             self.assertIn(key, spread, f"spread missing key {key!r}")
+        # Shape lock: conviction_range must be a STRING (e.g. "3-4 / 5" or "-"),
+        # and moved_in_round2 must be a LIST of persona-name strings — matching both
+        # the canned path (orchestrator.py:298,300) and the live path (live_engine.py:884,889).
+        self.assertIsInstance(spread["conviction_range"], str,
+                              f"spread.conviction_range must be str; got {type(spread['conviction_range'])}: "
+                              f"{spread['conviction_range']!r}")
+        self.assertIsInstance(spread["moved_in_round2"], list,
+                              f"spread.moved_in_round2 must be list; got {type(spread['moved_in_round2'])}: "
+                              f"{spread['moved_in_round2']!r}")
 
     def test_round2_entries_have_revised_and_shift(self):
         """round2 entries must carry revised (bool) and shift (str)."""

@@ -32,8 +32,8 @@ def _minimal_valid() -> dict:
                  "provenance": "persona-judgment", "status": "ok"},
             ],
             "round2": [],
-            "spread": {"conviction_range": [3, 3], "stance_mix": {}, "moved_in_round2": 0,
-                       "convergent_gate": ""},
+            "spread": {"conviction_range": "3-3 / 5", "stance_mix": {"conditional": 1},
+                       "moved_in_round2": [], "convergent_gate": ""},
         },
         "synthesize": {
             "recommendation": "Conditional advance", "confidence": "medium",

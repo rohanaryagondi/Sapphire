@@ -753,9 +753,12 @@
     ],
     "round2": [],
     "spread": {
-      "conviction_range": [],
-      "stance_mix": {},
-      "moved_in_round2": 0,
+      "conviction_range": "0-4 / 5",
+      "stance_mix": {
+        "conditional": 3,
+        "hold": 2
+      },
+      "moved_in_round2": [],
       "convergent_gate": ""
     }
   },
