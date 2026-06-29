@@ -1,0 +1,151 @@
+"use client";
+import * as React from "react";
+import { AlertCircle, FlaskConical } from "lucide-react";
+import { useFirm, type Turn } from "@/lib/store";
+import { agentLabel } from "@/lib/utils";
+import type { ProgressEvent } from "@/lib/types";
+import { EmptyState } from "@/components/empty-state";
+import { Synthesis } from "@/components/run/synthesis";
+import { Flags } from "@/components/run/flags";
+import { Dossier } from "@/components/run/dossier";
+import { Spread } from "@/components/run/spread";
+
+function liveLabel(ev?: ProgressEvent): string {
+  if (!ev) return "convening the firm…";
+  switch (ev.stage) {
+    case "plan":
+      return "scoping the engagement…";
+    case "bucket1":
+      return `gathering facts — ${agentLabel(ev.agent_id)}…`;
+    case "flags":
+      return "checking VETO / DIVERGENCE…";
+    case "roundtable":
+      return `roundtable — ${ev.agent_id || "partner"}…`;
+    case "synthesis":
+      return "writing the synthesis…";
+    default:
+      return "convening the firm…";
+  }
+}
+
+function TypingIndicator({ trace }: { trace: ProgressEvent[] }) {
+  const last = trace[trace.length - 1];
+  return (
+    <div className="flex items-center gap-2.5 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-panel)] px-3 py-2.5">
+      <span className="flex items-center gap-1">
+        <span className="typedot h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+        <span className="typedot h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+        <span className="typedot h-1.5 w-1.5 rounded-full bg-[var(--color-accent)]" />
+      </span>
+      <span className="text-[12.5px] text-[var(--color-fg-muted)]">{liveLabel(last)}</span>
+    </div>
+  );
+}
+
+function Banner({
+  tone,
+  children,
+}: {
+  tone: "sim" | "partial" | "error";
+  children: React.ReactNode;
+}) {
+  const style =
+    tone === "sim"
+      ? "border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.06)] text-[#e3b341]"
+      : tone === "error"
+        ? "border-[rgba(248,81,73,0.30)] bg-[rgba(248,81,73,0.06)] text-[#ff7b72]"
+        : "border-[var(--color-border)] bg-[var(--color-bg-subtle)] text-[var(--color-fg-muted)]";
+  return (
+    <div
+      className={`flex items-start gap-2 rounded-[var(--radius)] border px-3 py-2 text-[12px] leading-snug ${style}`}
+    >
+      {tone === "error" && <AlertCircle className="mt-0.5 size-3.5 shrink-0" />}
+      {tone === "sim" && <FlaskConical className="mt-0.5 size-3.5 shrink-0" />}
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function TurnView({ turn }: { turn: Turn }) {
+  const result = turn.result;
+  const status = result?.discover?.status ?? "";
+  const ku = result?.discover?.flags?.KNOWN_UNKNOWNS?.length ?? 0;
+
+  return (
+    <div className="space-y-3">
+      {/* user query */}
+      <div className="flex justify-end">
+        <div className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-[13.5px] leading-relaxed text-[var(--color-fg)]">
+          {turn.query}
+        </div>
+      </div>
+
+      {/* firm response */}
+      <div className="space-y-3 fadeup">
+        {turn.status === "running" && !result && <TypingIndicator trace={turn.trace} />}
+
+        {turn.status === "error" && (
+          <Banner tone="error">
+            The firm could not be convened ({turn.error || "unknown error"}). No answer is
+            fabricated.
+          </Banner>
+        )}
+
+        {result?._simulated && (
+          <Banner tone="sim">
+            <b>Simulated-models run.</b> Real moat, EMET PMIDs, seams and Q-Models — but the
+            roundtable verdicts and any claude fact-agent reasoning are{" "}
+            <b>simulated</b> (labeled <code className="font-mono">simulated</code>), not real
+            model output.
+          </Banner>
+        )}
+
+        {result && status && status !== "complete" && (
+          <Banner tone="partial">
+            Partial run — status: {status}
+            {ku ? ` · ${ku} known-unknown${ku > 1 ? "s" : ""}` : ""}
+          </Banner>
+        )}
+
+        {result && (
+          <>
+            <Synthesis result={result} />
+            <Flags flags={result.discover?.flags} />
+            <Dossier result={result} turnId={turn.id} />
+            <Spread result={result} turnId={turn.id} />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function ChatThread() {
+  const turns = useFirm((s) => s.turns);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // auto-scroll to bottom as turns/traces grow
+  const lastTraceLen = turns.reduce((n, t) => n + t.trace.length, 0);
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [turns.length, lastTraceLen]);
+
+  if (turns.length === 0) {
+    return (
+      <div className="relative flex-1 overflow-hidden">
+        <EmptyState />
+      </div>
+    );
+  }
+
+  return (
+    <div ref={scrollRef} className="flex-1 overflow-y-auto">
+      <div className="mx-auto max-w-3xl space-y-6 px-4 py-6">
+        {turns.map((t) => (
+          <TurnView key={t.id} turn={t} />
+        ))}
+      </div>
+    </div>
+  );
+}
