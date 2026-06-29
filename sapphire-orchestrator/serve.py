@@ -307,6 +307,16 @@ def _qmodels_status() -> str:
     return "mock"
 
 
+def _moat_status() -> str:
+    """Real moat status: 'real' when the SQLite DB is present and has the neighbors table,
+    'mock' otherwise (honest degrade — DB absent, symlink broken, or any error)."""
+    try:
+        from moat.client import MoatClient
+        return "real" if MoatClient().available() else "mock"
+    except Exception:
+        return "mock"
+
+
 class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **k):
         super().__init__(*a, directory=SITE, **k)
@@ -327,7 +337,7 @@ class Handler(SimpleHTTPRequestHandler):
             return self._json({"live": have, "model": CLAUDE_MODEL or "subscription default (Opus)",
                                "scenarios": list(SCENARIOS),
                                "subsystems": {"claude": "live" if have else "down",
-                                              "emet": "not-wired", "qmodels": _qmodels_status(), "moat": "mock"}})
+                                              "emet": "not-wired", "qmodels": _qmodels_status(), "moat": _moat_status()}})
         if parsed.path == "/api/tools":
             return self._json({"tools": ENGINE.tools_catalog()})
         if parsed.path == "/api/run":
@@ -368,19 +378,12 @@ class Handler(SimpleHTTPRequestHandler):
         if dossier and not _looks_like_engagement(msg):
             return self._json(_follow_up(msg, dossier, history))
 
-        from orchestrator import DISEASE_TO_SCENARIO
-        sid = DISEASE_TO_SCENARIO.get(ENGINE.triage(msg)["disease"])
-        if sid:
-            run = _stamp(ENGINE.run(sid), "captured")
-            run.update({"via": "engine", "live": False})
-            return self._json({"kind": "run", "run": run, "live": False, "via": "engine"})
-        live = _run_live(msg)
-        if live.get("live") and "discover" in live:
-            return self._json({"kind": "run", "run": live, "live": True,
-                               "via": "claude-subscription", "model": live.get("model")})
-        # live brain unavailable → reply with the engagement plan note
-        return self._json({"kind": "reply", "text": live.get("note", "Live brain unavailable."),
-                           "plan": live.get("plan"), "cites": [], "live": False})
+        # Fresh engagement: dispatch to the harnessed live firm (via=engine-live).
+        # _run_engine_live never raises — it returns an honest plan-only envelope on any error.
+        run = _run_engine_live(msg)
+        return self._json({"kind": "run", "run": run,
+                           "live": run.get("live", True),
+                           "via": run.get("via", "engine-live")})
 
     def log_message(self, fmt, *args):
         if "/api/" in (args[0] if args else ""):

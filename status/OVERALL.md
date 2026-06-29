@@ -75,6 +75,9 @@ backend is now end-to-end-capable on its own.)*
 ## Top risks
 - **Enforcement is local-only** (free repo, no branch protection/Actions) — relies on cooperating agents +
   `dev/audit-history.sh`. See `dev/CONVENTIONS.md` §1.
-- **Console UI still renders the canned data file** — `/api/run` serves the live path, but the static Console
-  page hasn't been re-pointed; don't overclaim "live" for the Console demo until that lands.
+- **`/api/chat` and `/api/run` now both serve the live firm** (`via=engine-live`); `frontend2/` is the live
+  SSE console. The legacy static Console (`site/`) still serves canned scenarios — acceptable for demo; don't
+  overclaim "live" for the old Console until it's re-pointed.
+- **The `:8101` orchestrator_ui console** (branch `rohan/orchestrator-8101`, not on `main`) is an experimental
+  demo asset, not the production front door — keep it as a reference snapshot only.
 - **Mock surfaces** must stay labeled; "SOTA on shit is still shit."
