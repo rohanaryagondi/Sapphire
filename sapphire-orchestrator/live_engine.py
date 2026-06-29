@@ -23,7 +23,7 @@ if _HERE not in sys.path:
 
 from orchestrator import Orchestrator
 from engagement import extract_entities, _eid
-from moat.facts import moat_facts
+from moat.facts import moat_facts, rescue_genes
 from memory import recall
 from harness import trace
 import harness
@@ -46,6 +46,18 @@ _BUCKET1_AGENTS = [
     "clinical-trial-registry",
     "post-market-safety",
     "payer",
+    # DEA scheduling classification — controlled-substance regulatory constraint.
+    "dea-scheduling",
+    # Manufacturing / CMC readiness — supply chain and formulation feasibility.
+    "manufacturing-cmc",
+    # Patient advocacy landscape — patient community sentiment and unmet need.
+    "patient-advocacy",
+    # KOL / social signal — expert opinion and pre-publication intelligence.
+    "kol-social",
+    # Policy / legislative environment — congressional and regulatory policy trends.
+    "policy-legislative",
+    # Reputational risk screen — press, litigation, and ESG signal.
+    "reputational",
     "financial",
     # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
     # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
@@ -144,6 +156,32 @@ def _extract_structure_inputs(query: str) -> dict:
             out["target_sequence"] = tok
             break
     return out
+
+
+_RESCUE_RE = re.compile(r"\brescue", re.I)
+
+
+def _is_rescue_ranking_query(query: str) -> bool:
+    """True for a "rank/identify GENES that RESCUE the <TARGET>-KO phenotype" question — the
+    trigger for the ranked-rescue-gene deliverable (structured rescue_genes + mechanism reasoning
+    + ranked synthesis).
+
+    Conservative by design: requires "rescue" AND a gene/ranking cue AND a KO/phenotype/signature
+    cue, so an ordinary viability question ("Is TSC2 a viable target?") does NOT match and keeps the
+    existing IND-style synthesis untouched.
+    """
+    q = query or ""
+    if not _RESCUE_RE.search(q):
+        return False
+    # Require an explicit GENE cue (the deliverable ranks GENES) — a bare "rank"/"identify" is too
+    # loose. And exclude compound/drug/molecule ranking questions, which are a different deliverable
+    # (the moat's rescue COMPOUNDS), so "rank the rescue compound candidates for TSC2 KO" does NOT
+    # trigger the gene path. Conservative by design: a miss falls back to IND synthesis (no harm).
+    has_gene_cue = re.search(r"\bgenes?\b", q, re.I) is not None
+    is_compound_q = re.search(r"\bcompounds?\b|\bdrugs?\b|\bmolecules?\b|\bsmall[- ]molecules?\b",
+                              q, re.I) is not None
+    has_ko_cue = re.search(r"\bK/?O\b|knock-?out|knock-?down|phenotype|signature", q, re.I) is not None
+    return has_gene_cue and has_ko_cue and not is_compound_q
 
 
 def _known_agent_ids(registry) -> set:
@@ -556,6 +594,79 @@ def run_live(
                 "facts": [f["value"][:120] for f in corpus_facts],
             })
 
+    # -----------------------------------------------------------------------
+    # 4b. Scientific mechanism reasoning (rescue-ranking queries only)
+    # -----------------------------------------------------------------------
+    # For a "rank genes that rescue the <TARGET>-KO phenotype" question, run the scientific-core
+    # reasoner over the moat's ranked rescue-gene candidates + the literature already gathered, to
+    # produce a plausible, CITED mechanism per gene. The rescue-mechanism agent is simulate_exempt →
+    # it does REAL reasoning even when the rest of the firm is stubbed (the science IS the
+    # deliverable). DATA BOUNDARY: only PUBLIC identifiers cross to it — gene symbols + ORDINAL rank,
+    # never the raw moat cosines (those stay here, for the ranked view). Non-rescue queries skip this
+    # entirely (rescue_ranked/gene_mechanisms stay empty → the existing IND synthesis runs unchanged).
+    rescue_ranked: list[dict] = []
+    gene_mechanisms: list[dict] = []
+    if _is_rescue_ranking_query(query) and target and "rescue-mechanism" in known_ids:
+        # Top-K rescuers. K=6 bounds the real claude mechanism call (~35s/gene observed) under the
+        # agent timeout while still giving a substantive ranked list. cosine is kept LOCAL (the view),
+        # never sent to the agent.
+        rescue_ranked = rescue_genes(target, k=6)
+        if rescue_ranked:
+            # The cited public literature already in the dossier (EMET / corpus) is the grounding set.
+            evidence = [
+                {"claim": f.get("value", "")[:300],
+                 "source": f.get("source", "") or f.get("url", "")}
+                for f in all_dossier_facts
+                if f.get("provenance") in ("emet-live", "emet-mcp", "corpus") and f.get("value")
+            ][:12]
+            mech_inputs = {
+                "target": target,
+                "disease": tri.get("disease_label", ""),
+                # PUBLIC ONLY: gene symbol + ordinal rank — no cosine / no internal score crosses.
+                "candidates": [{"gene": r["gene"], "rank": r["rank"]} for r in rescue_ranked],
+                "evidence": evidence,
+            }
+            _emit(on_progress, eid, {"stage": "bucket1", "agent_id": "rescue-mechanism",
+                                     "phase": "start"})
+            _t0 = time.monotonic()
+            mres = harness.run("rescue-mechanism", mech_inputs,
+                               engagement_id=eid, ctx=ctx, registry=registry)
+            _elapsed = round(time.monotonic() - _t0, 2)
+            if mres.ok and mres.output:
+                gene_mechanisms = mres.output.get("gene_mechanisms", []) or []
+            # Enforce "cite or hedge" MECHANICALLY (defense in depth — the JSON schema cannot): an
+            # uncited high/medium claim is downgraded to low, so a confident-but-unsupported mechanism
+            # can never be presented as well-grounded. The agent is instructed to do this; this makes
+            # it a guarantee regardless of what the model returns.
+            for gm in gene_mechanisms:
+                if gm.get("confidence") in ("high", "medium") and not (gm.get("citations") or []):
+                    gm["confidence"] = "low"
+            # Surface each cited mechanism as a dossier fact (provenance scientific-reasoning).
+            for gm in gene_mechanisms:
+                cites = ", ".join(gm.get("citations", []) or [])
+                val = f"Rescue mechanism — {gm.get('gene', '')}: {gm.get('mechanism', '')}"
+                if cites:
+                    val += f" [{cites}]"
+                all_dossier_facts.append({
+                    "value": val,
+                    "source": "Sapphire scientific reasoning (cites EMET/corpus literature)",
+                    "tier": "T3",
+                    "provenance": "scientific-reasoning",
+                    "plane": plane_for("scientific-reasoning"),
+                    "field": "rescue mechanism",
+                })
+            agent_statuses.append({
+                "id": "rescue-mechanism", "status": mres.status, "provenance": mres.provenance,
+            })
+            if not mres.ok:
+                abstained_agents.append("rescue-mechanism")
+            _emit(on_progress, eid, {
+                "stage": "bucket1", "agent_id": "rescue-mechanism", "phase": "done",
+                "status": mres.status, "provenance": mres.provenance,
+                "n_facts": len(gene_mechanisms), "elapsed_s": _elapsed,
+                "error": mres.error if not mres.ok else None,
+            })
+
     known_unknowns = [f"abstained: {aid}" for aid in abstained_agents]
 
     status = "complete" if not abstained_agents else "complete-with-known-unknowns"
@@ -581,6 +692,17 @@ def run_live(
     # -----------------------------------------------------------------------
     # 5. Bucket 2 — persona partners (one harness.run per seated persona)
     # -----------------------------------------------------------------------
+    # VETO gate: when VETO facts are present, surface them as first-class
+    # adjudication input into every persona's round-1 dispatch, and record a
+    # trace landmark so the gate is auditable mid-run.
+    veto_is_active = bool(veto_flags)
+    if veto_is_active:
+        trace.record(eid, {
+            "type": "veto_gate",
+            "veto_facts": veto_flags,
+            "n_veto": len(veto_flags),
+        })
+
     round1: list[dict] = []
 
     for p in panel:
@@ -588,9 +710,13 @@ def run_live(
         lens = p.get("lens", "")
 
         # Build a compact dossier field list for the partner to reference.
-        dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[
-            :10
-        ]
+        dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+        # VETO gate: when active, prepend VETO-adjudication markers so the
+        # persona receives the gate condition as first-class input (capped to 12).
+        if veto_is_active:
+            veto_markers = ["[VETO ADJUDICATION] " + v[:80] for v in veto_flags]
+            dossier_fields = (veto_markers + dossier_fields)[:12]
 
         if "company-partner" not in known_ids:
             continue
@@ -600,13 +726,17 @@ def run_live(
                                  "phase": "start", "round": 1})
         _t0 = time.monotonic()
 
+        persona_inputs: dict = {
+            "persona": persona_name,
+            "lens": lens,
+            "dossier_fields": dossier_fields,
+        }
+        if veto_is_active:
+            persona_inputs["veto_adjudication"] = veto_flags
+
         res = harness.run(
             "company-partner",
-            {
-                "persona": persona_name,
-                "lens": lens,
-                "dossier_fields": dossier_fields,
-            },
+            persona_inputs,
             engagement_id=eid,
             ctx={**ctx, "dossier_fields": dossier_fields},
             registry=registry,
@@ -638,6 +768,126 @@ def run_live(
             "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
             "elapsed_s": _elapsed,
         })
+
+    # -----------------------------------------------------------------------
+    # 5b. Bucket 2 — Round 2 (rebuttal) + spread
+    # -----------------------------------------------------------------------
+    # Compact round-1 summary threaded into each persona's round-2 prompt so
+    # they can revise or reaffirm in light of their peers' initial verdicts.
+    round1_verdicts = [
+        {
+            "persona": v.get("persona", ""),
+            "stance": v.get("stance", "conditional"),
+            "conviction": v.get("conviction", 0),
+            "rationale": (v.get("rationale") or "")[:150],
+        }
+        for v in round1
+        if isinstance(v, dict)
+    ]
+
+    round2: list[dict] = []
+
+    for p in panel:
+        persona_name = p.get("persona", "")
+        lens = p.get("lens", "")
+
+        dossier_fields_r2 = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+        if "company-partner" not in known_ids:
+            continue
+
+        # Locate this persona's round-1 entry for comparison (revised detection).
+        r1_verdict = next(
+            (v for v in round1 if v.get("persona") == persona_name), {}
+        )
+        r1_stance = r1_verdict.get("stance", "hold")
+        r1_conviction = r1_verdict.get("conviction", 0)
+
+        # Live progress: round-2 rebuttal starting (distinct phase name — must not
+        # collide with "start"/"done" so the existing stage-order test keeps passing).
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name,
+            "phase": "rebuttal_start", "round": 2,
+        })
+        _t0 = time.monotonic()
+
+        res = harness.run(
+            "company-partner",
+            {
+                "persona": persona_name,
+                "lens": lens,
+                "dossier_fields": dossier_fields_r2,
+                "round1_verdicts": round1_verdicts,
+            },
+            engagement_id=eid,
+            ctx={**ctx, "dossier_fields": dossier_fields_r2},
+            registry=registry,
+        )
+
+        _elapsed = round(time.monotonic() - _t0, 2)
+
+        if res.ok and res.output:
+            r2_stance = res.output.get("stance", "conditional")
+            r2_conviction = res.output.get("conviction", 0)
+            r2_rationale = res.output.get("rationale", "")
+        else:
+            r2_stance = r1_stance
+            r2_conviction = r1_conviction
+            r2_rationale = f"abstained ({res.error or 'unknown'})"
+
+        revised = (r2_conviction != r1_conviction or r2_stance != r1_stance)
+        shift = r2_rationale[:200]
+
+        rebuttal_entry: dict = {
+            "persona": persona_name,
+            "revised": revised,
+            "conviction": r2_conviction,
+            "shift": shift,
+        }
+        round2.append(rebuttal_entry)
+
+        # Live progress: rebuttal landed (distinct phase so stage-order filters are unaffected).
+        _emit(on_progress, eid, {
+            "stage": "roundtable", "agent_id": persona_name,
+            "phase": "rebuttal_done", "round": 2,
+            "revised": revised, "conviction": r2_conviction,
+            "elapsed_s": _elapsed,
+        })
+
+    # Spread computation — based on round-1 convictions and stances.
+    r1_convictions = [
+        v.get("conviction", 0)
+        for v in round1
+        if isinstance(v, dict) and isinstance(v.get("conviction"), int)
+    ]
+    r1_stances = [v.get("stance", "hold") for v in round1 if isinstance(v, dict)]
+    stance_mix = {s: r1_stances.count(s) for s in sorted(set(r1_stances))}
+    moved_in_r2 = [r["persona"].split(",")[0] for r in round2 if r.get("revised")]
+
+    _r1_no_go = r1_stances.count("no_go")
+    _r1_pass = r1_stances.count("pass")
+    _r1_conditional = r1_stances.count("conditional")
+    if _r1_no_go > 0 and _r1_pass == 0:
+        _consensus_label = "no_go"
+        _dissent_label = ""
+    elif _r1_pass > len(r1_stances) // 2:
+        _consensus_label = "majority pass"
+        _dissent_label = f"{_r1_conditional} conditional, {_r1_no_go} no_go"
+    else:
+        _consensus_label = ""
+        _dissent_label = f"{_r1_conditional} conditional, {_r1_no_go} no_go"
+
+    spread: dict = {
+        "consensus": _consensus_label,
+        "dissent": _dissent_label,
+        "convergent_gate": "VETO" if veto_flags else "",
+        "conviction_range": (
+            f"{min(r1_convictions)}-{max(r1_convictions)} / 5"
+            if r1_convictions else "-"
+        ),
+        "stance_mix": stance_mix,
+        "moved_in_round2": moved_in_r2,
+    }
 
     # -----------------------------------------------------------------------
     # 6. Synthesis — deterministic assembly
@@ -678,12 +928,45 @@ def run_live(
         else "Define experimental paradigm for primary target."
     )
 
+    # Rescue-ranking deliverable: when the query asked to RANK genes that rescue the KO, the
+    # synthesis IS a ranked gene table — merge the moat rank/cosine (internal, shown as the
+    # evidence basis) with each gene's cited mechanism. This OVERRIDES the IND-style recommendation
+    # computed above. Empty rescue_ranked (any non-rescue query) ⇒ this block is skipped entirely.
+    ranked_genes: list[dict] = []
+    if rescue_ranked:
+        mech_by_gene = {gm.get("gene", "").upper(): gm for gm in gene_mechanisms}
+        for r in rescue_ranked:
+            gm = mech_by_gene.get(r["gene"].upper(), {})
+            ranked_genes.append({
+                "rank": r["rank"],
+                "gene": r["gene"],
+                "cosine": r["cosine"],            # Quiver EP-signature reversal strength (internal)
+                "mechanism": gm.get("mechanism", ""),
+                "citations": gm.get("citations", []) or [],
+                "confidence": gm.get("confidence", "low"),
+                "source": r.get("source", ""),
+            })
+        grounded = [g for g in ranked_genes if g["citations"]]
+        top = ranked_genes[:5]
+        top_str = "; ".join(f"{g['rank']}. {g['gene']}" for g in top)
+        recommendation = (
+            f"Top rescue-gene candidates for {target}-KO, ranked by Quiver EP-signature reversal "
+            f"with literature-grounded mechanism: {top_str}."
+        )
+        confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
+        proposed_experiment = (
+            f"Validate the top rescue-gene candidate(s) ({', '.join(g['gene'] for g in top[:3])}) "
+            f"against the {target}-KO phenotype in a disease-relevant CNS model."
+        )
+
     syn = {
         "recommendation": recommendation,
         "confidence": confidence,
         "proposed_experiment": proposed_experiment,
         "entities": ents,
     }
+    if ranked_genes:
+        syn["ranked_genes"] = ranked_genes
 
     # Live progress: synthesis done — the recommendation + confidence.
     _emit(on_progress, eid, {
@@ -698,12 +981,22 @@ def run_live(
     # -----------------------------------------------------------------------
     # 7. Assemble and return
     # -----------------------------------------------------------------------
+    consult: dict = {"round1": round1, "round2": round2, "spread": spread}
+    # VETO gate adjudication: surfaced in the consult output when active so the
+    # front door / LOKA adapter can render the gate prominently.
+    if veto_is_active:
+        consult["adjudication"] = {
+            "veto_facts": veto_flags,
+            "n_veto": len(veto_flags),
+            "mode": "active",
+        }
+
     return {
         "query": query,
         "plan": public_plan,
         "priors": priors,
         "discover": discover,
-        "consult": {"round1": round1},
+        "consult": consult,
         "synthesize": syn,
         "engagement_id": eid,
         "reflection": reflection,

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import re
 from dataclasses import dataclass
 
@@ -123,9 +124,23 @@ def emet_tab_discipline(contract, output, ctx) -> list:
 
 def stamp_provenance(contract, output) -> dict:
     """Returns a copy of output with provenance set to contract.provenance_label
-    (and stamped onto each facts row if present). Raises nothing; the only transform guard."""
+    (and stamped onto each facts row if present). Raises nothing; the only transform guard.
+
+    Labeled simulate-models mode: when SAPPHIRE_SIMULATE_MODELS is on AND this is a
+    `claude-subagent` (whose reasoning was a placeholder, not a real model call), stamp
+    `simulated` instead — so the dossier fact / persona verdict, the step tree, and the agent
+    status ALL carry `provenance=simulated` and can never be mistaken for a real verdict. Real
+    EMET/moat/seam agents are not claude-subagents, so they keep their genuine label."""
     out = copy.deepcopy(output)
-    out["provenance"] = contract.provenance_label
+    label = contract.provenance_label
+    # A simulate_exempt agent (e.g. rescue-mechanism) does REAL reasoning even under the global
+    # simulate flag, so it KEEPS its genuine provenance label — only NON-exempt claude-subagents
+    # (the stubbed personas/semantic agents) are relabeled `simulated`.
+    if getattr(contract, "kind", "") == "claude-subagent" and \
+            not getattr(contract, "simulate_exempt", False) and \
+            (os.environ.get("SAPPHIRE_SIMULATE_MODELS") or "").strip() not in ("", "0", "false", "False"):
+        label = "simulated"
+    out["provenance"] = label
     for row in out.get("facts", []) or []:
-        row["provenance"] = contract.provenance_label
+        row["provenance"] = label
     return out

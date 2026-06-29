@@ -26,6 +26,7 @@ if _PKG not in sys.path:
 
 import harness
 from live_engine import run_live
+from contracts.run_live_schema import validate_run_live
 from tools import gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam
 from tools import boltz_seam
 
@@ -46,13 +47,20 @@ def _fake_claude_runner(cmd):
             break
 
     if '"stance"' in schema_str:
-        # Return a valid verdict object
+        # Return a valid verdict object.
+        # fact_claims is intentionally empty: a non-empty cite ("mock") would depend on
+        # dossier_fields containing "mock", but dossier_fields is built from a set whose
+        # iteration order is randomised by PYTHONHASHSEED. When the moat is available
+        # (k=4 → up to 12 unique fact values plus "emet mock") the total can exceed the
+        # [:10] slice, randomly excluding "mock" and causing must_cite_dossier to fire on
+        # every persona (~20-30% of runs). Empty fact_claims bypasses the guardrail check
+        # entirely (the loop runs zero iterations → no violations) and is schema-valid.
         obj = {
             "persona": "Mock Persona",
             "stance": "conditional",
             "conviction": 3,
             "rationale": "Mock rationale for testing.",
-            "fact_claims": [{"claim": "TSC2 loss activates mTOR", "cite": "mock"}],
+            "fact_claims": [],
             "provenance": "semantic-web",
         }
     else:
@@ -1750,6 +1758,32 @@ class TestEmetHandlerWiring(unittest.TestCase):
         self.assertEqual(agents.get("emet-runner"), "ok")  # fired, not abstained
 
 
+class TestSimulateModelsRunLive(unittest.TestCase):
+    """SAPPHIRE_SIMULATE_MODELS in a full run_live: persona reasoning is labeled-simulated, while
+    real moat/EMET facts stay genuinely real (the demo's honesty contract)."""
+
+    def setUp(self):
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_MEMORY_DIR"] = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+
+    def tearDown(self):
+        for k in ("SAPPHIRE_ENGAGEMENTS_DIR", "SAPPHIRE_MEMORY_DIR", "SAPPHIRE_SIMULATE_MODELS"):
+            os.environ.pop(k, None)
+
+    def test_personas_simulated_moat_stays_real(self):
+        r = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
+        self.assertEqual(validate_run_live(r), [])
+        # Every persona verdict is labeled simulated — never presented as a real verdict.
+        provs = [v.get("provenance") for v in r["consult"]["round1"]]
+        self.assertTrue(provs and all(p == "simulated" for p in provs), provs)
+        self.assertTrue(all("🧪 simulated" in v.get("rationale", "") for v in r["consult"]["round1"]))
+        # Real moat facts are untouched (internal plane, real provenance).
+        moat = [f for f in r["discover"]["dossier"] if f.get("provenance") == "moat-real"]
+        self.assertTrue(moat, "real moat facts must remain in a simulated run")
+        self.assertTrue(all(f.get("plane") == "internal" for f in moat))
+
+
 class TestLiveProgress(unittest.TestCase):
     """live-run-visibility W1 — run_live(on_progress=…) streams ordered milestones, additive."""
 
@@ -1832,6 +1866,188 @@ class TestLiveProgress(unittest.TestCase):
         first_progress = next(i for i, e in enumerate(evts) if e.get("type") == "progress")
         close_idx = kinds.index("engagement_close")
         self.assertLess(first_progress, close_idx)
+
+
+class TestPhaseADoD(unittest.TestCase):
+    """Phase A Definition of Done checks:
+    1. run_live output shape matches canned path (round1 + round2 + spread).
+    2. All 13 semantic agents dispatch.
+    3. A VETO fact provably forces adjudication.
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _run(self, query="Is TSC2 a viable target in tuberous sclerosis?", ctx=None):
+        return run_live(query, ctx=ctx or _build_ctx())
+
+    # DoD check 1: run_live shape matches canned path
+    def test_consult_has_round2_and_spread(self):
+        """run_live must return consult with round1, round2, and spread (matching canned shape)."""
+        result = self._run()
+        consult = result["consult"]
+        self.assertIn("round1", consult, "consult missing round1")
+        self.assertIn("round2", consult, "consult missing round2 — Phase A not done")
+        self.assertIn("spread", consult, "consult missing spread — Phase A not done")
+        # round2 is a list of rebuttal entries
+        self.assertIsInstance(consult["round2"], list)
+        # spread has the expected subkeys
+        spread = consult["spread"]
+        for key in ("conviction_range", "stance_mix", "moved_in_round2", "convergent_gate"):
+            self.assertIn(key, spread, f"spread missing key {key!r}")
+        # Shape lock: conviction_range must be a STRING (e.g. "3-4 / 5" or "-"),
+        # and moved_in_round2 must be a LIST of persona-name strings — matching both
+        # the canned path (orchestrator.py:298,300) and the live path (live_engine.py:884,889).
+        self.assertIsInstance(spread["conviction_range"], str,
+                              f"spread.conviction_range must be str; got {type(spread['conviction_range'])}: "
+                              f"{spread['conviction_range']!r}")
+        self.assertIsInstance(spread["moved_in_round2"], list,
+                              f"spread.moved_in_round2 must be list; got {type(spread['moved_in_round2'])}: "
+                              f"{spread['moved_in_round2']!r}")
+
+    def test_round2_entries_have_revised_and_shift(self):
+        """round2 entries must carry revised (bool) and shift (str)."""
+        result = self._run()
+        round2 = result["consult"]["round2"]
+        self.assertTrue(len(round2) > 0, "round2 must be non-empty")
+        for entry in round2:
+            self.assertIn("persona", entry)
+            self.assertIn("revised", entry)
+            self.assertIn("conviction", entry)
+            self.assertIn("shift", entry)
+            self.assertIsInstance(entry["revised"], bool)
+
+    # DoD check 2: all 13 semantic agents dispatch
+    def test_all_13_semantic_agents_dispatch(self):
+        """All 13 semantic agents must appear in discover.agents."""
+        SEMANTIC_13 = {
+            "fda-institutional-memory", "patent-ip", "global-regulatory-divergence",
+            "dea-scheduling", "clinical-trial-registry", "post-market-safety",
+            "financial", "payer", "manufacturing-cmc", "patient-advocacy",
+            "kol-social", "policy-legislative", "reputational",
+        }
+        result = self._run()
+        dispatched_ids = {a["id"] for a in result["discover"]["agents"]}
+        missing = SEMANTIC_13 - dispatched_ids
+        self.assertEqual(
+            missing, set(),
+            f"These semantic agents did not dispatch: {missing}. "
+            f"Got: {sorted(dispatched_ids)}"
+        )
+
+    # DoD check 3: VETO fact forces adjudication
+    def test_veto_fact_forces_adjudication(self):
+        """When a Bucket-1 agent returns a VETO fact, consult must carry adjudication
+        with veto_facts surfaced. This proves the VETO-as-gate MECHANICS fire:
+        - exactly 1 VETO from fda-institutional-memory (narrow mock, not 8 duplicates)
+        - adj["n_veto"] == 1
+        - a 'veto_gate' trace landmark is written mid-run (auditable gate)
+        """
+        # Build a ctx that injects a VETO fact ONLY from fda-institutional-memory.
+        ctx = _build_ctx()
+
+        _original_runner = ctx["runner"]
+        def _veto_runner(cmd):
+            # Detect if this is the fda-institutional-memory call by prompt content.
+            # Match ONLY on the exact agent id string — do NOT match the broad "fda"
+            # substring which would fire on ~8 agents and yield duplicate veto_facts.
+            prompt_str = ""
+            for i, tok in enumerate(cmd):
+                if tok == "-p" and i + 1 < len(cmd):
+                    prompt_str = cmd[i + 1]
+                    break
+            if "fda-institutional-memory" in prompt_str:
+                obj = {
+                    "candidate": "TSC2",
+                    "facts": [
+                        {"value": "Prior CRL on mTOR inhibitor class for CNS (2019)",
+                         "source": "FDA.gov", "tier": "T1", "flag": "VETO",
+                         "provenance": "fda-primary"}
+                    ],
+                    "provenance": "fda-primary",
+                }
+                return types.SimpleNamespace(
+                    stdout=json.dumps({"structured_output": obj}),
+                    returncode=0, stderr=""
+                )
+            return _original_runner(cmd)
+
+        ctx["runner"] = _veto_runner
+
+        result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=ctx)
+        eid = result["engagement_id"]
+
+        # VETO must be in discover.flags
+        veto_flags = result["discover"]["flags"]["VETO"]
+        self.assertTrue(len(veto_flags) >= 1,
+                        f"Expected ≥1 VETO flag; got {veto_flags}")
+
+        # consult must carry adjudication when veto_flags is non-empty
+        consult = result["consult"]
+        self.assertIn("adjudication", consult,
+                      "consult missing 'adjudication' key when VETO facts present")
+        adj = consult["adjudication"]
+        self.assertIn("veto_facts", adj)
+
+        # Exactly 1 VETO: the narrow mock fires only for fda-institutional-memory.
+        # If this fails (n_veto > 1) the broad "fda" match crept back in.
+        self.assertEqual(adj["n_veto"], 1,
+                         f"Expected exactly 1 VETO (from fda-institutional-memory only); "
+                         f"got {adj['n_veto']}. veto_facts={adj.get('veto_facts')}")
+
+        # Gate mechanics: the 'veto_gate' trace landmark must have been written
+        # mid-run — this proves the gate logic executed, not just that the output
+        # key was decorated after the fact.
+        trace_path = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_path),
+                        f"trace file not found at {trace_path}")
+        with open(trace_path, encoding="utf-8") as fh:
+            trace_records = [json.loads(line) for line in fh if line.strip()]
+        veto_gate_records = [r for r in trace_records if r.get("type") == "veto_gate"]
+        self.assertTrue(
+            len(veto_gate_records) >= 1,
+            f"Expected ≥1 'veto_gate' trace record; got types: "
+            f"{[r.get('type') for r in trace_records]}"
+        )
+
+    def test_plan_has_capability_class(self):
+        """The plan must carry a 'class' field ∈ {diligence, design, experiment}."""
+        result = self._run()
+        plan = result["plan"]
+        self.assertIn("class", plan, "plan missing 'class' field — Phase A not done")
+        self.assertIn(plan["class"], {"diligence", "design", "experiment"},
+                      f"plan.class must be one of diligence/design/experiment; got {plan['class']!r}")
+
+    def test_plan_class_design_for_design_query(self):
+        """A query containing 'design' should yield plan.class == 'design'."""
+        result = run_live(
+            "Design an ASO targeting TSC2 for tuberous sclerosis.",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "design")
+
+    def test_plan_class_experiment_for_experiment_query(self):
+        """A query containing an experiment keyword should yield plan.class == 'experiment'."""
+        result = run_live(
+            "Validate TSC2 as a target in vivo in a mouse model.",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "experiment")
+
+    def test_plan_class_default_diligence(self):
+        """A generic diligence query should default to plan.class == 'diligence'."""
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+        )
+        self.assertEqual(result["plan"].get("class"), "diligence")
 
 
 if __name__ == "__main__":

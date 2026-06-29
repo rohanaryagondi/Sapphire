@@ -39,11 +39,18 @@ DIR="${1:?usage: validate-corpus.sh <corpus-dir>}"
 IDX="$DIR/index.jsonl"
 [ -f "$IDX" ] || { echo "✗ no index.jsonl in $DIR"; exit 1; }
 
+# Intermediate URL list shared between the Python (write) + bash (read) phases. mktemp — NOT a
+# hardcoded /tmp — so it works under Windows git-bash, where python3's /tmp (→ C:\tmp) differs
+# from MSYS /tmp (which would make the two halves use different files → a false-clean URL phase).
+URLS_FILE="$(mktemp)"
+trap 'rm -f "$URLS_FILE"' EXIT
+
 # 1 + 2: schema / tier-domain (Python; no network).
-python3 - "$IDX" <<'PY'
+python3 - "$IDX" "$URLS_FILE" <<'PY'
 import json, sys
 from urllib.parse import urlparse
 idx = sys.argv[1]
+urls_out = sys.argv[2]
 inv = {"claim","date","source","url","quote","tier"}
 # US primary domains (suffix match).
 PRIMARY_SUFFIX = (".gov", ".edu")
@@ -61,6 +68,16 @@ PRIMARY_REGULATOR = (
     "tga.gov.au",         # TGA (Australia)
     "swissmedic.ch",      # Swissmedic
     "nmpa.gov.cn",        # NMPA (China)
+)
+# Granted-patent PRIMARY legal records — T1-eligible (the patent-ip agent spec tiers granted
+# patents & Orange/Purple Book listings T1). A granted patent IS a primary legal record; pending
+# apps / WO-PCT publications stay T2 (the contributor tiers those — the gate only allows the
+# domain). Host or subdomain match, spoof-safe. (Added 2026-06-25 for patent-ip; HELP from hayes.)
+PRIMARY_PATENT = (
+    "patents.google.com",       # USPTO/WIPO granted-patent record (Google Patents mirror)
+    "uspto.gov", "ppubs.uspto.gov",  # USPTO official (Patent Public Search)
+    "worldwide.espacenet.com",  # EPO Espacenet
+    "patentscope.wipo.int",     # WIPO PATENTSCOPE
 )
 fails = []
 rows = []
@@ -81,11 +98,13 @@ for i, line in enumerate(open(idx, encoding="utf-8"), 1):
     if c.get("tier") == "T1":
         ok = (host.endswith(PRIMARY_SUFFIX)
               or host in PRIMARY_HOST
-              or any(host == d or host.endswith("." + d) for d in PRIMARY_REGULATOR))
+              or any(host == d or host.endswith("." + d) for d in PRIMARY_REGULATOR)
+              or any(host == d or host.endswith("." + d) for d in PRIMARY_PATENT))
         if not ok: fails.append(f"line {i}: tier T1 but non-primary host '{host}' "
-                                f"(T1 = US .gov/.edu/PMC/NCBI or a credentialed national regulator; HTA/press = T2)")
-# stash the url list for the bash url-check phase
-with open("/tmp/_corpus_urls.txt","w") as f:
+                                f"(T1 = US .gov/.edu/PMC/NCBI, a credentialed national regulator, or a "
+                                f"granted-patent primary; HTA/press/pending-apps = T2)")
+# stash the url list for the bash url-check phase (path passed in from bash via mktemp)
+with open(urls_out, "w") as f:
     for i,c in rows:
         f.write(f"{i}\t{c.get('url','')}\t{1 if c.get('unverifiable_by_fetch') else 0}\n")
 print(f"  cards parsed: {len(rows)}")
@@ -114,8 +133,8 @@ while IFS=$'\t' read -r ln url unverif; do
         if [ "$unverif" = "1" ]; then echo "   • line $ln: HTTP $code timeout/5xx — tagged unverifiable_by_fetch (ok)";
         else echo "   ✗ line $ln: HTTP $code timeout/5xx and NOT tagged unverifiable_by_fetch — $url"; url_fail=1; fi ;;
   esac
-done < /tmp/_corpus_urls.txt
-rm -f /tmp/_corpus_urls.txt
+done < "$URLS_FILE"
+# (cleanup handled by the EXIT trap above)
 
 if [ "$url_fail" -ne 0 ]; then echo "✗ corpus validation FAILED (URL integrity)"; exit 1; fi
 echo "✓ corpus validation CLEAN: $DIR"

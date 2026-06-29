@@ -47,6 +47,66 @@ def build_ctx(mock: bool):
     return build_mock_ctx()
 
 
+def _candidate_of(query: str) -> str:
+    """The run's primary candidate (genes[0]) — the key the captured-envelope store is keyed on.
+
+    Best-effort: any extractor failure returns "" (no candidate → no auto-loaded envelope → the
+    session handler abstains honestly). Never raises into the run path.
+    """
+    try:
+        _ensure_engine_on_path()
+        from engagement import extract_entities
+        ents = extract_entities(query or "")
+        return ents["genes"][0] if ents.get("genes") else ""
+    except Exception:
+        return ""
+
+
+def _resolve_emet_envelopes(query: str, emet_envelopes: dict | None) -> dict:
+    """Resolve the captured EMET envelopes for this run.
+
+    Precedence: an explicit `emet_envelopes` dict wins (used as-is). When `None`, AUTO-LOAD the
+    single stored envelope covering the run's candidate from
+    `sapphire-orchestrator/scenarios/emet_envelopes/<candidate>.json` (the session-bridge store)
+    — so a front-end Live TSC2 run renders the real captured EMET dossier with zero wiring. No
+    stored envelope for the candidate ⇒ `{}` (the session handler then abstains honestly; we
+    never fabricate). Any load failure degrades to `{}` (never crashes the run).
+    """
+    if emet_envelopes is not None:
+        return emet_envelopes
+    try:
+        _ensure_engine_on_path()
+        from emet.envelopes import load_envelope_for
+        cand = _candidate_of(query)
+        env = load_envelope_for(cand) if cand else None
+        return {cand: env} if env else {}
+    except Exception:
+        return {}
+
+
+def _ctx_with_session_emet(mock: bool, envelopes: dict):
+    """Build the run ctx, injecting the in-session EMET handler when envelopes are present.
+
+    The session handler (backed by captured envelopes) is the front end's REAL-EMET path: for a
+    COVERED candidate it lands real `emet-live` PMIDs; for an UNCOVERED one it abstains honestly.
+    It is set ON the ctx so it WINS over `run_live`'s default (`claude -p`) handler — which
+    `_wire_emet_handler` only `setdefault`s. With no envelopes we return `build_ctx(mock)`
+    unchanged, so the `claude -p` path stays as the documented non-default fallback.
+
+    Live (`mock=False`) has ctx=None: we materialise a fresh dict carrying ONLY the handler, and
+    `run_live` `setdefault`s the rest (real moat / seams / Q-Models still load). Demo (`mock=True`)
+    starts from the mock ctx and the session handler overwrites its mock EMET handler.
+    """
+    base = build_ctx(mock)
+    if not envelopes:
+        return base
+    _ensure_engine_on_path()
+    from emet.session_bridge import make_session_emet_handler
+    ctx = dict(base) if base else {}
+    ctx["emet_handler"] = make_session_emet_handler(envelopes)
+    return ctx
+
+
 def _error_envelope(query: str, exc: Exception) -> dict:
     """An honest, well-formed degraded result when the bridge itself can't run the firm.
 
@@ -56,7 +116,7 @@ def _error_envelope(query: str, exc: Exception) -> dict:
     return {
         "query": query,
         "plan": {"deliverable": "", "disease": "", "modality": "",
-                 "agents": [], "panel": []},
+                 "agents": [], "panel": [], "class": "diligence"},
         "priors": [],
         "discover": {
             "dossier": [],
@@ -65,7 +125,12 @@ def _error_envelope(query: str, exc: Exception) -> dict:
             "status": "bridge-error",
             "agents": [],
         },
-        "consult": {"round1": []},
+        "consult": {
+            "round1": [],
+            "round2": [],
+            "spread": {"conviction_range": "-", "stance_mix": {}, "moved_in_round2": [],
+                       "convergent_gate": ""},
+        },
         "synthesize": {
             "recommendation": "Unavailable — the firm could not be convened (bridge error).",
             "confidence": "none",
@@ -80,8 +145,25 @@ def _error_envelope(query: str, exc: Exception) -> dict:
 
 
 def run(query: str, *, mock: bool = True, sequences: list | None = None,
-        model: str | None = None, on_progress=None) -> dict:
+        model: str | None = None, on_progress=None, simulate: bool = False,
+        emet_envelopes: dict | None = None) -> dict:
     """Run the firm for `query` and return the run_live result dict (+ `_elapsed_s`).
+
+    `emet_envelopes` is the front end's REAL-EMET path (the session-bridge). When a dict is
+    supplied, or — when `None` — when a captured envelope for the run's candidate exists under
+    `sapphire-orchestrator/scenarios/emet_envelopes/`, the in-session EMET handler
+    (`make_session_emet_handler`) is wired onto the ctx and WINS over `run_live`'s default
+    `claude -p` handler. A COVERED candidate (e.g. TSC2) then lands real `emet-live` PMIDs; an
+    UNCOVERED candidate abstains honestly (the session handler returns login_required → the agent
+    escalates → abstains) — never a fabricated fact. With no captured envelope the `claude -p`
+    path remains the documented non-default fallback (it tool-fails / is too slow per Gate-5, so
+    the session/captured envelope wins for covered candidates). `run_live` still `setdefault`s
+    the rest of the ctx, so the real moat / seams / Q-Models load as usual.
+
+    `simulate` (SAPPHIRE_SIMULATE_MODELS) replaces every claude-subagent's model reasoning
+    (persona verdicts + claude fact agents) with a CLEARLY-LABELED 🧪 simulated stand-in
+    (provenance `simulated`) — fast, for the demo, while real `claude -p` is slow. Real EMET /
+    moat / seams / Q-Models stay genuinely REAL. The env is set + restored around this call.
 
     `on_progress(event)` is forwarded to `run_live` (live-run-visibility): it fires per
     milestone (plan, each Bucket-1 agent start/done, flags, each persona start/done, synthesis)
@@ -104,12 +186,17 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
     """
     started = time.monotonic()
     _prev_model = os.environ.get("CLAUDE_MODEL")
+    _prev_sim = os.environ.get("SAPPHIRE_SIMULATE_MODELS")
     try:
         _ensure_engine_on_path()
         if model:
             os.environ["CLAUDE_MODEL"] = model
+        if simulate:
+            os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
         from live_engine import run_live
-        result = run_live(query, sequences=sequences, ctx=build_ctx(mock),
+        envelopes = _resolve_emet_envelopes(query, emet_envelopes)
+        result = run_live(query, sequences=sequences,
+                          ctx=_ctx_with_session_emet(mock, envelopes),
                           on_progress=on_progress)
     except Exception as exc:  # defensive — run_live is designed not to raise
         result = _error_envelope(query, exc)
@@ -119,9 +206,22 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
                 os.environ.pop("CLAUDE_MODEL", None)
             else:
                 os.environ["CLAUDE_MODEL"] = _prev_model
+        if simulate:
+            if _prev_sim is None:
+                os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+            else:
+                os.environ["SAPPHIRE_SIMULATE_MODELS"] = _prev_sim
     result["_elapsed_s"] = round(time.monotonic() - started, 2)
     result["_mock"] = bool(mock)
     result["_model"] = model or ""
+    result["_simulated"] = bool(simulate)
+    # Honest labeling: record which candidates this run had a captured-session EMET envelope for
+    # (the real-EMET path). Empty ⇒ no covered candidate → EMET ran via the claude -p fallback (or
+    # the mock handler in Demo). Never fabricated — derived from the resolved envelopes above.
+    try:
+        result["_emet_session"] = sorted(envelopes.keys())  # type: ignore[name-defined]
+    except Exception:
+        result["_emet_session"] = []
     return result
 
 
@@ -150,7 +250,14 @@ def replay(scenario: str = "tsc2_live_run") -> dict:
 
 
 def available_replays() -> list:
-    """List the frozen captured scenarios available for replay."""
+    """List the frozen captured scenarios available for replay.
+
+    Includes both the `*_live_run.json` captures and the `*_emet_session.json` session-bridge
+    captures (a full `run_live` output with a captured EMET envelope injected — real moat + real
+    EMET PMIDs + the spread, frozen for $0 deterministic replay).
+    """
     if not _SCENARIOS.is_dir():
         return []
-    return sorted(p.stem for p in _SCENARIOS.glob("*_live_run.json"))
+    stems = {p.stem for p in _SCENARIOS.glob("*_live_run.json")}
+    stems |= {p.stem for p in _SCENARIOS.glob("*_emet_session.json")}
+    return sorted(stems)

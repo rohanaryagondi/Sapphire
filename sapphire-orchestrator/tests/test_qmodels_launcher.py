@@ -12,6 +12,14 @@ from pathlib import Path
 from qmodels import launcher as L
 from qmodels.launcher import SafetyRefusal
 
+# boto3 is a LAUNCH-ONLY dep (used lazily in launcher._presign) — not a guaranteed test-env dep,
+# and every other suite is stdlib-only. So the presign tests SKIP (not error) where it's absent.
+try:
+    import boto3  # noqa: F401
+    _HAS_BOTO3 = True
+except ImportError:
+    _HAS_BOTO3 = False
+
 
 class _FakeAws:
     """Records aws calls; head-bucket raises (absent) unless `existing` lists the bucket."""
@@ -208,6 +216,7 @@ class TestLifecycle(unittest.TestCase):
         self.assertEqual(job["status"], "done")
 
 
+@unittest.skipUnless(_HAS_BOTO3, "boto3 not installed (launch-only dep) — presign tests skipped")
 class TestPresign(unittest.TestCase):
     """Presigned URL generation (Gap 4b) — boto3 signs locally (no network), offline-safe."""
 

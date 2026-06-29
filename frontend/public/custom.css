@@ -1,47 +1,294 @@
-.watermark {
-    display: none !important;
+/* ============================================================================
+   Sapphire — Chainlit restyle toward Gavin's chat-first console
+   (docs/design/console-ui/sapphire_chat.html, PR #93)
+
+   PURELY VISUAL. No engine/bridge/data change — the demo's content + behavior
+   are identical. The Quiver palette / typography / chat-first framing live in
+   theme.json (the shadcn HSL tokens Chainlit consumes); this file adds the
+   finishes Gavin's mock shows that tokens alone can't express:
+   message bubbles, the verdict callout, mono provenance chips, the CoT
+   step-tree look, the brand/welcome hero, suggestion pills, scrollbars.
+
+   Selectors lean on Chainlit 2.9.5's STABLE hooks (verified in the built
+   bundle): `.welcome-screen`, `.message-content`, `.chat-input`, `.starter`,
+   `[data-step-type]`. We avoid hashed MUI class names where possible and keep
+   every rule additive + defensive so a Chainlit bump degrades gracefully back
+   to the themed defaults rather than breaking.
+   ========================================================================== */
+
+/* ── Gavin's tokens (mirrors sapphire_chat.html :root) ─────────────────────
+   Kept here so the CSS rules below read 1:1 against the mock. Palette is also
+   in theme.json; these are for the bespoke finishes only. */
+:root {
+  --sa-bg:       #171717;
+  --sa-surface:  #1f1f1f;
+  --sa-bubble:   #2a2a2a;
+  --sa-panel-bg: #111111;
+
+  --sa-edge:     rgba(255, 255, 255, 0.07);
+  --sa-edge-2:   rgba(255, 255, 255, 0.11);
+
+  --sa-ink:      #ececec;
+  --sa-ink-2:    #909090;
+  --sa-ink-3:    #4f4f4f;
+
+  --sa-blue:     #4d7cfe;
+  --sa-blue-bg:  rgba(77, 124, 254, 0.10);
+  --sa-blue-bd:  rgba(77, 124, 254, 0.22);
+  --sa-purple:    #a07cff;                  /* refined violet accent (mirrors mock --purple) */
+  --sa-purple-bg: rgba(160, 124, 255, 0.12);
+  --sa-canvas:    #1a1722;                  /* violet-tinted canvas (mock --bg); set in theme.json dark --background */
+  --sa-teal:     #2dd4bf;
+
+  --sa-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --sa-mono: ui-monospace, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+
+  --sa-r: 12px;
+  --sa-r-sm: 7px;
 }
 
-/* Remove gap between logo and custom title */
-img[src*="logo"] {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+/* ── Violet canvas (mirrors sapphire_chat.html --bg #1a1722) ────────────────
+   The conversation canvas is tinted a touch lighter + violet via theme.json
+   (dark --background → "256 19% 11%" = #1a1722). Keep the header + composer
+   NEUTRAL so the tint reads as canvas-only, exactly like the mock (the header
+   bar and prompt bar stay untinted). Defensive: a wrong/stale selector is a
+   no-op here — these set background only, never layout. */
+header { background: var(--sa-bg) !important; }            /* neutral header */
+form:has(.chat-input),
+div:has(> .chat-input),
+[class*="input"]:has(textarea) { background: var(--sa-surface) !important; }  /* neutral composer */
+
+/* ── Chrome cleanup ────────────────────────────────────────────────────── */
+.watermark { display: none !important; }
+
+/* Thin Gavin-style scrollbars (4px, faint thumb) — desktop control surface. */
+* { scrollbar-width: thin; scrollbar-color: var(--sa-edge-2) transparent; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--sa-edge-2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.18); }
+
+/* Typography: Inter everywhere (Chainlit already bundles + loads Inter; we
+   just make sure the body opts into it and antialiases like the mock). */
+body, .message-content, button, input, textarea {
+  font-family: var(--sa-font);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Target logo parent containers */
-[class*="MuiBox"] img[src*="logo"],
-[class*="Welcome"] img[src*="logo"] {
-    margin-bottom: 0 !important;
+/* ── Welcome / empty state — the "Ask Sapphire" hero ───────────────────────
+   Gavin's at-rest view: centered heading + subtitle, generous breathing room,
+   nothing else competing. Chainlit centers `.welcome-screen` already; we just
+   style the injected title (see custom.js) and the logo to match. */
+.welcome-screen img[src*="logo"] {
+  width: 56px;
+  height: auto;
+  margin: 0 auto 4px !important;
+  padding-bottom: 0 !important;
+  opacity: 0.96;
 }
-
-/* Remove gap from any div containing the logo */
+/* Remove gap between logo and the injected title (kept from prior CSS). */
+img[src*="logo"] { margin-bottom: 0 !important; padding-bottom: 0 !important; }
+[class*="MuiBox"] img[src*="logo"] { margin-bottom: 0 !important; }
 div:has(> img[src*="logo"]) {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
-    gap: 0 !important;
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0 !important;
 }
 
-/* Custom welcome page title styling */
 #custom-welcome-title {
-    animation: fadeIn 0.8s ease-in;
-    margin-top: 0 !important;
+  animation: sa-fadeup 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  margin-top: 0 !important;
 }
-
 #custom-welcome-title h1 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--sa-font) !important;
+  font-size: 2rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
 }
-
 #custom-welcome-title p {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--sa-font) !important;
+  font-weight: 400 !important;
+  color: var(--sa-ink-2) !important;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ── Suggestion / starter pills ────────────────────────────────────────────
+   Gavin's `.sug`: quiet outlined pills that warm on hover. Chainlit renders
+   each starter inside `.starter`. */
+.starter button,
+button.starter,
+[class*="starter"] button {
+  border-radius: 9px !important;
+  border: 1px solid var(--sa-edge-2) !important;
+  background: transparent !important;
+  transition: background 0.14s, color 0.14s, border-color 0.14s !important;
+}
+.starter button:hover,
+button.starter:hover,
+[class*="starter"] button:hover {
+  background: var(--sa-bubble) !important;
+  border-color: var(--sa-edge-2) !important;
+  color: var(--sa-ink) !important;
+}
+
+/* ── Messages ──────────────────────────────────────────────────────────────
+   Gavin: assistant text is plain on the ground (no card), roomy line-height;
+   the USER turn is a right-aligned rounded bubble (#2a2a2a, 18/18/4/18). */
+.message-content {
+  font-size: 15px;
+  line-height: 1.75;
+}
+.message-content p { line-height: 1.75; }
+
+/* User message bubble. Chainlit marks the user turn; we target the user
+   step/message wrapper and pill its content. Defensive: multiple hooks. */
+.step[data-step-type="user_message"] .message-content,
+[data-step-type="user_message"] .message-content,
+.user-message .message-content {
+  display: inline-block;
+  max-width: 78%;
+  margin-left: auto;          /* right-align the bubble */
+  background: var(--sa-bubble);
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 16px;
+  color: var(--sa-ink);
+}
+/* Right-align the user row container so the bubble sits on the right. */
+.step[data-step-type="user_message"],
+[data-step-type="user_message"] {
+  text-align: right;
+}
+.step[data-step-type="user_message"] .message-content {
+  text-align: left;           /* keep the text itself left-aligned in-bubble */
+}
+
+/* ── Verdict callout + flag headings ───────────────────────────────────────
+   elements.py renders the verdict/flags as markdown `### …` blocks. Give the
+   roundtable/synthesis/flag H3s Gavin's accent treatment so the decisive
+   content reads as a callout, not just a heading. */
+.message-content h2,
+.message-content h3 {
+  letter-spacing: 0.01em;
+}
+/* The synthesis + roundtable section heads get a subtle blue left rule. */
+.message-content h2 {
+  border-left: 3px solid var(--sa-blue);
+  padding-left: 12px;
+  margin-left: -2px;
+}
+
+/* Markdown blockquotes (used for asides) → Gavin's tinted callout. */
+.message-content blockquote {
+  background: var(--sa-blue-bg);
+  border-left: 3px solid var(--sa-blue) !important;
+  border-radius: var(--sa-r-sm);
+  padding: 10px 16px;
+  color: var(--sa-ink-2);
+}
+
+/* ── Provenance / tier chips — inline `code` ───────────────────────────────
+   The dossier + verdicts lean on inline code for `T1`, provenance, stances.
+   Gavin styles these as compact mono chips. */
+.message-content code {
+  font-family: var(--sa-mono) !important;
+  font-size: 0.82em !important;
+  padding: 2px 7px !important;
+  border-radius: var(--sa-r-sm) !important;
+  background: var(--sa-bubble) !important;
+  color: var(--sa-ink) !important;
+  border: 1px solid var(--sa-edge) !important;
+}
+
+/* ── Dataframe tables (roster + dossier) ───────────────────────────────────
+   Quiet, Gavin-flat tables: surface header, hairline rows, mono-ish cells. */
+.message-content table,
+[class*="Dataframe"] table,
+[class*="dataframe"] table {
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.message-content th,
+[class*="Dataframe"] th {
+  background: var(--sa-surface) !important;
+  color: var(--sa-ink-2) !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 10.5px !important;
+  border-bottom: 1px solid var(--sa-edge-2) !important;
+}
+.message-content td,
+[class*="Dataframe"] td {
+  border-bottom: 1px solid var(--sa-edge) !important;
+}
+
+/* ── Chain-of-Thought step tree ────────────────────────────────────────────
+   Gavin's right-panel trace: numbered, hairline-separated, mono index, muted
+   text. Chainlit renders the CoT as nested steps; style the step rows to read
+   like that trace (vertical rhythm + a faint accent on the running step). */
+[data-step-type="tool"],
+[data-step-type="run"] {
+  border-left: 2px solid var(--sa-edge) !important;
+  padding-left: 12px;
+  margin-left: 2px;
+}
+/* The step header/label — mono-tinted, calm. */
+[data-step-type] [class*="step"] summary,
+[data-step-type] summary {
+  color: var(--sa-ink-2);
+}
+/* Nested child steps (per-agent/persona) get a lighter rule so the tree reads. */
+[data-step-type] [data-step-type] {
+  border-left-color: var(--sa-edge) !important;
+}
+
+/* ── Input bar — Claude/ChatGPT-style rounded surface ──────────────────────
+   Gavin's `.input-wrap`: a single rounded surface with the textarea + a solid
+   blue send affordance; border warms blue on focus. Chainlit wraps the
+   composer; we round the surface and accent the focus + send button. */
+.chat-input,
+#chat-input,
+.edit-chat-input {
+  font-family: var(--sa-font) !important;
+  font-size: 15px !important;
+}
+/* The composer container (round it like the mock). Chainlit's input shell is
+   the nearest themed surface; round + hairline it. */
+form:has(.chat-input),
+div:has(> .chat-input),
+[class*="input"]:has(textarea) {
+  border-radius: 14px !important;
+}
+/* Focus ring → Gavin's blue-tinted border. */
+div:has(> .chat-input):focus-within,
+[class*="input"]:has(textarea):focus-within {
+  border-color: rgba(77, 124, 254, 0.30) !important;
+}
+/* Send button → solid sapphire (driven by --primary in theme.json; reinforce
+   the rounded square + active press from the mock). */
+#chat-submit,
+button[type="submit"]:has(svg),
+.chat-input ~ button {
+  border-radius: 9px !important;
+  transition: opacity 0.14s, transform 0.1s !important;
+}
+#chat-submit:active,
+button[type="submit"]:active { transform: scale(0.96); }
+
+/* ── Brand wordmark in the header ──────────────────────────────────────────
+   Gavin's nav has a quiet centered "Sapphire" wordmark. Tighten the header
+   logo/title so it reads as a brand line, not chrome. */
+header img[src*="logo"] { height: 22px; width: auto; }
+
+/* ── Animations ────────────────────────────────────────────────────────── */
+@keyframes sa-fadeup {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {            /* kept: referenced by the injected title path */
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #custom-welcome-title { animation: none; }
 }

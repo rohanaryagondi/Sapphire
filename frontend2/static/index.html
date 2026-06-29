@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sapphire</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpolygon points='16,2 30,12 25,30 7,30 2,12' fill='%23a07cff'/%3E%3Cpolygon points='16,2 30,12 16,14 2,12' fill='white' opacity='.28'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── NAV ───────────────────────────────────────────────────── -->
+  <header class="nav">
+    <div class="nav-group">
+      <button class="toggle-btn" id="leftToggle" aria-pressed="true" aria-label="Toggle the Agents wing">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+          <rect x="8" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+        </svg>
+        Agents
+      </button>
+    </div>
+
+    <a class="brand" href="#" title="Sapphire — CNS decision firm">
+      <svg class="brand-mark" width="17" height="17" viewBox="0 0 32 32" aria-hidden="true">
+        <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
+        <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+      </svg>
+      Sapphire
+    </a>
+
+    <div class="nav-group right">
+      <select id="model" class="profile-select" aria-label="Model for this run" title="Model override (Default: uses the model your subscription provides)">
+        <option value="">Default (subscription)</option>
+        <option value="sonnet">Sonnet</option>
+        <option value="haiku">Haiku</option>
+      </select>
+      <select id="profile" class="profile-select" aria-label="Run profile" title="Run profile">
+        <option value="simulate" selected>Live · simulated models</option>
+        <option value="demo">Demo · mock backends</option>
+        <option value="live">Live · real models</option>
+        <option value="replay">Replay · captured TSC2 ($0)</option>
+      </select>
+      <span id="modelBadge" style="display:none;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:0 4px;" aria-live="polite"></span>
+      <div class="live-badge" id="liveBadge"><span class="live-dot"></span><span id="liveLabel">Live</span></div>
+      <button class="toggle-btn" id="rightToggle" aria-pressed="true" aria-label="Toggle the Sources &amp; Trace panel">
+        Sources
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
+          <rect x="1" y="1.5" width="6" height="12" rx="1.2" fill="currentColor" opacity="0.3"/>
+          <rect x="9" y="1.5" width="5" height="12" rx="1.2" fill="currentColor"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── WORKSPACE (3-pane) ───────────────────────────────────── -->
+  <div class="workspace">
+
+    <!-- LEFT PANE — the AGENT WING: categorized, expandable per-subagent cards -->
+    <aside class="panel left open" id="leftPanel" role="complementary" aria-label="Agents">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <span>Agents</span>
+          <span class="head-sub" id="wingMeta">the firm</span>
+        </div>
+        <div class="panel-scroll" id="agentTree">
+          <div class="hint">The wing fills as the firm convenes — categories of fact agents and the
+            roundtable partners. Each card shows its live status, what it did, and its sources.
+            Click a <span class="finding-inline">cited finding</span> in the answer to jump to the
+            agent that surfaced it.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER — the conversation: question → synthesis (attributed findings) → the spread -->
+    <main class="chat-col" id="chatCol">
+      <div class="thread" id="thread">
+        <div class="thread-inner" id="threadInner">
+
+          <div class="empty" id="emptyState">
+            <svg class="empty-mark" width="42" height="42" viewBox="0 0 32 32" aria-hidden="true">
+              <polygon points="16,2 30,12 25,30 7,30 2,12" fill="#a07cff"/>
+              <polygon points="16,2 30,12 16,14 2,12" fill="white" opacity=".28"/>
+            </svg>
+            <div class="empty-heading">Ask Sapphire</div>
+            <div class="empty-sub">CNS drug discovery, cited and deliberated. The firm gathers a cited
+              fact dossier, convenes a persona roundtable, and surfaces the spread — never a forced consensus.</div>
+          </div>
+
+          <div class="msg-list" id="msgList" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- INPUT BAR -->
+      <div class="inputbar">
+        <div class="inputbar-inner">
+          <div class="suggestions" id="suggestions">
+            <button class="sug" data-q="Is TSC2 a viable target in tuberous sclerosis?">TSC2 in tuberous sclerosis</button>
+            <button class="sug" data-q="Nav1.8 pain targets — worth prioritizing?">Nav1.8 pain targets</button>
+            <button class="sug" data-q="Is RHEB fundable for TSC?">RHEB fundable for TSC?</button>
+            <button class="sug" data-q="Is navacaprant a fundable CNS candidate for treatment-resistant depression?">Navacaprant TRD</button>
+          </div>
+          <div class="input-wrap">
+            <textarea class="chat-input" id="chatInput" rows="1"
+              placeholder="Ask a deliberative CNS question — a target, a go/no-go, a regulatory or payer read…"></textarea>
+            <button class="send" id="sendBtn" aria-label="Send">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M8 13V3M4 7L8 3L12 7" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="legend" id="legend">
+            <span class="lg"><span class="dot real"></span>● REAL</span>
+            <span class="lg"><span class="dot sim"></span>🧪 simulated</span>
+            <span class="lg"><span class="dot cap"></span>◆ CAPTURED</span>
+            <span class="lg sep">tier · provenance · plane on every fact · ⚠ abstentions never a false ✓</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANE — SOURCES & TRACE: evidence rows (the dossier) + the live trace -->
+    <aside class="panel right open" id="rightPanel" role="complementary" aria-label="Sources and Trace">
+      <div class="panel-inner">
+        <div class="panel-head">
+          <span>Sources &amp; Trace</span>
+          <span class="head-sub" id="traceStatus">idle</span>
+        </div>
+        <div class="panel-scroll" id="rightScroll">
+
+          <!-- EVIDENCE — every dossier fact, grouped by data plane -->
+          <div class="src-section">Evidence
+            <span class="src-section-meta" id="evidenceMeta"></span>
+          </div>
+          <div id="evidenceBody">
+            <div class="hint">Cited facts land here as the dossier fills — each with its tier,
+              provenance and data plane (🔒 internal moat · 🌐 external).</div>
+          </div>
+
+          <!-- TRACE — the live step-tree, streamed from the SSE progress events -->
+          <div class="src-section" style="margin-top:6px">Live Trace
+            <span class="src-section-meta" id="traceMeta"></span>
+          </div>
+          <div class="trace-tree" id="traceTree">
+            <div class="hint">The trace streams here live — plan → each agent (status · provenance ·
+              timing) → flags → personas → synthesis.</div>
+          </div>
+
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

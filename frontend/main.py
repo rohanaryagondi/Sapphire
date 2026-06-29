@@ -32,8 +32,21 @@ from starters import STARTERS  # noqa: E402
 DEMO_PROFILE = "Demo (mock backends)"
 LIVE_PROFILE = "Live (real firm)"
 CHEAP_PROFILE = "Live (cheap · haiku)"
+SIMULATE_PROFILE = "Live (demo · simulated models)"
 REPLAY_PROFILE = "Replay (captured TSC2 · $0)"
 REPLAY_SCENARIO = "tsc2_live_run"
+# Session-bridge capture: a frozen REAL run_live whose EMET came from the in-session capture path
+# (the front end's real-EMET path) — the captured envelope (9 real TSC2 PMIDs, chat c4a1031a)
+# injected via make_session_emet_handler. Real moat + 9 real EMET PMIDs + the spread, frozen.
+REPLAY_SESSION_PROFILE = "Replay (TSC2 · session-bridge EMET · $0)"
+REPLAY_SESSION_SCENARIO = "tsc2_emet_session"
+
+# 🧪 simulated-models banner — shown on every simulated run so the labeling is unmistakable.
+SIMULATE_BANNER = (
+    "🧪 **Simulated-models run.** Real **moat**, **EMET PMIDs**, **seams** and **Q-Models** — but the "
+    "**roundtable verdicts + any claude fact-agent reasoning are SIMULATED** (labeled `🧪 simulated`, "
+    "provenance `simulated`), not real model output. For a fast demo while real reasoning is wired in."
+)
 
 # The cheap-live model: real backends (moat/EMET/seams/corpora), but every claude agent
 # (Bucket-1 fact agents + Bucket-2 personas) runs on haiku so a real run doesn't burn
@@ -71,12 +84,30 @@ async def chat_profiles(current_user=None):
                                   "cheaper. Needs the `claude` CLI + a logged-in EMET session."),
         ),
         cl.ChatProfile(
+            name=SIMULATE_PROFILE,
+            markdown_description=("**Fast demo — real facts, 🧪 simulated reasoning.** Real moat · "
+                                  "real EMET PMIDs (logged-in) · real seams/Q-Models, but the "
+                                  "**roundtable verdicts + claude fact-agents are SIMULATED** "
+                                  "(clearly labeled `🧪 simulated`) so the run is fast while real "
+                                  "`claude -p` reasoning is wired in. Honest: simulated ≠ real verdict."),
+        ),
+        cl.ChatProfile(
             name=REPLAY_PROFILE,
             markdown_description=("**Captured TSC2 run — $0 instant replay.** A frozen REAL "
                                   "engagement (real Quiver moat · 8 real EMET PMIDs · the live "
                                   "persona spread · real DIVERGENCEs), captured once and replayed "
                                   "deterministically — no model, no network. Provenance/tiers/flags "
                                   "verbatim. ⚠ Contains internal moat data — internal demo only."),
+        ),
+        cl.ChatProfile(
+            name=REPLAY_SESSION_PROFILE,
+            markdown_description=("**Captured TSC2 run via the session-bridge — $0 instant replay.** "
+                                  "A frozen REAL engagement whose EMET came from the front end's "
+                                  "real-EMET path (the in-session capture): real Quiver moat · **9 "
+                                  "real EMET PMIDs** (driven live in the authenticated BenchSci "
+                                  "session, chat c4a1031a, injected via the session-bridge) · the "
+                                  "persona spread. Replayed deterministically — no model, no network. "
+                                  "⚠ Contains internal moat data — internal demo only."),
         ),
     ]
 
@@ -103,6 +134,9 @@ def _profile_run_kwargs(profile: str) -> dict:
         return {"mock": False, "model": None}
     if profile == CHEAP_PROFILE:
         return {"mock": False, "model": CHEAP_MODEL}
+    if profile == SIMULATE_PROFILE:
+        # Real backends (moat/EMET/seams), but claude-subagent reasoning is 🧪 simulated (fast).
+        return {"mock": False, "model": CHEAP_MODEL, "simulate": True}
     return {"mock": True, "model": None}
 
 
@@ -192,14 +226,21 @@ async def on_message(message: cl.Message):
         await cl.Message(content="_Please enter a question._").send()
         return
 
-    if profile == REPLAY_PROFILE:
+    if profile in (REPLAY_PROFILE, REPLAY_SESSION_PROFILE):
         # $0 deterministic replay of a frozen REAL capture — no model, no network, no live steps.
+        scenario = (REPLAY_SESSION_SCENARIO if profile == REPLAY_SESSION_PROFILE
+                    else REPLAY_SCENARIO)
         async with cl.Step(name="Replaying captured TSC2 run…", type="run") as step:
-            result = await cl.make_async(bridge.replay)(REPLAY_SCENARIO)
-            step.output = f"via=replay · captured {result.get('_captured_at', '')} · $0 (frozen real run)"
+            result = await cl.make_async(bridge.replay)(scenario)
+            via = "session-bridge EMET" if profile == REPLAY_SESSION_PROFILE else "replay"
+            step.output = (f"via={via} · scenario={scenario} · captured "
+                           f"{result.get('_captured_at', '')} · $0 (frozen real run)")
         await _render_final(result)
         return
 
-    # Live / Cheap / Demo: stream the firm convening as a live step tree, then the rich final view.
+    # Live / Cheap / Demo / Simulated: stream the firm convening as a live step tree, then the
+    # rich final view. A simulated run shows the 🧪 banner up-front so the labeling is unmistakable.
+    if profile == SIMULATE_PROFILE:
+        await cl.Message(content=SIMULATE_BANNER).send()
     result = await _run_with_live_steps(query, _profile_run_kwargs(profile))
     await _render_final(result)

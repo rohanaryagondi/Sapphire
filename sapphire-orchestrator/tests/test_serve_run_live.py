@@ -10,6 +10,7 @@ Run from sapphire-orchestrator/:
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
@@ -32,7 +33,8 @@ def _fake_run_live_result() -> dict:
     return {
         "query": "Is TSC2 a viable CNS target?",
         "plan": {"deliverable": "diligence", "disease": "tuberous sclerosis",
-                 "modality": "small molecule", "agents": [], "panel": []},
+                 "modality": "small molecule", "agents": [], "panel": [],
+                 "class": "diligence"},
         "priors": [],
         "discover": {
             "dossier": [{"value": "TSC2 loss activates mTOR", "source": "PMID:1",
@@ -41,8 +43,13 @@ def _fake_run_live_result() -> dict:
             "status": "complete",
             "agents": [{"id": "emet-runner", "status": "ok", "provenance": "emet-live"}],
         },
-        "consult": {"round1": [{"persona": "KOL", "stance": "conditional",
-                                "provenance": "persona-judgment", "status": "ok"}]},
+        "consult": {
+            "round1": [{"persona": "KOL", "stance": "conditional",
+                        "provenance": "persona-judgment", "status": "ok"}],
+            "round2": [],
+            "spread": {"conviction_range": "3-3 / 5", "stance_mix": {"conditional": 1},
+                       "moved_in_round2": [], "convergent_gate": ""},
+        },
         "synthesize": {"recommendation": "Conditional advance", "confidence": "medium",
                        "proposed_experiment": "Run orthogonal validation.", "entities": {}},
         "engagement_id": "eng_test",
@@ -121,6 +128,111 @@ class TestRealRunLiveConformsToContract(unittest.TestCase):
             "Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
         errs = validate_run_live(result)
         self.assertEqual(errs, [], f"run_live output drifted from its contract: {errs}")
+
+
+class TestMoatStatus(unittest.TestCase):
+    """B-7: _moat_status() reports honest real/mock status from MoatClient.available()."""
+
+    def test_returns_real_when_available(self):
+        with mock.patch("moat.client.MoatClient") as MockCls:
+            MockCls.return_value.available.return_value = True
+            status = serve._moat_status()
+        self.assertEqual(status, "real")
+
+    def test_returns_mock_when_unavailable(self):
+        with mock.patch("moat.client.MoatClient") as MockCls:
+            MockCls.return_value.available.return_value = False
+            status = serve._moat_status()
+        self.assertEqual(status, "mock")
+
+    def test_returns_mock_on_import_error(self):
+        """Any exception (including missing DB, import error) must degrade to mock."""
+        with mock.patch("moat.client.MoatClient", side_effect=Exception("DB gone")):
+            status = serve._moat_status()
+        self.assertEqual(status, "mock")
+
+
+class TestChatFreshEngagement(unittest.TestCase):
+    """B-5: POST /api/chat with a fresh query dispatches to _run_engine_live (via=engine-live).
+
+    Before this change the handler checked DISEASE_TO_SCENARIO first and would return
+    via='engine' (canned) for known-disease queries, and fall back to _run_live (claude -p)
+    for novel ones. After B-5 it unconditionally calls _run_engine_live.
+    """
+
+    def _post_chat(self, port: int, msg: str) -> tuple:
+        import http.client
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=10)
+        body = json.dumps({"message": msg}).encode("utf-8")
+        conn.request("POST", "/api/chat", body=body,
+                     headers={"Content-Type": "application/json",
+                              "Content-Length": str(len(body))})
+        resp = conn.getresponse()
+        return resp.status, json.loads(resp.read())
+
+    def _start_server(self):
+        from http.server import ThreadingHTTPServer
+        import threading
+        srv = ThreadingHTTPServer(("127.0.0.1", 0), serve.Handler)
+        port = srv.server_address[1]
+        t = threading.Thread(target=srv.serve_forever)
+        t.daemon = True
+        t.start()
+        return srv, port
+
+    def test_fresh_query_returns_engine_live(self):
+        """A fresh engagement POST (no prior dossier) returns kind=run, via=engine-live."""
+        fake = _fake_run_live_result()
+        with mock.patch.object(serve.live_engine, "run_live", return_value=fake) as m:
+            srv, port = self._start_server()
+            try:
+                status, data = self._post_chat(
+                    port, "Is TSC2 a viable target in tuberous sclerosis?")
+            finally:
+                srv.shutdown()
+
+        self.assertEqual(status, 200)
+        self.assertEqual(data["kind"], "run")
+        self.assertEqual(data["via"], "engine-live",
+                         "fresh /api/chat must use engine-live, not canned or claude-subscription")
+        self.assertTrue(data["live"])
+        m.assert_called_once()
+        # The run_live result flows through inside 'run'.
+        self.assertIn("discover", data["run"])
+
+    def test_canned_not_used_for_fresh_chat(self):
+        """Even if the query maps to a known disease (e.g. Dravet), the live firm is used.
+
+        Before B-5 this would have returned via='engine' (canned path). After B-5 it must
+        return via='engine-live'.
+        """
+        fake = _fake_run_live_result()
+        with mock.patch.object(serve.live_engine, "run_live", return_value=fake):
+            srv, port = self._start_server()
+            try:
+                _, data = self._post_chat(port, "Prioritize my Dravet syndrome targets")
+            finally:
+                srv.shutdown()
+        self.assertNotEqual(data.get("via"), "engine",
+                            "via='engine' (canned) must no longer appear for fresh /api/chat")
+        self.assertEqual(data.get("via"), "engine-live")
+
+    def test_engine_live_error_still_returns_run_envelope(self):
+        """If _run_engine_live degrades (run_live raises), the response is still kind=run."""
+        with mock.patch.object(serve.live_engine, "run_live",
+                               side_effect=RuntimeError("backend gone")):
+            srv, port = self._start_server()
+            try:
+                status, data = self._post_chat(
+                    port, "Is SCN11A a viable target?")
+            finally:
+                srv.shutdown()
+        self.assertEqual(status, 200)
+        self.assertEqual(data["kind"], "run")
+        # Degraded: via=plan, live=False, note present.
+        self.assertEqual(data["via"], "plan")
+        self.assertFalse(data["live"])
+        self.assertIn("note", data["run"])
 
 
 if __name__ == "__main__":
