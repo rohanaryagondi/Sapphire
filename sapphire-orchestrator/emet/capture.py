@@ -313,13 +313,21 @@ def parse_emet_html(html: str, *, candidate: str, query: str = "",
 # Live driver (Playwright imported lazily — keeps this module's import cheap)
 # --------------------------------------------------------------------------------------
 def _profile_has_session(profile_dir) -> bool:
-    """True when profile_dir exists and is non-empty (has been used before).
-    A missing or empty directory means the user has not yet run `python -m emet.login`.
-    Returns False → honest abstain before launching a browser."""
+    """True when profile_dir contains a Chromium Cookies file.
+
+    Playwright (and Chromium) only write `Default/Cookies` after a real authenticated
+    session, NOT on a bare `launch_persistent_context` launch that was interrupted before
+    the user completed login.  A non-empty dir check would false-positive on a partial
+    (interrupted) login attempt, causing a slow (~30-45s) headless launch that ends with
+    honest abstain at the `_on_login_page` gate anyway.
+
+    Returns False for:
+    - None / missing directory
+    - directory created by an interrupted `python -m emet.login` (no `Default/Cookies` yet)
+    → honest abstain before launching a browser."""
     if not profile_dir:
         return False
-    p = Path(profile_dir)
-    return p.is_dir() and any(True for _ in p.iterdir())
+    return (Path(profile_dir) / "Default" / "Cookies").is_file()
 
 
 def _on_login_page(url: str) -> bool:

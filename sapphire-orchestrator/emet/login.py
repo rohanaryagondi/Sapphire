@@ -21,7 +21,10 @@ DEFAULT_PROFILE = ROOT / "RohanOnly" / "benchsci_profile"
 
 _DEFAULT_URL = "https://emet.benchsci.com/"
 
-# URL fragments that indicate an SSO/login gate rather than the authenticated app.
+# Fragments that mark a URL as an SSO/login redirect rather than authenticated BenchSci.
+# Intentionally NARROWER than capture.py's _LOGIN_HOSTS (which guards the live scrape
+# driver against being fooled by content as well as URLs).  Here the only question is
+# "did the browser land on an authenticated BenchSci page?" — URL-only, no content check.
 _LOGIN_FRAGMENTS = (
     "id.summit.benchsci.com",
     "accounts.google.com",
@@ -62,6 +65,11 @@ def _launch_and_wait(profile: Path, url: str) -> int:
 
     profile.mkdir(parents=True, exist_ok=True)
 
+    # `authenticated` is set to True the moment the URL check passes — BEFORE the
+    # 2-second cookie-flush wait and BEFORE ctx.close().  This ensures that an exception
+    # raised during the flush (e.g. the user closes the window) cannot mislabel a
+    # successful session persist as "Session NOT persisted".
+    authenticated = False
     try:
         with sync_playwright() as pw:
             ctx = pw.chromium.launch_persistent_context(
@@ -74,30 +82,37 @@ def _launch_and_wait(profile: Path, url: str) -> int:
 
                 # Poll until authenticated.
                 while True:
-                    current_url = page.url
-                    if _is_authenticated_url(current_url):
-                        print(f"Session persisted to: {profile}")
+                    if _is_authenticated_url(page.url):
+                        authenticated = True
+                        print(f"Session persisted to: {profile}", flush=True)
                         # Sleep briefly to ensure cookies flush before closing.
                         page.wait_for_timeout(2000)
-                        ctx.close()
-                        return 0
+                        break
                     print("Waiting for BenchSci login...", flush=True)
                     page.wait_for_timeout(1500)
             except Exception:
-                # Browser was closed by the user before auth completed.
-                ctx.close()
-                print(
-                    "Browser closed before authentication was detected. "
-                    "Session NOT persisted.",
-                    file=sys.stderr,
-                )
-                return 2
+                # Browser closed or page op failed (before or after auth detection).
+                # `authenticated` flag records the truth; ctx.close() runs in finally.
+                pass
+            finally:
+                try:
+                    ctx.close()
+                except Exception:
+                    pass
     except KeyboardInterrupt:
         print(
             "\nInterrupted before authentication. Session NOT persisted.",
             file=sys.stderr,
         )
         return 2
+
+    if authenticated:
+        return 0
+    print(
+        "Browser closed before authentication was detected. Session NOT persisted.",
+        file=sys.stderr,
+    )
+    return 2
 
 
 def main(argv=None) -> int:
