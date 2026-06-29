@@ -198,8 +198,10 @@ class TestExtractSalientEntities(unittest.TestCase):
             {"value": "TSC1 expressed in neurons", "tier": "T1", "_source_agent": "emet"},
         ]
         result = extract_salient_entities(facts, already_covered=set())
-        if len(result) >= 2:
-            self.assertGreaterEqual(result[0]["salience"], result[1]["salience"])
+        # Both entities must appear (TSC2 salience=4, TSC1 salience=2 — both ≥ threshold).
+        self.assertEqual(len(result), 2, f"Expected exactly 2 entities; got {result}")
+        # Must be sorted descending — TSC2 first (salience 4 > TSC1 salience 2).
+        self.assertGreaterEqual(result[0]["salience"], result[1]["salience"])
 
     # ── (12) gene tokens in already_covered are excluded ────────────────────
     def test_covered_gene_excluded(self):
@@ -398,12 +400,19 @@ class TestConvergenceLoop(unittest.TestCase):
         except Exception as e:
             self.fail(f"adaptive loop raised instead of terminating: {e}")
 
-        # The loop must terminate; total moat calls <= 1 (initial) + _MAX_ADAPTIVE_DISPATCHES.
-        # Each redispatch of internal-science-lead counts as 1 dispatch.
+        # Upper bound on moat (internal-science-lead) calls:
+        #   1 initial Bucket-1 call
+        # + at most ceil(_MAX_ADAPTIVE_DISPATCHES / len(REDISPATCH_TARGETS)) adaptive calls
+        #   because moat is FIRST in REDISPATCH_TARGETS, so it fires before budget hits 0
+        #   for each new entity; each full-entity pass consumes len(REDISPATCH_TARGETS)=4
+        #   budget slots, so at most ceil(6/4)=2 entities get their moat dispatch.
+        # = 1 + ceil(6/4) = 1 + 2 = 3
+        import math as _math
+        _expected_max = 1 + _math.ceil(_MAX_ADAPTIVE_DISPATCHES / len(REDISPATCH_TARGETS))
         self.assertLessEqual(
             call_counts["n"],
-            1 + _MAX_ADAPTIVE_DISPATCHES,
-            f"Moat called {call_counts['n']} times — budget cap not respected"
+            _expected_max,
+            f"Moat called {call_counts['n']} times — budget cap not respected (max={_expected_max})"
         )
 
     # ── (8) visited pair never dispatched twice ──────────────────────────────
@@ -440,6 +449,159 @@ class TestConvergenceLoop(unittest.TestCase):
                 f"(entity={pair[1]}, agent={pair[0]}) dispatched more than once"
             )
             seen_pairs.add(pair)
+
+    # ── (8b) re-dispatched agents appear in discover["agents"] ──────────────
+    def test_redispatched_agents_appear_in_discover_agents_adaptive_true(self):
+        """
+        Fix #1 (auditability): when adaptive=True and a new entity is re-dispatched,
+        every re-dispatched agent must appear in discover["agents"] (phase="redispatch").
+        The initial Bucket-1 agents also appear (phase absent / no redispatch_round).
+        """
+        def _gnomad_fn(inputs):
+            return {
+                "candidate": inputs.get("candidate", ""),
+                "facts": [{"value": "TSC1 constraint documented in gnomAD", "tier": "T1", "source": "gnomAD"}],
+                "provenance": "gnomad",
+            }
+
+        ctx = _build_ctx()
+        ctx["python_fns"]["gnomad-constraint"] = _gnomad_fn
+
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=ctx,
+            adaptive=True,
+        )
+
+        agents = result["discover"]["agents"]
+        agent_ids = [a["id"] for a in agents]
+        redispatch_entries = [a for a in agents if a.get("phase") == "redispatch"]
+
+        # At least one redispatch entry must be present (TSC1 surfaced → REDISPATCH_TARGETS fire).
+        self.assertTrue(
+            len(redispatch_entries) >= 1,
+            f"Expected >=1 redispatch entries in discover['agents']; got: {agents}"
+        )
+
+        # Every redispatch entry must carry the required keys.
+        for entry in redispatch_entries:
+            self.assertIn("redispatch_round", entry, f"Missing redispatch_round: {entry}")
+            self.assertIn("trigger_entity", entry, f"Missing trigger_entity: {entry}")
+            self.assertIn("id", entry, f"Missing id: {entry}")
+            self.assertIn("status", entry, f"Missing status: {entry}")
+
+        # The redispatched target agents must be from REDISPATCH_TARGETS.
+        redispatch_ids = {e["id"] for e in redispatch_entries}
+        for rid in redispatch_ids:
+            self.assertIn(rid, REDISPATCH_TARGETS,
+                          f"Redispatch entry id '{rid}' not in REDISPATCH_TARGETS")
+
+    # ── (8c) adaptive=False — no redispatch entries in discover["agents"] ───
+    def test_no_redispatch_entries_in_discover_agents_adaptive_false(self):
+        """adaptive=False must NOT add any redispatch entries to discover["agents"]."""
+        result = run_live(
+            "Is TSC2 a viable target in tuberous sclerosis?",
+            ctx=_build_ctx(),
+            adaptive=False,
+        )
+        redispatch_entries = [
+            a for a in result["discover"]["agents"]
+            if a.get("phase") == "redispatch"
+        ]
+        self.assertEqual(
+            redispatch_entries, [],
+            f"Expected no redispatch entries in discover['agents'] for adaptive=False; got: {redispatch_entries}"
+        )
+
+    # ── (8d) round 2 fires with generous budget — proves _MAX_ADAPTIVE_ROUNDS ─
+    def test_adaptive_round2_fires_with_generous_budget(self):
+        """
+        Fix #2: proves _MAX_ADAPTIVE_ROUNDS=2 is the cap when budget is generous.
+
+        Setup:
+          - initial internal-science-lead returns T1 fact mentioning SCN2A
+            → SCN2A surfaces in round 1 (salience +1 base +1 T1 = 2)
+          - gnomad-constraint redispatch for SCN2A returns T1 fact mentioning FAK1A
+            → FAK1A surfaces in round 2 (salience +1 base +1 T1 = 2)
+          - All other calls return empty facts
+          - Budget patched to 20 — round cap _MAX_ADAPTIVE_ROUNDS=2 is the limiter
+
+        Assert:
+          - Redispatch trace events exist for BOTH round 1 and round 2
+          - Max round number = _MAX_ADAPTIVE_ROUNDS (round cap fired, not budget)
+          - Total dispatches < 20 (budget was NOT the limiter)
+
+        This test would FAIL if the outer range were range(1, 99) because round 3
+        would try to fire (FAK1A redispatch might surface another entity).
+        It also proves the round cap terminates regardless of budget.
+        """
+        def _moat_fn(inputs):
+            cand = inputs.get("candidate", "")
+            if cand == "TSC2":
+                return {
+                    "candidate": cand,
+                    "facts": [{"value": "SCN2A is a co-modifier in this pathway", "tier": "T1", "source": "moat"}],
+                    "provenance": "moat-real",
+                }
+            return {"candidate": cand, "facts": [], "provenance": "moat-real"}
+
+        def _gnomad_fn(inputs):
+            cand = inputs.get("candidate", "")
+            if cand == "SCN2A":
+                return {
+                    "candidate": cand,
+                    "facts": [{"value": "FAK1A co-occurs with SCN2A in constraint data", "tier": "T1", "source": "gnomAD"}],
+                    "provenance": "gnomad",
+                }
+            return {"candidate": cand, "facts": [], "provenance": "gnomad"}
+
+        ctx = _build_ctx()
+        ctx["python_fns"]["internal-science-lead"] = _moat_fn
+        ctx["python_fns"]["gnomad-constraint"] = _gnomad_fn
+
+        import unittest.mock as mock_mod
+
+        with mock_mod.patch("live_engine._MAX_ADAPTIVE_DISPATCHES", 20):
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=ctx,
+                adaptive=True,
+            )
+
+        eid = result["engagement_id"]
+        trace_path = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_path), "trace file not found")
+
+        redispatch_events = []
+        with open(trace_path, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if line:
+                    try:
+                        row = json.loads(line)
+                        if row.get("type") == "redispatch":
+                            redispatch_events.append(row)
+                    except json.JSONDecodeError:
+                        pass
+
+        rounds_fired = {ev["round"] for ev in redispatch_events}
+        total_dispatches = sum(len(ev.get("target_agents", [])) for ev in redispatch_events)
+
+        # Round 2 must have fired (FAK1A surfaced from round-1 gnomad→SCN2A redispatch).
+        self.assertIn(2, rounds_fired,
+                      f"Expected round 2 to fire; rounds: {rounds_fired}; events: {redispatch_events}")
+
+        # No round beyond _MAX_ADAPTIVE_ROUNDS (the cap terminates iteration).
+        self.assertEqual(
+            max(rounds_fired), _MAX_ADAPTIVE_ROUNDS,
+            f"Expected max round = {_MAX_ADAPTIVE_ROUNDS}; got max={max(rounds_fired)}"
+        )
+
+        # Budget was NOT the limiter (dispatches << 20).
+        self.assertLess(
+            total_dispatches, 20,
+            f"Total dispatches {total_dispatches} >= patched budget 20; budget was the limiter, not round cap"
+        )
 
     # ── (9) adaptive=False — no extra keys in result ─────────────────────────
     def test_adaptive_false_no_extra_top_level_keys(self):

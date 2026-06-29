@@ -977,6 +977,19 @@ def run_live(
                     _target_agents_fired.append(_target_id)
                     _any_dispatched_this_round = True
 
+                    # Fix #1 (auditability): append this redispatch to agent_statuses
+                    # so re-dispatched agents appear in discover["agents"].  The
+                    # "phase"/"redispatch_round"/"trigger_entity" keys distinguish these
+                    # entries from the initial Bucket-1 pass for monitoring consumers.
+                    agent_statuses.append({
+                        "id": _target_id,
+                        "status": _rd_res.status,
+                        "provenance": _rd_res.provenance,
+                        "phase": "redispatch",
+                        "redispatch_round": _rnd,
+                        "trigger_entity": _entity,
+                    })
+
                     # Fold new facts into all_dossier_facts (+ _annot_facts for
                     # further convergence rounds).  Stamp provenance + plane
                     # exactly like the main Bucket-1 loop.
