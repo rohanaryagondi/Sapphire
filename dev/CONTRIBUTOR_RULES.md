@@ -49,7 +49,7 @@ are unguarded and you will violate the rules below — so don't skip it.
     same commit range for runtime `.py` changes; (b) `agents.json` and its paired
     `architecture/**/*.md` spec are both changed together; (c) a `status/` file is updated for
     state-changing changes; (d) a `WO-<id>` or `plans/<slug>` reference exists for feature-tier
-    changes (also accepted: a `status/WORKBOARD.md` task ref in a `dev/work-orders/` file).
+    changes (also accepted: a changed `dev/work-orders/` file in the commit range).
     *What is reviewer-judged (NOT mechanically enforced)*: accuracy of what the ledger/status
     says. A green doc-check ≠ accurate docs. The reviewer is still responsible for content.
     Currently in **warn mode** (prints but never blocks). Flip to block: `export SAPPHIRE_DOCGATE=block`.

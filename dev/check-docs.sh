@@ -197,6 +197,19 @@ if [[ "$SELFTEST" == "1" ]]; then
   fi
   rm -rf "$_d"
 
+  # 5b. architecture spec changed WITHOUT agents.json → Rule 2 fires (reverse direction)
+  _d="$(mktemp -d)"; _init_repo "$_d"
+  _commit "$_d" "spec only no registry" \
+    "architecture/bucket1/new_agent.md:# spec" \
+    "status/OVERALL.md:updated"
+  _run "$_d"
+  if echo "$_out" | grep -q "architecture/\*\*/\*.md spec changed without a paired harness/agents.json"; then
+    _ok "5b" "arch spec without agents.json → Rule 2 (reverse) fires"
+  else
+    _nok "5b" "arch spec without agents.json → Rule 2 (reverse) fires" "output: $_out"
+  fi
+  rm -rf "$_d"
+
   # 6. state-changing change without status/ → Rule 3 fires
   _d="$(mktemp -d)"; _init_repo "$_d"
   _commit "$_d" "add dispatch no status" \
@@ -241,6 +254,18 @@ if [[ "$SELFTEST" == "1" ]]; then
   fi
   rm -rf "$_d"
 
+  # 9. [trivial] in commit subject → EXEMPT (even with runtime .py)
+  _d="$(mktemp -d)"; _init_repo "$_d"
+  _commit "$_d" "fix typo [trivial]" \
+    "sapphire-orchestrator/harness/dispatch.py:# engine"
+  _run "$_d"
+  if echo "$_out" | grep -q "\[EXEMPT"; then
+    _ok 9 "[trivial] in commit subject → EXEMPT"
+  else
+    _nok 9 "[trivial] in commit subject → EXEMPT" "output: $_out"
+  fi
+  rm -rf "$_d"
+
   printf '\ncheck-docs: self-test: %d passed, %d failed\n' "$_pass" "$_fail"
   [[ "$_fail" -eq 0 ]] && exit 0 || exit 1
 fi
@@ -254,9 +279,14 @@ if [[ "$DRY_RUN" == "1" ]]; then
   echo "check-docs: range → $RANGE"
 fi
 
-# Trivial exemption
+# Trivial exemption — via --tier trivial flag OR [trivial] token in any commit subject
 if [[ "$TRIVIAL" == "1" ]]; then
   echo "check-docs: [EXEMPT trivial]"
+  exit 0
+fi
+_subjects_early="$(git log --format='%s' "$RANGE" 2>/dev/null || true)"
+if echo "$_subjects_early" | grep -qF '[trivial]'; then
+  echo "check-docs: [EXEMPT trivial (commit subject contains [trivial])]"
   exit 0
 fi
 
@@ -269,25 +299,8 @@ if [[ -z "$changed" ]]; then
   exit 0
 fi
 
-# Docs-only detection: every file matches the docs-only pattern, none are runtime .py
-_all_docs=1
-_has_runtime_py_for_docs=0
-while IFS= read -r f; do
-  [[ -z "$f" ]] && continue
-  if ! is_docs_only_path "$f"; then
-    _all_docs=0
-  fi
-  if is_runtime_py "$f"; then
-    _has_runtime_py_for_docs=1
-  fi
-done <<< "$changed"
-
-if [[ "$_all_docs" == "1" && "$_has_runtime_py_for_docs" == "0" ]]; then
-  echo "check-docs: [EXEMPT docs-only]"
-  exit 0
-fi
-
 # ─── pre-compute flags from the changed file list ─────────────────────────────
+# (done before docs-only check so Rule 2 arch-spec trigger can override the exemption)
 
 _runtime_py=0   # any runtime .py changed
 _agents_json=0  # harness/agents.json changed
@@ -296,6 +309,7 @@ _ledger=0       # dev/LEDGER.md changed
 _status=0       # any status/ file changed
 _py_count=0     # total .py files changed
 _work_orders=0  # any dev/work-orders/ file changed
+_all_docs=1     # every changed file is docs-only
 
 while IFS= read -r f; do
   [[ -z "$f" ]] && continue
@@ -306,7 +320,20 @@ while IFS= read -r f; do
   if [[ "$f" =~ ^status/ ]]; then _status=1; fi
   if [[ "$f" == *.py ]]; then _py_count=$((_py_count + 1)); fi
   if [[ "$f" =~ ^dev/work-orders/ ]]; then _work_orders=1; fi
+  if ! is_docs_only_path "$f"; then _all_docs=0; fi
 done <<< "$changed"
+
+# Docs-only exemption: every file matches the docs-only pattern, none are runtime .py,
+# AND the change does NOT trigger a Rule-2 pairing requirement (arch spec without agents.json).
+# Architecture specs LOOK like docs but require registry synchronisation (Rule 2), so a
+# spec-only change is not truly docs-only.
+if [[ "$_all_docs" == "1" && "$_runtime_py" == "0" ]]; then
+  if [[ "$_arch_md" == "0" || "$_agents_json" == "1" ]]; then
+    echo "check-docs: [EXEMPT docs-only]"
+    exit 0
+  fi
+  # Fall through: arch spec changed without agents.json → Rule 2 must fire.
+fi
 
 # Detect new files added under sapphire-orchestrator/tools/ or harness/
 _has_new_tool_harness=0
