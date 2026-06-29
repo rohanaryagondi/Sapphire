@@ -108,6 +108,49 @@ class TestRouteApiRun(unittest.TestCase):
         self.assertEqual(out["via"], "plan")
         self.assertIn("note", out)
 
+    # ── WO 1.4 additions ────────────────────────────────────────────────────
+
+    def test_plan_mode_returns_pending_approval(self):
+        """mode='plan' → result has plan_pending_approval=True and via='engine-plan'."""
+        pending = {
+            "query": "test",
+            "plan": {"deliverable": "diligence", "disease": "test", "modality": "small molecule",
+                     "agents": [], "panel": [], "class": "diligence"},
+            "plan_pending_approval": True,
+            "plan_source": "llm",
+            "engagement_id": "eng_test_plan",
+            "_via": "harness-live-plan",
+        }
+        with mock.patch.object(serve.live_engine, "run_live", return_value=pending):
+            out = serve.route_api_run("test query", "plan")
+        self.assertTrue(out.get("plan_pending_approval") is True,
+                        f"Expected plan_pending_approval=True; got {out}")
+        self.assertEqual(out["via"], "engine-plan",
+                         f"Expected via='engine-plan'; got {out.get('via')}")
+
+    def test_approved_plan_passthrough(self):
+        """route_api_run(q, 'live', approved_plan=['emet-runner']) calls run_live
+        with approved_plan=['emet-runner'] in the kwargs."""
+        with mock.patch.object(serve.live_engine, "run_live",
+                               return_value=_fake_run_live_result()) as m:
+            serve.route_api_run("Is TSC2 a viable CNS target?", "live",
+                                approved_plan=["emet-runner"])
+        m.assert_called_once()
+        call_kwargs = m.call_args[1]  # keyword arguments
+        self.assertEqual(call_kwargs.get("approved_plan"), ["emet-runner"],
+                         f"Expected approved_plan=['emet-runner'] in run_live call; "
+                         f"got kwargs={call_kwargs}")
+
+    def test_live_default_uses_plan_mode_llm(self):
+        """mode='live' (default) calls run_live with plan_mode='llm' (smart by default)."""
+        with mock.patch.object(serve.live_engine, "run_live",
+                               return_value=_fake_run_live_result()) as m:
+            serve.route_api_run("Is TSC2 a viable CNS target?", "live")
+        m.assert_called_once()
+        call_kwargs = m.call_args[1]  # keyword arguments
+        self.assertEqual(call_kwargs.get("plan_mode"), "llm",
+                         f"Expected plan_mode='llm' in run_live call; got kwargs={call_kwargs}")
+
 
 class TestRealRunLiveConformsToContract(unittest.TestCase):
     """A REAL run_live (mock backends, real moat if present) conforms to the schema."""

@@ -84,6 +84,9 @@ _BUCKET1_AGENTS = [
     "robyn-scs",
 ]
 
+# Fast membership test for approved_plan filtering (WO 1.2).
+_BUCKET1_AGENTS_SET: frozenset = frozenset(_BUCKET1_AGENTS)
+
 
 # ---------------------------------------------------------------------------
 # ASO sequence extraction helper
@@ -306,40 +309,56 @@ def run_live(
     registry=None,
     engine: Orchestrator | None = None,
     on_progress=None,
+    plan_mode: str = "off",
+    approved_plan: list[str] | None = None,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
 
     Parameters
     ----------
-    query     : the free-text question / task.
-    sequences : optional list of ASO candidate sequences (e.g. ["GCACTTGAATTTCACGTTGT"]).
-                When provided, sequences are threaded into every Bucket-1 agent's inputs
-                so the aso-tox agent can score them.  If None (default), the function
-                falls back to extracting pure A/T/G/C tokens of length ≥ 15 from the
-                query text via _extract_aso_sequences().
-                NOTE: this is the documented handoff point for the future ASO-Design tool —
-                that tool will pass its designed sequences here after its own dispatch.
-    structure : optional dict of Boltz STRUCTURE/AFFINITY inputs — public identifiers only:
-                {"target_sequence"|"protein_sequence", "ligand_smiles"|"ligand_ccd"} (or a
-                pre-built {"entities": [...], "binding": {...}}).  When provided, these are
-                threaded into every Bucket-1 agent's inputs so the boltz agent folds/scores
-                them (a protein + a ligand auto-requests a binding_confidence).  If None
-                (default), the function falls back to extracting a target protein sequence
-                from the query text via _extract_structure_inputs().  Boltz fires ONLY when
-                a structure/affinity input is in scope — with neither a sequence nor a
-                ligand it stays dormant (honest-empty), mirroring aso-tox.
-                NOTE: this is the documented handoff point for the upstream ASO Design /
-                small-molecule tools — they pass a target sequence + candidate ligand here.
-    ctx       : optional harness context dict (inject mock backends for testing).
-    registry  : optional pre-loaded agents.json dict (default: harness.load_registry()).
-    engine    : optional Orchestrator instance (default: new Orchestrator()).
+    query         : the free-text question / task.
+    sequences     : optional list of ASO candidate sequences (e.g. ["GCACTTGAATTTCACGTTGT"]).
+                    When provided, sequences are threaded into every Bucket-1 agent's inputs
+                    so the aso-tox agent can score them.  If None (default), the function
+                    falls back to extracting pure A/T/G/C tokens of length ≥ 15 from the
+                    query text via _extract_aso_sequences().
+                    NOTE: this is the documented handoff point for the future ASO-Design tool —
+                    that tool will pass its designed sequences here after its own dispatch.
+    structure     : optional dict of Boltz STRUCTURE/AFFINITY inputs — public identifiers only:
+                    {"target_sequence"|"protein_sequence", "ligand_smiles"|"ligand_ccd"} (or a
+                    pre-built {"entities": [...], "binding": {...}}).  When provided, these are
+                    threaded into every Bucket-1 agent's inputs so the boltz agent folds/scores
+                    them (a protein + a ligand auto-requests a binding_confidence).  If None
+                    (default), the function falls back to extracting a target protein sequence
+                    from the query text via _extract_structure_inputs().  Boltz fires ONLY when
+                    a structure/affinity input is in scope — with neither a sequence nor a
+                    ligand it stays dormant (honest-empty), mirroring aso-tox.
+                    NOTE: this is the documented handoff point for the upstream ASO Design /
+                    small-molecule tools — they pass a target sequence + candidate ligand here.
+    ctx           : optional harness context dict (inject mock backends for testing).
+    registry      : optional pre-loaded agents.json dict (default: harness.load_registry()).
+    engine        : optional Orchestrator instance (default: new Orchestrator()).
+    plan_mode     : controls Bucket-1 agent selection strategy:
+                    "off" (default) — run all _BUCKET1_AGENTS (deterministic; backward-compat).
+                    "llm"           — call smart_plan to select a relevant subset; fall back to
+                                      deterministic on any smart_plan failure.
+                    "llm+approve"   — call smart_plan and return immediately with
+                                      plan_pending_approval=True without running any agents.
+                                      The caller (front-door / LOKA) must approve and then
+                                      re-call with approved_plan=<ids>.
+    approved_plan : when not None, run ONLY these agent ids (filtered to known registry ids
+                    and _BUCKET1_AGENTS); overrides plan_mode (smart_plan is skipped).
 
     Returns
     -------
     A structured dict with keys:
         query, plan, priors, discover, consult, synthesize, engagement_id,
-        reflection, _via.
+        reflection, _via, plan_source.
+
+    For plan_mode="llm+approve" returns early with:
+        query, plan, plan_pending_approval, smart_plan (or absent on fallback),
+        plan_source, engagement_id, _via="harness-live-plan".
     """
     # -----------------------------------------------------------------------
     # 0. Initialise engine + ctx
@@ -380,6 +399,11 @@ def run_live(
     plan = engine.plan(query)
     panel = plan.get("panel", [])
 
+    # Bucket-1 selection defaults — overridden below by plan_mode or approved_plan.
+    selected_ids: list[str] = list(_BUCKET1_AGENTS)  # default: full deterministic list
+    plan_source: str = "deterministic"
+    smart_plan_rationale: dict | None = None
+
     # -----------------------------------------------------------------------
     # 2. Entity extraction + engagement id + priors
     # -----------------------------------------------------------------------
@@ -403,6 +427,57 @@ def run_live(
         "panel": [p.get("persona", p) if isinstance(p, dict) else p
                   for p in public_plan.get("panel", [])],
     })
+
+    # -----------------------------------------------------------------------
+    # 2b. Plan-mode routing — approved_plan overrides plan_mode; smart_plan is
+    #     called lazily only for plan_mode in ("llm", "llm+approve").
+    # -----------------------------------------------------------------------
+    if approved_plan is not None:
+        # Explicit approved_plan takes full precedence over plan_mode.
+        # Filter to agents that exist in the registry AND are Bucket-1 agents
+        # (silently drop unknown or out-of-bucket ids — never crash).
+        selected_ids = [i for i in approved_plan
+                        if i in known_ids and i in _BUCKET1_AGENTS_SET]
+        plan_source = "approved"
+    elif plan_mode.lower() == "llm+approve":
+        # Compute the LLM plan, then return immediately WITHOUT running any agents.
+        # The caller (front-door / LOKA) approves and re-calls with approved_plan.
+        try:
+            from smart_plan import smart_plan as _sp
+            _sp_result = _sp(query, plan, registry, ctx)
+            return {
+                "query": query,
+                "plan": public_plan,
+                "plan_pending_approval": True,
+                "smart_plan": _sp_result,
+                "plan_source": "llm",
+                "engagement_id": eid,
+                "_via": "harness-live-plan",
+            }
+        except Exception as _e:
+            trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
+            # Fall back to a deterministic plan-only envelope (no agents ran).
+            return {
+                "query": query,
+                "plan": public_plan,
+                "plan_pending_approval": True,
+                "plan_source": "deterministic",
+                "engagement_id": eid,
+                "_via": "harness-live-plan",
+            }
+    elif plan_mode.lower() == "llm":
+        # Let the LLM prune the Bucket-1 panel; fall back to the full deterministic
+        # list on any smart_plan failure (never raises to the caller).
+        try:
+            from smart_plan import smart_plan as _sp
+            _sp_result = _sp(query, plan, registry, ctx)
+            selected_ids = [a["id"] for a in _sp_result.get("selected_agents", [])]
+            plan_source = "llm"
+            smart_plan_rationale = _sp_result
+        except Exception as _e:
+            trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
+            # selected_ids and plan_source stay at their deterministic defaults.
+    # else: plan_mode "off" or any unrecognised value — keep deterministic defaults.
 
     # -----------------------------------------------------------------------
     # 3. Wire the REAL moat backend (only if caller didn't supply one already)
@@ -491,7 +566,17 @@ def run_live(
         if ctx.get("batch_buckets") else {}
     )
 
-    for agent_id in _BUCKET1_AGENTS:
+    # Emit a plan trace event so the run is auditable: which plan_source drove
+    # Bucket-1 and what the LLM rationale was (None for deterministic/approved).
+    trace.record(eid, {
+        "type": "plan",
+        "plan_source": plan_source,
+        "selected_ids": selected_ids,
+        "rationale": smart_plan_rationale,
+    })
+
+    # plan_mode seam: drive from LLM-selected or full deterministic list.
+    for agent_id in selected_ids:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
             continue
@@ -1001,4 +1086,5 @@ def run_live(
         "engagement_id": eid,
         "reflection": reflection,
         "_via": "harness-live",
+        "plan_source": plan_source,
     }
