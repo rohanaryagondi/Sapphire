@@ -205,12 +205,13 @@ class Handler(BaseHTTPRequestHandler):
         query = (body.get("query") or "").strip()
         profile = (body.get("profile") or "demo").strip()
         scenario = (body.get("scenario") or _DEFAULT_REPLAY).strip()
+        model = (body.get("model") or "").strip()
         if not query and profile != "replay":
             return self._send_json(400, {"error": "empty query"})
-        self._stream_run(query, profile, scenario)
+        self._stream_run(query, profile, scenario, model)
 
     # ------------------------------------------------------- SSE streaming
-    def _stream_run(self, query: str, profile: str, scenario: str) -> None:
+    def _stream_run(self, query: str, profile: str, scenario: str, model: str = "") -> None:
         """Run the firm and stream progress + result as SSE.
 
         The run executes on a worker thread; its ``on_progress`` callback (fired on that
@@ -247,6 +248,7 @@ class Handler(BaseHTTPRequestHandler):
                     result = bridge.replay(scenario)
                 else:
                     result = bridge.run(query, on_progress=on_progress,
+                                        model=(model or None),
                                         **_profile_kwargs(profile))
                 _cache_result(result)  # so GET /api/runs/<engagement_id> can return it
                 evq.put(("result", result))
