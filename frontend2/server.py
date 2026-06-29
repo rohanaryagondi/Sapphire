@@ -183,6 +183,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._serve_trace(path[len("/api/trace/"):])
         if path.startswith("/api/runs/"):
             return self._serve_run(path[len("/api/runs/"):])
+        # Conversation history routes (Wave-1 persistence).
+        if path == "/api/conversations":
+            return self._serve_conversations_list()
+        if path.startswith("/api/conversations/"):
+            conv_id = path[len("/api/conversations/"):]
+            return self._serve_conversation_detail(conv_id)
         if path.startswith("/static/"):
             rel = path[len("/static/"):]
             target = (_STATIC / rel).resolve()
@@ -194,24 +200,79 @@ class Handler(BaseHTTPRequestHandler):
 
     # ----------------------------------------------------------------- POST
     def do_POST(self) -> None:
-        if self.path.split("?", 1)[0] != "/api/run":
-            return self._send_json(404, {"error": "not found"})
+        path = self.path.split("?", 1)[0]
         try:
             length = int(self.headers.get("Content-Length", "0") or "0")
             raw = self.rfile.read(length) if length else b"{}"
             body = json.loads(raw.decode("utf-8") or "{}")
         except Exception:
             return self._send_json(400, {"error": "invalid JSON body"})
-        query = (body.get("query") or "").strip()
-        profile = (body.get("profile") or "demo").strip()
-        scenario = (body.get("scenario") or _DEFAULT_REPLAY).strip()
-        model = (body.get("model") or "").strip()
-        if not query and profile != "replay":
-            return self._send_json(400, {"error": "empty query"})
-        self._stream_run(query, profile, scenario, model)
+        if path == "/api/run":
+            query = (body.get("query") or "").strip()
+            profile = (body.get("profile") or "demo").strip()
+            scenario = (body.get("scenario") or _DEFAULT_REPLAY).strip()
+            model = (body.get("model") or "").strip()
+            conversation_id = (body.get("conversation_id") or "").strip() or None
+            if not query and profile != "replay":
+                return self._send_json(400, {"error": "empty query"})
+            self._stream_run(query, profile, scenario, model,
+                             conversation_id=conversation_id)
+        elif path == "/api/conversations":
+            try:
+                import store as _store_mod
+                title = body.get("title") or "New conversation"
+                cid = _store_mod.create_conversation(title)
+                return self._send_json(200, {"id": cid})
+            except Exception as exc:
+                return self._send_json(500, {"error": str(exc)})
+        else:
+            return self._send_json(404, {"error": "not found"})
+
+    # ---------------------------------------------------------------- PATCH
+    def do_PATCH(self) -> None:
+        path = self.path.split("?", 1)[0]
+        try:
+            length = int(self.headers.get("Content-Length", "0") or "0")
+            raw = self.rfile.read(length) if length else b"{}"
+            body = json.loads(raw.decode("utf-8") or "{}")
+        except Exception:
+            return self._send_json(400, {"error": "invalid JSON body"})
+        if path.startswith("/api/conversations/"):
+            conv_id = path[len("/api/conversations/"):]
+            try:
+                import store as _store_mod
+                changed = False
+                if "title" in body:
+                    changed = _store_mod.rename_conversation(conv_id, body["title"])
+                elif "starred" in body:
+                    changed = _store_mod.set_starred(conv_id, bool(body["starred"]))
+                else:
+                    changed = True  # no-op PATCH on valid body with no known fields is fine
+                if not changed:
+                    return self._send_json(404, {"error": "not found"})
+                return self._send_json(200, {"ok": True})
+            except Exception as exc:
+                return self._send_json(500, {"error": str(exc)})
+        return self._send_json(404, {"error": "not found"})
+
+    # --------------------------------------------------------------- DELETE
+    def do_DELETE(self) -> None:
+        path = self.path.split("?", 1)[0]
+        if path.startswith("/api/conversations/"):
+            conv_id = path[len("/api/conversations/"):]
+            try:
+                import store as _store_mod
+                deleted = _store_mod.delete_conversation(conv_id)
+                if deleted:
+                    return self._send_json(200, {"ok": True})
+                return self._send_json(404, {"error": "not found"})
+            except Exception as exc:
+                return self._send_json(500, {"error": str(exc)})
+        return self._send_json(404, {"error": "not found"})
 
     # ------------------------------------------------------- SSE streaming
-    def _stream_run(self, query: str, profile: str, scenario: str, model: str = "") -> None:
+    def _stream_run(self, query: str, profile: str, scenario: str, model: str = "",
+                    conversation_id: "str | None" = None) -> None:
         """Run the firm and stream progress + result as SSE.
 
         The run executes on a worker thread; its ``on_progress`` callback (fired on that
@@ -267,6 +328,26 @@ class Handler(BaseHTTPRequestHandler):
                 kind, payload = evq.get()
                 if kind is _DONE:
                     break
+                if kind == "result":
+                    # best-effort — store failure must NOT break the SSE stream
+                    try:
+                        import store as _store_mod
+                        cid = conversation_id
+                        if cid is None:
+                            cid = _store_mod.create_conversation(
+                                query[:80] or "Sapphire run"
+                            )
+                        msg_id = _store_mod.add_message(cid, "user", query)
+                        run_id = _store_mod.save_run(cid, msg_id, query, payload, via)
+                        if isinstance(payload, dict):
+                            payload["_conversation_id"] = cid
+                            payload["_run_id"] = run_id
+                    except Exception as _store_exc:
+                        import sys as _sys
+                        print(
+                            f"[store] save failed (non-fatal): {_store_exc}",
+                            file=_sys.stderr,
+                        )
                 if not self._write(_sse(kind, payload)):
                     break  # client disconnected — stop writing
         finally:
@@ -294,6 +375,25 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-cache")
         self.end_headers()
         self._write(data)
+
+    def _serve_conversations_list(self) -> None:
+        """GET /api/conversations → {conversations: [...]} from the persistent store."""
+        try:
+            import store as _store_mod
+            return self._send_json(200, {"conversations": _store_mod.list_conversations()})
+        except Exception as exc:
+            return self._send_json(500, {"error": str(exc)})
+
+    def _serve_conversation_detail(self, conv_id: str) -> None:
+        """GET /api/conversations/<id> → full {conversation, messages, runs} dict or 404."""
+        try:
+            import store as _store_mod
+            conv = _store_mod.get_conversation(conv_id)
+            if conv is None:
+                return self._send_json(404, {"error": "not found"})
+            return self._send_json(200, conv)
+        except Exception as exc:
+            return self._send_json(500, {"error": str(exc)})
 
     def _serve_trace(self, eid: str) -> None:
         """GET /api/trace/<engagement_id> → the RAW append-only trace JSONL for that run.
