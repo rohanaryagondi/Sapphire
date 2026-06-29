@@ -1,14 +1,25 @@
 """
-_build/build_moat_db.py — Parquet → SQLite moat ingest (WO-5 dual-rank fix).
+_build/build_moat_db.py — Parquet → SQLite moat ingest (WO-5 dual-rank fix, v2 true-global).
 
-Streams the 38.4M-row CNS DFP parquet through bounded per-query heapq heaps
-(size K, two per partition) to produce top-K similar + top-K opposite neighbour
-rows per perturbation PER REF_TYPE using a DUAL-RANK union approach, then writes
-them to a SQLite database at SAPPHIRE_MOAT_DB.
+Streams the 38.4M-row CNS DFP parquet and accumulates per-partition rows in memory,
+then computes TRUE GLOBAL ranks (faithful to Loka's perturbation_similarity_top200
+materialized view) before writing to a SQLite database at SAPPHIRE_MOAT_DB.
 
 Dual-rank union: a candidate survives if rank_cosine <= K OR rank_euclidean <= K.
 The final output record carries rank_cosine, rank_euclidean, and union_rank
 (= rank_cosine + rank_euclidean) so the client can order by union_rank.
+
+True global ranks (Loka faithful):
+    ROW_NUMBER() OVER (PARTITION BY query_name, match_effect, ref_type
+                       ORDER BY cosine ASC, euclidean ASC, ref ASC)   → rank_cosine
+    ROW_NUMBER() OVER (PARTITION BY ...
+                       ORDER BY euclidean ASC, cosine ASC, ref ASC)   → rank_euclidean
+No K+1 sentinel — every row in the partition gets its true global rank.
+
+Multi-dose deduplication (Loka global_ranking.py faithful):
+    When a query name has multiple perturbation IDs (doses), each produces its own
+    similarity rows. We aggregate by (query_name, ref_name, effect, ref_type), keeping
+    MIN(cosine) and MIN(euclidean) per ref — matching Loka's MIN aggregation approach.
 
 Environment variables:
     MOAT_PARQUET      Path to the source parquet (default: Loka path below)
@@ -34,10 +45,11 @@ Pure, testable function (importable without pyarrow):
         Grouping: per (query, effect, ref_type) — genes and compounds get
               separate top-K lists so compounds are never crowded out by genes.
         Survival: rank_cosine <= k OR rank_euclidean <= k
-        Rank semantics:
-              rank_cosine    = 1-based rank by cosine ASC within the cosine top-K
-              rank_euclidean = 1-based rank by euclidean ASC within the euclidean top-K
-              K+1 sentinel   = "not in top-K for that metric"
+        Rank semantics (TRUE global, no sentinel):
+              rank_cosine    = 1-based rank by (cosine ASC, euclidean ASC, ref ASC)
+                               across ALL rows in the partition
+              rank_euclidean = 1-based rank by (euclidean ASC, cosine ASC, ref ASC)
+                               across ALL rows in the partition
               union_rank     = rank_cosine + rank_euclidean (sort key, lower is better)
 
 NOTE: pyarrow is imported ONLY inside main() — topk_neighbors has zero
@@ -46,9 +58,9 @@ third-party dependencies so it can be loaded by tests without pyarrow installed.
 
 from __future__ import annotations
 
-import heapq
 import os
 import sqlite3
+import sys
 from pathlib import Path
 from typing import Iterable
 
@@ -82,13 +94,17 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
 
     Partitions rows by (query_UPPER, effect, ref_type), excluding self-pairs.
     For each partition:
-      - cosine top-K  = k rows with smallest cosine (tiebreak: ref asc)
-      - euclidean top-K = k rows with smallest euclidean (tiebreak: ref asc)
-      - A candidate survives if it appears in EITHER list (union).
+      - Computes TRUE global rank_cosine for ALL rows in the partition,
+        ordered by (cosine ASC, euclidean ASC, ref ASC).
+      - Computes TRUE global rank_euclidean for ALL rows in the partition,
+        ordered by (euclidean ASC, cosine ASC, ref ASC).
+      - A candidate survives if rank_cosine <= k OR rank_euclidean <= k (union).
 
-    Rank semantics within each partition:
-      rank_cosine    = 1-based position in cosine top-K (k+1 sentinel if absent)
-      rank_euclidean = 1-based position in euclidean top-K (k+1 sentinel if absent)
+    No K+1 sentinel — ranks are the true global 1-based positions.
+
+    Rank semantics within each partition (TRUE global, no sentinel):
+      rank_cosine    = 1-based global rank by (cosine ASC, euclidean ASC, ref ASC)
+      rank_euclidean = 1-based global rank by (euclidean ASC, cosine ASC, ref ASC)
       union_rank     = rank_cosine + rank_euclidean  (sort key, ascending)
 
     Output is sorted by (union_rank ASC, ref ASC) within each partition.
@@ -100,7 +116,7 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
         rows: iterable of dicts with keys:
               query, query_type, ref, ref_type, ref_dose, cosine, euclidean,
               direction ('Original'|'Antipodal')
-        k:    number of neighbours per metric per partition
+        k:    number of neighbours per metric per partition (survival threshold)
 
     Returns:
         Flat list of dicts, each:
@@ -127,29 +143,37 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
             partitions[key] = []
         partitions[key].append(row)
 
-    # Process each partition with dual-rank union
+    # Process each partition with true global dual-rank union
     result: list[dict] = []
 
     for key in sorted(partitions):
         q_upper, effect, ref_type_val = key
         rows_p = partitions[key]
 
-        # ── cosine top-K: k smallest cosines (tiebreak: ref asc) ──────────────
-        cos_sorted = sorted(rows_p, key=lambda r: (float(r["cosine"]), str(r["ref"])))
-        cos_top_k  = cos_sorted[:k]
+        # ── TRUE global rank_cosine: rank ALL rows, tiebreak (cosine, euclidean, ref) ──
+        cos_sorted = sorted(
+            rows_p,
+            key=lambda r: (float(r["cosine"]), float(r["euclidean"]), str(r["ref"])),
+        )
         cos_rank_map: dict[str, int] = {
-            str(r["ref"]): rank for rank, r in enumerate(cos_top_k, 1)
+            str(r["ref"]): rank for rank, r in enumerate(cos_sorted, 1)
         }
 
-        # ── euclidean top-K: k smallest euclideans (tiebreak: ref asc) ────────
-        euc_sorted = sorted(rows_p, key=lambda r: (float(r["euclidean"]), str(r["ref"])))
-        euc_top_k  = euc_sorted[:k]
+        # ── TRUE global rank_euclidean: rank ALL rows, tiebreak (euclidean, cosine, ref) ──
+        euc_sorted = sorted(
+            rows_p,
+            key=lambda r: (float(r["euclidean"]), float(r["cosine"]), str(r["ref"])),
+        )
         euc_rank_map: dict[str, int] = {
-            str(r["ref"]): rank for rank, r in enumerate(euc_top_k, 1)
+            str(r["ref"]): rank for rank, r in enumerate(euc_sorted, 1)
         }
 
-        # ── union of refs that appear in at least one top-K ───────────────────
-        all_refs = set(cos_rank_map) | set(euc_rank_map)
+        # ── union of refs that appear in at least one top-K (survival gate) ───
+        all_refs = {
+            ref for ref, rc in cos_rank_map.items() if rc <= k
+        } | {
+            ref for ref, re in euc_rank_map.items() if re <= k
+        }
 
         # ref → row lookup (last occurrence if duplicate refs — refs should be unique)
         row_by_ref: dict[str, dict] = {str(r["ref"]): r for r in rows_p}
@@ -157,22 +181,22 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
         # ── build and sort records by union_rank ───────────────────────────────
         recs: list[dict] = []
         for ref in all_refs:
-            rank_cosine    = cos_rank_map.get(ref, k + 1)
-            rank_euclidean = euc_rank_map.get(ref, k + 1)
+            rank_cosine    = cos_rank_map[ref]    # true global rank, no sentinel
+            rank_euclidean = euc_rank_map[ref]    # true global rank, no sentinel
             union_rank     = rank_cosine + rank_euclidean
             row            = row_by_ref[ref]
             recs.append({
-                "query":         q_upper,
-                "query_type":    str(row.get("query_type", "")),
-                "ref":           ref,
-                "ref_type":      ref_type_val,
-                "ref_dose":      row.get("ref_dose", ""),
-                "effect":        effect,
-                "rank_cosine":   rank_cosine,
+                "query":          q_upper,
+                "query_type":     str(row.get("query_type", "")),
+                "ref":            ref,
+                "ref_type":       ref_type_val,
+                "ref_dose":       row.get("ref_dose", ""),
+                "effect":         effect,
+                "rank_cosine":    rank_cosine,
                 "rank_euclidean": rank_euclidean,
-                "union_rank":    union_rank,
-                "cosine":        float(row["cosine"]),
-                "euclidean":     float(row["euclidean"]),
+                "union_rank":     union_rank,
+                "cosine":         float(row["cosine"]),
+                "euclidean":      float(row["euclidean"]),
             })
 
         recs.sort(key=lambda r: (r["union_rank"], r["ref"]))
@@ -185,15 +209,21 @@ def topk_neighbors(rows: Iterable[dict], k: int) -> list[dict]:
 
 def main() -> None:
     """
-    Stream the parquet, build bounded dual-rank per-query heaps, write to SQLite.
+    Stream the parquet, accumulate per-partition rows in memory, compute true
+    global dual-rank union, write to SQLite.
 
-    Dual-rank union: two heaps per partition (q_upper, effect, ref_type):
-      cos_heap: max-heap keeping K smallest cosines
-        entry: (-cosine, euclidean, ref, qt, rt, rd)
-      euc_heap: max-heap keeping K smallest euclideans
-        entry: (-euclidean, cosine, ref, qt, rt, rd)
+    True global ranks (faithful to Loka's perturbation_similarity_top200 view):
+      For each partition (q_name, match_effect, ref_type), rank ALL rows by
+        (cosine ASC, euclidean ASC, ref ASC)  → rank_cosine
+        (euclidean ASC, cosine ASC, ref ASC)  → rank_euclidean
+      No K+1 sentinel — all rows get their true 1-based global rank.
 
-    A candidate survives if rank_cosine <= K OR rank_euclidean <= K.
+    Multi-dose deduplication (faithful to Loka's global_ranking.py MIN approach):
+      Per partition, keep MIN(cosine) and MIN(euclidean) per ref_name.
+      This correctly handles queries that have multiple perturbation IDs (doses).
+
+    Memory: per-partition dict of ref → (min_cos, min_euc, qt, rd) after dedup.
+    sys.intern() is used on all repeated string values to reduce object count.
 
     Env vars: MOAT_PARQUET, SAPPHIRE_MOAT_DB, MOAT_K, MOAT_BATCH_LOG.
     """
@@ -208,29 +238,31 @@ def main() -> None:
     print(f"[build_moat_db] source parquet : {parquet_path}")
     print(f"[build_moat_db] output db      : {db_path}")
     print(f"[build_moat_db] K              : {K}")
+    print("[build_moat_db] rank mode      : true-global (no sentinel)")
 
     if not parquet_path.exists():
         raise FileNotFoundError(f"Parquet not found: {parquet_path}")
 
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # ── per-partition bounded dual heaps ──────────────────────────────────────
+    # ── per-partition accumulation with min-dedup ──────────────────────────────
     # Partition key: (q_upper, effect_str, ref_type_str)
     #   effect_str = 'opposite' if direction == 'Antipodal' else 'similar'
     #
-    # cos_heaps[key]: max-heap keeping K smallest cosines
-    #   entry: (-cosine, euclidean, ref, qt, rt, rd)
-    #   heappop evicts the LARGEST cosine (= least similar / least opposite)
+    # partitions[key][ref] = (min_cosine, min_euclidean, query_type, ref_dose)
+    #   min_cosine and min_euclidean tracked independently (faithful to Loka MIN agg).
+    #   ref_type comes from the partition key, not stored per row.
     #
-    # euc_heaps[key]: max-heap keeping K smallest euclideans
-    #   entry: (-euclidean, cosine, ref, qt, rt, rd)
-    #   heappop evicts the LARGEST euclidean
-    cos_heaps: dict[tuple[str, str, str], list] = {}
-    euc_heaps: dict[tuple[str, str, str], list] = {}
-    n_rows_seen    = 0
+    # sys.intern() is used on all small/repeated strings for memory efficiency.
+    partitions: dict[tuple[str, str, str], dict[str, tuple]] = {}
+    n_rows_seen     = 0
     n_self_excluded = 0
 
-    print("[build_moat_db] streaming parquet ...")
+    # Intern the two constant effect strings up front
+    _similar  = sys.intern("similar")
+    _opposite = sys.intern("opposite")
+
+    print("[build_moat_db] streaming parquet and accumulating per-partition ...")
     dataset = ds.dataset(str(parquet_path), format="parquet")
     columns = list(_COL_MAP.keys())
 
@@ -238,7 +270,11 @@ def main() -> None:
     for batch in dataset.to_batches(columns=columns, batch_size=65_536):
         batch_num += 1
         if batch_num % BATCH_LOG == 0:
-            print(f"  batch {batch_num:,}  rows_seen={n_rows_seen:,}  partitions={len(cos_heaps):,}")
+            total_refs = sum(len(v) for v in partitions.values())
+            print(
+                "  batch %d  rows_seen=%d  partitions=%d  unique_refs=%d"
+                % (batch_num, n_rows_seen, len(partitions), total_refs)
+            )
 
         q_names  = batch.column("query_perturbationName").to_pylist()
         q_types  = batch.column("query_perturbationType").to_pylist()
@@ -251,105 +287,83 @@ def main() -> None:
 
         for i in range(len(q_names)):
             n_rows_seen += 1
-            q_upper = str(q_names[i]).upper() if q_names[i] is not None else ""
+            q_upper = sys.intern(str(q_names[i]).upper()) if q_names[i] is not None else ""
             ref_val = str(r_names[i]) if r_names[i] is not None else ""
 
             if ref_val.upper() == q_upper:
                 n_self_excluded += 1
                 continue
 
-            direction      = str(q_dirs[i]) if q_dirs[i] is not None else "Original"
-            cosine_val     = float(cosines[i]) if cosines[i] is not None else 0.0
-            euclidean_val  = float(euclids[i]) if euclids[i] is not None else 0.0
-            ref_str        = ref_val
-            ref_type_str   = str(r_types[i] or "")
-            qt             = str(q_types[i] or "")
-            rt             = ref_type_str
-            rd             = str(r_doses[i] or "")
-            effect_str     = "opposite" if direction == "Antipodal" else "similar"
-            heap_key       = (q_upper, effect_str, ref_type_str)
+            direction     = str(q_dirs[i]) if q_dirs[i] is not None else "Original"
+            cosine_val    = float(cosines[i]) if cosines[i] is not None else 0.0
+            euclidean_val = float(euclids[i]) if euclids[i] is not None else 0.0
+            ref_str       = sys.intern(ref_val)
+            ref_type_str  = sys.intern(str(r_types[i] or ""))
+            qt            = sys.intern(str(q_types[i] or ""))
+            rd            = sys.intern(str(r_doses[i] or ""))
+            effect_str    = _opposite if direction == "Antipodal" else _similar
+            part_key      = (q_upper, effect_str, ref_type_str)
 
-            # cos_heap: keeps K smallest cosines
-            # entry: (-cosine, euclidean, ref, qt, rt, rd)
-            cos_entry = (-cosine_val, euclidean_val, ref_str, qt, rt, rd)
-            if heap_key not in cos_heaps:
-                cos_heaps[heap_key] = []
-            heapq.heappush(cos_heaps[heap_key], cos_entry)
-            if len(cos_heaps[heap_key]) > K:
-                heapq.heappop(cos_heaps[heap_key])
+            if part_key not in partitions:
+                partitions[part_key] = {}
+            ref_dict = partitions[part_key]
 
-            # euc_heap: keeps K smallest euclideans
-            # entry: (-euclidean, cosine, ref, qt, rt, rd)
-            euc_entry = (-euclidean_val, cosine_val, ref_str, qt, rt, rd)
-            if heap_key not in euc_heaps:
-                euc_heaps[heap_key] = []
-            heapq.heappush(euc_heaps[heap_key], euc_entry)
-            if len(euc_heaps[heap_key]) > K:
-                heapq.heappop(euc_heaps[heap_key])
+            existing = ref_dict.get(ref_str)
+            if existing is None:
+                ref_dict[ref_str] = (cosine_val, euclidean_val, qt, rd)
+            else:
+                # Multi-dose dedup: keep MIN(cosine) and MIN(euclidean) independently
+                # (faithful to Loka global_ranking.py MIN aggregation approach)
+                prev_cos, prev_euc, _, _ = existing
+                ref_dict[ref_str] = (
+                    min(cosine_val, prev_cos),
+                    min(euclidean_val, prev_euc),
+                    qt, rd,  # keep query_type and dose from first occurrence
+                )
 
-    all_heap_keys = sorted(set(cos_heaps) | set(euc_heaps))
-    n_queries = len({k[0] for k in all_heap_keys})
-    print(f"[build_moat_db] done streaming: {n_rows_seen:,} rows, {n_self_excluded:,} self-excluded, {n_queries:,} queries")
+    all_part_keys = sorted(partitions)
+    n_queries     = len({k[0] for k in all_part_keys})
+    total_unique  = sum(len(v) for v in partitions.values())
+    print(
+        "[build_moat_db] done streaming: %d rows, %d self-excluded, %d queries, "
+        "%d unique partition-ref entries after dedup"
+        % (n_rows_seen, n_self_excluded, n_queries, total_unique)
+    )
 
-    # ── drain heaps → flat records ─────────────────────────────────────────────
-    print("[build_moat_db] draining heaps and writing SQLite ...")
+    # ── compute true global ranks and filter union per partition ───────────────
+    print("[build_moat_db] computing true global ranks and writing SQLite ...")
 
     records: list[tuple] = []
-    for heap_key in all_heap_keys:
-        q_upper, effect_str, ref_type_str = heap_key
+    for part_key in all_part_keys:
+        q_upper, effect_str, ref_type_str = part_key
+        ref_dict = partitions[part_key]  # {ref: (min_cos, min_euc, qt, rd)}
 
-        # ── cosine heap: sorted by cosine ASC, euclidean ASC, ref ASC ─────────
-        # cos_entry: (-cosine, euclidean, ref, qt, rt, rd)
-        # -e[0] = cosine ASC, e[1] = euclidean ASC, e[2] = ref ASC
-        cos_items  = cos_heaps.get(heap_key, [])
-        cos_sorted = sorted(cos_items, key=lambda e: (-e[0], e[1], e[2]))
-        cos_rank_map: dict[str, int] = {
-            e[2]: rank for rank, e in enumerate(cos_sorted, 1)
-        }
+        # TRUE global rank_cosine: sort ALL refs by (min_cos, min_euc, ref)
+        items = list(ref_dict.items())
+        cos_sorted = sorted(items, key=lambda x: (x[1][0], x[1][1], x[0]))
+        cos_rank_map: dict[str, int] = {ref: i + 1 for i, (ref, _) in enumerate(cos_sorted)}
 
-        # ── euclidean heap: sorted by euclidean ASC, cosine ASC, ref ASC ──────
-        # euc_entry: (-euclidean, cosine, ref, qt, rt, rd)
-        # -e[0] = euclidean ASC, e[1] = cosine ASC, e[2] = ref ASC
-        euc_items  = euc_heaps.get(heap_key, [])
-        euc_sorted = sorted(euc_items, key=lambda e: (-e[0], e[1], e[2]))
-        euc_rank_map: dict[str, int] = {
-            e[2]: rank for rank, e in enumerate(euc_sorted, 1)
-        }
+        # TRUE global rank_euclidean: sort ALL refs by (min_euc, min_cos, ref)
+        euc_sorted = sorted(items, key=lambda x: (x[1][1], x[1][0], x[0]))
+        euc_rank_map: dict[str, int] = {ref: i + 1 for i, (ref, _) in enumerate(euc_sorted)}
 
-        # ── ref → (cosine, euclidean, qt, rt, rd) lookup from both heaps ──────
-        ref_data: dict[str, tuple] = {}
-        for e in cos_items:
-            ref = e[2]
-            cosv = -e[0]
-            eucv = e[1]
-            qt, rt, rd = e[3], e[4], e[5]
-            ref_data[ref] = (cosv, eucv, qt, rt, rd)
-        for e in euc_items:
-            ref = e[2]
-            eucv = -e[0]
-            cosv = e[1]
-            qt, rt, rd = e[3], e[4], e[5]
-            if ref not in ref_data:
-                ref_data[ref] = (cosv, eucv, qt, rt, rd)
-
-        # ── union and dual-rank ───────────────────────────────────────────────
-        all_refs = set(cos_rank_map) | set(euc_rank_map)
+        # Filter: keep rank_cosine <= K OR rank_euclidean <= K
         recs: list[tuple] = []
-        for ref in all_refs:
-            rank_cosine    = cos_rank_map.get(ref, K + 1)
-            rank_euclidean = euc_rank_map.get(ref, K + 1)
-            union_rank     = rank_cosine + rank_euclidean
-            cosv, eucv, qt, rt, rd = ref_data[ref]
+        for ref, (cosv, eucv, qt, rd) in ref_dict.items():
+            rank_cosine    = cos_rank_map[ref]    # true global rank, no sentinel
+            rank_euclidean = euc_rank_map[ref]    # true global rank, no sentinel
+            if rank_cosine > K and rank_euclidean > K:
+                continue
+            union_rank = rank_cosine + rank_euclidean
             recs.append((
-                union_rank, ref,          # sort keys (not stored)
-                q_upper, qt, ref, rt, rd, effect_str,
+                union_rank, ref,              # sort keys (dropped before storing)
+                q_upper, qt, ref, ref_type_str, rd, effect_str,
                 rank_cosine, rank_euclidean, union_rank, cosv, eucv,
             ))
 
-        recs.sort(key=lambda r: (r[0], r[1]))  # union_rank ASC, ref ASC
+        recs.sort(key=lambda r: (r[0], r[1]))  # union_rank ASC, ref ASC tiebreak
         for rec in recs:
-            # Strip the two sort-key prefix values
-            records.append(rec[2:])
+            records.append(rec[2:])            # strip the two sort-key prefix values
 
     # ── write SQLite ───────────────────────────────────────────────────────────
     con = sqlite3.connect(str(db_path))
@@ -387,6 +401,7 @@ def main() -> None:
             ("source",    str(parquet_path)),
             ("built_at",  datetime.now().isoformat()),
             ("k",         str(K)),
+            ("rank_mode", "true-global"),
             ("n_queries", str(n_queries)),
             ("n_rows",    str(len(records))),
         ]
@@ -395,17 +410,20 @@ def main() -> None:
     finally:
         con.close()
 
-    print(f"[build_moat_db] wrote {len(records):,} neighbor rows ({n_queries:,} queries x2 effects x ref_types) → {db_path}")
+    print(
+        "[build_moat_db] wrote %d neighbor rows (%d queries x2 effects x ref_types) → %s"
+        % (len(records), n_queries, db_path)
+    )
 
-    # ── sanity: print top-5 similar + opposite + opposite genes for TSC2 ──────
+    # ── sanity: print top-10 opposite genes for TSC2 (MTOR gene-rescue check) ──
     _print_sanity(str(db_path), "TSC2")
 
 
 def _print_sanity(db_path: str, query: str) -> None:
     """Print top-5 similar and opposite for the given query as a sanity check.
 
-    Ordered by union_rank (dual-rank metric). Also prints top-5 opposite GENE
-    results for the TSC2 gene-rescue sanity check.
+    Ordered by union_rank (dual-rank metric). Also prints top-10 opposite GENE
+    results for the TSC2 gene-rescue sanity check (MTOR TRUE rank verification).
     """
     try:
         con = sqlite3.connect(db_path)
@@ -418,7 +436,7 @@ def _print_sanity(db_path: str, query: str) -> None:
             (query.upper(),),
         ):
             print(
-                f"  union={row['union_rank']:2d} (cos_r={row['rank_cosine']}, euc_r={row['rank_euclidean']}). "
+                f"  union={row['union_rank']:3d} (cos_r={row['rank_cosine']:3d}, euc_r={row['rank_euclidean']:3d}). "
                 f"{row['ref']:<30s}  cosine={row['cosine']:.4f}  type={row['ref_type']}"
             )
         print(f"\n── Sanity: {query} opposite (top-5, all types) ──")
@@ -429,19 +447,19 @@ def _print_sanity(db_path: str, query: str) -> None:
             (query.upper(),),
         ):
             print(
-                f"  union={row['union_rank']:2d} (cos_r={row['rank_cosine']}, euc_r={row['rank_euclidean']}). "
+                f"  union={row['union_rank']:3d} (cos_r={row['rank_cosine']:3d}, euc_r={row['rank_euclidean']:3d}). "
                 f"{row['ref']:<30s}  cosine={row['cosine']:.4f}  type={row['ref_type']}"
             )
-        print(f"\n── Sanity: {query} opposite GENES (top-5, rescue) ──")
+        print(f"\n── Sanity: {query} opposite GENES top-10 (rescue / MTOR check) ──")
         for row in con.execute(
             "SELECT rank_cosine, rank_euclidean, union_rank, ref, ref_type, cosine "
             "FROM neighbors WHERE query=? AND effect='opposite' AND ref_type='gene' "
-            "ORDER BY union_rank LIMIT 5",
+            "ORDER BY union_rank LIMIT 10",
             (query.upper(),),
         ):
             print(
-                f"  union={row['union_rank']:2d} (cos_r={row['rank_cosine']}, euc_r={row['rank_euclidean']}). "
-                f"{row['ref']:<30s}  cosine={row['cosine']:.4f}  type={row['ref_type']}"
+                f"  union={row['union_rank']:3d} (cos_r={row['rank_cosine']:3d}, euc_r={row['rank_euclidean']:3d}). "
+                f"{row['ref']:<30s}  cosine={row['cosine']:.4f}"
             )
         con.close()
     except Exception as exc:

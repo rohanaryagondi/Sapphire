@@ -233,7 +233,28 @@ class TestTopkNeighborsUppercase(unittest.TestCase):
 
 
 class TestTopkNeighborsTiebreak(unittest.TestCase):
-    """When cosines are equal, tie-break must be deterministic by ref name ascending."""
+    """Tie-breaks must be deterministic and correctly ordered."""
+
+    def test_euclidean_tiebreak_when_cosines_equal(self):
+        """Equal cosines → euclidean is the secondary sort key; lower euclidean wins lower rank_cosine."""
+        rows = [
+            {"query": "TSC2", "query_type": "gene", "ref": "ref_X",
+             "ref_type": "gene", "ref_dose": "1",
+             "cosine": 0.5, "euclidean": 0.2, "direction": "Original"},
+            {"query": "TSC2", "query_type": "gene", "ref": "ref_Y",
+             "ref_type": "gene", "ref_dose": "1",
+             "cosine": 0.5, "euclidean": 0.8, "direction": "Original"},
+        ]
+        result = topk_neighbors(rows, k=2)
+        similar = [r for r in result if r["effect"] == "similar"]
+        ref_x = next((r for r in similar if r["ref"] == "ref_X"), None)
+        ref_y = next((r for r in similar if r["ref"] == "ref_Y"), None)
+        self.assertIsNotNone(ref_x, "ref_X must be in output")
+        self.assertIsNotNone(ref_y, "ref_Y must be in output")
+        self.assertEqual(ref_x["rank_cosine"], 1,
+                         "Equal cosines: lower euclidean (0.2) must win rank_cosine=1")
+        self.assertEqual(ref_y["rank_cosine"], 2,
+                         "Equal cosines: higher euclidean (0.8) must get rank_cosine=2")
 
     def _run_tiebreak_similar(self):
         rows = [
@@ -455,20 +476,21 @@ class TestTopkNeighborsHeapUnionFix(unittest.TestCase):
     """
     The dual-rank union fix: a row that is euclidean-top-K but NOT cosine-top-K must survive.
 
-    Scenario: k=2, three refs where:
-        ref_A: cosine=0.1, euclidean=0.9  → rank_cosine=1, rank_euclidean=k+1=3 (not in euc top-2)
+    Scenario: k=2, three refs where (true global ranks, no sentinel):
+        ref_A: cosine=0.1, euclidean=0.9  → rank_cosine=1, rank_euclidean=3 (not in euc top-2)
         ref_B: cosine=0.2, euclidean=0.8  → rank_cosine=2, rank_euclidean=2
-        ref_C: cosine=0.9, euclidean=0.1  → rank_cosine=k+1=3, rank_euclidean=1
+        ref_C: cosine=0.9, euclidean=0.1  → rank_cosine=3, rank_euclidean=1 (not in cos top-2)
 
     With k=2:
-        cosine top-2:    ref_A(cos=0.1), ref_B(cos=0.2)  → rank_cosine: A=1, B=2
-        euclidean top-2: ref_C(euc=0.1), ref_B(euc=0.8)  → rank_euclidean: C=1, B=2
+        cosine top-2:    ref_A(cos=0.1), ref_B(cos=0.2)  → rank_cosine: A=1, B=2, C=3
+        euclidean top-2: ref_C(euc=0.1), ref_B(euc=0.8)  → rank_euclidean: C=1, B=2, A=3
 
-    Union = {ref_A, ref_B, ref_C} — all three survive!
-        ref_A: rank_cosine=1, rank_euclidean=k+1=3, union_rank=4
-        ref_B: rank_cosine=2, rank_euclidean=2,     union_rank=4
-        ref_C: rank_cosine=k+1=3, rank_euclidean=1, union_rank=4
+    Union = {ref_A, ref_B, ref_C} — all three survive (rank_cosine<=2 OR rank_euclidean<=2)!
+        ref_A: rank_cosine=1, rank_euclidean=3 (true global), union_rank=4
+        ref_B: rank_cosine=2, rank_euclidean=2,               union_rank=4
+        ref_C: rank_cosine=3 (true global), rank_euclidean=1, union_rank=4
 
+    Note: with 3 rows and k=2, true global rank of the 3rd row = k+1 = 3 (coincidence for this N).
     Critical assertion: ref_C (euclidean-best but cosine-worst) MUST be in output.
     """
 
@@ -505,33 +527,36 @@ class TestTopkNeighborsHeapUnionFix(unittest.TestCase):
         self.assertIsNotNone(ref_c, "ref_C must be in output")
         self.assertEqual(ref_c["rank_euclidean"], 1,
                          "ref_C is euclidean-rank=1 globally, must be stored as 1")
-        # ref_C's cosine rank is 3 (>k=2), so sentinel = k+1 = 3
+        # ref_C's TRUE global cosine rank is 3 (3 rows in partition; ref_C has cosine=0.9, last)
+        # Note: with N=3 rows and k=2, true rank = k+1 = 3 (coincidence for this test case)
         self.assertEqual(ref_c["rank_cosine"], 3,
-                         "ref_C cosine-rank=3 > k=2, sentinel k+1=3 expected")
+                         "ref_C true global cosine-rank=3 (last of 3 rows by cosine)")
 
-    def test_cosine_top_k_only_candidate_has_sentinel_euc_rank(self):
-        """ref_A is in cosine top-2 but NOT euclidean top-2; must get rank_euclidean=k+1."""
+    def test_cosine_top_k_only_candidate_has_true_global_euc_rank(self):
+        """ref_A is in cosine top-2 but NOT euclidean top-2; true global rank_euclidean=3."""
         rows = self._make_dual_rank_rows("Antipodal")
         result = topk_neighbors(rows, k=2)
         opposite = [r for r in result if r["effect"] == "opposite"]
         ref_a = next((r for r in opposite if r["ref"] == "ref_A"), None)
         self.assertIsNotNone(ref_a, "ref_A must be in output")
         self.assertEqual(ref_a["rank_cosine"], 1)
-        self.assertEqual(ref_a["rank_euclidean"], 3,  # sentinel = k+1 = 3
-                         "ref_A is not in euclidean top-2; sentinel k+1=3 expected")
+        # ref_A's TRUE global euclidean rank is 3 (3 rows; ref_A has euclidean=0.9, last)
+        # Note: with N=3 rows and k=2, true rank = k+1 = 3 (coincidence for this test case)
+        self.assertEqual(ref_a["rank_euclidean"], 3,
+                         "ref_A true global euclidean-rank=3 (last of 3 rows by euclidean)")
 
     def test_union_rank_ordering(self):
         """Output must be ordered by union_rank ASC (then ref for tiebreak)."""
         rows = [
-            # ref_X: cosine=0.3, euclidean=0.5 → rank_cos=2, rank_euc=2 → union=4
+            # ref_X: cosine=0.3, euclidean=0.5 → rank_cos=2, rank_euc=2 (true global) → union=4
             {"query": "TSC2", "query_type": "gene", "ref": "ref_X",
              "ref_type": "gene", "ref_dose": "1",
              "cosine": 0.3, "euclidean": 0.5, "direction": "Original"},
-            # ref_Y: cosine=0.1, euclidean=0.9 → rank_cos=1, rank_euc=k+1=3 → union=4
+            # ref_Y: cosine=0.1, euclidean=0.9 → rank_cos=1, rank_euc=3 (true global) → union=4
             {"query": "TSC2", "query_type": "gene", "ref": "ref_Y",
              "ref_type": "gene", "ref_dose": "1",
              "cosine": 0.1, "euclidean": 0.9, "direction": "Original"},
-            # ref_Z: cosine=0.8, euclidean=0.1 → rank_cos=k+1=3, rank_euc=1 → union=4
+            # ref_Z: cosine=0.8, euclidean=0.1 → rank_cos=3 (true global), rank_euc=1 → union=4
             {"query": "TSC2", "query_type": "gene", "ref": "ref_Z",
              "ref_type": "gene", "ref_dose": "1",
              "cosine": 0.8, "euclidean": 0.1, "direction": "Original"},

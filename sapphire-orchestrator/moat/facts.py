@@ -58,7 +58,7 @@ def moat_facts(
             "source":           _SOURCE,
             "tier":             _TIER,
             "provenance":       _PROV,
-            "supporting_genes": 1,
+            "supporting_genes": 1,  # single-query EP match; multi-query COUNT(DISTINCT) aggregation deferred
         })
 
     # ---- rescue genes (opposite EP-signature genes) -------------------------
@@ -80,7 +80,7 @@ def moat_facts(
             "source":           _SOURCE,
             "tier":             _TIER,
             "provenance":       _PROV,
-            "supporting_genes": 1,
+            "supporting_genes": 1,  # single-query EP match; multi-query COUNT(DISTINCT) aggregation deferred
         })
 
     # ---- rescue compounds (opposite EP-signature) ---------------------------
@@ -98,7 +98,7 @@ def moat_facts(
             "source":           _SOURCE,
             "tier":             _TIER,
             "provenance":       _PROV,
-            "supporting_genes": 1,
+            "supporting_genes": 1,  # single-query EP match; multi-query COUNT(DISTINCT) aggregation deferred
         })
 
     return facts
