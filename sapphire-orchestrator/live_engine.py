@@ -472,8 +472,16 @@ def run_live(
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
             selected_ids = [a["id"] for a in _sp_result.get("selected_agents", [])]
-            plan_source = "llm"
-            smart_plan_rationale = _sp_result
+            if not selected_ids:
+                # An empty LLM selection is not an exception, but running zero
+                # Bucket-1 agents yields no facts — fall back to deterministic.
+                trace.record(eid, {"type": "plan_fallback",
+                                   "reason": "smart_plan returned empty selection"})
+                selected_ids = list(_BUCKET1_AGENTS)
+                plan_source = "deterministic"
+            else:
+                plan_source = "llm"
+                smart_plan_rationale = _sp_result
         except Exception as _e:
             trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
             # selected_ids and plan_source stay at their deterministic defaults.

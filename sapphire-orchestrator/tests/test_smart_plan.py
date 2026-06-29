@@ -114,11 +114,13 @@ class TestSmartPlan(unittest.TestCase):
 
     # ── test 4: empty selection accepted ────────────────────────────────────
     def test_empty_selection_accepted(self):
-        """Runner returns selected_agents=[] → accepted without error.
+        """Runner returns selected_agents=[] → accepted without error by smart_plan.
 
-        The LLM may legitimately decide no agent is relevant (e.g. for a very
-        abstract meta-query). Callers fall back to deterministic when they see
-        an empty selection — smart_plan itself must not reject it.
+        smart_plan does NOT reject an empty selection (it is not a hallucination).
+        live_engine detects the empty selection AFTER calling smart_plan and falls
+        back to the full deterministic list automatically — the fallback lives in
+        the caller, not here.  This test verifies only that smart_plan itself
+        returns the empty-selection result cleanly.
         """
         def _runner_empty(cmd):
             obj = {
@@ -128,7 +130,7 @@ class TestSmartPlan(unittest.TestCase):
                     for aid in self._universe
                 ],
                 "panel_rationale": "Nothing in the universe matches this meta-query.",
-                "notes": "caller should fall back to deterministic",
+                "notes": "live_engine falls back to deterministic on empty selection",
             }
             return types.SimpleNamespace(
                 stdout=json.dumps({"structured_output": obj}),

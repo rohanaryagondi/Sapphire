@@ -143,10 +143,16 @@ class TestPlanMode(unittest.TestCase):
         self.assertIn("emet-runner", agent_ids,
                       "Known id must still run after filtering")
 
-    # ── test 4: plan_mode off is equivalent to no plan_mode kwarg ───────────
-    def test_plan_mode_off_is_byte_identical(self):
-        """plan_mode='off' must produce the same top-level keys as a run with
-        no plan_mode kwarg (the regression floor — backward compatibility).
+    # ── test 4: plan_mode off matches default kwarg (structural regression floor) ─
+    def test_plan_mode_off_matches_default_kwarg(self):
+        """plan_mode='off' produces the same top-level keys as the no-kwarg call.
+
+        Note: both runs post-PR include the new additive `plan_source` key (which
+        was absent pre-PR).  Adding `plan_source` is an accepted additive change —
+        callers that ignore unknown keys are unaffected.  This test is the structural
+        regression floor (same keys, same plan_source value); it does not reproduce
+        the pre-PR call signature because both sides of the comparison already have
+        `plan_source` from this branch.
         """
         ctx_a = self._ctx()
         ctx_b = self._ctx()
@@ -219,6 +225,42 @@ class TestPlanMode(unittest.TestCase):
             if aid in known_ids:
                 self.assertIn(aid, agent_ids,
                               f"Expected {aid!r} in discover.agents on deterministic fallback")
+
+    # ── test 7: empty LLM selection falls back to deterministic ─────────────
+    def test_empty_llm_selection_falls_back_to_deterministic(self):
+        """When smart_plan returns selected_agents=[], live_engine must NOT run
+        zero agents silently.  It must fall back to the full deterministic list
+        and stamp plan_source='deterministic'.
+
+        This guards against the degenerate case where the LLM legitimately
+        over-prunes (e.g. on a meta-query) and produces an empty selection —
+        running no Bucket-1 agents would yield a fact-free dossier, which is
+        worse than a deterministic run.
+        """
+        empty_result = {
+            "selected_agents": [],
+            "dropped_agents": [{"id": aid, "why": "over-pruned"} for aid in _BUCKET1_AGENTS],
+            "panel_rationale": "Nothing matched the query.",
+            "notes": "empty selection — caller should fall back",
+        }
+        with mock.patch("smart_plan.smart_plan", return_value=empty_result):
+            result = run_live(
+                "Is TSC2 viable in tuberous sclerosis?",
+                plan_mode="llm",
+                ctx=self._ctx(),
+            )
+        self.assertIn("discover", result,
+                      "Empty LLM selection must fall back to deterministic, not produce no facts")
+        self.assertEqual(result.get("plan_source"), "deterministic",
+                         f"Expected plan_source='deterministic' on empty LLM selection; "
+                         f"got {result.get('plan_source')}")
+        # The full deterministic panel must have run.
+        agent_ids = {a["id"] for a in result["discover"]["agents"]}
+        known_ids = {a["id"] for a in self._registry.get("agents", [])}
+        for aid in _BUCKET1_AGENTS:
+            if aid in known_ids:
+                self.assertIn(aid, agent_ids,
+                              f"Expected {aid!r} in discover.agents on empty-selection fallback")
 
 
 if __name__ == "__main__":
