@@ -81,14 +81,19 @@ function TurnView({ turn }: { turn: Turn }) {
   const result = turn.result;
   const status = result?.discover?.status ?? "";
   const ku = result?.discover?.flags?.KNOWN_UNKNOWNS?.length ?? 0;
+  const setMonitorTurn = useFirm((s) => s.setMonitorTurn);
 
   return (
     <div className="space-y-3">
-      {/* user query */}
+      {/* user query — click to focus this turn's trace in the Monitor (#10) */}
       <div className="flex justify-end">
-        <div className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-[13.5px] leading-relaxed text-[var(--color-fg)]">
+        <button
+          onClick={() => setMonitorTurn(turn.id)}
+          title="Show this turn's trace in the Monitor"
+          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[13.5px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
+        >
           {turn.query}
-        </div>
+        </button>
       </div>
 
       {/* firm response */}

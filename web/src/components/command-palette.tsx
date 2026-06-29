@@ -2,6 +2,7 @@
 import * as React from "react";
 import { Command } from "cmdk";
 import {
+  Check,
   Cpu,
   FlaskConical,
   MessageSquarePlus,
@@ -12,10 +13,12 @@ import {
 import { useFirm } from "@/lib/store";
 import type { ModelChoice, Profile } from "@/lib/types";
 
+// keep in sync with the empty-state suggestions (all 4)
 const QUERIES = [
   "Which genes rescue the TSC2 phenotype the most?",
   "TSC2 in tuberous sclerosis — is it a tractable CNS target?",
   "Nav1.8 pain targets — what does the evidence say?",
+  "Assess the regulatory + payer risk for an ASO in a rare CNS disease.",
 ];
 
 const PROFILES: Profile[] = ["demo", "simulate", "live", "replay"];
@@ -28,6 +31,8 @@ export function CommandPalette() {
   const submit = useFirm((s) => s.submit);
   const setProfile = useFirm((s) => s.setProfile);
   const setModel = useFirm((s) => s.setModel);
+  const profile = useFirm((s) => s.profile);
+  const model = useFirm((s) => s.model);
   const setInspectorOpen = useFirm((s) => s.setInspectorOpen);
   const inspectorOpen = useFirm((s) => s.inspectorOpen);
   const conversations = useFirm((s) => s.conversations);
@@ -104,6 +109,7 @@ export function CommandPalette() {
             <Item
               key={p}
               icon={<FlaskConical className="size-3.5" />}
+              active={p === profile}
               onSelect={() => run(() => setProfile(p))}
             >
               Set profile · <span className="capitalize">{p}</span>
@@ -113,7 +119,12 @@ export function CommandPalette() {
 
         <Group heading="Model">
           {MODELS.map((m) => (
-            <Item key={m} icon={<Cpu className="size-3.5" />} onSelect={() => run(() => setModel(m))}>
+            <Item
+              key={m}
+              icon={<Cpu className="size-3.5" />}
+              active={m === model}
+              onSelect={() => run(() => setModel(m))}
+            >
               Set model · <span className="capitalize">{m}</span>
             </Item>
           ))}
@@ -152,10 +163,12 @@ function Item({
   icon,
   onSelect,
   children,
+  active,
 }: {
   icon: React.ReactNode;
   onSelect: () => void;
   children: React.ReactNode;
+  active?: boolean;
 }) {
   return (
     <Command.Item
@@ -164,6 +177,9 @@ function Item({
     >
       <span className="text-[var(--color-fg-subtle)]">{icon}</span>
       <span className="flex flex-1 items-center gap-1 truncate">{children}</span>
+      {active && (
+        <Check className="ml-auto size-3.5 shrink-0 text-[var(--color-accent)]" />
+      )}
     </Command.Item>
   );
 }

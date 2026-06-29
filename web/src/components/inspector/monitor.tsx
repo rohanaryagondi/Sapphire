@@ -140,6 +140,39 @@ function GroupHeader({
   );
 }
 
+function TurnSwitcher({ turn }: { turn: Turn }) {
+  const turns = useFirm((s) => s.turns);
+  const setMonitorTurn = useFirm((s) => s.setMonitorTurn);
+  if (turns.length < 2) return null;
+  return (
+    <div className="mb-2 border-b border-[var(--color-border)] px-1 pb-2.5">
+      <div className="mb-1 text-[10px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
+        Turn trace · {turns.findIndex((t) => t.id === turn.id) + 1}/{turns.length}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {turns.map((t, i) => {
+          const isLast = i === turns.length - 1;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setMonitorTurn(isLast ? null : t.id)}
+              title={t.query}
+              className={cn(
+                "max-w-[150px] truncate rounded-[var(--radius-sm)] border px-1.5 py-0.5 text-[10.5px] transition-colors",
+                t.id === turn.id
+                  ? "border-[var(--color-border-focus)] bg-[var(--color-elevated)] text-[var(--color-fg)]"
+                  : "border-[var(--color-border)] text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
+              )}
+            >
+              <span className="font-mono">{i + 1}.</span> {t.query}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export function Monitor({ turn }: { turn?: Turn }) {
   if (!turn) {
     return (
@@ -183,6 +216,7 @@ export function Monitor({ turn }: { turn?: Turn }) {
 
   return (
     <div className="space-y-1 p-3">
+      <TurnSwitcher turn={turn} />
       <TopStep
         node={m.plan}
         icon={<ClipboardList className="size-3 text-[var(--color-accent)]" />}

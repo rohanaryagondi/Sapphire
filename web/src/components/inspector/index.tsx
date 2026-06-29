@@ -13,9 +13,12 @@ export function Inspector() {
   const setTab = useFirm((s) => s.setInspectorTab);
   const setOpen = useFirm((s) => s.setInspectorOpen);
   const selection = useFirm((s) => s.selection);
+  const monitorTurnId = useFirm((s) => s.monitorTurnId);
 
-  // monitor follows the most recent turn
-  const activeTurn = turns[turns.length - 1];
+  // the Monitor shows the pinned turn (#10) if one is selected, else follows the latest
+  const activeTurn =
+    (monitorTurnId && turns.find((t) => t.id === monitorTurnId)) ||
+    turns[turns.length - 1];
 
   return (
     <div className="flex h-full flex-col">

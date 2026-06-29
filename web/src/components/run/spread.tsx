@@ -27,8 +27,9 @@ function VerdictCard({ v, turnId, via }: { v: Verdict; turnId: string; via?: str
   return (
     <button
       onClick={() => select({ kind: "verdict", persona: v.persona, turnId })}
+      title="Investigate this partner's verdict"
       className={cn(
-        "card-hover relative w-full overflow-hidden rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-panel)] p-3 pl-3.5 text-left",
+        "card-hover relative w-full cursor-pointer overflow-hidden rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-panel)] p-3 pl-3.5 text-left",
         active && "border-[var(--color-border-focus)] bg-[var(--color-panel-raised)]",
       )}
     >
