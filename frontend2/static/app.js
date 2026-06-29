@@ -107,6 +107,23 @@
   profileSel.addEventListener("change", syncBadge);
   syncBadge();
 
+  // ── URL-param preselection (?mode=replay | ?profile=<name>) ─────────────────
+  // Keeps the $0 canned demo shareable: /?mode=replay instantly selects `replay`.
+  // ?profile=simulate (or any valid option value) also preselects that profile.
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const target = params.get("mode") === "replay"
+      ? "replay"
+      : (params.get("profile") || "");
+    if (target) {
+      const valid = Array.from(profileSel.options).map(o => o.value);
+      if (valid.indexOf(target) !== -1) {
+        profileSel.value = target;
+        syncBadge();
+      }
+    }
+  })();
+
   // ── panel toggles ────────────────────────────────────────────
   function bindToggle(btn, panel) {
     btn.classList.toggle("active", panel.classList.contains("open"));

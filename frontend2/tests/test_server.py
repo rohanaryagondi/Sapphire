@@ -219,6 +219,26 @@ class TestServer(unittest.TestCase):
         self.assertIn("replays", data)
         self.assertIsInstance(data["replays"], list)
 
+    # ---- URL-param preselection (B-6) ------------------------------------
+    def test_app_js_served_and_contains_url_param_preselection(self):
+        """app.js must be served at /static/app.js and must contain the
+        URLSearchParams preselection logic so that ?mode=replay (shareable link)
+        preselects the `replay` profile in the dropdown on load."""
+        with _ServerHarness() as h:
+            status, body, headers = h.get("/static/app.js")
+        self.assertEqual(status, 200)
+        self.assertIn("javascript", headers.get("Content-Type", "").lower())
+        # The feature: URLSearchParams read on page load — anchored to the IIFE's unique logic.
+        self.assertIn("URLSearchParams", body,
+                      "app.js must read URLSearchParams for ?mode=replay preselection")
+        # The mode=replay → "replay" mapping is the key contract: a link with ?mode=replay
+        # must select the $0 canned-replay profile.  This literal only appears in the IIFE.
+        self.assertIn('params.get("mode") === "replay"', body,
+                      'IIFE must map mode=replay to the replay profile')
+        # profileSel.value is set inside the IIFE (unique to the new code).
+        self.assertIn("profileSel.value = target", body,
+                      "IIFE must preselect the dropdown by setting profileSel.value")
+
 
 class TestFullAccess(unittest.TestCase):
     """The Demo-Claude full-backend-access surface: the COMPLETE result over SSE,
