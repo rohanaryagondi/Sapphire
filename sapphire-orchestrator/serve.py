@@ -244,19 +244,24 @@ def _run_live(query: str) -> dict:
     return _stamp(run, "live")
 
 
-def _run_engine_live(query: str, ctx: dict | None = None) -> dict:
-    """Run the REAL harnessed firm (`live_engine.run_live`) and stamp the HTTP envelope.
+def _run_engine_live(query: str, ctx: dict | None = None,
+                     approved_plan: list | None = None) -> dict:
+    """Run the REAL harnessed firm (``live_engine.run_live``) and stamp the HTTP envelope.
 
     This is the live-firm service boundary K1 exposes — the integration point LOKA will call.
-    `run_live` never raises for a down backend (the harness abstains honestly), so the result is
+    ``run_live`` never raises for a down backend (the harness abstains honestly), so the result is
     always well-formed, possibly degraded. We still wrap in try/except so a *programming* error
     can never take down the endpoint; on that path we return an honest plan-only envelope.
 
-    The returned dict is the documented `run_live` contract
-    (`contracts/run_live_schema.md`) plus two HTTP stamps: `via="engine-live"`, `live=True`.
+    Uses ``plan_mode="llm"`` (smart by default for the front door) unless ``approved_plan`` is
+    provided, in which case ``run_live`` uses it to select exactly those agents.
+
+    The returned dict is the documented ``run_live`` contract
+    (``contracts/run_live_schema.md``) plus two HTTP stamps: ``via="engine-live"``, ``live=True``.
     """
     try:
-        result = live_engine.run_live(query, ctx=ctx)
+        result = live_engine.run_live(query, ctx=ctx, plan_mode="llm",
+                                      approved_plan=approved_plan)
     except Exception as e:  # defensive — run_live is designed not to raise
         plan = ENGINE.plan(query)
         plan_public = {k: v for k, v in plan.items() if not k.startswith("_")}
@@ -284,21 +289,43 @@ def _run_canned(query: str) -> dict:
             "note": "No canned scenario matches this query; omit ?mode=canned for the live engine."}
 
 
-def route_api_run(query: str, mode: str = "live") -> dict:
+def route_api_run(query: str, mode: str = "live",
+                  approved_plan: list | None = None) -> dict:
     """Pure routing decision for GET /api/run (testable without a live server).
 
     mode:
-      "live"   (default) -> the harnessed firm via run_live           (via=engine-live)
+      "live"   (default) -> the harnessed firm via run_live with plan_mode="llm"
+                            (smart by default; via=engine-live)
+      "plan"             -> LLM plan + approval gate: run_live with plan_mode="llm+approve";
+                            returns plan_pending_approval=True, no agents run (via=engine-plan)
       "canned"           -> a pre-captured scenario, $0 offline        (via=canned)
       "claude"           -> headless-Claude reconstruction (subscription) (via=claude-subscription)
+
+    approved_plan:
+      When not None, passed to run_live as approved_plan — runs exactly those agent ids
+      (filtered to registry ∩ _BUCKET1_AGENTS). Overrides plan_mode in run_live.
     """
+    if mode == "plan":
+        # LLM-plan + approval gate: compute the smart plan and return it for review.
+        # No agents run on this path; the caller re-calls with approved_plan once approved.
+        try:
+            result = live_engine.run_live(query, plan_mode="llm+approve", ctx=None)
+        except Exception as e:
+            plan = ENGINE.plan(query)
+            plan_public = {k: v for k, v in plan.items() if not k.startswith("_")}
+            return {"query": query, "plan": plan_public,
+                    "via": "engine-plan", "live": False,
+                    "note": f"plan mode unavailable ({type(e).__name__}: {str(e)[:160]})."}
+        result["via"] = "engine-plan"
+        result["live"] = True
+        return result
     if mode == "canned":
         return _run_canned(query)
     if mode == "claude":
         return _run_live(query)
     # "live" and any unrecognised mode fall through to the live firm (the safe,
     # forward-compatible default). Covered by test_unknown_mode_defaults_to_engine_live.
-    return _run_engine_live(query)
+    return _run_engine_live(query, approved_plan=approved_plan)
 
 
 def _qmodels_status() -> str:
@@ -353,9 +380,22 @@ class Handler(SimpleHTTPRequestHandler):
                 return self._json({"error": "missing q"}, 400)
             # Default: the REAL harnessed firm (via=engine-live). The canned scenarios remain
             # reachable as an explicit $0 offline fallback via ?mode=canned; the headless-Claude
-            # reconstruction via ?mode=claude.
+            # reconstruction via ?mode=claude; the LLM plan gate via ?mode=plan.
             mode = qs.get("mode", ["live"])[0].strip().lower()
-            return self._json(route_api_run(q, mode))
+            # Optional: ?approved_plan=["emet-runner","clinical-trial-registry"] (JSON array).
+            # When present, passed to run_live to run exactly those agents.
+            approved_raw = qs.get("approved_plan", [None])[0]
+            approved_plan = None
+            if approved_raw:
+                try:
+                    _parsed = json.loads(approved_raw)
+                    # Only a JSON array is a valid approved_plan. A bare string
+                    # iterates into characters; an object iterates keys. Both are
+                    # silently treated as "no approved_plan" (same as absent).
+                    approved_plan = [str(i) for i in _parsed] if isinstance(_parsed, list) else None
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            return self._json(route_api_run(q, mode, approved_plan=approved_plan))
         return super().do_GET()
 
     def do_POST(self):

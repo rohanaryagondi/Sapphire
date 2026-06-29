@@ -32,12 +32,18 @@
     </a>
 
     <div class="nav-group right">
+      <select id="model" class="profile-select" aria-label="Model for this run" title="Model override (Default: uses the model your subscription provides)">
+        <option value="">Default (subscription)</option>
+        <option value="sonnet">Sonnet</option>
+        <option value="haiku">Haiku</option>
+      </select>
       <select id="profile" class="profile-select" aria-label="Run profile" title="Run profile">
         <option value="simulate" selected>Live · simulated models</option>
         <option value="demo">Demo · mock backends</option>
         <option value="live">Live · real models</option>
         <option value="replay">Replay · captured TSC2 ($0)</option>
       </select>
+      <span id="modelBadge" style="display:none;font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding:0 4px;" aria-live="polite"></span>
       <div class="live-badge" id="liveBadge"><span class="live-dot"></span><span id="liveLabel">Live</span></div>
       <button class="toggle-btn" id="rightToggle" aria-pressed="true" aria-label="Toggle the Sources &amp; Trace panel">
         Sources

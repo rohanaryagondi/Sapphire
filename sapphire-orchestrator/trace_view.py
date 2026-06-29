@@ -178,6 +178,22 @@ def render(engagement_id: str, *, full: bool = False) -> str:
         if ts:
             lines.append(f"     ts         : {ts}")
 
+    # ---- Redispatch events (adaptive convergence loop, WOs 2.1–2.5) --------
+    redispatch_rows = [r for r in rows if r.get("type") == "redispatch"]
+    if redispatch_rows:
+        lines.append("")
+        lines.append("  ── Adaptive redispatch ──")
+        for r in redispatch_rows:
+            rnd = r.get("round", "?")
+            entity = r.get("trigger_entity", "?")
+            targets = ", ".join(r.get("target_agents", []))
+            reason = r.get("reason", "")
+            src = r.get("source_agent", "")
+            lines.append(
+                f"  ↻  round={rnd}  entity={entity}  from={src}  targets=[{targets}]"
+                + (f"  ({reason})" if reason else "")
+            )
+
     # ---- Footer -----------------------------------------------------------
     close_row = next((r for r in rows if r.get("type") == "engagement_close"), None)
     lines.append("")

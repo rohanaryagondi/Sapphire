@@ -38,6 +38,15 @@ EMET PMIDs via this path, point the runner at a **dedicated authenticated browse
 the login helper.
 
 ## One-time login (creds in the gitignored `RohanOnly/emet_creds.env`)
+
+The canonical one-time login is:
+```bash
+python -m emet.login            # headed browser — log in, session persists to RohanOnly/benchsci_profile/
+python -m emet.login --profile /path/to/profile   # use a custom profile path
+```
+Session survives restarts — re-run only if BenchSci shows a login screen on a live EMET call.
+The legacy shell-script route (`bash _build/emet_login.sh --manual`) still works for SSO/2FA.
+
 ```bash
 bash _build/emet_login.sh            # AUTO: headless login with SAPPHIRE_EMET_USER/_PASS into the profile
 bash _build/emet_login.sh --manual   # MANUAL: opens a headed Chrome to sign in by hand (SSO/2FA)

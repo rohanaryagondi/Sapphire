@@ -22,7 +22,7 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
 from orchestrator import Orchestrator
-from engagement import extract_entities, _eid
+from engagement import extract_entities, _eid, _GENE_RE
 from moat.facts import moat_facts, rescue_genes
 from memory import recall
 from harness import trace
@@ -83,6 +83,102 @@ _BUCKET1_AGENTS = [
     # imaging data (a v17_traces plate dir) is present in inputs; honest-empty otherwise.
     "robyn-scs",
 ]
+
+# Fast membership test for approved_plan filtering (WO 1.2).
+_BUCKET1_AGENTS_SET: frozenset = frozenset(_BUCKET1_AGENTS)
+
+
+# ---------------------------------------------------------------------------
+# Adaptive convergence loop (WOs 2.1–2.5) — OPT-IN (adaptive=False default)
+# ---------------------------------------------------------------------------
+
+# v1 redispatch targets: CHEAP, DETERMINISTIC, no paid external API.
+# EMET is intentionally excluded (paid/slow/login-gated — a later flag).
+# "internal-science-lead" → moat (real internal DB lookup, stdlib-only engine).
+# The three public-API seams (gnomad/gtex/interpro) fire only when a gene is present;
+# they honest-empty when the gene is not found — so a spurious entity is harmless.
+REDISPATCH_TARGETS: list[str] = [
+    "internal-science-lead",  # real moat (Quiver internal; python kind; stdlib seam)
+    "gnomad-constraint",       # gnomAD pLI / LOEUF (public; stdlib urllib seam)
+    "gtex-expression",         # GTEx TPM + CNS selectivity (public; stdlib urllib seam)
+    "interpro-domains",        # InterPro domain annotations (public; stdlib urllib seam)
+]
+
+_MAX_ADAPTIVE_ROUNDS: int = 2     # max convergence rounds after the initial Bucket-1 pass
+_MAX_ADAPTIVE_DISPATCHES: int = 6  # max total follow-up harness.run calls across all rounds
+_ADAPTIVE_SALIENCE_THRESHOLD: int = 2  # minimum salience score to trigger re-dispatch
+
+
+def extract_salient_entities(
+    facts: list[dict],
+    already_covered: set[str],
+) -> list[dict]:
+    """Scan returned facts[].value for gene-symbol tokens NOT in already_covered.
+
+    Pure function — stdlib only, no I/O.
+
+    Salience (deterministic, explainable):
+      - Base: +1 per occurrence of the entity in any fact.
+      - +1 if the containing fact has tier "T1" or "T2" (high-quality source).
+      - +2 if the containing fact carries flag "DIVERGENCE" or "VETO" (high-signal).
+      - +2 cross-agent bonus if the entity appears in facts from ≥ 2 distinct
+        source agents (corroboration across independent sources). Each fact may
+        carry a ``_source_agent`` key for this computation; facts without it are
+        treated as from the same anonymous agent and do NOT contribute to the bonus.
+
+    already_covered: entity symbols to exclude (original query genes + any entity
+    already re-dispatched in a prior round).
+
+    Returns:
+        list of {entity: str, salience: int, source_agent: str} sorted descending
+        by salience, filtered to salience >= _ADAPTIVE_SALIENCE_THRESHOLD.
+        Returns [] if no new qualifying entities are found.
+    """
+    # entity → {salience: int, source_agent: str, agents: set[str]}
+    scores: dict[str, dict] = {}
+
+    for fact in facts:
+        value = fact.get("value") or ""
+        tier = fact.get("tier", "")
+        flag = fact.get("flag", "")
+        src = fact.get("_source_agent", "")  # optional internal annotation
+
+        tokens = set(_GENE_RE.findall(value))
+        for tok in tokens:
+            if tok in already_covered:
+                continue
+            if tok not in scores:
+                scores[tok] = {
+                    "salience": 0,
+                    "source_agent": src or "unknown",
+                    "agents": set(),
+                }
+            entry = scores[tok]
+            entry["salience"] += 1            # base: one occurrence
+            if tier in ("T1", "T2"):
+                entry["salience"] += 1        # quality tier bonus
+            if flag in ("DIVERGENCE", "VETO"):
+                entry["salience"] += 2        # high-signal flag bonus
+            if src:
+                entry["agents"].add(src)
+
+    # Cross-agent bonus: entity appears in facts from ≥ 2 distinct agents.
+    for entry in scores.values():
+        if len(entry["agents"]) >= 2:
+            entry["salience"] += 2
+
+    # Filter to threshold, sort descending.
+    result = [
+        {
+            "entity": tok,
+            "salience": entry["salience"],
+            "source_agent": entry["source_agent"],
+        }
+        for tok, entry in scores.items()
+        if entry["salience"] >= _ADAPTIVE_SALIENCE_THRESHOLD
+    ]
+    result.sort(key=lambda x: x["salience"], reverse=True)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -306,40 +402,65 @@ def run_live(
     registry=None,
     engine: Orchestrator | None = None,
     on_progress=None,
+    plan_mode: str = "off",
+    approved_plan: list[str] | None = None,
+    adaptive: bool = False,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
 
     Parameters
     ----------
-    query     : the free-text question / task.
-    sequences : optional list of ASO candidate sequences (e.g. ["GCACTTGAATTTCACGTTGT"]).
-                When provided, sequences are threaded into every Bucket-1 agent's inputs
-                so the aso-tox agent can score them.  If None (default), the function
-                falls back to extracting pure A/T/G/C tokens of length ≥ 15 from the
-                query text via _extract_aso_sequences().
-                NOTE: this is the documented handoff point for the future ASO-Design tool —
-                that tool will pass its designed sequences here after its own dispatch.
-    structure : optional dict of Boltz STRUCTURE/AFFINITY inputs — public identifiers only:
-                {"target_sequence"|"protein_sequence", "ligand_smiles"|"ligand_ccd"} (or a
-                pre-built {"entities": [...], "binding": {...}}).  When provided, these are
-                threaded into every Bucket-1 agent's inputs so the boltz agent folds/scores
-                them (a protein + a ligand auto-requests a binding_confidence).  If None
-                (default), the function falls back to extracting a target protein sequence
-                from the query text via _extract_structure_inputs().  Boltz fires ONLY when
-                a structure/affinity input is in scope — with neither a sequence nor a
-                ligand it stays dormant (honest-empty), mirroring aso-tox.
-                NOTE: this is the documented handoff point for the upstream ASO Design /
-                small-molecule tools — they pass a target sequence + candidate ligand here.
-    ctx       : optional harness context dict (inject mock backends for testing).
-    registry  : optional pre-loaded agents.json dict (default: harness.load_registry()).
-    engine    : optional Orchestrator instance (default: new Orchestrator()).
+    query         : the free-text question / task.
+    sequences     : optional list of ASO candidate sequences (e.g. ["GCACTTGAATTTCACGTTGT"]).
+                    When provided, sequences are threaded into every Bucket-1 agent's inputs
+                    so the aso-tox agent can score them.  If None (default), the function
+                    falls back to extracting pure A/T/G/C tokens of length ≥ 15 from the
+                    query text via _extract_aso_sequences().
+                    NOTE: this is the documented handoff point for the future ASO-Design tool —
+                    that tool will pass its designed sequences here after its own dispatch.
+    structure     : optional dict of Boltz STRUCTURE/AFFINITY inputs — public identifiers only:
+                    {"target_sequence"|"protein_sequence", "ligand_smiles"|"ligand_ccd"} (or a
+                    pre-built {"entities": [...], "binding": {...}}).  When provided, these are
+                    threaded into every Bucket-1 agent's inputs so the boltz agent folds/scores
+                    them (a protein + a ligand auto-requests a binding_confidence).  If None
+                    (default), the function falls back to extracting a target protein sequence
+                    from the query text via _extract_structure_inputs().  Boltz fires ONLY when
+                    a structure/affinity input is in scope — with neither a sequence nor a
+                    ligand it stays dormant (honest-empty), mirroring aso-tox.
+                    NOTE: this is the documented handoff point for the upstream ASO Design /
+                    small-molecule tools — they pass a target sequence + candidate ligand here.
+    ctx           : optional harness context dict (inject mock backends for testing).
+    registry      : optional pre-loaded agents.json dict (default: harness.load_registry()).
+    engine        : optional Orchestrator instance (default: new Orchestrator()).
+    plan_mode     : controls Bucket-1 agent selection strategy:
+                    "off" (default) — run all _BUCKET1_AGENTS (deterministic; backward-compat).
+                    "llm"           — call smart_plan to select a relevant subset; fall back to
+                                      deterministic on any smart_plan failure.
+                    "llm+approve"   — call smart_plan and return immediately with
+                                      plan_pending_approval=True without running any agents.
+                                      The caller (front-door / LOKA) must approve and then
+                                      re-call with approved_plan=<ids>.
+    approved_plan : when not None, run ONLY these agent ids (filtered to known registry ids
+                    and _BUCKET1_AGENTS); overrides plan_mode (smart_plan is skipped).
+    adaptive      : when True, enable the adaptive convergence loop (WOs 2.1–2.5).
+                    After the initial Bucket-1 pass, scan returned facts for new
+                    high-salience gene-symbol entities not covered by the original
+                    query; re-dispatch the REDISPATCH_TARGETS agents for each surfaced
+                    entity; fold new facts into the dossier; repeat up to
+                    _MAX_ADAPTIVE_ROUNDS rounds or _MAX_ADAPTIVE_DISPATCHES total
+                    follow-up calls.  Default False (OPT-IN, Gate-5 validated).
+                    MUST reproduce today's output byte-for-byte when False.
 
     Returns
     -------
     A structured dict with keys:
         query, plan, priors, discover, consult, synthesize, engagement_id,
-        reflection, _via.
+        reflection, _via, plan_source.
+
+    For plan_mode="llm+approve" returns early with:
+        query, plan, plan_pending_approval, smart_plan (or absent on fallback),
+        plan_source, engagement_id, _via="harness-live-plan".
     """
     # -----------------------------------------------------------------------
     # 0. Initialise engine + ctx
@@ -380,6 +501,11 @@ def run_live(
     plan = engine.plan(query)
     panel = plan.get("panel", [])
 
+    # Bucket-1 selection defaults — overridden below by plan_mode or approved_plan.
+    selected_ids: list[str] = list(_BUCKET1_AGENTS)  # default: full deterministic list
+    plan_source: str = "deterministic"
+    smart_plan_rationale: dict | None = None
+
     # -----------------------------------------------------------------------
     # 2. Entity extraction + engagement id + priors
     # -----------------------------------------------------------------------
@@ -403,6 +529,78 @@ def run_live(
         "panel": [p.get("persona", p) if isinstance(p, dict) else p
                   for p in public_plan.get("panel", [])],
     })
+
+    # -----------------------------------------------------------------------
+    # 2b. Plan-mode routing — approved_plan overrides plan_mode; smart_plan is
+    #     called lazily only for plan_mode in ("llm", "llm+approve").
+    # -----------------------------------------------------------------------
+    if approved_plan is not None:
+        # Explicit approved_plan takes full precedence over plan_mode.
+        # Filter to agents that exist in the registry AND are Bucket-1 agents
+        # (silently drop unknown or out-of-bucket ids — never crash).
+        selected_ids = [i for i in approved_plan
+                        if i in known_ids and i in _BUCKET1_AGENTS_SET]
+        if not selected_ids:
+            # All client-supplied ids were unknown/out-of-bucket — running zero
+            # fact agents silently yields a fact-free dossier. Mirror the llm
+            # empty-selection guard: fall back to the full deterministic list.
+            trace.record(eid, {"type": "plan_fallback",
+                               "reason": "approved_plan all-filtered (no valid bucket-1 ids)"})
+            selected_ids = list(_BUCKET1_AGENTS)
+            plan_source = "deterministic"
+        else:
+            plan_source = "approved"
+    elif plan_mode.lower() == "llm+approve":
+        # Compute the LLM plan, then return immediately WITHOUT running any agents.
+        # The caller (front-door / LOKA) approves and re-calls with approved_plan.
+        # We close the engagement trace before every early return so that
+        # trace_view / reflect() see a clean open→close pair, not a "crashed run".
+        try:
+            from smart_plan import smart_plan as _sp
+            _sp_result = _sp(query, plan, registry, ctx)
+            trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "llm"})
+            return {
+                "query": query,
+                "plan": public_plan,
+                "plan_pending_approval": True,
+                "smart_plan": _sp_result,
+                "plan_source": "llm",
+                "engagement_id": eid,
+                "_via": "harness-live-plan",
+            }
+        except Exception as _e:
+            trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
+            # Fall back to a deterministic plan-only envelope (no agents ran).
+            trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "deterministic"})
+            return {
+                "query": query,
+                "plan": public_plan,
+                "plan_pending_approval": True,
+                "plan_source": "deterministic",
+                "engagement_id": eid,
+                "_via": "harness-live-plan",
+            }
+    elif plan_mode.lower() == "llm":
+        # Let the LLM prune the Bucket-1 panel; fall back to the full deterministic
+        # list on any smart_plan failure (never raises to the caller).
+        try:
+            from smart_plan import smart_plan as _sp
+            _sp_result = _sp(query, plan, registry, ctx)
+            selected_ids = [a["id"] for a in _sp_result.get("selected_agents", [])]
+            if not selected_ids:
+                # An empty LLM selection is not an exception, but running zero
+                # Bucket-1 agents yields no facts — fall back to deterministic.
+                trace.record(eid, {"type": "plan_fallback",
+                                   "reason": "smart_plan returned empty selection"})
+                selected_ids = list(_BUCKET1_AGENTS)
+                plan_source = "deterministic"
+            else:
+                plan_source = "llm"
+                smart_plan_rationale = _sp_result
+        except Exception as _e:
+            trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
+            # selected_ids and plan_source stay at their deterministic defaults.
+    # else: plan_mode "off" or any unrecognised value — keep deterministic defaults.
 
     # -----------------------------------------------------------------------
     # 3. Wire the REAL moat backend (only if caller didn't supply one already)
@@ -454,6 +652,11 @@ def run_live(
     divergence_flags: list[str] = []
     abstained_agents: list[str] = []
 
+    # Annotated facts list: parallel to all_dossier_facts, each entry carries
+    # "_source_agent" key for the adaptive salience computation. Only populated
+    # when adaptive=True; always empty (and unused) when adaptive=False.
+    _annot_facts: list[dict] = []
+
     bucket1_inputs = {
         "candidate": target,
         "disease": tri.get("disease_label", ""),
@@ -491,7 +694,17 @@ def run_live(
         if ctx.get("batch_buckets") else {}
     )
 
-    for agent_id in _BUCKET1_AGENTS:
+    # Emit a plan trace event so the run is auditable: which plan_source drove
+    # Bucket-1 and what the LLM rationale was (None for deterministic/approved).
+    trace.record(eid, {
+        "type": "plan",
+        "plan_source": plan_source,
+        "selected_ids": selected_ids,
+        "rationale": smart_plan_rationale,
+    })
+
+    # plan_mode seam: drive from LLM-selected or full deterministic list.
+    for agent_id in selected_ids:
         if agent_id not in known_ids:
             # Skip agents absent from the registry gracefully.
             continue
@@ -569,6 +782,8 @@ def run_live(
                 except KeyError:
                     enriched["plane"] = "external"
                 all_dossier_facts.append(enriched)
+                if adaptive:
+                    _annot_facts.append({**enriched, "_source_agent": agent_id})
                 flag = f.get("flag")
                 if flag == "VETO":
                     veto_flags.append(f.get("value", ""))
@@ -587,6 +802,9 @@ def run_live(
         if corpus_cards:
             corpus_facts = [_corpus_card_to_fact(agent_id, c) for c in corpus_cards]
             all_dossier_facts.extend(corpus_facts)
+            if adaptive:
+                for _cf in corpus_facts:
+                    _annot_facts.append({**_cf, "_source_agent": agent_id})
             trace.record(eid, {
                 "type": "corpus_retrieval",
                 "agent_id": agent_id,
@@ -655,6 +873,16 @@ def run_live(
                     "plane": plane_for("scientific-reasoning"),
                     "field": "rescue mechanism",
                 })
+                if adaptive:
+                    _annot_facts.append({
+                        "value": val,
+                        "source": "Sapphire scientific reasoning (cites EMET/corpus literature)",
+                        "tier": "T3",
+                        "provenance": "scientific-reasoning",
+                        "plane": plane_for("scientific-reasoning"),
+                        "field": "rescue mechanism",
+                        "_source_agent": "rescue-mechanism",
+                    })
             agent_statuses.append({
                 "id": "rescue-mechanism", "status": mres.status, "provenance": mres.provenance,
             })
@@ -666,6 +894,163 @@ def run_live(
                 "n_facts": len(gene_mechanisms), "elapsed_s": _elapsed,
                 "error": mres.error if not mres.ok else None,
             })
+
+    # -----------------------------------------------------------------------
+    # 4c. Adaptive convergence loop (WOs 2.1–2.5) — OPT-IN (adaptive=False skips)
+    #
+    # After the initial Bucket-1 pass (4 + 4b), scan returned facts for new
+    # high-salience gene-symbol entities not in the original query.  For each,
+    # re-dispatch the CHEAP DETERMINISTIC REDISPATCH_TARGETS agents through harness.run
+    # (guards/provenance/trace fire identically to the main loop).  Fold any new
+    # facts back into all_dossier_facts and _annot_facts.  Repeat for up to
+    # _MAX_ADAPTIVE_ROUNDS rounds or _MAX_ADAPTIVE_DISPATCHES total dispatches.
+    #
+    # Termination is GUARANTEED by three independent caps:
+    #   1. _MAX_ADAPTIVE_ROUNDS (2): loop exits after at most 2 convergence passes.
+    #   2. _MAX_ADAPTIVE_DISPATCHES (6): total dispatch_budget counter.
+    #   3. already_covered_adaptive: entities re-dispatched in prior rounds are
+    #      added here, so extract_salient_entities never re-surfaces them.
+    # A "pathological all-genes" input terminates as soon as budget=0.
+    # -----------------------------------------------------------------------
+    if adaptive:
+        already_covered_adaptive: set[str] = set(ents.get("genes", []))
+        visited: set[tuple[str, str]] = set()   # (entity, agent_id) pairs dispatched
+        dispatch_budget: int = _MAX_ADAPTIVE_DISPATCHES
+
+        for _rnd in range(1, _MAX_ADAPTIVE_ROUNDS + 1):
+            if dispatch_budget <= 0:
+                break
+
+            salient = extract_salient_entities(_annot_facts, already_covered_adaptive)
+            if not salient:
+                break  # no new entities above threshold — dossier converged
+
+            _any_dispatched_this_round = False
+
+            for _ent_rec in salient:
+                if dispatch_budget <= 0:
+                    break
+
+                _entity = _ent_rec["entity"]
+                _source_agent = _ent_rec["source_agent"]
+                _target_agents_fired: list[str] = []
+
+                for _target_id in REDISPATCH_TARGETS:
+                    if dispatch_budget <= 0:
+                        break
+                    if (_entity, _target_id) in visited:
+                        continue  # never dispatch a (entity, agent) pair twice
+                    if _target_id not in known_ids:
+                        continue  # skip agents absent from the registry
+
+                    visited.add((_entity, _target_id))
+
+                    # Build redispatch inputs: ONLY the public gene SYMBOL crosses.
+                    # Sequences and structure inputs are excluded (gene-level re-query
+                    # doesn't need ASO/structure data).
+                    _rd_inputs: dict = {
+                        "candidate": _entity,           # public gene symbol ONLY
+                        "genes": [_entity],             # one-element gene set
+                        "disease": bucket1_inputs.get("disease", ""),
+                        "query": bucket1_inputs.get("query", ""),
+                        "sequences": [],                # no ASO sequences in re-query
+                    }
+
+                    # WO 2.4 — progress: redispatch start milestone
+                    _emit(on_progress, eid, {
+                        "stage": "redispatch", "phase": "start",
+                        "round": _rnd, "entity": _entity,
+                        "target_agent": _target_id,
+                    })
+                    _t0_rd = time.monotonic()
+
+                    _rd_res = harness.run(
+                        _target_id,
+                        _rd_inputs,
+                        engagement_id=eid,
+                        ctx=ctx,
+                        registry=registry,
+                    )
+
+                    _elapsed_rd = round(time.monotonic() - _t0_rd, 2)
+                    dispatch_budget -= 1
+                    _target_agents_fired.append(_target_id)
+                    _any_dispatched_this_round = True
+
+                    # Fix #1 (auditability): append this redispatch to agent_statuses
+                    # so re-dispatched agents appear in discover["agents"].  The
+                    # "phase"/"redispatch_round"/"trigger_entity" keys distinguish these
+                    # entries from the initial Bucket-1 pass for monitoring consumers.
+                    agent_statuses.append({
+                        "id": _target_id,
+                        "status": _rd_res.status,
+                        "provenance": _rd_res.provenance,
+                        "phase": "redispatch",
+                        "redispatch_round": _rnd,
+                        "trigger_entity": _entity,
+                    })
+
+                    # Fold new facts into all_dossier_facts (+ _annot_facts for
+                    # further convergence rounds).  Stamp provenance + plane
+                    # exactly like the main Bucket-1 loop.
+                    if _rd_res.ok and _rd_res.output:
+                        _rd_facts = _rd_res.output.get("facts", [])
+                        _rd_prov = _rd_res.output.get("provenance", _rd_res.provenance)
+                        for _f in _rd_facts:
+                            _enriched = dict(_f)
+                            _enriched.setdefault("provenance", _rd_prov)
+                            _f_prov = _enriched.get("provenance", _rd_prov)
+                            try:
+                                _enriched["plane"] = plane_for(_f_prov)
+                            except KeyError:
+                                _enriched["plane"] = "external"
+                            all_dossier_facts.append(_enriched)
+                            _annot_facts.append({**_enriched, "_source_agent": _target_id})
+                            _f_flag = _f.get("flag")
+                            if _f_flag == "VETO":
+                                veto_flags.append(_f.get("value", ""))
+                            elif _f_flag == "DIVERGENCE":
+                                divergence_flags.append(_f.get("value", ""))
+
+                    # WO 2.4 — progress: redispatch done milestone
+                    _emit(on_progress, eid, {
+                        "stage": "redispatch", "phase": "done",
+                        "round": _rnd, "entity": _entity,
+                        "target_agent": _target_id,
+                        "status": _rd_res.status,
+                        "n_new_facts": (
+                            len(_rd_res.output.get("facts", []))
+                            if (_rd_res.ok and _rd_res.output) else 0
+                        ),
+                        "elapsed_s": _elapsed_rd,
+                    })
+
+                # WO 2.4 — trace: ONE redispatch event per entity per round.
+                # Best-effort: a trace failure never breaks the run.
+                if _target_agents_fired:
+                    try:
+                        trace.record(eid, {
+                            "type": "redispatch",
+                            "round": _rnd,
+                            "trigger_entity": _entity,
+                            "source_agent": _source_agent,
+                            "target_agents": _target_agents_fired,
+                            "reason": f"salience={_ent_rec['salience']}",
+                        })
+                    except Exception:
+                        pass
+
+                # Mark entity as covered so it is not re-surfaced in later rounds.
+                # Intentional trade-off: the entity is marked covered even when budget
+                # depleted mid-dispatch (e.g. 2 of 4 targets fired before budget hit 0).
+                # The remaining (entity, target_id) pairs become unreachable — they are
+                # not in visited (so no guard fires) but budget=0 prevents any dispatch.
+                # This is by design: once budget is exhausted, further coverage of that
+                # entity is deferred to a future engagement (the spec allows this).
+                already_covered_adaptive.add(_entity)
+
+            if not _any_dispatched_this_round:
+                break  # nothing new dispatched this round — converged
 
     known_unknowns = [f"abstained: {aid}" for aid in abstained_agents]
 
@@ -1001,4 +1386,5 @@ def run_live(
         "engagement_id": eid,
         "reflection": reflection,
         "_via": "harness-live",
+        "plan_source": plan_source,
     }
