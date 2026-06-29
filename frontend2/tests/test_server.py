@@ -219,6 +219,75 @@ class TestServer(unittest.TestCase):
         self.assertIn("replays", data)
         self.assertIsInstance(data["replays"], list)
 
+    # ---- WO 3.1 model forwarding ----------------------------------------
+    def test_model_in_post_body_forwarded_to_bridge_run(self):
+        """When the POST body contains model=haiku, bridge.run is called with model='haiku'."""
+        received = {}
+        orig_run = server.bridge.run
+
+        def _capture_run(*args, **kwargs):
+            received.update(kwargs)
+            return orig_run(*args, **kwargs)
+
+        server.bridge.run = _capture_run
+        try:
+            with _ServerHarness() as h:
+                h.post_run({"query": "Is TSC2 viable?", "profile": "demo", "model": "haiku"})
+        finally:
+            server.bridge.run = orig_run
+
+        self.assertEqual(received.get("model"), "haiku",
+                         "model='haiku' in POST body must reach bridge.run(model=...)")
+
+    def test_empty_model_in_post_body_no_model_override(self):
+        """When model is absent or empty in POST body, bridge.run is called with model=None."""
+        received = {}
+        orig_run = server.bridge.run
+
+        def _capture_run(*args, **kwargs):
+            received.update(kwargs)
+            return orig_run(*args, **kwargs)
+
+        server.bridge.run = _capture_run
+        try:
+            with _ServerHarness() as h:
+                # No model field at all
+                h.post_run({"query": "Is TSC2 viable?", "profile": "demo"})
+        finally:
+            server.bridge.run = orig_run
+
+        # model=None or model not present both mean "no override"
+        self.assertIsNone(received.get("model"),
+                          "absent model in POST body must result in model=None to bridge.run")
+
+    def test_replay_profile_ignores_model(self):
+        """replay profile calls bridge.replay (not bridge.run), so model is silently ignored."""
+        bridge_run_calls = []
+        bridge_replay_calls = []
+        orig_run = server.bridge.run
+        orig_replay = server.bridge.replay
+
+        def _track_run(*args, **kwargs):
+            bridge_run_calls.append(kwargs)
+            return orig_run(*args, **kwargs)
+
+        def _track_replay(*args, **kwargs):
+            bridge_replay_calls.append(args)
+            return orig_replay(*args, **kwargs)
+
+        server.bridge.run = _track_run
+        server.bridge.replay = _track_replay
+        try:
+            with _ServerHarness() as h:
+                h.post_run({"query": "", "profile": "replay", "model": "haiku"})
+        finally:
+            server.bridge.run = orig_run
+            server.bridge.replay = orig_replay
+
+        # For replay, bridge.replay was called (not bridge.run), so model was NOT forwarded.
+        self.assertTrue(bridge_replay_calls, "bridge.replay must be called for profile=replay")
+        self.assertFalse(bridge_run_calls, "bridge.run must NOT be called for profile=replay")
+
     # ---- URL-param preselection (B-6) ------------------------------------
     def test_app_js_served_and_contains_url_param_preselection(self):
         """app.js must be served at /static/app.js and must contain the
