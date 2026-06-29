@@ -88,6 +88,8 @@ class MoatClient:
         """
         Return up to k neighbor rows for `perturbation` (case-insensitive).
 
+        Rows are ordered by union_rank ASC (dual-rank metric: rank_cosine + rank_euclidean).
+
         Args:
             perturbation: gene symbol or compound name (matched UPPERCASE).
             effect: "similar" | "opposite".
@@ -96,7 +98,8 @@ class MoatClient:
 
         Returns:
             List of dicts with keys:
-                query, ref, ref_type, ref_dose, effect, rank,
+                query, ref, ref_type, ref_dose, effect,
+                rank_cosine, rank_euclidean, union_rank,
                 cosine, euclidean, provenance.
             Returns [] if unavailable, no match, or any error — never raises.
         """
@@ -112,19 +115,23 @@ class MoatClient:
 
             if ref_type is not None:
                 sql = """
-                    SELECT query, ref, ref_type, ref_dose, effect, rank, cosine, euclidean
+                    SELECT query, ref, ref_type, ref_dose, effect,
+                           rank_cosine, rank_euclidean, union_rank,
+                           cosine, euclidean
                     FROM neighbors
                     WHERE query = ? AND effect = ? AND ref_type = ?
-                    ORDER BY rank
+                    ORDER BY union_rank ASC, cosine ASC, ref ASC
                     LIMIT ?
                 """
                 params = (query_upper, effect, ref_type, k)
             else:
                 sql = """
-                    SELECT query, ref, ref_type, ref_dose, effect, rank, cosine, euclidean
+                    SELECT query, ref, ref_type, ref_dose, effect,
+                           rank_cosine, rank_euclidean, union_rank,
+                           cosine, euclidean
                     FROM neighbors
                     WHERE query = ? AND effect = ?
-                    ORDER BY rank
+                    ORDER BY union_rank ASC, cosine ASC, ref ASC
                     LIMIT ?
                 """
                 params = (query_upper, effect, k)
@@ -136,15 +143,17 @@ class MoatClient:
             result = []
             for row in rows:
                 result.append({
-                    "query":     row["query"],
-                    "ref":       row["ref"],
-                    "ref_type":  row["ref_type"],
-                    "ref_dose":  row["ref_dose"],
-                    "effect":    row["effect"],
-                    "rank":      row["rank"],
-                    "cosine":    row["cosine"],
-                    "euclidean": row["euclidean"],
-                    "provenance": PROVENANCE,
+                    "query":         row["query"],
+                    "ref":           row["ref"],
+                    "ref_type":      row["ref_type"],
+                    "ref_dose":      row["ref_dose"],
+                    "effect":        row["effect"],
+                    "rank_cosine":   row["rank_cosine"],
+                    "rank_euclidean": row["rank_euclidean"],
+                    "union_rank":    row["union_rank"],
+                    "cosine":        row["cosine"],
+                    "euclidean":     row["euclidean"],
+                    "provenance":    PROVENANCE,
                 })
             return result
 

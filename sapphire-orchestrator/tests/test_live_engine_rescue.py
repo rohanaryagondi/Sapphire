@@ -30,18 +30,24 @@ def _make_fixture_moat() -> str:
     db = tmp.name
     tmp.close()
     con = sqlite3.connect(db)
-    con.execute("""CREATE TABLE neighbors (query TEXT, query_type TEXT, ref TEXT, ref_type TEXT,
-                   ref_dose TEXT, effect TEXT, rank INTEGER, cosine REAL, euclidean REAL)""")
+    # WO-5 dual-rank schema: rank_cosine, rank_euclidean, union_rank replace 'rank'
+    con.execute("""CREATE TABLE neighbors (
+                   query TEXT, query_type TEXT, ref TEXT, ref_type TEXT,
+                   ref_dose TEXT, effect TEXT,
+                   rank_cosine INTEGER, rank_euclidean INTEGER, union_rank INTEGER,
+                   cosine REAL, euclidean REAL)""")
     con.execute("CREATE TABLE moat_meta (key TEXT PRIMARY KEY, value TEXT)")
+    # Tuple: (query, query_type, ref, ref_type, ref_dose, effect,
+    #         rank_cosine, rank_euclidean, union_rank, cosine, euclidean)
     rows = [
-        ("TSC2", "gene", "TSC1",  "gene", None, "similar",  1, 0.970, 0.18),
-        # the rescuers — opposite-signature genes, rank-ordered
-        ("TSC2", "gene", "DCTN6", "gene", None, "opposite", 1, 0.163, 0.50),
-        ("TSC2", "gene", "FZD7",  "gene", None, "opposite", 2, 0.204, 0.55),
-        ("TSC2", "gene", "RALA",  "gene", None, "opposite", 3, 0.227, 0.60),
-        ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 0.823, 0.44),
+        ("TSC2", "gene", "TSC1",      "gene",     None,   "similar",  1, 1, 2,  0.970, 0.18),
+        # the rescuers — opposite-signature genes, union_rank-ordered
+        ("TSC2", "gene", "DCTN6",     "gene",     None,   "opposite", 1, 1, 2,  0.163, 0.50),
+        ("TSC2", "gene", "FZD7",      "gene",     None,   "opposite", 2, 2, 4,  0.204, 0.55),
+        ("TSC2", "gene", "RALA",      "gene",     None,   "opposite", 3, 3, 6,  0.227, 0.60),
+        ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 1, 2,  0.823, 0.44),
     ]
-    con.executemany("INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?)", rows)
+    con.executemany("INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
     con.commit()
     con.close()
     return db

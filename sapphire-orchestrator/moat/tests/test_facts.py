@@ -1,9 +1,12 @@
 """
-Tests for moat_facts (Task 4).
+Tests for moat_facts (Task 4, updated for WO-5 dual-rank schema).
 
-Builds a temp SQLite fixture with TSC2 rows (same schema as Task 2's test_client.py),
+Builds a temp SQLite fixture with TSC2 rows (11-column dual-rank schema),
 then asserts dossier-shaped fact rows are returned with provenance="moat-real".
 All stdlib — no pyarrow, no pandas.
+
+Schema change (WO-5): 'rank' column replaced by rank_cosine, rank_euclidean,
+union_rank. Facts now also include 'supporting_genes' field.
 """
 import os
 import sqlite3
@@ -21,15 +24,17 @@ def _make_fixture_db() -> str:
     cur = con.cursor()
     cur.execute("""
         CREATE TABLE neighbors (
-            query      TEXT,
-            query_type TEXT,
-            ref        TEXT,
-            ref_type   TEXT,
-            ref_dose   TEXT,
-            effect     TEXT,
-            rank       INTEGER,
-            cosine     REAL,
-            euclidean  REAL
+            query          TEXT,
+            query_type     TEXT,
+            ref            TEXT,
+            ref_type       TEXT,
+            ref_dose       TEXT,
+            effect         TEXT,
+            rank_cosine    INTEGER,
+            rank_euclidean INTEGER,
+            union_rank     INTEGER,
+            cosine         REAL,
+            euclidean      REAL
         )
     """)
     cur.execute("""
@@ -38,15 +43,19 @@ def _make_fixture_db() -> str:
             value TEXT
         )
     """)
+    # Tuple: (query, query_type, ref, ref_type, ref_dose, effect,
+    #         rank_cosine, rank_euclidean, union_rank, cosine, euclidean)
     rows = [
-        ("TSC2", "gene", "TSC1",      "gene",     None,   "similar",  1, 0.97,  0.18),
-        ("TSC2", "gene", "RHEB",      "gene",     None,   "similar",  2, 0.89,  0.31),
-        # rescue GENES (opposite EP-signature genes) — the rescuers, rank-ordered.
-        ("TSC2", "gene", "DCTN6",     "gene",     None,   "opposite", 1, 0.163, 0.50),
-        ("TSC2", "gene", "FZD7",      "gene",     None,   "opposite", 2, 0.204, 0.55),
-        ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 0.823, 0.44),
+        # similar genes (EP-signature mimics) — distinct union_ranks
+        ("TSC2", "gene", "TSC1",  "gene",     None,   "similar",  1, 2, 3, 0.97,  0.18),
+        ("TSC2", "gene", "RHEB",  "gene",     None,   "similar",  2, 3, 5, 0.89,  0.31),
+        # rescue GENES (opposite EP-signature genes) — the rescuers, union_rank-ordered
+        ("TSC2", "gene", "DCTN6", "gene",     None,   "opposite", 1, 1, 2, 0.163, 0.50),
+        ("TSC2", "gene", "FZD7",  "gene",     None,   "opposite", 2, 2, 4, 0.204, 0.55),
+        # rescue compound (opposite EP-signature compound)
+        ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 1, 2, 0.823, 0.44),
     ]
-    cur.executemany("INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?)", rows)
+    cur.executemany("INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows)
     cur.execute("INSERT INTO moat_meta VALUES ('version','test-1.0')")
     con.commit()
     con.close()
@@ -120,11 +129,14 @@ class TestMoatFactsHappyPath(unittest.TestCase):
 
     def test_cosine_rounded_to_3_decimals_in_value(self):
         facts = self.moat_facts("TSC2", client=self.client)
-        # TSC1 row has cosine=0.97 (already 3dp); RAPAMYCIN has 0.823
+        # RAPAMYCIN has cosine=0.823
         cpd_rows = [f for f in facts if f["field"] == "moat rescue (compound)"]
         self.assertTrue(any("0.823" in f["value"] for f in cpd_rows))
 
     def test_similar_genes_come_before_compounds(self):
+        """Similar-gene rows must come before rescue-compound rows.
+        (Rescue-gene rows may appear in between — that's fine.)
+        """
         facts = self.moat_facts("TSC2", client=self.client)
         gene_indices = [i for i, f in enumerate(facts) if f["field"] == "moat similar (gene)"]
         cpd_indices  = [i for i, f in enumerate(facts) if f["field"] == "moat rescue (compound)"]
@@ -133,7 +145,7 @@ class TestMoatFactsHappyPath(unittest.TestCase):
 
     def test_fact_has_required_keys(self):
         facts = self.moat_facts("TSC2", client=self.client)
-        required = {"field", "value", "source", "tier", "provenance"}
+        required = {"field", "value", "source", "tier", "provenance", "supporting_genes"}
         for f in facts:
             self.assertTrue(required.issubset(f.keys()), f"Missing keys in {f}")
 
@@ -148,7 +160,6 @@ class TestMoatFactsHappyPath(unittest.TestCase):
         facts_lower = self.moat_facts("tsc2", client=self.client)
         facts_upper = self.moat_facts("TSC2", client=self.client)
         self.assertEqual(len(facts_lower), len(facts_upper))
-
 
     def test_includes_rescue_gene_row(self):
         facts = self.moat_facts("TSC2", client=self.client)
@@ -166,6 +177,15 @@ class TestMoatFactsHappyPath(unittest.TestCase):
                 f"Unexpected rescue-gene fact value: {f['value']}"
             )
 
+    def test_rescue_gene_value_includes_union_rank(self):
+        """Rescue-gene value strings must include the union_rank field."""
+        facts = self.moat_facts("TSC2", client=self.client)
+        rescue_gene_rows = [f for f in facts if f["field"] == "moat rescue (gene)"]
+        self.assertGreater(len(rescue_gene_rows), 0)
+        for f in rescue_gene_rows:
+            self.assertIn("union_rank", f["value"],
+                          f"union_rank not in rescue-gene value: {f['value']}")
+
     def test_rescue_genes_distinct_from_similar_genes(self):
         # The rescuers (opposite genes) must NOT be confused with the similar genes.
         facts = self.moat_facts("TSC2", client=self.client)
@@ -175,6 +195,27 @@ class TestMoatFactsHappyPath(unittest.TestCase):
         self.assertFalse(any("DCTN6" in v for v in similar))
         self.assertTrue(any("TSC1" in v for v in similar))
         self.assertFalse(any("TSC1" in v for v in rescue))
+
+    def test_supporting_genes_present(self):
+        """Every fact must carry supporting_genes (int >= 1)."""
+        facts = self.moat_facts("TSC2", client=self.client)
+        self.assertGreater(len(facts), 0)
+        for f in facts:
+            self.assertIn("supporting_genes", f,
+                          f"supporting_genes missing from fact: {f}")
+            self.assertIsInstance(f["supporting_genes"], int)
+            self.assertGreaterEqual(f["supporting_genes"], 1)
+
+    def test_supporting_genes_present_all_categories(self):
+        """supporting_genes must be present in similar-gene, rescue-gene, AND rescue-compound."""
+        facts = self.moat_facts("TSC2", client=self.client)
+        for field in ("moat similar (gene)", "moat rescue (gene)", "moat rescue (compound)"):
+            category_facts = [f for f in facts if f["field"] == field]
+            for f in category_facts:
+                self.assertIn(
+                    "supporting_genes", f,
+                    f"supporting_genes missing from {field} fact: {f}"
+                )
 
 
 class TestRescueGenes(unittest.TestCase):
@@ -201,10 +242,11 @@ class TestRescueGenes(unittest.TestCase):
         self.assertNotIn("RAPAMYCIN", genes)
 
     def test_rank_ordered_best_first(self):
+        """rescue_genes() returns rows ordered by union_rank (rank field = union_rank)."""
         rows = self.rescue_genes("TSC2", client=self.client)
         ranks = [r["rank"] for r in rows]
         self.assertEqual(ranks, sorted(ranks))
-        self.assertEqual(rows[0]["gene"], "DCTN6")  # rank 1
+        self.assertEqual(rows[0]["gene"], "DCTN6")  # lowest union_rank
 
     def test_structured_keys(self):
         rows = self.rescue_genes("TSC2", client=self.client)
@@ -234,6 +276,13 @@ class TestRescueGenes(unittest.TestCase):
         from moat.facts import rescue_genes
         bad = MoatClient(db_path="/tmp/__no_such_moat_rescue_genes__.sqlite")
         self.assertEqual(rescue_genes("TSC2", client=bad), [])
+
+    def test_rank_is_union_rank(self):
+        """The 'rank' field in rescue_genes output is the union_rank from the DB."""
+        rows = self.rescue_genes("TSC2", client=self.client)
+        # DCTN6 has union_rank=2 in fixture; FZD7 has union_rank=4
+        self.assertEqual(rows[0]["rank"], 2)   # DCTN6 union_rank
+        self.assertEqual(rows[1]["rank"], 4)   # FZD7 union_rank
 
 
 class TestMoatFactsUnavailableClient(unittest.TestCase):

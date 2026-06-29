@@ -1,8 +1,11 @@
 """
-Tests for MoatClient (Task 2).
+Tests for MoatClient (Task 2, updated for WO-5 dual-rank schema).
 
 setUp builds a tiny in-memory-backed temp SQLite with the expected schema
 and a handful of rows for TSC2. All stdlib — no pyarrow, no pandas.
+
+Schema change (WO-5): 'rank' column replaced by rank_cosine, rank_euclidean,
+union_rank. ORDER BY is now union_rank ASC.
 """
 import os
 import sqlite3
@@ -22,15 +25,17 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
         cur = con.cursor()
         cur.execute("""
             CREATE TABLE neighbors (
-                query      TEXT,
-                query_type TEXT,
-                ref        TEXT,
-                ref_type   TEXT,
-                ref_dose   TEXT,
-                effect     TEXT,
-                rank       INTEGER,
-                cosine     REAL,
-                euclidean  REAL
+                query          TEXT,
+                query_type     TEXT,
+                ref            TEXT,
+                ref_type       TEXT,
+                ref_dose       TEXT,
+                effect         TEXT,
+                rank_cosine    INTEGER,
+                rank_euclidean INTEGER,
+                union_rank     INTEGER,
+                cosine         REAL,
+                euclidean      REAL
             )
         """)
         cur.execute("""
@@ -39,21 +44,23 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
                 value TEXT
             )
         """)
-        # Two similar genes for TSC2 (stored uppercase), one opposite compound
+        # Two similar genes for TSC2 (stored uppercase), one opposite compound.
+        # Distinct union_ranks so ORDER BY union_rank gives a deterministic order.
+        # Tuple: (query, query_type, ref, ref_type, ref_dose, effect,
+        #         rank_cosine, rank_euclidean, union_rank, cosine, euclidean)
         rows = [
-            ("TSC2", "gene", "TSC1",      "gene",     None,      "similar",  1, 0.97, 0.18),
-            ("TSC2", "gene", "RHEB",      "gene",     None,      "similar",  2, 0.89, 0.31),
-            ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM",    "opposite", 1, 0.82, 0.44),
+            ("TSC2", "gene", "TSC1",      "gene",     None,   "similar",  1, 2, 3, 0.97, 0.18),
+            ("TSC2", "gene", "RHEB",      "gene",     None,   "similar",  2, 3, 5, 0.89, 0.31),
+            ("TSC2", "gene", "RAPAMYCIN", "compound", "10nM", "opposite", 1, 1, 2, 0.82, 0.44),
         ]
         cur.executemany(
-            "INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?)", rows
+            "INSERT INTO neighbors VALUES (?,?,?,?,?,?,?,?,?,?,?)", rows
         )
         cur.execute("INSERT INTO moat_meta VALUES ('version','test-1.0')")
         con.commit()
         con.close()
 
         # Import here so the test file can be parsed even when the module is absent
-        # (Step 1: write failing test).
         from moat.client import MoatClient
         self.MoatClient = MoatClient
         self.client = MoatClient(db_path=self._db_path)
@@ -79,7 +86,8 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
         rows = self.client.neighbors("Tsc2", effect="similar")
         self.assertGreater(len(rows), 0)
 
-    def test_neighbors_similar_ordered_by_rank(self):
+    def test_neighbors_similar_ordered_by_union_rank(self):
+        """Rows must be ordered by union_rank ASC — TSC1 (union=3) before RHEB (union=5)."""
         rows = self.client.neighbors("TSC2", effect="similar")
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0]["ref"], "TSC1")
@@ -101,6 +109,7 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
             self.assertEqual(row["provenance"], "moat-real")
 
     def test_neighbors_k_caps_results(self):
+        """k=1 returns TSC1 (lowest union_rank=3)."""
         rows = self.client.neighbors("TSC2", effect="similar", k=1)
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["ref"], "TSC1")
@@ -110,10 +119,47 @@ class TestMoatClientAvailableAndNeighbors(unittest.TestCase):
         self.assertEqual(rows, [])
 
     def test_neighbors_row_dict_keys(self):
+        """Result dicts must have the new dual-rank keys, not the old 'rank' key."""
         rows = self.client.neighbors("TSC2", effect="similar")
-        expected_keys = {"query", "ref", "ref_type", "ref_dose", "effect", "rank",
-                         "cosine", "euclidean", "provenance"}
+        expected_keys = {
+            "query", "ref", "ref_type", "ref_dose", "effect",
+            "rank_cosine", "rank_euclidean", "union_rank",
+            "cosine", "euclidean", "provenance",
+        }
         self.assertEqual(set(rows[0].keys()), expected_keys)
+
+    def test_neighbors_rank_cosine_present(self):
+        rows = self.client.neighbors("TSC2", effect="similar")
+        for row in rows:
+            self.assertIn("rank_cosine", row)
+            self.assertIsInstance(row["rank_cosine"], int)
+
+    def test_neighbors_rank_euclidean_present(self):
+        rows = self.client.neighbors("TSC2", effect="similar")
+        for row in rows:
+            self.assertIn("rank_euclidean", row)
+            self.assertIsInstance(row["rank_euclidean"], int)
+
+    def test_neighbors_union_rank_present(self):
+        rows = self.client.neighbors("TSC2", effect="similar")
+        for row in rows:
+            self.assertIn("union_rank", row)
+            self.assertIsInstance(row["union_rank"], int)
+
+    def test_neighbors_union_rank_equals_sum(self):
+        """union_rank must equal rank_cosine + rank_euclidean."""
+        rows = self.client.neighbors("TSC2", effect="similar")
+        for row in rows:
+            self.assertEqual(
+                row["union_rank"], row["rank_cosine"] + row["rank_euclidean"],
+                f"union_rank mismatch for {row['ref']}"
+            )
+
+    def test_old_rank_key_absent(self):
+        """The old 'rank' key must not appear in result dicts."""
+        rows = self.client.neighbors("TSC2", effect="similar")
+        for row in rows:
+            self.assertNotIn("rank", row, "Old 'rank' key must not appear — use union_rank")
 
     # ------------------------------------------------------------------
     # health()
