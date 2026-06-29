@@ -63,7 +63,8 @@
         "persona": "Adversarial Red-Team (always seated)",
         "why": "institutional \u2014 must stay adversarial; stress every claim"
       }
-    ]
+    ],
+    "class": "diligence"
   },
   "priors": [],
   "discover": {
@@ -749,7 +750,17 @@
         "provenance": "persona-judgment",
         "status": "abstained"
       }
-    ]
+    ],
+    "round2": [],
+    "spread": {
+      "conviction_range": "0-4 / 5",
+      "stance_mix": {
+        "conditional": 3,
+        "hold": 2
+      },
+      "moved_in_round2": [],
+      "convergent_gate": ""
+    }
   },
   "synthesize": {
     "recommendation": "Conditional advance \u2014 3 conditional verdict(s). Address open items before IND filing.",

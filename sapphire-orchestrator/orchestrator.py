@@ -123,10 +123,22 @@ class Orchestrator:
                  else "portfolio" if "portfolio" in q or "franchise" in q
                  else "prioritization")
         difficulty = "deep" if ptype in ("diligence", "portfolio") else "standard"
+        # Capability-class: diligence (default) / design / experiment
+        design_keys = ["design ", "engineer", "synthesize ", "build a ", "create a ",
+                       "develop a ", "generate a ", "optimize a "]
+        experiment_keys = ["test ", "validate ", "in vivo", "in vitro", "screen ",
+                           "assay", "measure", "study "]
+        if any(k in q for k in design_keys):
+            cap_class = "design"
+        elif any(k in q for k in experiment_keys):
+            cap_class = "experiment"
+        else:
+            cap_class = "diligence"
         return {
             "type": ptype, "disease": disease,
             "disease_label": DISEASE_ROUTES[disease]["label"] if disease else "general CNS",
             "modality": modality, "deliverable": deliverable, "difficulty": difficulty,
+            "class": cap_class,
         }
 
     def scope(self, triage: dict) -> dict:
@@ -189,6 +201,7 @@ class Orchestrator:
         return {
             "deliverable": tri["deliverable"], "type": tri["type"],
             "disease": tri["disease_label"], "modality": tri["modality"],
+            "class": tri.get("class", "diligence"),
             "required_fields": [f"{g} {FIELD_GROUPS[g]}" for g in sc["required"]],
             "skip_fields": [f"{g} {FIELD_GROUPS[g]}" for g in sc["skip"]],
             "agents": self._activated_agents(tri, sc),

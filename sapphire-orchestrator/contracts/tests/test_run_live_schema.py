@@ -14,6 +14,7 @@ def _minimal_valid() -> dict:
         "plan": {
             "deliverable": "diligence", "disease": "tuberous sclerosis",
             "modality": "small molecule", "agents": [], "panel": [],
+            "class": "diligence",
         },
         "priors": [],
         "discover": {
@@ -30,6 +31,9 @@ def _minimal_valid() -> dict:
                 {"persona": "KOL", "stance": "conditional",
                  "provenance": "persona-judgment", "status": "ok"},
             ],
+            "round2": [],
+            "spread": {"conviction_range": "3-3 / 5", "stance_mix": {"conditional": 1},
+                       "moved_in_round2": [], "convergent_gate": ""},
         },
         "synthesize": {
             "recommendation": "Conditional advance", "confidence": "medium",
