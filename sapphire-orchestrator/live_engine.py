@@ -22,7 +22,7 @@ if _HERE not in sys.path:
     sys.path.insert(0, _HERE)
 
 from orchestrator import Orchestrator
-from engagement import extract_entities, _eid
+from engagement import extract_entities, _eid, _GENE_RE
 from moat.facts import moat_facts, rescue_genes
 from memory import recall
 from harness import trace
@@ -86,6 +86,99 @@ _BUCKET1_AGENTS = [
 
 # Fast membership test for approved_plan filtering (WO 1.2).
 _BUCKET1_AGENTS_SET: frozenset = frozenset(_BUCKET1_AGENTS)
+
+
+# ---------------------------------------------------------------------------
+# Adaptive convergence loop (WOs 2.1–2.5) — OPT-IN (adaptive=False default)
+# ---------------------------------------------------------------------------
+
+# v1 redispatch targets: CHEAP, DETERMINISTIC, no paid external API.
+# EMET is intentionally excluded (paid/slow/login-gated — a later flag).
+# "internal-science-lead" → moat (real internal DB lookup, stdlib-only engine).
+# The three public-API seams (gnomad/gtex/interpro) fire only when a gene is present;
+# they honest-empty when the gene is not found — so a spurious entity is harmless.
+REDISPATCH_TARGETS: list[str] = [
+    "internal-science-lead",  # real moat (Quiver internal; python kind; stdlib seam)
+    "gnomad-constraint",       # gnomAD pLI / LOEUF (public; stdlib urllib seam)
+    "gtex-expression",         # GTEx TPM + CNS selectivity (public; stdlib urllib seam)
+    "interpro-domains",        # InterPro domain annotations (public; stdlib urllib seam)
+]
+
+_MAX_ADAPTIVE_ROUNDS: int = 2     # max convergence rounds after the initial Bucket-1 pass
+_MAX_ADAPTIVE_DISPATCHES: int = 6  # max total follow-up harness.run calls across all rounds
+_ADAPTIVE_SALIENCE_THRESHOLD: int = 2  # minimum salience score to trigger re-dispatch
+
+
+def extract_salient_entities(
+    facts: list[dict],
+    already_covered: set[str],
+) -> list[dict]:
+    """Scan returned facts[].value for gene-symbol tokens NOT in already_covered.
+
+    Pure function — stdlib only, no I/O.
+
+    Salience (deterministic, explainable):
+      - Base: +1 per occurrence of the entity in any fact.
+      - +1 if the containing fact has tier "T1" or "T2" (high-quality source).
+      - +2 if the containing fact carries flag "DIVERGENCE" or "VETO" (high-signal).
+      - +2 cross-agent bonus if the entity appears in facts from ≥ 2 distinct
+        source agents (corroboration across independent sources). Each fact may
+        carry a ``_source_agent`` key for this computation; facts without it are
+        treated as from the same anonymous agent and do NOT contribute to the bonus.
+
+    already_covered: entity symbols to exclude (original query genes + any entity
+    already re-dispatched in a prior round).
+
+    Returns:
+        list of {entity: str, salience: int, source_agent: str} sorted descending
+        by salience, filtered to salience >= _ADAPTIVE_SALIENCE_THRESHOLD.
+        Returns [] if no new qualifying entities are found.
+    """
+    # entity → {salience: int, source_agent: str, agents: set[str]}
+    scores: dict[str, dict] = {}
+
+    for fact in facts:
+        value = fact.get("value") or ""
+        tier = fact.get("tier", "")
+        flag = fact.get("flag", "")
+        src = fact.get("_source_agent", "")  # optional internal annotation
+
+        tokens = set(_GENE_RE.findall(value))
+        for tok in tokens:
+            if tok in already_covered:
+                continue
+            if tok not in scores:
+                scores[tok] = {
+                    "salience": 0,
+                    "source_agent": src or "unknown",
+                    "agents": set(),
+                }
+            entry = scores[tok]
+            entry["salience"] += 1            # base: one occurrence
+            if tier in ("T1", "T2"):
+                entry["salience"] += 1        # quality tier bonus
+            if flag in ("DIVERGENCE", "VETO"):
+                entry["salience"] += 2        # high-signal flag bonus
+            if src:
+                entry["agents"].add(src)
+
+    # Cross-agent bonus: entity appears in facts from ≥ 2 distinct agents.
+    for entry in scores.values():
+        if len(entry["agents"]) >= 2:
+            entry["salience"] += 2
+
+    # Filter to threshold, sort descending.
+    result = [
+        {
+            "entity": tok,
+            "salience": entry["salience"],
+            "source_agent": entry["source_agent"],
+        }
+        for tok, entry in scores.items()
+        if entry["salience"] >= _ADAPTIVE_SALIENCE_THRESHOLD
+    ]
+    result.sort(key=lambda x: x["salience"], reverse=True)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -311,6 +404,7 @@ def run_live(
     on_progress=None,
     plan_mode: str = "off",
     approved_plan: list[str] | None = None,
+    adaptive: bool = False,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
@@ -349,6 +443,14 @@ def run_live(
                                       re-call with approved_plan=<ids>.
     approved_plan : when not None, run ONLY these agent ids (filtered to known registry ids
                     and _BUCKET1_AGENTS); overrides plan_mode (smart_plan is skipped).
+    adaptive      : when True, enable the adaptive convergence loop (WOs 2.1–2.5).
+                    After the initial Bucket-1 pass, scan returned facts for new
+                    high-salience gene-symbol entities not covered by the original
+                    query; re-dispatch the REDISPATCH_TARGETS agents for each surfaced
+                    entity; fold new facts into the dossier; repeat up to
+                    _MAX_ADAPTIVE_ROUNDS rounds or _MAX_ADAPTIVE_DISPATCHES total
+                    follow-up calls.  Default False (OPT-IN, Gate-5 validated).
+                    MUST reproduce today's output byte-for-byte when False.
 
     Returns
     -------
@@ -550,6 +652,11 @@ def run_live(
     divergence_flags: list[str] = []
     abstained_agents: list[str] = []
 
+    # Annotated facts list: parallel to all_dossier_facts, each entry carries
+    # "_source_agent" key for the adaptive salience computation. Only populated
+    # when adaptive=True; always empty (and unused) when adaptive=False.
+    _annot_facts: list[dict] = []
+
     bucket1_inputs = {
         "candidate": target,
         "disease": tri.get("disease_label", ""),
@@ -675,6 +782,8 @@ def run_live(
                 except KeyError:
                     enriched["plane"] = "external"
                 all_dossier_facts.append(enriched)
+                if adaptive:
+                    _annot_facts.append({**enriched, "_source_agent": agent_id})
                 flag = f.get("flag")
                 if flag == "VETO":
                     veto_flags.append(f.get("value", ""))
@@ -693,6 +802,9 @@ def run_live(
         if corpus_cards:
             corpus_facts = [_corpus_card_to_fact(agent_id, c) for c in corpus_cards]
             all_dossier_facts.extend(corpus_facts)
+            if adaptive:
+                for _cf in corpus_facts:
+                    _annot_facts.append({**_cf, "_source_agent": agent_id})
             trace.record(eid, {
                 "type": "corpus_retrieval",
                 "agent_id": agent_id,
@@ -761,6 +873,16 @@ def run_live(
                     "plane": plane_for("scientific-reasoning"),
                     "field": "rescue mechanism",
                 })
+                if adaptive:
+                    _annot_facts.append({
+                        "value": val,
+                        "source": "Sapphire scientific reasoning (cites EMET/corpus literature)",
+                        "tier": "T3",
+                        "provenance": "scientific-reasoning",
+                        "plane": plane_for("scientific-reasoning"),
+                        "field": "rescue mechanism",
+                        "_source_agent": "rescue-mechanism",
+                    })
             agent_statuses.append({
                 "id": "rescue-mechanism", "status": mres.status, "provenance": mres.provenance,
             })
@@ -772,6 +894,144 @@ def run_live(
                 "n_facts": len(gene_mechanisms), "elapsed_s": _elapsed,
                 "error": mres.error if not mres.ok else None,
             })
+
+    # -----------------------------------------------------------------------
+    # 4c. Adaptive convergence loop (WOs 2.1–2.5) — OPT-IN (adaptive=False skips)
+    #
+    # After the initial Bucket-1 pass (4 + 4b), scan returned facts for new
+    # high-salience gene-symbol entities not in the original query.  For each,
+    # re-dispatch the CHEAP DETERMINISTIC REDISPATCH_TARGETS agents through harness.run
+    # (guards/provenance/trace fire identically to the main loop).  Fold any new
+    # facts back into all_dossier_facts and _annot_facts.  Repeat for up to
+    # _MAX_ADAPTIVE_ROUNDS rounds or _MAX_ADAPTIVE_DISPATCHES total dispatches.
+    #
+    # Termination is GUARANTEED by three independent caps:
+    #   1. _MAX_ADAPTIVE_ROUNDS (2): loop exits after at most 2 convergence passes.
+    #   2. _MAX_ADAPTIVE_DISPATCHES (6): total dispatch_budget counter.
+    #   3. already_covered_adaptive: entities re-dispatched in prior rounds are
+    #      added here, so extract_salient_entities never re-surfaces them.
+    # A "pathological all-genes" input terminates as soon as budget=0.
+    # -----------------------------------------------------------------------
+    if adaptive:
+        already_covered_adaptive: set[str] = set(ents.get("genes", []))
+        visited: set[tuple[str, str]] = set()   # (entity, agent_id) pairs dispatched
+        dispatch_budget: int = _MAX_ADAPTIVE_DISPATCHES
+
+        for _rnd in range(1, _MAX_ADAPTIVE_ROUNDS + 1):
+            if dispatch_budget <= 0:
+                break
+
+            salient = extract_salient_entities(_annot_facts, already_covered_adaptive)
+            if not salient:
+                break  # no new entities above threshold — dossier converged
+
+            _any_dispatched_this_round = False
+
+            for _ent_rec in salient:
+                if dispatch_budget <= 0:
+                    break
+
+                _entity = _ent_rec["entity"]
+                _source_agent = _ent_rec["source_agent"]
+                _target_agents_fired: list[str] = []
+
+                for _target_id in REDISPATCH_TARGETS:
+                    if dispatch_budget <= 0:
+                        break
+                    if (_entity, _target_id) in visited:
+                        continue  # never dispatch a (entity, agent) pair twice
+                    if _target_id not in known_ids:
+                        continue  # skip agents absent from the registry
+
+                    visited.add((_entity, _target_id))
+
+                    # Build redispatch inputs: ONLY the public gene SYMBOL crosses.
+                    # Sequences and structure inputs are excluded (gene-level re-query
+                    # doesn't need ASO/structure data).
+                    _rd_inputs: dict = {
+                        "candidate": _entity,           # public gene symbol ONLY
+                        "genes": [_entity],             # one-element gene set
+                        "disease": bucket1_inputs.get("disease", ""),
+                        "query": bucket1_inputs.get("query", ""),
+                        "sequences": [],                # no ASO sequences in re-query
+                    }
+
+                    # WO 2.4 — progress: redispatch start milestone
+                    _emit(on_progress, eid, {
+                        "stage": "redispatch", "phase": "start",
+                        "round": _rnd, "entity": _entity,
+                        "target_agent": _target_id,
+                    })
+                    _t0_rd = time.monotonic()
+
+                    _rd_res = harness.run(
+                        _target_id,
+                        _rd_inputs,
+                        engagement_id=eid,
+                        ctx=ctx,
+                        registry=registry,
+                    )
+
+                    _elapsed_rd = round(time.monotonic() - _t0_rd, 2)
+                    dispatch_budget -= 1
+                    _target_agents_fired.append(_target_id)
+                    _any_dispatched_this_round = True
+
+                    # Fold new facts into all_dossier_facts (+ _annot_facts for
+                    # further convergence rounds).  Stamp provenance + plane
+                    # exactly like the main Bucket-1 loop.
+                    if _rd_res.ok and _rd_res.output:
+                        _rd_facts = _rd_res.output.get("facts", [])
+                        _rd_prov = _rd_res.output.get("provenance", _rd_res.provenance)
+                        for _f in _rd_facts:
+                            _enriched = dict(_f)
+                            _enriched.setdefault("provenance", _rd_prov)
+                            _f_prov = _enriched.get("provenance", _rd_prov)
+                            try:
+                                _enriched["plane"] = plane_for(_f_prov)
+                            except KeyError:
+                                _enriched["plane"] = "external"
+                            all_dossier_facts.append(_enriched)
+                            _annot_facts.append({**_enriched, "_source_agent": _target_id})
+                            _f_flag = _f.get("flag")
+                            if _f_flag == "VETO":
+                                veto_flags.append(_f.get("value", ""))
+                            elif _f_flag == "DIVERGENCE":
+                                divergence_flags.append(_f.get("value", ""))
+
+                    # WO 2.4 — progress: redispatch done milestone
+                    _emit(on_progress, eid, {
+                        "stage": "redispatch", "phase": "done",
+                        "round": _rnd, "entity": _entity,
+                        "target_agent": _target_id,
+                        "status": _rd_res.status,
+                        "n_new_facts": (
+                            len(_rd_res.output.get("facts", []))
+                            if (_rd_res.ok and _rd_res.output) else 0
+                        ),
+                        "elapsed_s": _elapsed_rd,
+                    })
+
+                # WO 2.4 — trace: ONE redispatch event per entity per round.
+                # Best-effort: a trace failure never breaks the run.
+                if _target_agents_fired:
+                    try:
+                        trace.record(eid, {
+                            "type": "redispatch",
+                            "round": _rnd,
+                            "trigger_entity": _entity,
+                            "source_agent": _source_agent,
+                            "target_agents": _target_agents_fired,
+                            "reason": f"salience={_ent_rec['salience']}",
+                        })
+                    except Exception:
+                        pass
+
+                # Mark entity as covered so it is not re-surfaced in later rounds.
+                already_covered_adaptive.add(_entity)
+
+            if not _any_dispatched_this_round:
+                break  # nothing new dispatched this round — converged
 
     known_unknowns = [f"abstained: {aid}" for aid in abstained_agents]
 
