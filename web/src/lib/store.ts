@@ -65,8 +65,11 @@ interface FirmState {
   inspectorTab: InspectorTab;
   inspectorOpen: boolean;
   selection: InspectorSelection;
+  /** which turn the Monitor shows; null = follow the latest turn */
+  monitorTurnId: string | null;
   setInspectorTab: (t: InspectorTab) => void;
   setInspectorOpen: (open: boolean) => void;
+  setMonitorTurn: (id: string | null) => void;
   select: (sel: InspectorSelection) => void;
 
   // command palette
@@ -117,8 +120,11 @@ export const useFirm = create<FirmState>((set, get) => ({
   inspectorTab: "monitor",
   inspectorOpen: true,
   selection: { kind: "none" },
+  monitorTurnId: null,
   setInspectorTab: (inspectorTab) => set({ inspectorTab }),
   setInspectorOpen: (inspectorOpen) => set({ inspectorOpen }),
+  setMonitorTurn: (monitorTurnId) =>
+    set({ monitorTurnId, inspectorTab: "monitor", inspectorOpen: true }),
   select: (selection) =>
     set({
       selection,
@@ -199,8 +205,10 @@ export const useFirm = create<FirmState>((set, get) => ({
       activeConversationId: null,
       selection: { kind: "none" },
       inspectorTab: "monitor",
+      monitorTurnId: null,
       pendingPlan: null,
       planError: null,
+      historyQuery: "", // #16 — a fresh chat clears the history search filter
     });
   },
 
@@ -212,6 +220,7 @@ export const useFirm = create<FirmState>((set, get) => ({
       pendingPlan: null,
       planError: null,
       selection: { kind: "none" },
+      monitorTurnId: null,
     });
     if (!detail) {
       // backend returned nothing (404 / offline) — show an empty restored thread
@@ -289,6 +298,7 @@ export const useFirm = create<FirmState>((set, get) => ({
       selection: { kind: "none" },
       inspectorTab: "monitor",
       inspectorOpen: true,
+      monitorTurnId: null, // a new turn returns the Monitor to "follow latest"
     }));
 
     const patchTurn = (patch: Partial<Turn>) =>

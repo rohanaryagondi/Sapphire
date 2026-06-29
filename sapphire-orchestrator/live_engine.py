@@ -763,6 +763,10 @@ def run_live(
             "id": agent_id,
             "status": res.status,
             "provenance": res.provenance,
+            # Persist the per-agent fact count so a restored run (which has no live
+            # trace) can show each agent's REAL contribution instead of mis-attributing
+            # by shared provenance. Mirrors the n_facts in the live progress event above.
+            "n_facts": _n_facts,
         })
 
         if res.ok and res.output:
@@ -885,6 +889,7 @@ def run_live(
                     })
             agent_statuses.append({
                 "id": "rescue-mechanism", "status": mres.status, "provenance": mres.provenance,
+                "n_facts": len(gene_mechanisms),
             })
             if not mres.ok:
                 abstained_agents.append("rescue-mechanism")
@@ -985,6 +990,10 @@ def run_live(
                         "id": _target_id,
                         "status": _rd_res.status,
                         "provenance": _rd_res.provenance,
+                        "n_facts": (
+                            len(_rd_res.output.get("facts", []))
+                            if (_rd_res.ok and _rd_res.output) else 0
+                        ),
                         "phase": "redispatch",
                         "redispatch_round": _rnd,
                         "trigger_entity": _entity,

@@ -9,14 +9,28 @@
    just with every node already `phase:"done"`. Nothing is fabricated: every field is
    read straight off the stored result.
    ============================================================================ */
-import type { ProgressEvent, RunResult } from "./types";
+import type { AgentStatus, ProgressEvent, RunResult } from "./types";
+import { finalVerdicts } from "./verdicts";
 
-/** Count dossier facts attributable to an agent by shared provenance (best-effort —
- *  the engine doesn't persist a per-agent fact count, so we derive it the same way
- *  Investigate's AgentDetail does). */
-function factsForProvenance(result: RunResult, prov?: string): number {
-  if (!prov) return 0;
-  return (result.discover?.dossier ?? []).filter((f) => f.provenance === prov).length;
+/** This agent's REAL fact count, restored honestly:
+ *   1. prefer the engine-persisted `n_facts` (authoritative);
+ *   2. else attribute by provenance ONLY when that provenance is unique to one
+ *      agent (a safe 1:1 map);
+ *   3. else `undefined` — multiple agents share the provenance, so we cannot
+ *      attribute a per-agent count and must NOT fabricate one (the old code
+ *      assigned the full shared count to every sharing agent, e.g. the moat's
+ *      12 facts showed on every row). */
+function factsForAgent(
+  result: RunResult,
+  agent: AgentStatus,
+  provAgentCount: Map<string, number>,
+): number | undefined {
+  if (typeof agent.n_facts === "number") return agent.n_facts;
+  const prov = agent.provenance;
+  if (prov && provAgentCount.get(prov) === 1) {
+    return (result.discover?.dossier ?? []).filter((f) => f.provenance === prov).length;
+  }
+  return undefined;
 }
 
 /** Synthesise the static progress trace for a completed run. Returns [] for an
@@ -39,15 +53,21 @@ export function traceFromResult(result?: RunResult | null): ProgressEvent[] {
     });
   }
 
-  // 2. bucket1 — one done node per fact agent that ran
-  for (const a of result.discover?.agents ?? []) {
+  // 2. bucket1 — one done node per fact agent that ran. Each row shows ITS OWN
+  //    fact count (persisted n_facts, or a safe unique-provenance fallback).
+  const agents = result.discover?.agents ?? [];
+  const provAgentCount = new Map<string, number>();
+  for (const a of agents) {
+    provAgentCount.set(a.provenance, (provAgentCount.get(a.provenance) ?? 0) + 1);
+  }
+  for (const a of agents) {
     events.push({
       stage: "bucket1",
       phase: "done",
       agent_id: a.id,
       status: a.status,
       provenance: a.provenance,
-      n_facts: factsForProvenance(result, a.provenance),
+      n_facts: factsForAgent(result, a, provAgentCount),
     });
   }
 
@@ -63,10 +83,9 @@ export function traceFromResult(result?: RunResult | null): ProgressEvent[] {
     });
   }
 
-  // 4. roundtable — prefer the final (round2) verdicts; else round1
-  const consult = result.consult;
-  const round = consult?.round2?.length ? consult.round2 : (consult?.round1 ?? []);
-  for (const v of round) {
+  // 4. roundtable — the SAME normalised verdicts the spread renders (round-2
+  //    deltas merged over round-1), so the Monitor never contradicts the spread.
+  for (const v of finalVerdicts(result)) {
     events.push({
       stage: "roundtable",
       phase: "done",

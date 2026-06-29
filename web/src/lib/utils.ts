@@ -76,9 +76,37 @@ export function isVetoAgent(id?: string): boolean {
   return !!id && VETO_AGENTS.has(id);
 }
 
+/* ── honesty: mock / stub / illustrative surfaces must stay labeled ───────────
+   A fact is "not real" when its provenance is mock/stub/simulated, or its text
+   self-describes as a mock/stub/illustrative placeholder (e.g. "EMET mock").
+   Real provenances (moat-real, emet-live, corpus, qmodels, semantic-web, …) and
+   real fact text return null and stay prominent. */
+export type MockLabel = "MOCK" | "SIMULATED" | "ILLUSTRATIVE";
+
+export function mockLabel(prov?: string, value?: string, source?: string): MockLabel | null {
+  const p = String(prov ?? "").trim().toLowerCase();
+  const blob = `${value ?? ""} ${source ?? ""}`.toLowerCase();
+  if (p === "simulated" || /\bsimulated\b/.test(blob)) return "SIMULATED";
+  if (p === "mock" || p === "stub" || /\bmock\b|\bstub\b/.test(blob)) return "MOCK";
+  if (/\billustrative\b|\bplaceholder\b/.test(blob)) return "ILLUSTRATIVE";
+  return null;
+}
+
+/* A citation that is just a bare, implausibly-small PMID (e.g. "PMID:1") — a
+   placeholder stub, not a real reference. Real PMIDs are 4+ digits. */
+export function isPlaceholderCitation(s?: string): boolean {
+  const t = String(s ?? "").trim();
+  if (!t) return false;
+  const m = t.match(/^pmid:?\s*0*(\d+)$/i);
+  return !!m && m[1].length <= 3;
+}
+
 /* ── time / misc ──────────────────────────────────────────────────────────── */
 export function fmtElapsed(s?: number): string {
   if (s == null) return "";
+  // 0 / sub-millisecond (common in the offline Demo profile) reads as "instant"
+  // rather than a misleading "0ms"; real sub-second timings keep their ms value.
+  if (s <= 0) return "instant";
   if (s < 1) return `${Math.round(s * 1000)}ms`;
   return `${s.toFixed(s < 10 ? 1 : 0)}s`;
 }

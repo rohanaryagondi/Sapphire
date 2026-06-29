@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Check, ClipboardList, Play, X } from "lucide-react";
+import { Check, ClipboardList, Play, ShieldAlert, X } from "lucide-react";
 import { useFirm } from "@/lib/store";
 import { agentLabel, cn, isVetoAgent } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,22 @@ export function PlanReview() {
   const setAll = useFirm((s) => s.setAllPlanAgents);
   const cancel = useFirm((s) => s.cancelPlan);
   const approve = useFirm((s) => s.approvePlan);
+
+  // #8 — veto-class agents (FDA Institutional Memory ⛔, Patent/IP ⛔) gate the
+  // roundtable. Warn (dismissibly) whenever one is currently deselected.
+  const deselectedVeto = (plan?.agents ?? [])
+    .filter((a) => isVetoAgent(a.id) && !a.selected)
+    .map((a) => a.id);
+  const vetoKey = deselectedVeto.join(",");
+  const [vetoDismissed, setVetoDismissed] = React.useState(false);
+  const prevVetoKey = React.useRef(vetoKey);
+  React.useEffect(() => {
+    // re-surface the warning whenever the set of deselected veto agents changes
+    if (prevVetoKey.current !== vetoKey) {
+      prevVetoKey.current = vetoKey;
+      if (vetoKey) setVetoDismissed(false);
+    }
+  }, [vetoKey]);
 
   if (loading) {
     return (
@@ -114,6 +130,7 @@ export function PlanReview() {
                 key={a.id}
                 onClick={() => toggle(a.id)}
                 aria-pressed={a.selected}
+                title={a.why || a.role || agentLabel(a.id)}
                 className={cn(
                   "flex w-full items-start gap-2.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-elevated)]",
                   !a.selected && "opacity-45",
@@ -152,6 +169,27 @@ export function PlanReview() {
             ))}
           </div>
         </div>
+
+        {/* #8 — veto-class deselection warning (dismissible) */}
+        {deselectedVeto.length > 0 && !vetoDismissed && (
+          <div className="flex items-start gap-2 border-t border-[rgba(248,81,73,0.25)] bg-[rgba(248,81,73,0.06)] px-4 py-2.5">
+            <ShieldAlert className="mt-0.5 size-3.5 shrink-0 text-[#ff7b72]" />
+            <div className="min-w-0 flex-1 text-[11.5px] leading-snug text-[#ff7b72]">
+              <b>Veto-class agent deselected.</b>{" "}
+              {deselectedVeto.map((id) => agentLabel(id)).join(" · ")} gate{" "}
+              {deselectedVeto.length > 1 ? "" : "s"} the roundtable (FDA institutional
+              memory / IP). Dropping {deselectedVeto.length > 1 ? "them" : "it"} means the
+              partners can't adjudicate that veto.
+            </div>
+            <button
+              onClick={() => setVetoDismissed(true)}
+              aria-label="Dismiss warning"
+              className="flex size-5 shrink-0 items-center justify-center rounded-[4px] text-[#ff7b72] hover:bg-[rgba(248,81,73,0.12)]"
+            >
+              <X className="size-3" />
+            </button>
+          </div>
+        )}
 
         {/* actions */}
         <div className="flex items-center justify-between gap-2 border-t border-[var(--color-border)] px-4 py-2.5">

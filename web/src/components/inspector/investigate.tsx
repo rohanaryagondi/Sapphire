@@ -2,11 +2,13 @@
 import { MousePointerClick } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm, type InspectorSelection } from "@/lib/store";
-import { agentLabel, fmtElapsed, isVetoAgent, stanceKind } from "@/lib/utils";
+import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind } from "@/lib/utils";
+import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import {
   Chip,
   FlagChip,
+  MockBadge,
   PlaneChip,
   ProvChip,
   StatusDot,
@@ -65,22 +67,43 @@ function FactDetail({ turn, index }: { turn: Turn; index: number }) {
   const fact = turn.result?.discover?.dossier?.[index];
   if (!fact) return <EmptyInvestigate />;
   const via = turn.result?._via === "replay" ? "replay" : undefined;
+  const mock = mockLabel(fact.provenance, fact.value, fact.source);
   return (
     <div className="p-3.5">
       <Header
-        eyebrow="Dossier fact"
+        eyebrow={mock ? "Dossier fact · mock/illustrative" : "Dossier fact"}
         title={fact.field || fact.source || "fact"}
         right={<PlaneChip plane={fact.plane === "internal" ? "internal" : "external"} />}
       />
-      <p className="mb-3 rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] p-2.5 text-[13px] leading-relaxed text-[var(--color-fg)]">
+      <p
+        className={cn(
+          "mb-3 rounded-[var(--radius)] border p-2.5 text-[13px] leading-relaxed",
+          mock
+            ? "border-dashed border-[rgba(210,153,34,0.35)] bg-[var(--color-bg-subtle)]/50 italic text-[var(--color-fg-muted)]"
+            : "border-[var(--color-border)] bg-[var(--color-bg-subtle)] text-[var(--color-fg)]",
+        )}
+      >
         {fact.value}
       </p>
       <div className="mb-3 flex flex-wrap gap-1">
+        {mock && <MockBadge label={mock} />}
         <TierChip tier={fact.tier} />
         <ProvChip prov={fact.provenance} via={via} />
         {fact.flag && <FlagChip flag={fact.flag} />}
       </div>
-      <KV k="source" v={fact.source} />
+      <KV
+        k="source"
+        v={
+          fact.source &&
+          (isPlaceholderCitation(fact.source) ? (
+            <span className="italic text-[var(--color-fg-muted)]">
+              {fact.source} · placeholder citation (not a real reference)
+            </span>
+          ) : (
+            fact.source
+          ))
+        }
+      />
       <KV k="field" v={fact.field} />
       <KV k="tier" v={fact.tier} />
       <KV k="provenance" v={fact.provenance} />
@@ -150,8 +173,7 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
 }
 
 function VerdictDetail({ turn, persona }: { turn: Turn; persona: string }) {
-  const consult = turn.result?.consult;
-  const round = consult?.round2?.length ? consult.round2 : (consult?.round1 ?? []);
+  const round = finalVerdicts(turn.result);
   const v = round.find((x) => x.persona === persona);
   if (!v) {
     // maybe still running — show trace row
@@ -203,11 +225,21 @@ function VerdictDetail({ turn, persona }: { turn: Turn; persona: string }) {
             Cited dossier facts · {v.fact_claims!.length}
           </div>
           <div className="flex flex-wrap gap-1">
-            {v.fact_claims!.map((c, i) => (
-              <Chip key={i} className="max-w-full truncate">
-                {String(c)}
-              </Chip>
-            ))}
+            {v.fact_claims!.map((c, i) =>
+              isPlaceholderCitation(String(c)) ? (
+                <Chip
+                  key={i}
+                  className="max-w-full truncate italic opacity-60"
+                  title="Placeholder citation — not a real reference."
+                >
+                  {String(c)} · placeholder
+                </Chip>
+              ) : (
+                <Chip key={i} className="max-w-full truncate">
+                  {String(c)}
+                </Chip>
+              ),
+            )}
           </div>
         </div>
       )}

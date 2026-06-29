@@ -46,11 +46,11 @@ function Banner({
   tone,
   children,
 }: {
-  tone: "sim" | "partial" | "error";
+  tone: "sim" | "mock" | "partial" | "error";
   children: React.ReactNode;
 }) {
   const style =
-    tone === "sim"
+    tone === "sim" || tone === "mock"
       ? "border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.06)] text-[#e3b341]"
       : tone === "error"
         ? "border-[rgba(248,81,73,0.30)] bg-[rgba(248,81,73,0.06)] text-[#ff7b72]"
@@ -60,24 +60,40 @@ function Banner({
       className={`flex items-start gap-2 rounded-[var(--radius)] border px-3 py-2 text-[12px] leading-snug ${style}`}
     >
       {tone === "error" && <AlertCircle className="mt-0.5 size-3.5 shrink-0" />}
-      {tone === "sim" && <FlaskConical className="mt-0.5 size-3.5 shrink-0" />}
+      {(tone === "sim" || tone === "mock") && (
+        <FlaskConical className="mt-0.5 size-3.5 shrink-0" />
+      )}
       <span>{children}</span>
     </div>
   );
+}
+
+/** A Demo/mock/generic-fallback run is illustrative, not a real analysis. */
+function isMockRun(turn: Turn): boolean {
+  const r = turn.result;
+  if (!r) return false;
+  if (r._simulated) return false; // the simulate banner already covers this
+  const via = String(turn.via ?? r._via ?? "").toLowerCase();
+  return turn.profile === "demo" || r._mock === true || /fallback|canned|mock/.test(via);
 }
 
 function TurnView({ turn }: { turn: Turn }) {
   const result = turn.result;
   const status = result?.discover?.status ?? "";
   const ku = result?.discover?.flags?.KNOWN_UNKNOWNS?.length ?? 0;
+  const setMonitorTurn = useFirm((s) => s.setMonitorTurn);
 
   return (
     <div className="space-y-3">
-      {/* user query */}
+      {/* user query — click to focus this turn's trace in the Monitor (#10) */}
       <div className="flex justify-end">
-        <div className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-[13.5px] leading-relaxed text-[var(--color-fg)]">
+        <button
+          onClick={() => setMonitorTurn(turn.id)}
+          title="Show this turn's trace in the Monitor"
+          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[13.5px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
+        >
           {turn.query}
-        </div>
+        </button>
       </div>
 
       {/* firm response */}
@@ -88,6 +104,14 @@ function TurnView({ turn }: { turn: Turn }) {
           <Banner tone="error">
             The firm could not be convened ({turn.error || "unknown error"}). No answer is
             fabricated.
+          </Banner>
+        )}
+
+        {isMockRun(turn) && (
+          <Banner tone="mock">
+            <b>Illustrative mock output.</b> This is canned/Demo-profile data, not a
+            real analysis — facts may be placeholders. Switch to the{" "}
+            <b>Simulate</b> profile for real moat / EMET / seam data.
           </Banner>
         )}
 
