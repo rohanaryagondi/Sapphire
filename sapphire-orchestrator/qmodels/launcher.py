@@ -229,9 +229,11 @@ def submit_job(tool: dict, inputs: dict, *, mode: str = "dry-run", kind: str = "
     # tool renders a clear no-recipe stub (dry-run validates as "not wired", never crashes).
     if kind == "smoke":
         job["userdata"] = _render_smoke_userdata(job_id, bucket, max_minutes)
+        job["result_file"] = "result.json"
     else:
         try:
             recipe = _gpu_recipe(job.get("tool_id"))
+            job["result_file"] = recipe["result"]   # per-tool result filename (not always result.json)
             job["userdata"] = _render_tool_userdata(job, _placeholder_urls(recipe), max_minutes)
         except SafetyRefusal as e:
             job["userdata"] = f"# no GPU recipe for tool {job.get('tool_id')!r} — not wired for live launch\n# {e}\n"
@@ -273,16 +275,39 @@ def _launch_live(job: dict, bucket: str, max_minutes: int) -> dict:
         urls = _stage_and_presign(job, bucket)
         job["userdata"] = _render_tool_userdata(job, urls, max_minutes)
     ami = _aws("ssm", "get-parameter", "--name", _ami_ssm_for(job), "--query", "Parameter.Value")
-    tag_spec = "ResourceType=instance,Tags=[" + ",".join(
-        [f"{{Key=Name,Value={job['job_id']}}}"] + [f"{{Key={k},Value={v}}}" for k, v in TAGS.items()]) + "]"
+    run_id = job["job_id"]
+    # Skill naming convention: Name=Sapphire + Run=<job_id> + Owner=Rohan (every resource).
+    tag_spec = (
+        f"ResourceType=instance,Tags=["
+        f"{{Key=Name,Value=Sapphire}},"
+        f"{{Key=Run,Value={run_id}}},"
+        f"{{Key=Owner,Value=Rohan}},"
+        f"{{Key=Project,Value=sapphire-qmodels}},"
+        f"{{Key=BudgetCapUSD,Value={BUDGET_CAP_USD}}}"
+        f"]"
+    )
+    # Root volume: 100 GB gp3 (DL AMI needs >= 75 GB; must be != 50 GB to avoid matching the Sapphire
+    # EBS cache vol when detecting the device in userdata by size).
+    bdm = json.dumps([{"DeviceName": "/dev/sda1",
+                       "Ebs": {"VolumeSize": 100, "VolumeType": "gp3", "DeleteOnTermination": True}}])
     import base64
     ud_b64 = base64.b64encode(job["userdata"].encode()).decode()
-    out = _aws("ec2", "run-instances", "--image-id", ami, "--instance-type", job["instance_type"],
+    out = _aws("ec2", "run-instances",
+               "--image-id", ami,
+               "--instance-type", job["instance_type"],
+               "--subnet-id", "subnet-93dd2ccb",          # us-east-1b — co-located with Sapphire EBS vol
                "--instance-initiated-shutdown-behavior", "terminate",
-               "--user-data", ud_b64, "--tag-specifications", tag_spec, "--count", "1")
+               "--metadata-options", "HttpTokens=required,HttpPutResponseHopLimit=2",
+               "--block-device-mappings", bdm,
+               "--user-data", ud_b64,
+               "--tag-specifications", tag_spec,
+               "--count", "1")
     iid = out["Instances"][0]["InstanceId"]
     _ledger_append({"event": "create", "resource": "instance", "id": iid, "job": job["job_id"],
-                    "instance_type": job["instance_type"], "est_usd": job["est_usd"]})
+                    "instance_type": job["instance_type"], "ami": ami, "az": "us-east-1b",
+                    "subnet": "subnet-93dd2ccb", "sg": "sg-1b4dee62",
+                    "name": "Sapphire", "run": run_id,
+                    "est_usd": job["est_usd"]})
     job.update({"status": "launched", "instance_id": iid, "launched": _now()})
     _write_job(job)
     return job
@@ -306,15 +331,17 @@ def job_status(job_id: str, aws=None) -> dict:
         state = (st[0] if st else None)
         job["instance_state"] = state
         if state in ("terminated", "shutting-down", "stopped"):
-            # finished → fetch the prediction the GPU box uploaded (presigned PUT → S3)
+            # finished → fetch the prediction the GPU box uploaded (presigned PUT → S3).
+            # Use the per-tool result_file name (not always "result.json").
+            result_file = job.get("result_file", "result.json")
             bucket = _bucket_name()
             try:
-                raw = aws("s3", "cp", f"s3://{bucket}/{job_id}/result.json", "-", parse=False)
+                raw = aws("s3", "cp", f"s3://{bucket}/{job_id}/{result_file}", "-", parse=False)
                 job["result"] = json.loads(raw)
                 job["status"] = "done"
             except Exception as e:
                 job["status"] = "done-no-result"
-                job["note"] = f"instance {state} but no parseable result.json: {str(e)[:160]}"
+                job["note"] = f"instance {state} but no parseable {result_file}: {str(e)[:160]}"
     _write_job(job)
     return job
 
@@ -438,6 +465,18 @@ def _boltz_complexes(inputs: dict) -> list:
              "protein_seq": seq, "smiles": smi}]
 
 
+def _esm2_panel(inputs: dict) -> list:
+    """Map registry inputs {sequences: [{name, sequence, family}...]} → esm2_big_layer_sweep panel.
+    Each entry must carry name/sequence/family. Validates and passes through."""
+    panel = inputs.get("sequences") or inputs.get("panel") or []
+    if not panel:
+        raise ValueError("esm2/family_clustering requires 'sequences': list of {name, sequence, family}")
+    for entry in panel:
+        if not all(k in entry for k in ("name", "sequence", "family")):
+            raise ValueError(f"each panel entry needs name/sequence/family, got: {list(entry.keys())}")
+    return panel
+
+
 # tool_id → recipe. `code`: local repo files staged onto the box (presigned GET); `inputs_fn`
 # builds the JSON the eval reads (staged as `inputs_name`); `deps`: pip installs; `out_env`: the
 # env var the eval writes its outputs under; `run`: the in-cwd command; `result`: file under
@@ -451,6 +490,18 @@ _GPU_TOOLS = {
         "out_env": "BOLTZ_OUT",
         "run": "python boltz_runner.py complexes.json",
         "result": "results.json",
+    },
+    # ESM-2 family clustering (GPU proof tool): runs esm2_big_layer_sweep.py with 3B + 15B models.
+    # Real per-tool contract: python esm2_big_layer_sweep.py <panel_seqs.json> <out_dir> (positional).
+    # HF_HOME set inline so models cache on the Sapphire EBS volume if mounted at /mnt/sapphire.
+    "family_clustering": {
+        "code": {"esm2_big_layer_sweep.py": "q-models/aws/esm2_big_layer_sweep.py"},
+        "inputs_name": "panel_seqs.json",
+        "inputs_fn": _esm2_panel,
+        "deps": ["torch", "transformers", "accelerate", "numpy"],
+        "out_env": "OUT",
+        "run": "HF_HOME=/mnt/sapphire/hf_cache python esm2_big_layer_sweep.py panel_seqs.json $OUT",
+        "result": "esm2_big_layer_sweep.json",
     },
 }
 
