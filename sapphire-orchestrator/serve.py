@@ -388,7 +388,11 @@ class Handler(SimpleHTTPRequestHandler):
             approved_plan = None
             if approved_raw:
                 try:
-                    approved_plan = [str(i) for i in json.loads(approved_raw)]
+                    _parsed = json.loads(approved_raw)
+                    # Only a JSON array is a valid approved_plan. A bare string
+                    # iterates into characters; an object iterates keys. Both are
+                    # silently treated as "no approved_plan" (same as absent).
+                    approved_plan = [str(i) for i in _parsed] if isinstance(_parsed, list) else None
                 except (json.JSONDecodeError, TypeError):
                     pass
             return self._json(route_api_run(q, mode, approved_plan=approved_plan))

@@ -438,13 +438,25 @@ def run_live(
         # (silently drop unknown or out-of-bucket ids — never crash).
         selected_ids = [i for i in approved_plan
                         if i in known_ids and i in _BUCKET1_AGENTS_SET]
-        plan_source = "approved"
+        if not selected_ids:
+            # All client-supplied ids were unknown/out-of-bucket — running zero
+            # fact agents silently yields a fact-free dossier. Mirror the llm
+            # empty-selection guard: fall back to the full deterministic list.
+            trace.record(eid, {"type": "plan_fallback",
+                               "reason": "approved_plan all-filtered (no valid bucket-1 ids)"})
+            selected_ids = list(_BUCKET1_AGENTS)
+            plan_source = "deterministic"
+        else:
+            plan_source = "approved"
     elif plan_mode.lower() == "llm+approve":
         # Compute the LLM plan, then return immediately WITHOUT running any agents.
         # The caller (front-door / LOKA) approves and re-calls with approved_plan.
+        # We close the engagement trace before every early return so that
+        # trace_view / reflect() see a clean open→close pair, not a "crashed run".
         try:
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
+            trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "llm"})
             return {
                 "query": query,
                 "plan": public_plan,
@@ -457,6 +469,7 @@ def run_live(
         except Exception as _e:
             trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
             # Fall back to a deterministic plan-only envelope (no agents ran).
+            trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "deterministic"})
             return {
                 "query": query,
                 "plan": public_plan,

@@ -262,6 +262,59 @@ class TestPlanMode(unittest.TestCase):
                 self.assertIn(aid, agent_ids,
                               f"Expected {aid!r} in discover.agents on empty-selection fallback")
 
+    # ── test 8: all-filtered approved_plan falls back to deterministic ────────
+    def test_all_filtered_approved_plan_falls_back_to_deterministic(self):
+        """When every id in approved_plan is unknown or out-of-bucket, the filtered
+        list is empty.  live_engine must NOT silently run zero fact agents.
+        It must fall back to the full deterministic list and stamp
+        plan_source='deterministic'.
+        """
+        result = run_live(
+            "Is TSC2 viable in tuberous sclerosis?",
+            plan_mode="off",
+            approved_plan=["FAKE_AGENT_XYZ", "ANOTHER_UNKNOWN_ID"],
+            ctx=self._ctx(),
+        )
+        self.assertIn("discover", result,
+                      "All-filtered approved_plan must fall back to deterministic, not zero agents")
+        self.assertEqual(result.get("plan_source"), "deterministic",
+                         f"Expected plan_source='deterministic' for all-filtered approved_plan; "
+                         f"got {result.get('plan_source')}")
+        # Full deterministic panel must have run.
+        agent_ids = {a["id"] for a in result["discover"]["agents"]}
+        known_ids = {a["id"] for a in self._registry.get("agents", [])}
+        for aid in _BUCKET1_AGENTS:
+            if aid in known_ids:
+                self.assertIn(aid, agent_ids,
+                              f"Expected {aid!r} in discover.agents on all-filtered fallback")
+
+    # ── test 9: llm+approve + smart_plan fails → deterministic fallback envelope
+    def test_llm_approve_smartplan_fails_returns_deterministic_envelope(self):
+        """plan_mode='llm+approve' when smart_plan raises SmartPlanError must:
+          - still return plan_pending_approval=True (not crash)
+          - stamp plan_source='deterministic'
+          - NOT include the 'smart_plan' key (callers must not KeyError on the
+            success shape when the LLM plan was unavailable)
+        """
+        with mock.patch("smart_plan.smart_plan",
+                        side_effect=SmartPlanError("forced failure for test")):
+            result = run_live(
+                "Is TSC2 viable in tuberous sclerosis?",
+                plan_mode="llm+approve",
+                ctx=self._ctx(),
+            )
+        self.assertTrue(result.get("plan_pending_approval") is True,
+                        f"Expected plan_pending_approval=True; got {result.get('plan_pending_approval')}")
+        self.assertEqual(result.get("plan_source"), "deterministic",
+                         f"Expected plan_source='deterministic' on smart_plan failure; "
+                         f"got {result.get('plan_source')}")
+        self.assertNotIn("smart_plan", result,
+                         "'smart_plan' key must be absent in the fallback envelope — "
+                         "a caller built against the success shape would KeyError on it")
+        # No agents should have run.
+        self.assertNotIn("discover", result,
+                         "'discover' must not be present in llm+approve envelope")
+
 
 if __name__ == "__main__":
     unittest.main()

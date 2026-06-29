@@ -120,8 +120,11 @@ def smart_plan(query: str, deterministic_plan: dict, registry: dict, ctx: dict) 
     label from ``contracts/provenance.py``.  Public identifiers only are sent to
     the model (agent IDs, roles, deterministic plan metadata).
     """
-    # Import here to avoid a circular import at module level:
-    # smart_plan ← live_engine ← smart_plan would be a cycle.
+    # NOTE: circular import — smart_plan lazy-imports _BUCKET1_AGENTS from live_engine,
+    # and live_engine lazy-imports smart_plan inside run_live. The laziness (inside the
+    # function body, not at module level) breaks the cycle — both modules are fully
+    # initialised before either lazy import fires. This is intentional but fragile:
+    # do NOT hoist either import to module level.
     from live_engine import _BUCKET1_AGENTS
 
     # Candidate universe = _BUCKET1_AGENTS ∩ ids present in the registry.

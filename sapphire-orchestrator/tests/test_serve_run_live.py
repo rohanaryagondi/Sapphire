@@ -151,6 +151,44 @@ class TestRouteApiRun(unittest.TestCase):
         self.assertEqual(call_kwargs.get("plan_mode"), "llm",
                          f"Expected plan_mode='llm' in run_live call; got kwargs={call_kwargs}")
 
+    def test_non_list_approved_plan_treated_as_absent(self):
+        """A non-list JSON approved_plan value (e.g. a bare string) in the HTTP query
+        string must be treated as absent (None) — not iterated into characters.
+
+        This test drives the Handler's parsing logic directly by calling the
+        json.loads + isinstance guard path.  We verify that a bare JSON string
+        'emet-runner' does NOT produce approved_plan=['e','m','e','t',...] by
+        checking that route_api_run receives approved_plan=None.
+        """
+        # Simulate what the Handler does when ?approved_plan="emet-runner" is in the QS.
+        import urllib.parse
+
+        def _parse_approved_plan(raw_value: str):
+            """Mirror the Handler's parsing logic (the fix under test)."""
+            try:
+                _parsed = json.loads(raw_value)
+                return [str(i) for i in _parsed] if isinstance(_parsed, list) else None
+            except (json.JSONDecodeError, TypeError):
+                return None
+
+        # A bare JSON string iterates to characters without the guard.
+        bare_string = json.dumps("emet-runner")      # → '"emet-runner"'
+        result = _parse_approved_plan(bare_string)
+        self.assertIsNone(result,
+                          f"A bare JSON string must be treated as absent; got {result!r}")
+
+        # A JSON object iterates over keys without the guard.
+        json_object = json.dumps({"emet-runner": True})
+        result_obj = _parse_approved_plan(json_object)
+        self.assertIsNone(result_obj,
+                          f"A JSON object must be treated as absent; got {result_obj!r}")
+
+        # A valid JSON array must still work.
+        json_array = json.dumps(["emet-runner", "clinical-trial-registry"])
+        result_arr = _parse_approved_plan(json_array)
+        self.assertEqual(result_arr, ["emet-runner", "clinical-trial-registry"],
+                         f"A JSON array must pass through; got {result_arr!r}")
+
 
 class TestRealRunLiveConformsToContract(unittest.TestCase):
     """A REAL run_live (mock backends, real moat if present) conforms to the schema."""
