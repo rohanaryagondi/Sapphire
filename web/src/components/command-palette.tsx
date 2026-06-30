@@ -1,12 +1,19 @@
 "use client";
+/* ============================================================================
+   Phase 5 enhancement: jump-to-step (agents/partners in the current run) +
+   Pin active conversation command.  Existing commands (new chat, profile,
+   model, conversations) kept verbatim.  Zero emojis — lucide-react SVG only.
+   ============================================================================ */
 import * as React from "react";
 import { Command } from "cmdk";
 import {
+  ArrowRight,
   Check,
   Cpu,
   FlaskConical,
   MessageSquarePlus,
   PanelRight,
+  Pin,
   Play,
   SlidersHorizontal,
 } from "lucide-react";
@@ -37,6 +44,38 @@ export function CommandPalette() {
   const inspectorOpen = useFirm((s) => s.inspectorOpen);
   const conversations = useFirm((s) => s.conversations);
   const openConversation = useFirm((s) => s.openConversation);
+
+  // Phase 5: jump-to-step — derive agent steps from the latest turn's trace
+  const turns = useFirm((s) => s.turns);
+  const select = useFirm((s) => s.select);
+  const latestTurn = turns.length > 0 ? turns[turns.length - 1] : null;
+  const steps = React.useMemo(() => {
+    if (!latestTurn) return [];
+    // Collect unique agent_ids from the trace
+    const seen = new Set<string>();
+    const result: { agentId: string; stage: string }[] = [];
+    for (const ev of latestTurn.trace) {
+      if (ev.agent_id && !seen.has(ev.agent_id)) {
+        seen.add(ev.agent_id);
+        result.push({ agentId: ev.agent_id, stage: ev.stage ?? "" });
+      }
+    }
+    // Also include result-level agents if available
+    const agents = latestTurn.result?.discover?.agents ?? [];
+    for (const a of agents) {
+      if (!seen.has(a.id)) {
+        seen.add(a.id);
+        result.push({ agentId: a.id, stage: "bucket1" });
+      }
+    }
+    return result;
+  }, [latestTurn]);
+
+  // Phase 5: pin active conversation
+  const activeConversationId = useFirm((s) => s.activeConversationId);
+  const pinConversation = useFirm((s) => s.pinConversation);
+  const pinned = useFirm((s) => s.pinned);
+  const isActivePinned = activeConversationId ? pinned.includes(activeConversationId) : false;
 
   // global keyboard shortcuts
   React.useEffect(() => {
@@ -94,7 +133,36 @@ export function CommandPalette() {
             {inspectorOpen ? "Hide" : "Show"} inspector
             <Shortcut keys="⌘/" />
           </Item>
+          {/* Phase 5: pin active conversation */}
+          {activeConversationId && !isActivePinned && (
+            <Item
+              icon={<Pin className="size-3.5" />}
+              onSelect={() => run(() => pinConversation(activeConversationId))}
+            >
+              Pin this conversation
+            </Item>
+          )}
         </Group>
+
+        {/* Phase 5: jump-to-step (agents in the current run) */}
+        {steps.length > 0 && (
+          <Group heading="Jump to step">
+            {steps.map(({ agentId }) => (
+              <Item
+                key={agentId}
+                icon={<ArrowRight className="size-3.5" />}
+                onSelect={() =>
+                  run(() => {
+                    if (!latestTurn) return;
+                    select({ kind: "agent", agentId, turnId: latestTurn.id });
+                  })
+                }
+              >
+                {agentId}
+              </Item>
+            ))}
+          </Group>
+        )}
 
         <Group heading="Run a query">
           {QUERIES.map((q) => (
