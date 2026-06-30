@@ -38,7 +38,7 @@ export default function Home() {
         }}
       >
         {/* left — history rail */}
-        <aside className="overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-panel)]/50 flex flex-col min-h-0">
+        <aside className="overflow-hidden border-r border-[var(--color-seam)] bg-[var(--color-side)] flex flex-col min-h-0">
           <HistoryRail />
         </aside>
 
@@ -52,7 +52,7 @@ export default function Home() {
         {/* right — inspector panel. Always mounted so the grid .22s column-collapse
             animation slides real content (not an empty box). The aside's overflow:hidden
             clips the content when the column collapses to 0px. */}
-        <aside className="overflow-hidden border-l border-[var(--color-border)] bg-[var(--color-panel)]/50 flex flex-col min-h-0">
+        <aside className="overflow-hidden border-l border-[var(--color-seam)] bg-[var(--color-side)] flex flex-col min-h-0">
           <Inspector />
         </aside>
       </div>

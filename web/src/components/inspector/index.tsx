@@ -34,8 +34,8 @@ export function Inspector() {
           className={cn(
             "relative flex h-7 items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 text-[12.5px] font-medium transition-colors",
             tab === "trace"
-              ? "bg-[var(--color-elevated)] text-[var(--color-fg)]"
-              : "text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
+              ? "bg-[var(--color-q)] text-white"
+              : "bg-transparent text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]",
           )}
         >
           <Activity className="size-3.5" />
@@ -49,13 +49,13 @@ export function Inspector() {
           className={cn(
             "relative flex h-7 items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 text-[12.5px] font-medium transition-colors",
             tab === "dossier"
-              ? "bg-[var(--color-elevated)] text-[var(--color-fg)]"
-              : "text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
+              ? "bg-[var(--color-q)] text-white"
+              : "bg-transparent text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]",
           )}
         >
-          Dossier
+          Info
           {activeTurn?.result?.discover?.dossier?.length ? (
-            <span className="ml-0.5 font-mono text-[10px] text-[var(--color-fg-faint)]">
+            <span className="ml-0.5 font-mono text-[10px] opacity-70">
               {activeTurn.result.discover.dossier.length}
             </span>
           ) : null}

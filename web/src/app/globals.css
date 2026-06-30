@@ -20,19 +20,34 @@
   /* borders — hairline */
   --color-border: rgba(255, 255, 255, 0.07);
   --color-border-strong: rgba(255, 255, 255, 0.12);
-  --color-border-focus: rgba(93, 141, 255, 0.45);
-
   /* text */
   --color-fg: #f4f5f6;
   --color-fg-muted: #9ca0a8;
   --color-fg-subtle: #6b6f78;
   --color-fg-faint: #4a4d55;
 
-  /* accent — sapphire */
+  /* side panel surface — faint indigo (new) */
+  --color-side: #0d0c22;
+  /* seam border between chat and panels (new) */
+  --color-seam: rgba(124, 99, 196, 0.18);
+
+  /* accent — sapphire (kept for back-compat) */
   --color-accent: #4d8dff;
   --color-accent-hover: #6b9eff;
   --color-accent-soft: rgba(77, 141, 255, 0.12);
   --color-accent-ring: rgba(77, 141, 255, 0.30);
+
+  /* brand / interactive — Quiver violet (new primary interactive color) */
+  --color-q: #8b5cf6;
+  --color-q-bright: #a78bfa;
+  --color-q-text: #c4b5fd;
+  --color-q-d: #7c3aed;
+  --color-q-soft: rgba(139, 92, 246, 0.12);
+  --color-q-bd: rgba(139, 92, 246, 0.34);
+  --color-q-ring: rgba(139, 92, 246, 0.30);
+
+  /* border-focus changes to violet */
+  --color-border-focus: rgba(139, 92, 246, 0.5);
 
   /* semantic */
   --color-ok: #3fb950;
@@ -96,8 +111,8 @@
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(900px 480px at 18% -8%, rgba(77, 141, 255, 0.10), transparent 60%),
-    radial-gradient(720px 420px at 100% 0%, rgba(167, 100, 255, 0.06), transparent 55%);
+    radial-gradient(900px 480px at 18% -8%, rgba(139, 92, 246, 0.07), transparent 60%),
+    radial-gradient(720px 420px at 100% 0%, rgba(167, 100, 255, 0.05), transparent 55%);
 }
 .dot-grid {
   background-image: radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px);
@@ -147,7 +162,7 @@
   height: 12px;
   border-radius: 9999px;
   border: 1.5px solid var(--color-border-strong);
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-q);
   animation: spin 0.7s linear infinite;
   display: inline-block;
 }
@@ -190,4 +205,9 @@
 .card-hover:hover {
   border-color: var(--color-border-strong);
   background: var(--color-panel-raised);
+}
+
+/* ── synthesis glow — soft violet lift ───────────────────────────────────── */
+.synth-glow {
+  box-shadow: 0 1px 0 rgba(255,255,255,.03), 0 14px 34px -28px rgba(139,92,246,.28);
 }

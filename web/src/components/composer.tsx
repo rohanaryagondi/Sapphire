@@ -57,7 +57,7 @@ export function Composer() {
       <div className="mx-auto max-w-3xl">
         <div
           className={cn(
-            "relative flex items-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border-strong)] bg-[var(--color-panel)] px-3 py-2.5 transition-all duration-150 focus-within:border-[var(--color-border-focus)] focus-within:shadow-[0_0_0_3px_var(--color-accent-soft)]",
+            "relative flex items-end gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border-strong)] bg-[var(--color-panel)] px-3 py-2.5 transition-all duration-150 focus-within:border-[var(--color-border-focus)] focus-within:shadow-[0_0_0_3px_var(--color-q-soft)]",
           )}
         >
           <textarea
@@ -89,7 +89,7 @@ export function Composer() {
             className={cn(
               "flex h-7 w-7 shrink-0 items-center justify-center rounded-[var(--radius-sm)] transition-all duration-150",
               canSend
-                ? "bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)]"
+                ? "bg-[var(--color-q)] text-white hover:bg-[var(--color-q-d)]"
                 : "cursor-not-allowed bg-[var(--color-elevated)] text-[var(--color-fg-faint)]",
             )}
           >

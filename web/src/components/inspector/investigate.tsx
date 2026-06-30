@@ -1,5 +1,5 @@
 "use client";
-import { MousePointerClick } from "lucide-react";
+import { MousePointerClick, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm, type InspectorSelection } from "@/lib/store";
 import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind } from "@/lib/utils";
@@ -32,7 +32,7 @@ function Header({
   title,
   right,
 }: {
-  eyebrow: string;
+  eyebrow: React.ReactNode;
   title: string;
   right?: React.ReactNode;
 }) {
@@ -130,7 +130,11 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
   return (
     <div className="p-3.5">
       <Header
-        eyebrow={`Bucket 1 fact agent${isVetoAgent(agentId) ? " · veto-class ⛔" : ""}`}
+        eyebrow={
+          isVetoAgent(agentId) ? (
+            <span className="flex items-center gap-1">Bucket 1 fact agent · veto-class <ShieldAlert className="size-3 text-[var(--color-danger)]" /></span>
+          ) : "Bucket 1 fact agent"
+        }
         title={agentLabel(agentId)}
         right={
           <span className="flex items-center gap-1.5 text-[11px] text-[var(--color-fg-muted)]">

@@ -18,7 +18,7 @@ export function PlanReview() {
   const cancel = useFirm((s) => s.cancelPlan);
   const approve = useFirm((s) => s.approvePlan);
 
-  // #8 — veto-class agents (FDA Institutional Memory ⛔, Patent/IP ⛔) gate the
+  // #8 — veto-class agents (FDA Institutional Memory, Patent/IP) gate the
   // roundtable. Warn (dismissibly) whenever one is currently deselected.
   const deselectedVeto = (plan?.agents ?? [])
     .filter((a) => isVetoAgent(a.id) && !a.selected)
@@ -150,9 +150,7 @@ export function PlanReview() {
                   <span className="flex items-center gap-1 text-[12.5px] font-medium text-[var(--color-fg)]">
                     {agentLabel(a.id)}
                     {isVetoAgent(a.id) && (
-                      <span title="veto-class agent" className="text-[10px] text-[var(--color-danger)]">
-                        ⛔
-                      </span>
+                      <ShieldAlert className="size-3 text-[var(--color-danger)]" />
                     )}
                   </span>
                   {a.why ? (

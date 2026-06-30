@@ -54,6 +54,20 @@ if [ -d frontend2/tests ]; then
   fi
 fi
 
+# web/ React component tests (Vitest + RTL). Runs in production mode (vitest run).
+ROOT_SAVE="$ROOT"
+cd "$ROOT/web" || { echo "run-tests: no web/ dir"; true; }
+if [ -f package.json ] && grep -q '"vitest"' package.json 2>/dev/null; then
+  out="$(npx vitest run --reporter=verbose 2>&1)"
+  n="$(printf '%s' "$out" | grep -oE 'Tests[[:space:]]+[0-9]+' | grep -oE '[0-9]+' | head -1)"
+  if printf '%s' "$out" | grep -qE 'Tests[[:space:]]+[0-9]+[[:space:]]+passed'; then
+    echo "  ✓ web/react (${n:-0})"; total=$((total + ${n:-0}))
+  else
+    echo "  ✗ web/react FAILED"; printf '%s\n' "$out" | tail -15; fail=1
+  fi
+fi
+cd "$ROOT_SAVE" || true
+
 if [ "$fail" -eq 0 ]; then
   echo "Gate 1 GREEN — $total tests."
 else

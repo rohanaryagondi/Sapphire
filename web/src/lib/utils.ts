@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 
 /* ── provenance honesty class ─────────────────────────────────────────────────
    Derive a marker class from a fact/agent provenance string — verbatim, never
-   relabeled. ● REAL / 🧪 simulated / ◆ CAPTURED. Mirrors frontend2/app.js. */
+   relabeled. REAL / sim / cap. Mirrors frontend2/app.js. */
 export type ProvKind = "real" | "sim" | "cap";
 
 export function provKind(prov?: string, via?: string): ProvKind {
@@ -19,7 +19,7 @@ export function provKind(prov?: string, via?: string): ProvKind {
 }
 
 export function provMarker(kind: ProvKind): string {
-  return kind === "sim" ? "🧪" : kind === "cap" ? "◆" : "●";
+  return kind === "sim" ? "sim" : kind === "cap" ? "cap" : "real";
 }
 
 export function tierClass(tier?: string): string {

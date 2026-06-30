@@ -8,7 +8,7 @@ import type { ModelChoice, Profile } from "@/lib/types";
 
 const PROFILE_OPTS: SelectOption[] = [
   { value: "demo", label: "Demo", hint: "offline mock backends · $0 · deterministic", dot: "bg-[var(--color-fg-subtle)]" },
-  { value: "simulate", label: "Simulate", hint: "real moat/EMET/seams · 🧪 reasoning", dot: "bg-[var(--color-warn)]" },
+  { value: "simulate", label: "Simulate", hint: "real moat/EMET/seams · sim reasoning", dot: "bg-[var(--color-warn)]" },
   { value: "live", label: "Live", hint: "real backends · claude subagents", dot: "bg-[var(--color-ok)]" },
   { value: "replay", label: "Replay", hint: "frozen real capture · $0", dot: "bg-[var(--color-external)]" },
 ];
@@ -47,7 +47,7 @@ export function TopBar() {
 
         {/* brand */}
         <div className="flex items-center gap-2.5">
-          <div className="relative flex h-6 w-6 items-center justify-center rounded-[7px] bg-gradient-to-br from-[#5b8def] to-[#7c5cff] shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_2px_8px_rgba(77,141,255,0.35)]">
+          <div className="relative flex h-6 w-6 items-center justify-center rounded-[7px] bg-gradient-to-br from-[#c4b5fd] to-[#8b5cf6] shadow-[0_0_0_1px_rgba(255,255,255,0.08),0_2px_8px_rgba(139,92,246,0.40)]">
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-white" fill="none">
               <path
                 d="M12 2 4 8l8 14 8-14-8-6Z"
@@ -59,7 +59,10 @@ export function TopBar() {
             </svg>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-[14px] font-semibold tracking-tight text-[var(--color-fg)]">
+            <span
+              className="text-[14px] font-semibold tracking-tight"
+              style={{ background: "linear-gradient(90deg, #f4f5f6, #cdbcff)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}
+            >
               Sapphire
             </span>
             <span className="hidden text-[11px] text-[var(--color-fg-subtle)] sm:inline">
@@ -67,6 +70,20 @@ export function TopBar() {
             </span>
           </div>
         </div>
+      </div>
+
+      {/* A/B variant toggle */}
+      <div className="hidden items-center gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] overflow-hidden md:inline-flex">
+        <button
+          className="border-r border-[var(--color-border-strong)] bg-[var(--color-q)] px-3 py-1 text-[11.5px] text-white"
+        >
+          A <span className="font-mono text-[9.5px] opacity-70 ml-1">workspace</span>
+        </button>
+        <button
+          className="bg-transparent px-3 py-1 text-[11.5px] text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]"
+        >
+          B <span className="font-mono text-[9.5px] opacity-70 ml-1">report</span>
+        </button>
       </div>
 
       {/* controls */}
