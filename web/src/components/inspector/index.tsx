@@ -1,4 +1,5 @@
 "use client";
+import { useRef } from "react";
 import { Activity } from "lucide-react";
 import { useFirm } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,11 @@ export function Inspector() {
   const setPanelWide = useFirm((s) => s.setPanelWide);
   const panelWide = useFirm((s) => s.panelWide);
   const monitorTurnId = useFirm((s) => s.monitorTurnId);
+
+  // The outer scroll container ref is threaded into Monitor so the virtualizer
+  // (and the focusRowId scrollIntoView) uses the panel's single scroll surface,
+  // preventing a nested double-scrollbar when > 20 agent rows are rendered.
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const activeTurn =
     (monitorTurnId && turns.find((t) => t.id === monitorTurnId)) ||
@@ -80,10 +86,10 @@ export function Inspector() {
         {running && <div className="streamline h-px" />}
       </div>
 
-      {/* body */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      {/* body — single scroll surface; Monitor's virtualizer binds to this ref */}
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
         {tab === "trace" ? (
-          <Monitor turn={activeTurn} />
+          <Monitor turn={activeTurn} outerScrollRef={scrollRef} />
         ) : (
           <DossierTab turn={activeTurn} />
         )}

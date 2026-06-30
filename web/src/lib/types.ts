@@ -96,7 +96,7 @@ export interface RunResult {
 
 /* ── SSE progress event (the live trace) — forwarded verbatim from the engine ── */
 export type TraceStage = "plan" | "bucket1" | "flags" | "roundtable" | "synthesis" | "redispatch";
-export type TracePhase = "start" | "done";
+export type TracePhase = "start" | "done" | "rebuttal_start" | "rebuttal_done";
 
 export interface ProgressEvent {
   stage: TraceStage | string;

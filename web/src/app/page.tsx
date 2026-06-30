@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { TopBar } from "@/components/topbar";
 import { HistoryRail } from "@/components/history-rail";
 import { ChatThread } from "@/components/chat-thread";
@@ -12,6 +13,13 @@ export default function Home() {
   const railOpen = useFirm((s) => s.railOpen);
   const panelOpen = useFirm((s) => s.panelOpen);
   const panelWide = useFirm((s) => s.panelWide);
+  const abortRun = useFirm((s) => s.abortRun);
+
+  // Abort any in-flight SSE run when the page component unmounts (e.g. hot-
+  // reload, navigation) so the ReadableStream reader doesn't leak.
+  useEffect(() => {
+    return () => { abortRun(); };
+  }, [abortRun]);
 
   // Compute grid-template-columns
   const railCol = railOpen ? "236px" : "0px";

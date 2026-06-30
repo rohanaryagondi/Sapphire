@@ -115,6 +115,8 @@ interface FirmState {
 
   // run
   submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
+  /** Abort the current in-flight run (safe to call when nothing is running). */
+  abortRun: () => void;
 }
 
 let _seq = 0;
@@ -319,11 +321,37 @@ export const useFirm = create<FirmState>((set, get) => ({
     await deleteConversation(id);
   },
 
+  abortRun: () => {
+    const ac = (get() as unknown as { _runAbort: AbortController | null })._runAbort;
+    if (ac) ac.abort();
+  },
+
+  // Tracks the AbortController for the in-flight run so we can cancel it on
+  // new-query or unmount. Stored outside Zustand state (closure var) — it's an
+  // imperative handle, not view state.
+  _runAbort: null as AbortController | null,
+
   submit: async (query, opts) => {
     const q = query.trim();
     const { profile, running } = get();
-    if (running || (!q && profile !== "replay")) return;
+    if (!q && profile !== "replay") return;
+
+    // Abort any in-flight run before starting a new one (new-query cancel).
+    const prev = (get() as unknown as { _runAbort: AbortController | null })._runAbort;
+    if (prev) prev.abort();
+    if (running) {
+      // Mark the previous turn as aborted if it was still running.
+      set((s) => ({
+        turns: s.turns.map((t) =>
+          t.status === "running" ? { ...t, status: "error", error: "aborted" } : t,
+        ),
+      }));
+    }
+
     const approvedPlan = opts?.approvedPlan;
+    const ac = new AbortController();
+    // Store the AbortController so unmount/new-query can cancel.
+    (get() as unknown as { _runAbort: AbortController | null })._runAbort = ac;
 
     const turn: Turn = {
       id: uid("turn"),
@@ -349,25 +377,24 @@ export const useFirm = create<FirmState>((set, get) => ({
       set((s) => ({
         turns: s.turns.map((t) => (t.id === turn.id ? { ...t, ...patch } : t)),
       }));
-    const pushTrace = (ev: ProgressEvent) => {
-      set((s) => ({
-        turns: s.turns.map((t) =>
-          t.id === turn.id ? { ...t, trace: [...t.trace, ev] } : t,
-        ),
-      }));
-      // RAM cap: keep full trace for the last 3 turns; trim older turns to "done" events only
+
+    // Single set() per event — appends the event and applies the RAM cap in one
+    // state transition to avoid double renders.
+    const pushTrace = (ev: ProgressEvent) =>
       set((s) => {
-        const n = s.turns.length;
-        if (n <= 3) return {};
-        const trimmed = s.turns.map((t, i) => {
-          if (i >= n - 3) return t; // keep last 3 full
-          const doneOnly = t.trace.filter((e) => e.phase === "done");
-          if (doneOnly.length === t.trace.length) return t; // already trimmed
-          return { ...t, trace: doneOnly };
+        const turns = s.turns.map((t) =>
+          t.id === turn.id ? { ...t, trace: [...t.trace, ev] } : t,
+        );
+        // RAM cap: keep full trace for last 3 turns; trim older to "done" events only
+        const n = turns.length;
+        if (n <= 3) return { turns };
+        const trimmed = turns.map((t, i) => {
+          if (i >= n - 3) return t;
+          const doneOnly = t.trace.filter((e) => e.phase === "done" || e.phase === "rebuttal_done");
+          return doneOnly.length === t.trace.length ? t : { ...t, trace: doneOnly };
         });
         return { turns: trimmed };
       });
-    };
 
     // ensure a conversation exists for persistence (best-effort; degrades to null)
     let convId = get().activeConversationId;
@@ -400,22 +427,35 @@ export const useFirm = create<FirmState>((set, get) => ({
             finalResult = result;
             patchTurn({ result, status: "complete" });
           },
-          onError: (message) => patchTurn({ error: message, status: "error" }),
+          onError: (message) => {
+            // Swallow AbortError — the user/component deliberately cancelled.
+            if (ac.signal.aborted) return;
+            patchTurn({ error: message, status: "error" });
+          },
           onDone: () => {
             // if a result never arrived and no error was set, mark complete-ish
+            if (ac.signal.aborted) return;
             const cur = get().turns.find((t) => t.id === turn.id);
             if (cur && cur.status === "running") {
               patchTurn({ status: cur.result ? "complete" : "error", error: cur.error });
             }
           },
+          signal: ac.signal,
         },
       );
     } catch (e) {
-      patchTurn({
-        status: "error",
-        error: e instanceof Error ? e.message : "the firm could not be convened",
-      });
+      if (!ac.signal.aborted) {
+        patchTurn({
+          status: "error",
+          error: e instanceof Error ? e.message : "the firm could not be convened",
+        });
+      }
     } finally {
+      // Always release the abort controller.
+      if ((get() as unknown as { _runAbort: AbortController | null })._runAbort === ac) {
+        (get() as unknown as { _runAbort: AbortController | null })._runAbort = null;
+      }
+      ac.abort(); // idempotent: closes the SSE ReadableStream reader on 'done'
       set({ running: false });
       // best-effort persist the turn onto the conversation
       if (convId && finalResult) {

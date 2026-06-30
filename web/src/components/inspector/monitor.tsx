@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { Check, ClipboardList, FlagTriangleRight, Sparkles, TriangleAlert } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Turn } from "@/lib/store";
@@ -40,9 +40,31 @@ function TopStep({
   );
 }
 
-function AgentRow({ row, turn }: { row: TraceRow; turn?: Turn }) {
+type RowRegistration = { open: () => void; el: HTMLDivElement | null };
+
+function AgentRow({
+  row,
+  turn,
+  registerRow,
+}: {
+  row: TraceRow;
+  turn?: Turn;
+  registerRow?: (id: string, reg: RowRegistration) => void;
+}) {
   const [open, setOpen] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
   const ev = row.ev;
+
+  // Register this row with the Monitor so the focusRowId effect can open+scroll it.
+  useEffect(() => {
+    if (!registerRow) return;
+    registerRow(row.agentId, {
+      open: () => setOpen(true),
+      el: rowRef.current,
+    });
+    return () => registerRow(row.agentId, { open: () => {}, el: null });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [row.agentId, registerRow]);
   const isRT = ev.stage === "roundtable";
   const isVeto = isVetoAgent(row.agentId);
 
@@ -82,6 +104,8 @@ function AgentRow({ row, turn }: { row: TraceRow; turn?: Turn }) {
 
   return (
     <div
+      ref={rowRef}
+      data-agent-row={row.agentId}
       className="mx-0.5 my-1 overflow-hidden rounded-[8px] border border-[var(--color-border)] bg-[var(--color-panel)] transition-colors hover:border-[var(--color-border-strong)]"
       style={open ? { borderColor: "var(--color-border-strong)" } : {}}
     >
@@ -199,12 +223,22 @@ function AgentRow({ row, turn }: { row: TraceRow; turn?: Turn }) {
   );
 }
 
-function AgentList({ rows, turn }: { rows: TraceRow[]; turn?: Turn }) {
-  const parentRef = useRef<HTMLDivElement>(null);
+function AgentList({
+  rows,
+  turn,
+  registerRow,
+  outerScrollRef,
+}: {
+  rows: TraceRow[];
+  turn?: Turn;
+  registerRow?: (id: string, reg: RowRegistration) => void;
+  outerScrollRef?: React.RefObject<HTMLDivElement | null>;
+}) {
   const shouldVirtualize = rows.length > 20;
   const virtualizer = useVirtualizer({
     count: rows.length,
-    getScrollElement: () => parentRef.current,
+    // Use the outer panel scroll container so there's only one scrollbar.
+    getScrollElement: () => outerScrollRef?.current ?? null,
     estimateSize: () => 52,
     enabled: shouldVirtualize,
   });
@@ -213,24 +247,22 @@ function AgentList({ rows, turn }: { rows: TraceRow[]; turn?: Turn }) {
     return (
       <>
         {rows.map((row) => (
-          <AgentRow key={row.agentId} row={row} turn={turn} />
+          <AgentRow key={row.agentId} row={row} turn={turn} registerRow={registerRow} />
         ))}
       </>
     );
   }
 
   return (
-    <div ref={parentRef} style={{ overflow: "auto", maxHeight: 400 }}>
-      <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
-        {virtualizer.getVirtualItems().map((vi) => (
-          <div
-            key={vi.key}
-            style={{ position: "absolute", top: vi.start, left: 0, right: 0, height: vi.size }}
-          >
-            <AgentRow row={rows[vi.index]!} turn={turn} />
-          </div>
-        ))}
-      </div>
+    <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+      {virtualizer.getVirtualItems().map((vi) => (
+        <div
+          key={vi.key}
+          style={{ position: "absolute", top: vi.start, left: 0, right: 0, height: vi.size }}
+        >
+          <AgentRow row={rows[vi.index]!} turn={turn} registerRow={registerRow} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -290,7 +322,30 @@ function TurnSwitcher({ turn }: { turn: Turn }) {
   );
 }
 
-export function Monitor({ turn }: { turn?: Turn }) {
+export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?: React.RefObject<HTMLDivElement | null> }) {
+  // Registry: agentId → { open fn, DOM element }. Updated by each AgentRow on mount.
+  const rowRegistry = useRef<Map<string, RowRegistration>>(new Map());
+  const registerRow = useCallback((id: string, reg: RowRegistration) => {
+    rowRegistry.current.set(id, reg);
+  }, []);
+
+  // Deep-link: when focusRowId changes, open the matching row and scroll it into view.
+  const focusRowId = useFirm((s) => s.focusRowId);
+  const setFocusRowId = useFirm((s) => s.setFocusRowId);
+  useEffect(() => {
+    if (!focusRowId) return;
+    // Brief delay so the row is mounted (if it just appeared via a new SSE event).
+    const t = setTimeout(() => {
+      const reg = rowRegistry.current.get(focusRowId);
+      if (reg) {
+        reg.open();
+        reg.el?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+      setFocusRowId(null); // consume — reset so the same id can be re-fired
+    }, 80);
+    return () => clearTimeout(t);
+  }, [focusRowId, setFocusRowId]);
+
   if (!turn) {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 text-center">
@@ -356,7 +411,7 @@ export function Monitor({ turn }: { turn?: Turn }) {
             done={m.b1Done}
             total={m.bucket1.length}
           />
-          <AgentList rows={m.bucket1} turn={turn} />
+          <AgentList rows={m.bucket1} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
         </div>
       )}
 
@@ -384,7 +439,7 @@ export function Monitor({ turn }: { turn?: Turn }) {
             done={rtDone}
             total={roundtable.length}
           />
-          <AgentList rows={roundtable} turn={turn} />
+          <AgentList rows={roundtable} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
         </div>
       )}
 

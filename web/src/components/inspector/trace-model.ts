@@ -47,7 +47,8 @@ export function buildTrace(trace: ProgressEvent[]): TraceModel {
       const row = map.get(id) ?? { agentId: id, started: false, done: false, ev };
       row.started = true;
       row.ev = { ...row.ev, ...ev };
-      if (phase === "done") row.done = true;
+      // phase==="rebuttal_done" is the round-2 terminal phase; treat it as done
+      if (phase === "done" || phase === "rebuttal_done") row.done = true;
       map.set(id, row);
     }
   }
