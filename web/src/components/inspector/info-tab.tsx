@@ -97,10 +97,6 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
     ? byAgentId
     : dossier.filter((f) => prov && f.provenance === prov);
 
-  // tier chip removed per UI polish spec; useMemo kept to avoid hook reorder
-  // if callers later re-add tier display — just drop the computed value.
-  void useMemo(() => undefined, [facts]);
-
   const via = result?._via === "replay" || result?._replay ? "replay" : undefined;
   const takeaway = typeof ev?.summary === "string" ? ev.summary : undefined;
 

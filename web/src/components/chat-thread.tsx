@@ -173,7 +173,7 @@ export function TurnView({ turn }: { turn: Turn }) {
         <button
           onClick={openTrace}
           title="Show this turn's trace in the Monitor"
-          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[13.5px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
+          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[15px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
         >
           {turn.query}
         </button>
