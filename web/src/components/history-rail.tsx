@@ -47,7 +47,7 @@ export function HistoryRail() {
       {/* header */}
       <div className="flex h-11 shrink-0 items-center justify-between gap-2 border-b border-[var(--color-border)] px-3">
         <span className="text-[12px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
-          History
+          Workspace
         </span>
         <Button
           variant="secondary"
@@ -72,6 +72,12 @@ export function HistoryRail() {
             className="h-7 flex-1 bg-transparent text-[12.5px] text-[var(--color-fg)] outline-none placeholder:text-[var(--color-fg-faint)]"
           />
         </div>
+      </div>
+
+      {/* Pinned section — empty placeholder for Phase 5 */}
+      <div className="shrink-0 px-3 pb-1 pt-2">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--color-fg-faint)]">Pinned</div>
+        <div className="py-2 text-[11.5px] text-[var(--color-fg-faint)] italic">Nothing pinned yet</div>
       </div>
 
       {/* list */}

@@ -1,16 +1,23 @@
 "use client";
 import * as React from "react";
-import { cn, provKind, provMarker, tierClass, type MockLabel, type ProvKind } from "@/lib/utils";
+import { Activity, FlaskConical, Globe, Lock, ShieldAlert } from "lucide-react";
+import { cn, provKind, tierClass, type MockLabel, type ProvKind } from "@/lib/utils";
 import type { FlagKind, Plane } from "@/lib/types";
 
 const base =
   "inline-flex items-center gap-1 rounded-[5px] border px-1.5 h-[18px] text-[10.5px] font-medium leading-none tracking-tight whitespace-nowrap font-mono";
 
-/* ── provenance chip (honesty marker — ● REAL / 🧪 simulated / ◆ CAPTURED) ── */
+/* ── provenance chip (honesty marker — icon + label) ── */
 const provStyle: Record<ProvKind, string> = {
   real: "border-[rgba(63,185,80,0.30)] bg-[rgba(63,185,80,0.08)] text-[#7ee787]",
   sim: "border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.08)] text-[#e3b341]",
   cap: "border-[rgba(86,182,255,0.28)] bg-[rgba(86,182,255,0.08)] text-[#79c0ff]",
+};
+
+const provIcon: Record<ProvKind, React.ReactNode> = {
+  real: <Activity className="size-2.5 shrink-0" />,
+  sim: <FlaskConical className="size-2.5 shrink-0" />,
+  cap: <Activity className="size-2.5 shrink-0 opacity-60" />,
 };
 
 export function ProvChip({ prov, via }: { prov?: string; via?: string }) {
@@ -18,7 +25,7 @@ export function ProvChip({ prov, via }: { prov?: string; via?: string }) {
   const kind = provKind(prov, via);
   return (
     <span className={cn(base, provStyle[kind])} title={`provenance: ${prov}`}>
-      <span className="text-[8px] leading-none">{provMarker(kind)}</span>
+      {provIcon[kind]}
       {prov}
     </span>
   );
@@ -34,7 +41,7 @@ export function MockBadge({ label }: { label: MockLabel }) {
       )}
       title="Not a real result — illustrative/mock output, kept labeled."
     >
-      <span className="text-[8px] leading-none">🧪</span>
+      <FlaskConical className="size-2.5 text-[var(--color-warn)]" />
       {label}
     </span>
   );
@@ -53,7 +60,7 @@ export function TierChip({ tier }: { tier?: string }) {
   return <span className={cn(base, tierStyle[t])}>{t}</span>;
 }
 
-/* ── plane chip — 🔒 internal / 🌐 external ─────────────────────────────── */
+/* ── plane chip — internal / external ───────────────────────────────────── */
 export function PlaneChip({ plane }: { plane?: Plane }) {
   const internal = plane === "internal";
   return (
@@ -65,7 +72,11 @@ export function PlaneChip({ plane }: { plane?: Plane }) {
           : "border-[rgba(86,182,255,0.28)] bg-[rgba(86,182,255,0.08)] text-[#79c0ff]",
       )}
     >
-      {internal ? "🔒 internal" : "🌐 external"}
+      {internal ? (
+        <><Lock className="size-2.5" /> internal</>
+      ) : (
+        <><Globe className="size-2.5" /> external</>
+      )}
     </span>
   );
 }
@@ -76,10 +87,10 @@ const flagStyle: Record<string, string> = {
   DIVERGENCE: "border-[rgba(210,153,34,0.38)] bg-[rgba(210,153,34,0.12)] text-[#e3b341]",
   KNOWN_UNKNOWN: "border-[var(--color-border-strong)] bg-[var(--color-elevated)] text-[var(--color-fg-muted)]",
 };
-const flagIcon: Record<string, string> = {
-  VETO: "⛔",
-  DIVERGENCE: "⚠",
-  KNOWN_UNKNOWN: "?",
+const flagBadge: Record<string, React.ReactNode> = {
+  VETO: <ShieldAlert className="size-2.5" />,
+  DIVERGENCE: <span className="text-[8px] font-bold">!</span>,
+  KNOWN_UNKNOWN: <span className="text-[8px]">?</span>,
 };
 
 export function FlagChip({ flag }: { flag?: FlagKind | string }) {
@@ -87,7 +98,7 @@ export function FlagChip({ flag }: { flag?: FlagKind | string }) {
   const key = String(flag);
   return (
     <span className={cn(base, flagStyle[key] ?? flagStyle.KNOWN_UNKNOWN)}>
-      <span className="text-[8px]">{flagIcon[key] ?? "•"}</span>
+      {flagBadge[key] ?? <span className="text-[8px]">•</span>}
       {key}
     </span>
   );

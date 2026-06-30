@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { Check, ClipboardList, FlagTriangleRight, Sparkles, TriangleAlert } from "lucide-react";
+import { AlertTriangle, Check, ClipboardList, FlagTriangleRight, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
@@ -75,7 +75,7 @@ function AgentRow({
   } else if (!row.done) {
     statusEl = <span className="spinner" style={{ color: "var(--color-accent)" }} />;
   } else if (isVeto) {
-    statusEl = <span className="text-[9px] text-[var(--color-danger)]">⛔</span>;
+    statusEl = <ShieldAlert className="size-3 text-[var(--color-danger)]" />;
   } else {
     const ok = String(ev.status ?? "ok") === "ok";
     statusEl = ok
@@ -426,9 +426,9 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
         detail={
           flagsEv ? (
             <span className="flex flex-wrap gap-1.5">
-              <span className="text-[var(--color-danger)]">⛔ {flagsEv.n_veto || 0} VETO</span>
-              <span className="text-[var(--color-warn)]">
-                ⚠ {flagsEv.n_divergence || 0} DIVERGENCE
+              <span className="flex items-center gap-1 text-[var(--color-danger)]"><ShieldAlert className="size-3" /> {flagsEv.n_veto || 0} VETO</span>
+              <span className="flex items-center gap-1 text-[var(--color-warn)]">
+                <AlertTriangle className="size-3" /> {flagsEv.n_divergence || 0} DIVERGENCE
               </span>
               <span>{flagsEv.n_known_unknowns || 0} known-unknown(s)</span>
             </span>
