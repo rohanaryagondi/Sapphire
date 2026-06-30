@@ -13,7 +13,7 @@ parties privately assessed probability of success.
 ## Procedure — corpus-first, then search the gap
 1. Identify public companies with programs against this target/class/indication (by name, CAS, dev code).
 2. **Query the local corpus FIRST.** Search
-   [`sapphire-orchestrator/corpus/financial-investor/`](../../../sapphire-orchestrator/corpus/financial-investor/)
+   [`sapphire-orchestrator/corpus/financial/`](../../../sapphire-orchestrator/corpus/financial/)
    — `index.jsonl` (one card per line: company · event · figure · target_drug · indication · `deal_structure` ·
    `implication` · date · source · url · quote · tier) and the themed `notes/`. This holds the stable
    landmark CNS deal intel (M&A structure → implied PoS), risk/write-down events (clinical failures,
@@ -36,7 +36,7 @@ KNOWN UNKNOWNS: private-company programs with thin disclosure
 ```
 
 ## Sources / tools
-**Local corpus (first):** [`sapphire-orchestrator/corpus/financial-investor/`](../../../sapphire-orchestrator/corpus/financial-investor/)
+**Local corpus (first):** [`sapphire-orchestrator/corpus/financial/`](../../../sapphire-orchestrator/corpus/financial/)
 — pre-ingested, cited CNS deal/risk cards (`index.jsonl` + themed `notes/`, each card carrying source url,
 ≤2-sentence quote, and **tier**). Hit this before any live call.
 

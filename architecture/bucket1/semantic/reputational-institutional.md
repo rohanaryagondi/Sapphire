@@ -14,7 +14,7 @@ track record, a prior scandal in the class) shape FDA scrutiny, partner appetite
 1. Assess the **class/field credibility** and **sponsor track record** — reputational baggage (high-profile
    failure, retraction, hype-cycle, scandal, data-integrity history) that raises institutional skepticism.
 2. **Query the local corpus FIRST.** Search
-   [`sapphire-orchestrator/corpus/reputational-institutional/`](../../../sapphire-orchestrator/corpus/reputational-institutional/)
+   [`sapphire-orchestrator/corpus/reputational/`](../../../sapphire-orchestrator/corpus/reputational/)
    — `index.jsonl` (one card per line: subject · perception_type · headwind_tailwind · date · source · url ·
    quote · tier) and the themed `notes/`. This holds the dominant CNS reputational case (the amyloid field's
    credibility crisis — process scandal, fraud, foundational retraction) **plus** the perception-vs-merit
@@ -35,7 +35,7 @@ KNOWN UNKNOWNS: thinly-covered sponsors or emerging narratives
 ```
 
 ## Sources / tools
-**Local corpus (first):** [`sapphire-orchestrator/corpus/reputational-institutional/`](../../../sapphire-orchestrator/corpus/reputational-institutional/)
+**Local corpus (first):** [`sapphire-orchestrator/corpus/reputational/`](../../../sapphire-orchestrator/corpus/reputational/)
 — pre-ingested CNS reputational cards (`index.jsonl` + themed `notes/`, each with subject/perception/date/url/
 quote/tier). Hit this before any live call.
 
