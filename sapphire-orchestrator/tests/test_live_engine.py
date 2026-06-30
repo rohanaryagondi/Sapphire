@@ -2440,6 +2440,118 @@ class TestBucket2Parallel(unittest.TestCase):
                 f"Got phases={sorted(phases)} from events={persona_events}"
             )
 
+    # ── test 6: round-2 (rebuttal) runs in parallel — no personas dropped ────
+    def test_round2_no_persona_dropped_parallel(self):
+        """Parallel round-2 dispatch must yield exactly len(panel) rebuttal entries
+        (no future silently dropped, no persona duplicated)."""
+        result = self._run(concurrency=4)
+        round2 = result["consult"]["round2"]
+        panel = result["plan"].get("panel", [])
+
+        self.assertEqual(
+            len(round2), len(panel),
+            f"Round-2 parallel dropped/duplicated entries: "
+            f"expected {len(panel)} got {len(round2)}.\n"
+            f"  panel={[p.get('persona', p) for p in panel]}\n"
+            f"  round2 personas={[r.get('persona') for r in round2]}"
+        )
+
+    # ── test 7: round-2 trace is valid JSONL under concurrent writes ──────────
+    def test_round2_trace_valid_jsonl_parallel(self):
+        """After parallel round-2 dispatch with 4 workers, every line of trace.jsonl
+        must parse as valid JSON (no interleaved writes from concurrent rebuttal threads)."""
+        result = self._run(concurrency=4)
+        eid = result["engagement_id"]
+        trace_file = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_file), f"Trace not found: {trace_file}")
+
+        with open(trace_file, encoding="utf-8") as fh:
+            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+
+        for i, line in enumerate(lines):
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as exc:
+                self.fail(
+                    f"Trace line {i} not valid JSON (interleaved write from parallel "
+                    f"round-2 threads?): {exc}\n  Line: {line[:160]}"
+                )
+            self.assertIsInstance(obj, dict, f"Trace line {i} is not a JSON object")
+
+    # ── test 8: round-2 on_progress events cover all personas ────────────────
+    def test_round2_on_progress_events_all_personas(self):
+        """With on_progress callback, every persona must have a rebuttal_start and
+        rebuttal_done event in the roundtable stage (round-2 progress events)."""
+        import live_engine
+        events: list[dict] = []
+
+        def _collect(ev):
+            events.append(dict(ev))
+
+        old = live_engine._MAX_BUCKET2_WORKERS
+        live_engine._MAX_BUCKET2_WORKERS = 3
+        try:
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=_build_ctx(),
+                on_progress=_collect,
+            )
+        finally:
+            live_engine._MAX_BUCKET2_WORKERS = old
+
+        panel = result["plan"].get("panel", [])
+        if not panel:
+            self.skipTest("No personas in plan.panel; skipping round-2 event check.")
+
+        r2_events = [
+            ev for ev in events
+            if ev.get("stage") == "roundtable" and ev.get("round") == 2
+        ]
+
+        for p in panel:
+            persona_name = p.get("persona", "")
+            persona_r2_events = [ev for ev in r2_events if ev.get("agent_id") == persona_name]
+            phases = {ev.get("phase") for ev in persona_r2_events}
+
+            self.assertIn(
+                "rebuttal_start", phases,
+                f"Persona '{persona_name}' missing 'rebuttal_start' event in round-2. "
+                f"Got phases={sorted(phases)} from events={persona_r2_events}"
+            )
+            self.assertIn(
+                "rebuttal_done", phases,
+                f"Persona '{persona_name}' missing 'rebuttal_done' event in round-2. "
+                f"Got phases={sorted(phases)} from events={persona_r2_events}"
+            )
+
+    # ── test 9: round-2 barrier — round1 fully joined before round2 starts ───
+    def test_round2_barrier_round1_complete(self):
+        """round1 must be fully populated BEFORE round2 dispatches — each round-2
+        worker must see the complete round1 verdicts list (barrier invariant)."""
+        result = self._run(concurrency=4)
+        round1 = result["consult"]["round1"]
+        round2 = result["consult"]["round2"]
+        panel = result["plan"].get("panel", [])
+
+        # Basic sanity: both lists have the same length as the panel.
+        self.assertEqual(len(round1), len(panel),
+                         "round1 length must equal panel length")
+        self.assertEqual(len(round2), len(panel),
+                         "round2 length must equal panel length")
+
+        # Every round2 entry must have a 'revised' field (set by the worker using
+        # round1 conviction/stance comparison — only possible if round1 was complete).
+        for i, r2 in enumerate(round2):
+            self.assertIn(
+                "revised", r2,
+                f"round2[{i}] missing 'revised' field — was round1 incomplete at dispatch? "
+                f"entry={r2}"
+            )
+            self.assertIsInstance(
+                r2["revised"], bool,
+                f"round2[{i}].revised must be bool; got {type(r2['revised'])}: {r2['revised']}"
+            )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

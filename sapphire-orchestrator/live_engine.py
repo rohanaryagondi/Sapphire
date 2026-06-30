@@ -707,14 +707,11 @@ def _run_persona_round2(
     r1_conviction = r1_verdict.get("conviction", 0)
 
     # Live progress: round-2 rebuttal starting.
-    with _PROGRESS_LOCK:
-        try:
-            _emit(on_progress, eid, {
-                "stage": "roundtable", "agent_id": persona_name,
-                "phase": "rebuttal_start", "round": 2,
-            })
-        except Exception:
-            pass
+    # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    _emit(on_progress, eid, {
+        "stage": "roundtable", "agent_id": persona_name,
+        "phase": "rebuttal_start", "round": 2,
+    })
     _t0 = time.monotonic()
 
     # Per-thread ctx: shallow copy + isolated _cache dict.
@@ -755,16 +752,13 @@ def _run_persona_round2(
     }
 
     # Live progress: rebuttal landed.
-    with _PROGRESS_LOCK:
-        try:
-            _emit(on_progress, eid, {
-                "stage": "roundtable", "agent_id": persona_name,
-                "phase": "rebuttal_done", "round": 2,
-                "revised": revised, "conviction": r2_conviction,
-                "elapsed_s": _elapsed,
-            })
-        except Exception:
-            pass
+    # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    _emit(on_progress, eid, {
+        "stage": "roundtable", "agent_id": persona_name,
+        "phase": "rebuttal_done", "round": 2,
+        "revised": revised, "conviction": r2_conviction,
+        "elapsed_s": _elapsed,
+    })
 
     return (persona_name, rebuttal_entry)
 
@@ -1523,72 +1517,39 @@ def run_live(
 
     round2: list[dict] = []
 
+    # ── Parallel Bucket-2 round-2 (rebuttal) dispatch ────────────────────────
+    # Barrier: round1 is fully joined before this block (the round-1 executor has
+    # already exited, so round1 + round1_verdicts are complete snapshots). This
+    # guarantees every persona's round-2 prompt sees ALL round-1 verdicts — the
+    # deliberation order invariant is preserved.
+    #
+    # Each worker (_run_persona_round2) reads round1/round1_verdicts as read-only
+    # snapshots and returns (persona_name, rebuttal_dict) without mutating any
+    # shared state. Results are merged in panel order after all futures join.
+    #
+    # Reuses _MAX_BUCKET2_WORKERS / SAPPHIRE_BUCKET2_CONCURRENCY (same cap as
+    # round-1 — personas are independent within a round in both cases). Set to 1
+    # to reproduce the former serial behavior exactly.
+    _b2r2_n_workers = min(_MAX_BUCKET2_WORKERS, max(1, len(panel)))
+
+    _b2r2_futures: dict[str, concurrent.futures.Future] = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=_b2r2_n_workers) as _b2r2_pool:
+        for p in panel:
+            fut = _b2r2_pool.submit(
+                _run_persona_round2,
+                p, all_dossier_facts, round1, round1_verdicts,
+                eid, ctx, registry, on_progress, known_ids,
+            )
+            _b2r2_futures[p.get("persona", "")] = fut
+    # Pool __exit__ blocks until all futures complete (barrier before spread).
+
+    # Merge results in seated-persona (panel) order for deterministic round2 list.
     for p in panel:
         persona_name = p.get("persona", "")
-        lens = p.get("lens", "")
-
-        dossier_fields_r2 = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
-
-        if "company-partner" not in known_ids:
+        if persona_name not in _b2r2_futures:
             continue
-
-        # Locate this persona's round-1 entry for comparison (revised detection).
-        r1_verdict = next(
-            (v for v in round1 if v.get("persona") == persona_name), {}
-        )
-        r1_stance = r1_verdict.get("stance", "hold")
-        r1_conviction = r1_verdict.get("conviction", 0)
-
-        # Live progress: round-2 rebuttal starting (distinct phase name — must not
-        # collide with "start"/"done" so the existing stage-order test keeps passing).
-        _emit(on_progress, eid, {
-            "stage": "roundtable", "agent_id": persona_name,
-            "phase": "rebuttal_start", "round": 2,
-        })
-        _t0 = time.monotonic()
-
-        res = harness.run(
-            "company-partner",
-            {
-                "persona": persona_name,
-                "lens": lens,
-                "dossier_fields": dossier_fields_r2,
-                "round1_verdicts": round1_verdicts,
-            },
-            engagement_id=eid,
-            ctx={**ctx, "dossier_fields": dossier_fields_r2},
-            registry=registry,
-        )
-
-        _elapsed = round(time.monotonic() - _t0, 2)
-
-        if res.ok and res.output:
-            r2_stance = res.output.get("stance", "conditional")
-            r2_conviction = res.output.get("conviction", 0)
-            r2_rationale = res.output.get("rationale", "")
-        else:
-            r2_stance = r1_stance
-            r2_conviction = r1_conviction
-            r2_rationale = f"abstained ({res.error or 'unknown'})"
-
-        revised = (r2_conviction != r1_conviction or r2_stance != r1_stance)
-        shift = r2_rationale[:200]
-
-        rebuttal_entry: dict = {
-            "persona": persona_name,
-            "revised": revised,
-            "conviction": r2_conviction,
-            "shift": shift,
-        }
+        _, rebuttal_entry = _b2r2_futures[persona_name].result()
         round2.append(rebuttal_entry)
-
-        # Live progress: rebuttal landed (distinct phase so stage-order filters are unaffected).
-        _emit(on_progress, eid, {
-            "stage": "roundtable", "agent_id": persona_name,
-            "phase": "rebuttal_done", "round": 2,
-            "revised": revised, "conviction": r2_conviction,
-            "elapsed_s": _elapsed,
-        })
 
     # Spread computation — based on round-1 convictions and stances.
     r1_convictions = [
