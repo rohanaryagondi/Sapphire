@@ -1,7 +1,7 @@
 # Manifest — Reputational & Institutional Perception corpus
 
 **Agent:** Reputational & Institutional Perception Analyst (Bucket 1, semantic) · dossier field **F4** (institutional/press perception).
-**Built:** `gavin/corpus-reputational-institutional` (6th and LAST of Gavin's 6 semantic corpora; per `fda-institutional-memory/METHOD.md`).
+**Built:** `gavin/corpus-reputational-institutional` (6th and LAST of Gavin's 6 semantic corpora; per `fda-institutional-memory/METHOD.md`). **Corpus dir:** `corpus/reputational/` (renamed from `corpus/reputational-institutional/` — Phase 0 ID fix, WO-6).
 **Retrieval window:** 2026-06-25.
 **Cards:** **4** in `index.jsonl` (3 reputational events + 1 EMET perception-vs-merit check) · **Notes:** 1 themed file in `notes/`.
 **Tier split:** **2 T1 / 2 T2** — T1 = official .gov findings/actions (congressional report; SEC enforcement); T2 = a journal retraction + the EMET card. (Spec tiers press/institutional **T3** → corpus **T2**; social **T4** = live-only. Official .gov investigations/enforcement are primary facts → T1.)
