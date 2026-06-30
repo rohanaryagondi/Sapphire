@@ -12,6 +12,7 @@ Usage:
 from __future__ import annotations
 
 import concurrent.futures
+import threading
 import re
 import sys
 import os
@@ -76,10 +77,18 @@ _BUCKET1_AGENTS = [
 # ---------------------------------------------------------------------------
 # Concurrency cap for Bucket-1 parallel dispatch.
 # Threads are ideal for subprocess/I-O-bound agents (each `claude -p` call blocks
-# on a subprocess, not the GIL). Default 8; override via the env for dev/testing.
+# on a subprocess, not the GIL). Default 8; override via the env at process start
+# (the constant is read once at import; changing the env after import has no effect
+# without patching `_MAX_BUCKET1_WORKERS` directly).
 # Set to 1 to reproduce the former serial behavior exactly (regression path).
 # ---------------------------------------------------------------------------
 _MAX_BUCKET1_WORKERS: int = max(1, int(os.environ.get("SAPPHIRE_BUCKET1_CONCURRENCY", "8")))
+
+# Lock protecting the `on_progress` callback invocation from concurrent Bucket-1 threads.
+# The callback is user-supplied and may not be thread-safe (e.g. a list.append without a
+# lock). Serialising through `_PROGRESS_LOCK` prevents interleaved calls while keeping
+# the callback as a pure best-effort side channel (all exceptions are still swallowed).
+_PROGRESS_LOCK = threading.Lock()
 
 
 # ---------------------------------------------------------------------------
@@ -250,7 +259,8 @@ def _emit(on_progress, eid, event: dict) -> None:
         pass
     if on_progress is not None:
         try:
-            on_progress(ev)
+            with _PROGRESS_LOCK:
+                on_progress(ev)
         except Exception:
             pass
 
