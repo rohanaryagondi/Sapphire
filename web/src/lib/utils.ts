@@ -116,6 +116,24 @@ export function stripEmoji(s: string): string {
   ).trim();
 }
 
+/**
+ * Derive a human-readable backend/model label from an agent's provenance string
+ * and (optionally) the run model name. Used by the Info panel to show what actually ran.
+ * Maps provenance to honest labels; never invents claims.
+ */
+export function backendLabel(provenance?: string, runModel?: string): string {
+  const p = String(provenance ?? "").trim().toLowerCase();
+  if (p === "simulated") return "Simulated -- no real model called";
+  if (p.startsWith("emet")) return "EMET · BenchSci (live)";
+  if (p.startsWith("moat")) return "Internal CNS_DFP (no LLM)";
+  if (p === "qmodels") return "Q-Models launchpad";
+  if (p === "corpus" || p === "gnomad" || p === "gtex" || p === "interpro" || p === "gprofiler")
+    return "Curated dataset";
+  // Reasoning agents run through Claude
+  const m = runModel ? runModel.charAt(0).toUpperCase() + runModel.slice(1) : "default";
+  return `Claude · ${m}`;
+}
+
 /* ── time / misc ──────────────────────────────────────────────────────────── */
 export function fmtElapsed(s?: number): string {
   if (s == null) return "";

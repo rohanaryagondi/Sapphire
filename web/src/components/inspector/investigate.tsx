@@ -2,7 +2,7 @@
 import { MousePointerClick, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm, type InspectorSelection } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind, stripEmoji } from "@/lib/utils";
+import { agentLabel, backendLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import {
@@ -140,6 +140,7 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
       <KV k="agent id" v={<span className="font-mono text-[11.5px]">{agentId}</span>} />
       <KV k="status" v={status} />
       <KV k="provenance" v={prov ?? "—"} />
+      <KV k="model" v={backendLabel(prov, turn.model)} />
       <KV k="facts" v={ev?.n_facts != null ? `${ev.n_facts}` : `${facts.length}`} />
       <KV k="elapsed" v={ev?.elapsed_s != null ? fmtElapsed(ev.elapsed_s) : undefined} />
       {ev?.error ? <KV k="note" v={String(ev.error)} /> : null}
