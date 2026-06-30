@@ -616,6 +616,9 @@ def _run_persona_round1(
     _elapsed = round(time.monotonic() - _t0, 2)
     if res.ok and res.output:
         verdict = dict(res.output)
+        # Defensive stamp-back: ensure the persona name matches the dispatched slot regardless
+        # of what the model returned (the round-2 lookup by persona name depends on this).
+        verdict["persona"] = persona_name
         verdict.setdefault("provenance", res.provenance)
         verdict["status"] = res.status
     else:
