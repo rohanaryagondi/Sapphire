@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { AlertTriangle, Check, ChevronRight, ClipboardList, FlagTriangleRight, Loader2, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
+import { ChevronRight, ClipboardList, AlertTriangle, ShieldAlert } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
@@ -68,19 +68,26 @@ function AgentRow({
   const isRT = ev.stage === "roundtable";
   const isVeto = isVetoAgent(row.agentId);
 
-  // Status glyph
+  // Status dot (colored, no lucide icon glyphs on the trace)
   let statusEl: React.ReactNode;
   if (!row.started) {
-    statusEl = <Loader2 className="size-3 animate-spin text-[var(--color-fg-faint)] opacity-30" />;
+    statusEl = (
+      <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-fg-faint)] opacity-30" />
+    );
   } else if (!row.done) {
-    statusEl = <Loader2 className="size-3 animate-spin text-[var(--color-accent)]" />;
+    statusEl = (
+      <span
+        className="inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]"
+        style={{ animation: "pulse 1.4s cubic-bezier(0.4,0,0.6,1) infinite" }}
+      />
+    );
   } else if (isVeto) {
-    statusEl = <ShieldAlert className="size-3 text-[var(--color-danger)]" />;
+    statusEl = <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-danger)]" />;
   } else {
     const ok = String(ev.status ?? "ok") === "ok";
     statusEl = ok
-      ? <Check className="size-3 text-[var(--color-ok)]" />
-      : <TriangleAlert className="size-3 text-[var(--color-warn)]" />;
+      ? <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-ok)]" />
+      : <span className="inline-block h-2 w-2 rounded-full bg-[var(--color-warn)]" />;
   }
 
   // Facts for this agent (bucket1 only)
@@ -101,6 +108,26 @@ function AgentRow({
     ];
     return all.find((v) => v.persona === row.agentId) ?? null;
   }, [isRT, turn, row.agentId]);
+
+  // Derive a 1-2 line summary when ev.summary is absent (reloaded runs).
+  const rowSummary: string = (() => {
+    if (ev.summary) return stripEmoji(ev.summary);
+    if (isRT) {
+      if (!verdict) return "Awaiting verdict.";
+      const stance = verdict.stance || "neutral";
+      const rat = verdict.rationale
+        ? " -- " + (verdict.rationale.length > 120 ? verdict.rationale.slice(0, 120) + "..." : verdict.rationale)
+        : "";
+      return stripEmoji(stance + rat);
+    }
+    if (agentFacts.length > 0) {
+      const first = agentFacts[0]!;
+      const val = first.value.length > 140 ? first.value.slice(0, 140) + "..." : first.value;
+      const summary = stripEmoji(val);
+      return agentFacts.length > 1 ? summary + ` (+${agentFacts.length - 1} more)` : summary;
+    }
+    return "No facts recorded.";
+  })();
 
   return (
     <div
@@ -133,7 +160,7 @@ function AgentRow({
           </span>
           {row.done && (
             <p className="text-xs text-[var(--color-fg-muted)] mt-0.5">
-              {ev.summary ? stripEmoji(ev.summary) : "Step completed."}
+              {rowSummary}
             </p>
           )}
         </span>
@@ -309,7 +336,10 @@ function GroupHeader({
 function WorkingRow() {
   return (
     <div className="flex items-center gap-2 px-3 py-2 text-[12px] text-[var(--color-fg-subtle)]">
-      <Loader2 className="size-3 animate-spin" />
+      <span
+        className="inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]"
+        style={{ animation: "pulse 1.4s cubic-bezier(0.4,0,0.6,1) infinite" }}
+      />
       <span>working...</span>
     </div>
   );
@@ -428,7 +458,7 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
       <TurnSwitcher turn={turn} />
       <TopStep
         node={m.plan}
-        icon={<ClipboardList className="size-3 text-[var(--color-accent)]" />}
+        icon={<span className="inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]" />}
         title="Plan -- scoping the engagement"
         detail={
           plan
@@ -457,7 +487,7 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
 
       <TopStep
         node={m.flags}
-        icon={<FlagTriangleRight className="size-3 text-[var(--color-warn)]" />}
+        icon={<span className="inline-block h-2 w-2 rounded-full bg-[var(--color-warn)]" />}
         title="Flags -- VETO / DIVERGENCE"
         detail={
           flagsEv ? (
@@ -492,7 +522,7 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
 
       <TopStep
         node={m.synthesis}
-        icon={<Sparkles className="size-3 text-[var(--color-accent)]" />}
+        icon={<span className="inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]" />}
         title="Synthesis -- the recommendation"
         detail={
           synthEv

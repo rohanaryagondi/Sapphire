@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { AlertCircle, FlaskConical } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useFirm, type Turn } from "@/lib/store";
 import { agentLabel, fmtElapsed, stripEmoji } from "@/lib/utils";
 import type { ProgressEvent } from "@/lib/types";
@@ -8,7 +8,6 @@ import { EmptyState } from "@/components/empty-state";
 import { Synthesis } from "@/components/run/synthesis";
 import { Flags } from "@/components/run/flags";
 import { Dossier } from "@/components/run/dossier";
-import { Spread } from "@/components/run/spread";
 
 function liveLabel(ev?: ProgressEvent): string {
   if (!ev) return "convening the firm…";
@@ -60,9 +59,6 @@ function Banner({
       className={`flex items-start gap-2 rounded-[var(--radius)] border px-3 py-2 text-[12px] leading-snug ${style}`}
     >
       {tone === "error" && <AlertCircle className="mt-0.5 size-3.5 shrink-0" />}
-      {(tone === "sim" || tone === "mock") && (
-        <FlaskConical className="mt-0.5 size-3.5 shrink-0" />
-      )}
       <span>{children}</span>
     </div>
   );
@@ -245,7 +241,6 @@ export function TurnView({ turn }: { turn: Turn }) {
             <Synthesis result={result} />
             <Flags flags={result.discover?.flags} />
             <Dossier result={result} turnId={turn.id} />
-            <Spread result={result} turnId={turn.id} />
           </>
         )}
 

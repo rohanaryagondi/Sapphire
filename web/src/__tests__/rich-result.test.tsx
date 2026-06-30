@@ -138,20 +138,21 @@ describe("Synthesis component", () => {
     ).toBeInTheDocument();
   });
 
-  // 2. Synthesis renders ranked candidates
-  it("renders ranked candidates when present", async () => {
+  // 2. Synthesis renders the evidence section with dossier facts
+  it("renders evidence section with dossier facts when present", async () => {
     const { Synthesis } = await import("@/components/run/synthesis");
     const result = makeResult();
     render(<Synthesis result={result} />);
-    expect(screen.getByText("SCN10A")).toBeInTheDocument();
-    expect(screen.getByText("SCN9A")).toBeInTheDocument();
+    // The report now shows "What the firm found" section with the dossier fact value
+    expect(screen.getByText(/what the firm found/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nav1.8 is highly expressed in nociceptors/i)).toBeInTheDocument();
   });
 
-  it("does not render candidate section when absent", async () => {
+  it("does not render ranked candidates section (moved out of synthesis report)", async () => {
     const { Synthesis } = await import("@/components/run/synthesis");
     const result = makeResult();
-    (result.synthesize.entities as Record<string, unknown>).ranked_candidates = [];
     render(<Synthesis result={result} />);
+    // Ranked candidates are no longer surfaced in the prose report
     expect(screen.queryByText("Ranked candidates")).not.toBeInTheDocument();
   });
 
@@ -163,12 +164,14 @@ describe("Synthesis component", () => {
     expect(screen.getByText("high")).toBeInTheDocument();
   });
 
-  it("applies green tone class for high confidence", async () => {
+  it("renders confidence inline with the bottom line section", async () => {
     const { Synthesis } = await import("@/components/run/synthesis");
     const result = makeResult();
     render(<Synthesis result={result} />);
+    // Confidence now appears inline in the bottom-line section as plain text
     const el = screen.getByText("high");
-    expect(el.className).toContain("text-[var(--color-ok)]");
+    // It's in a font-medium span (no color-coding in the new prose design)
+    expect(el.className).toContain("font-medium");
   });
 
   // 4. Synthesis shows Export button

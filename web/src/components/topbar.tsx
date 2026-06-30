@@ -72,20 +72,6 @@ export function TopBar() {
         </div>
       </div>
 
-      {/* A/B variant toggle */}
-      <div className="hidden items-center gap-0 rounded-[var(--radius-sm)] border border-[var(--color-border-strong)] overflow-hidden md:inline-flex">
-        <button
-          className="border-r border-[var(--color-border-strong)] bg-[var(--color-q)] px-3 py-1 text-[11.5px] text-white"
-        >
-          A <span className="font-mono text-[9.5px] opacity-70 ml-1">workspace</span>
-        </button>
-        <button
-          className="bg-transparent px-3 py-1 text-[11.5px] text-[var(--color-fg-muted)] hover:text-[var(--color-fg)]"
-        >
-          B <span className="font-mono text-[9.5px] opacity-70 ml-1">report</span>
-        </button>
-      </div>
-
       {/* controls */}
       <div className="flex items-center gap-2">
         <button
