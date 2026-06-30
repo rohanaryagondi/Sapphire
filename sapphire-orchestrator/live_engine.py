@@ -33,6 +33,7 @@ from selfimprove.reflect import reflect
 from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, interpro_domains_seam, geneset_enrichment_seam, robyn_scs_seam, boltz_seam
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
+from summarizer import summarize_step
 
 # ---------------------------------------------------------------------------
 # Bucket-1 agent IDs — the representative span the spec requests.
@@ -503,11 +504,16 @@ def _run_one_bucket1_agent(
         (len(res.output.get("facts", [])) if (res.ok and res.output) else 0)
         + len(corpus_cards)
     )
+    # Per-step summary for the live trace panel (haiku, cached on the event).
+    # Best-effort: summarize_step never raises; falls back to a deterministic stub.
+    _facts_for_summary = res.output.get("facts", [])[:10] if (res.ok and res.output) else []
+    _summary = summarize_step(_facts_for_summary, agent_id)
     _emit(on_progress, eid, {
         "stage": "bucket1", "agent_id": agent_id, "phase": "done",
         "status": res.status, "provenance": res.provenance,
         "n_facts": _n_facts, "elapsed_s": _elapsed,
         "error": res.error if not res.ok else None,
+        "summary": _summary,
     })
 
     # Collect _annot_facts locally (only populated when adaptive=True).
@@ -638,11 +644,19 @@ def _run_persona_round1(
 
     # Live progress: this persona's verdict landed — stance·conviction, or honest abstention.
     # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    # Per-step summary: distill the persona's stance + rationale into a tight takeaway.
+    _rt_facts = []
+    _stance = verdict.get("stance", "")
+    _rationale = verdict.get("rationale", "")
+    if _stance or _rationale:
+        _rt_facts = [{"value": f"{_stance}: {_rationale[:200]}".strip(": "), "source": "verdict", "provenance": "persona-judgment"}]
+    _rt_summary = summarize_step(_rt_facts, persona_name)
     _emit(on_progress, eid, {
         "stage": "roundtable", "agent_id": persona_name, "phase": "done", "round": 1,
         "status": verdict.get("status", res.status),
         "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
         "elapsed_s": _elapsed,
+        "summary": _rt_summary,
     })
 
     return (persona_name, verdict)
@@ -759,11 +773,17 @@ def _run_persona_round2(
 
     # Live progress: rebuttal landed.
     # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    # Per-step summary for the rebuttal: distill the round-2 shift into a tight takeaway.
+    _r2_facts = []
+    if shift:
+        _r2_facts = [{"value": f"R2 shift: {shift}", "source": "verdict", "provenance": "persona-judgment"}]
+    _r2_summary = summarize_step(_r2_facts, persona_name)
     _emit(on_progress, eid, {
         "stage": "roundtable", "agent_id": persona_name,
         "phase": "rebuttal_done", "round": 2,
         "revised": revised, "conviction": r2_conviction,
         "elapsed_s": _elapsed,
+        "summary": _r2_summary,
     })
 
     return (persona_name, rebuttal_entry)

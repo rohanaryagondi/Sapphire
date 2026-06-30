@@ -1,13 +1,13 @@
 "use client";
 import * as React from "react";
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { AlertTriangle, Check, ClipboardList, FlagTriangleRight, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
+import { AlertTriangle, Check, ChevronRight, ClipboardList, FlagTriangleRight, Loader2, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
 import { agentLabel, cn, fmtElapsed, isVetoAgent } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
-import { PlaneChip, ProvChip } from "@/components/ui/chips";
+import { ProvChip } from "@/components/ui/chips";
 import { buildTrace, type TraceNode, type TraceRow } from "./trace-model";
 import type { Verdict } from "@/lib/types";
 
@@ -72,9 +72,9 @@ function AgentRow({
   // Status glyph
   let statusEl: React.ReactNode;
   if (!row.started) {
-    statusEl = <span className="spinner opacity-30" />;
+    statusEl = <Loader2 className="size-3 animate-spin text-[var(--color-fg-faint)] opacity-30" />;
   } else if (!row.done) {
-    statusEl = <span className="spinner" style={{ color: "var(--color-accent)" }} />;
+    statusEl = <Loader2 className="size-3 animate-spin text-[var(--color-accent)]" />;
   } else if (isVeto) {
     statusEl = <ShieldAlert className="size-3 text-[var(--color-danger)]" />;
   } else {
@@ -125,37 +125,29 @@ function AgentRow({
         }}
         className="flex w-full items-center gap-2 px-2.5 py-2 text-left"
       >
-        <span className="flex size-[15px] shrink-0 items-center justify-center">
+        <span className="flex size-[14px] shrink-0 items-center justify-center rounded-full">
           {statusEl}
         </span>
         <span className="flex-1 min-w-0">
-          <span className="block truncate font-mono text-[12.5px] font-medium text-[var(--color-fg)]">
+          <span className="block truncate font-sans text-[12.5px] font-medium text-[var(--color-fg)]">
             {isRT ? row.agentId || "partner" : agentLabel(row.agentId)}
           </span>
-          {row.done && (
-            <span className="block truncate text-[11px] text-[var(--color-fg-subtle)]">
-              {isRT
-                ? ev.stance || "verdict"
-                : ev.n_facts != null
-                  ? `${ev.n_facts} fact(s)`
-                  : ev.status !== "ok" ? String(ev.status ?? "") : "ran"}
+          {row.done && ev.summary && (
+            <span className="block truncate text-[11.5px] leading-snug text-[var(--color-fg-muted)] mt-0.5">
+              {ev.summary}
             </span>
           )}
         </span>
         {/* right badges */}
         <span className="flex shrink-0 items-center gap-1">
-          {!isRT && agentFacts[0]?.plane && (
-            <PlaneChip plane={agentFacts[0].plane === "internal" ? "internal" : "external"} />
-          )}
-          {ev.provenance && <ProvChip prov={ev.provenance} />}
           {isRT && ev.conviction != null && (
             <span className="font-mono text-[10px] text-[var(--color-fg-muted)]">
               {ev.conviction}/5
             </span>
           )}
           {!isRT && ev.n_facts != null && (
-            <span className="font-mono text-[10px] text-[var(--color-fg-muted)]">
-              {ev.n_facts}
+            <span className="text-[11px] text-[var(--color-fg-subtle)]">
+              {ev.n_facts} facts
             </span>
           )}
           {ev.elapsed_s != null && (
@@ -172,7 +164,7 @@ function AgentRow({
             color: open ? "var(--color-accent)" : undefined,
           }}
         >
-          ▸
+          &#9656;
         </span>
       </button>
 
@@ -224,7 +216,7 @@ function AgentRow({
               ))
             ) : (
               <p className="text-[var(--color-fg-faint)]">
-                {row.done ? "No facts in dossier for this agent." : "Running…"}
+                {row.done ? "No facts in dossier for this agent." : "Running..."}
               </p>
             )
           )}
@@ -282,13 +274,26 @@ function GroupHeader({
   label,
   done,
   total,
+  collapsed,
+  onClick,
 }: {
   label: string;
   done: number;
   total: number;
+  collapsed?: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <div className="mb-1 mt-3 flex items-center gap-2 px-1 first:mt-0">
+    <div
+      className="mb-1 mt-3 flex items-center gap-2 px-1 first:mt-0 cursor-pointer select-none"
+      onClick={onClick}
+      role="button"
+      aria-expanded={!collapsed}
+    >
+      <ChevronRight
+        className="size-3 shrink-0 text-[var(--color-fg-faint)] transition-transform duration-150"
+        style={{ transform: collapsed ? "none" : "rotate(90deg)" }}
+      />
       <span className="text-[10.5px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
         {label}
       </span>
@@ -296,6 +301,15 @@ function GroupHeader({
       <span className="font-mono text-[10px] text-[var(--color-fg-faint)]">
         {done}/{total}
       </span>
+    </div>
+  );
+}
+
+function WorkingRow() {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2 text-[12px] text-[var(--color-fg-subtle)]">
+      <Loader2 className="size-3 animate-spin" />
+      <span>working...</span>
     </div>
   );
 }
@@ -334,7 +348,7 @@ function TurnSwitcher({ turn }: { turn: Turn }) {
 }
 
 export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?: React.RefObject<HTMLDivElement | null> }) {
-  // Registry: agentId → { open fn, DOM element }. Updated by each AgentRow on mount.
+  // Registry: agentId -> { open fn, DOM element }. Updated by each AgentRow on mount.
   const rowRegistry = useRef<Map<string, RowRegistration>>(new Map());
   const registerRow = useCallback((id: string, reg: RowRegistration) => {
     rowRegistry.current.set(id, reg);
@@ -352,14 +366,17 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
         reg.open();
         reg.el?.scrollIntoView({ block: "center", behavior: "smooth" });
       }
-      setFocusRowId(null); // consume — reset so the same id can be re-fired
+      setFocusRowId(null); // consume -- reset so the same id can be re-fired
     }, 80);
     return () => clearTimeout(t);
   }, [focusRowId, setFocusRowId]);
 
+  const [b1Collapsed, setB1Collapsed] = useState(false);
+  const [b2Collapsed, setB2Collapsed] = useState(false);
+
   // ── ALL hooks must fire unconditionally, before any early return (Rules of Hooks) ──
 
-  // Memoize buildTrace — it iterates the full trace on every call; during a live run
+  // Memoize buildTrace -- it iterates the full trace on every call; during a live run
   // the store pushes a new ProgressEvent on every SSE frame, which would re-render Monitor.
   // Null-safe: when turn is undefined we pass [] and get a well-typed empty TraceModel.
   // Keyed to trace.length so we recompute only when a new event arrives.
@@ -367,7 +384,7 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
   const m = useMemo(() => buildTrace(turn?.trace ?? []), [turn?.trace?.length]);
 
   // Once the run has a result, the roundtable rows are derived from the SAME
-  // normalised verdicts the spread renders — so Monitor can never contradict it.
+  // normalised verdicts the spread renders -- so Monitor can never contradict it.
   // While still streaming (no result yet), fall back to the live trace rows.
   const verdicts = finalVerdicts(turn?.result);
   const roundtable: TraceRow[] =
@@ -389,7 +406,7 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
       : m.roundtable;
   const rtDone = roundtable.filter((r) => r.done).length;
 
-  // ── Early return — only AFTER all hooks have been called ──────────────────
+  // ── Early return -- only AFTER all hooks have been called ──────────────────
   if (!turn) {
     return (
       <div className="flex h-full flex-col items-center justify-center px-6 text-center">
@@ -411,10 +428,10 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
       <TopStep
         node={m.plan}
         icon={<ClipboardList className="size-3 text-[var(--color-accent)]" />}
-        title="Plan — scoping the engagement"
+        title="Plan -- scoping the engagement"
         detail={
           plan
-            ? `${plan.disease || "—"} · ${plan.modality || "—"} · ${(plan.agents || []).length} fact agents · ${(plan.panel || []).length} panel`
+            ? `${plan.disease || "--"} · ${plan.modality || "--"} · ${(plan.agents || []).length} fact agents · ${(plan.panel || []).length} panel`
             : null
         }
       />
@@ -422,18 +439,25 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
       {m.bucket1.length > 0 && (
         <div>
           <GroupHeader
-            label="Bucket 1 — cited fact dossier"
+            label="Bucket 1 -- cited fact dossier"
             done={m.b1Done}
             total={m.bucket1.length}
+            collapsed={b1Collapsed}
+            onClick={() => setB1Collapsed((c) => !c)}
           />
-          <AgentList rows={m.bucket1} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+          {!b1Collapsed && (
+            <>
+              <AgentList rows={m.bucket1} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+              {turn.status === "running" && m.b1Done < m.bucket1.length && <WorkingRow />}
+            </>
+          )}
         </div>
       )}
 
       <TopStep
         node={m.flags}
         icon={<FlagTriangleRight className="size-3 text-[var(--color-warn)]" />}
-        title="Flags — VETO / DIVERGENCE"
+        title="Flags -- VETO / DIVERGENCE"
         detail={
           flagsEv ? (
             <span className="flex flex-wrap gap-1.5">
@@ -450,21 +474,28 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
       {roundtable.length > 0 && (
         <div>
           <GroupHeader
-            label="Bucket 2 — the roundtable spread"
+            label="Bucket 2 -- the roundtable spread"
             done={rtDone}
             total={roundtable.length}
+            collapsed={b2Collapsed}
+            onClick={() => setB2Collapsed((c) => !c)}
           />
-          <AgentList rows={roundtable} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+          {!b2Collapsed && (
+            <>
+              <AgentList rows={roundtable} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+              {turn.status === "running" && rtDone < roundtable.length && <WorkingRow />}
+            </>
+          )}
         </div>
       )}
 
       <TopStep
         node={m.synthesis}
         icon={<Sparkles className="size-3 text-[var(--color-accent)]" />}
-        title="Synthesis — the recommendation"
+        title="Synthesis -- the recommendation"
         detail={
           synthEv
-            ? `${synthEv.recommendation || ""} (confidence: ${synthEv.confidence || "—"})`
+            ? `${synthEv.recommendation || ""} (confidence: ${synthEv.confidence || "--"})`
             : null
         }
       />
