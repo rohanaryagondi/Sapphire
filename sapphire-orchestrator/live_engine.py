@@ -584,7 +584,7 @@ def _run_persona_round1(
             "conviction": 0,
             "rationale": "abstained (company-partner not in registry)",
             "fact_claims": [],
-            "provenance": "unknown",
+            "provenance": "unavailable",
             "status": "abstained",
         })
 
