@@ -146,11 +146,19 @@ export function TurnView({ turn }: { turn: Turn }) {
   const ku = result?.discover?.flags?.KNOWN_UNKNOWNS?.length ?? 0;
   const setPanelOpen = useFirm((s) => s.setPanelOpen);
   const setPanelTab = useFirm((s) => s.setPanelTab);
+  const select = useFirm((s) => s.select);
 
-  /** Open the panel to the Dossier tab. */
-  const openDossier = () => { setPanelOpen(true); setPanelTab("dossier"); };
   /** Open the panel to the Trace tab. */
   const openTrace = () => { setPanelOpen(true); setPanelTab("trace"); };
+  /** WO-8 Phase 3: there's no separate whole-dossier view anymore (facts live
+   *  inside each step's Info) — this deep link now opens Info on the FIRST
+   *  cited dossier fact (a useful "show me a fact" entry point) rather than
+   *  landing on an empty Info pane with no selection. */
+  const openDossier = () => {
+    if (!result?.discover?.dossier?.length) return;
+    setPanelOpen(true);
+    select({ kind: "fact", index: 0, turnId: turn.id });
+  };
 
   const followUpQuestions: string[] = (() => {
     const entities = result?.synthesize?.entities as Record<string, unknown> | undefined;

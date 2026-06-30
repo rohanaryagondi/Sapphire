@@ -55,6 +55,18 @@ export interface Turn {
 export type InspectorTab = "monitor" | "investigate";
 export type PanelTab = "trace" | "dossier";
 
+/** WO-8 Phase 3: a pinned step (a Bucket-1 agent or Bucket-2 partner, on one
+ *  turn) from the Info tab's pin affordance. NOTE: distinct from Phase 5's
+ *  `pinned: string[]` (whole-conversation pins on `rohan/web-ui-chrome`, not
+ *  yet merged when this landed) — this is a per-STEP pin, in-memory only
+ *  (Phase 5 owns persistence). Reconcile the two when both land on main. */
+export interface PinnedStep {
+  turnId: string;
+  /** the agentId (Bucket-1) or persona (Bucket-2) this pin refers to */
+  key: string;
+  label: string;
+}
+
 export type InspectorSelection =
   | { kind: "none" }
   | { kind: "agent"; agentId: string; turnId: string }
@@ -141,6 +153,11 @@ interface FirmState {
   submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
   /** Abort the current in-flight run (safe to call when nothing is running). */
   abortRun: () => void;
+
+  // WO-8 Phase 3: per-step pin (Info tab) — see PinnedStep doc comment above.
+  pinnedSteps: PinnedStep[];
+  togglePinStep: (step: PinnedStep) => void;
+  isStepPinned: (turnId: string, key: string) => boolean;
 }
 
 let _seq = 0;
@@ -171,14 +188,12 @@ export const useFirm = create<FirmState>((set, get) => ({
       panelOpen: true,
       // Legacy: kept for backward compat with command-palette / investigate.tsx
       inspectorTab: selection.kind === "none" ? get().inspectorTab : "investigate",
-      // New panel deep-link: agent/verdict selections open the Trace tab and
-      // focus the matching row; fact selections open the Dossier tab.
-      panelTab:
-        selection.kind === "none"
-          ? get().panelTab
-          : selection.kind === "fact"
-            ? "dossier"
-            : "trace",
+      // WO-8 Phase 3: "click a trace row → Info". agent/verdict/fact selections all
+      // open the Info view (panelTab "dossier") for that step/fact — NOT the Trace
+      // tab — per the locked design (no separate "Dossier" tab; the cited facts +
+      // full detail live inside each step's Info). Only `kind:"none"` leaves the
+      // current tab alone.
+      panelTab: selection.kind === "none" ? get().panelTab : "dossier",
       focusRowId:
         selection.kind === "agent"
           ? selection.agentId
@@ -560,4 +575,21 @@ export const useFirm = create<FirmState>((set, get) => ({
       }
     }
   },
+
+  // WO-8 Phase 3: per-step pin (Info tab). In-memory only — Phase 5 owns
+  // cross-reload persistence for the rail's Pinned section (see PinnedStep doc).
+  pinnedSteps: [],
+  togglePinStep: (step) =>
+    set((s) => {
+      const exists = s.pinnedSteps.some(
+        (p) => p.turnId === step.turnId && p.key === step.key,
+      );
+      return {
+        pinnedSteps: exists
+          ? s.pinnedSteps.filter((p) => !(p.turnId === step.turnId && p.key === step.key))
+          : [step, ...s.pinnedSteps],
+      };
+    }),
+  isStepPinned: (turnId, key) =>
+    get().pinnedSteps.some((p) => p.turnId === turnId && p.key === key),
 }));
