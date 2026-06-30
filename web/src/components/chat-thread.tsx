@@ -82,6 +82,13 @@ function TurnView({ turn }: { turn: Turn }) {
   const status = result?.discover?.status ?? "";
   const ku = result?.discover?.flags?.KNOWN_UNKNOWNS?.length ?? 0;
   const setMonitorTurn = useFirm((s) => s.setMonitorTurn);
+  const setPanelTab = useFirm((s) => s.setPanelTab);
+  const setPanelOpen = useFirm((s) => s.setPanelOpen);
+
+  /** Open the panel to the Trace tab. */
+  const openTrace = () => { setPanelOpen(true); setPanelTab("trace"); };
+  /** Open the panel to the Dossier tab. */
+  const openDossier = () => { setPanelOpen(true); setPanelTab("dossier"); };
 
   return (
     <div className="space-y-3">
@@ -99,6 +106,27 @@ function TurnView({ turn }: { turn: Turn }) {
       {/* firm response */}
       <div className="space-y-3 fadeup">
         {turn.status === "running" && !result && <TypingIndicator trace={turn.trace} />}
+
+        {/* Deep-link refs — appear once the run is underway / complete */}
+        {(turn.status === "running" || result) && (
+          <div className="flex items-center gap-2 text-[12px] text-[var(--color-fg-muted)]">
+            <span>Full receipts on the right:</span>
+            <button
+              onClick={openTrace}
+              className="rounded-[4px] border border-[var(--color-accent-ring)] bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]/80"
+            >
+              trace ↗
+            </button>
+            {result && (
+              <button
+                onClick={openDossier}
+                className="rounded-[4px] border border-[var(--color-accent-ring)] bg-[var(--color-accent-soft)] px-1.5 py-0.5 font-mono text-[11px] text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]/80"
+              >
+                dossier ↗
+              </button>
+            )}
+          </div>
+        )}
 
         {turn.status === "error" && (
           <Banner tone="error">

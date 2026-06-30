@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { TopBar } from "@/components/topbar";
 import { HistoryRail } from "@/components/history-rail";
 import { ChatThread } from "@/components/chat-thread";
@@ -7,36 +8,52 @@ import { Composer } from "@/components/composer";
 import { Inspector } from "@/components/inspector";
 import { CommandPalette } from "@/components/command-palette";
 import { useFirm } from "@/lib/store";
-import { cn } from "@/lib/utils";
 
 export default function Home() {
-  const inspectorOpen = useFirm((s) => s.inspectorOpen);
+  const railOpen = useFirm((s) => s.railOpen);
+  const panelOpen = useFirm((s) => s.panelOpen);
+  const panelWide = useFirm((s) => s.panelWide);
+  const abortRun = useFirm((s) => s.abortRun);
+
+  // Abort any in-flight SSE run when the page component unmounts (e.g. hot-
+  // reload, navigation) so the ReadableStream reader doesn't leak.
+  useEffect(() => {
+    return () => { abortRun(); };
+  }, [abortRun]);
+
+  // Compute grid-template-columns
+  const railCol = railOpen ? "236px" : "0px";
+  const panelCol = !panelOpen ? "0px" : panelWide ? "600px" : "400px";
+  const cols = `${railCol} 1fr ${panelCol}`;
 
   return (
     <div className="relative z-10 flex h-dvh flex-col overflow-hidden">
       <TopBar />
 
-      <div className="flex min-h-0 flex-1">
+      <div
+        className="grid min-h-0 flex-1"
+        style={{
+          gridTemplateColumns: cols,
+          transition: "grid-template-columns .22s ease",
+        }}
+      >
         {/* left — history rail */}
-        <aside className="hidden w-[256px] shrink-0 border-r border-[var(--color-border)] bg-[var(--color-panel)]/50 md:flex md:flex-col">
+        <aside className="overflow-hidden border-r border-[var(--color-border)] bg-[var(--color-panel)]/50 flex flex-col min-h-0">
           <HistoryRail />
         </aside>
 
         {/* center — chat thread + composer */}
-        <main className="flex min-w-0 flex-1 flex-col bg-[var(--color-bg)]">
+        <main className="flex min-w-0 flex-1 flex-col bg-[var(--color-bg)] min-h-0">
           <ChatThread />
           <PlanReview />
           <Composer />
         </main>
 
-        {/* right — inspector */}
-        <aside
-          className={cn(
-            "hidden shrink-0 border-l border-[var(--color-border)] bg-[var(--color-panel)]/50 transition-[width] duration-200 lg:flex lg:flex-col",
-            inspectorOpen ? "w-[360px]" : "w-0 overflow-hidden border-l-0",
-          )}
-        >
-          {inspectorOpen && <Inspector />}
+        {/* right — inspector panel. Always mounted so the grid .22s column-collapse
+            animation slides real content (not an empty box). The aside's overflow:hidden
+            clips the content when the column collapses to 0px. */}
+        <aside className="overflow-hidden border-l border-[var(--color-border)] bg-[var(--color-panel)]/50 flex flex-col min-h-0">
+          <Inspector />
         </aside>
       </div>
 
