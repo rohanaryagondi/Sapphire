@@ -228,4 +228,6 @@ def build_deterministic_narrative(
     return {
         "framing": framing,
         "steps": [step_moat, step_ext, step_veto, step_roundtable, step_synth],
+        # source="deterministic" — the card shows an honesty label when this is not "llm".
+        "source": "deterministic",
     }

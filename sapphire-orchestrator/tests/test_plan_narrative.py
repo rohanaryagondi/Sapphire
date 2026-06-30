@@ -52,6 +52,10 @@ class TestDeterministicNarrative(unittest.TestCase):
         step_keys = {s["key"] for s in steps}
         self.assertEqual(step_keys, _CANONICAL_KEYS,
                          f"Steps must have the 5 canonical keys; got {step_keys}")
+        # FIX 2: deterministic builder must stamp source="deterministic"
+        self.assertEqual(result.get("source"), "deterministic",
+                         f"deterministic builder must set source='deterministic'; "
+                         f"got {result.get('source')!r}")
 
     # ── test 2: step shapes ───────────────────────────────────────────────────
     def test_each_step_has_required_fields(self):
@@ -211,6 +215,73 @@ class TestDeterministicNarrative(unittest.TestCase):
         ext = next(s for s in result["steps"] if s["key"] == "external")
         # The step should mention 1 agent (emet-runner) not the full 15+
         self.assertIn("1 agent", ext["prose"] or "")
+
+    # ── test 11: source field is always "deterministic" ───────────────────────
+    def test_deterministic_builder_always_stamps_source(self):
+        """build_deterministic_narrative must ALWAYS set source='deterministic' —
+        every call variant (roundtable on, roundtable off, subset agents). This is
+        the key plumbing for Fix 2: the card uses narrative.source, not plan_source,
+        to decide whether to show the honesty label."""
+        for panel, name in [
+            ([], "roundtable-off"),
+            (["ex-fda-regulator", "kol"], "roundtable-on"),
+        ]:
+            with self.subTest(variant=name):
+                result = build_deterministic_narrative(
+                    "Is TSC2 viable?",
+                    self._plan(),
+                    list(_BUCKET1_AGENTS),
+                    panel=panel,
+                )
+                self.assertEqual(
+                    result.get("source"), "deterministic",
+                    f"[{name}] narrative.source must be 'deterministic'; got {result.get('source')!r}"
+                )
+
+    # ── test 12: live_engine deterministic fallback carries narrative.source ──
+    def test_live_engine_deterministic_fallback_carries_narrative_source(self):
+        """When live_engine llm+approve falls back to deterministic (smart_plan raises),
+        the returned envelope carries narrative.source='deterministic' — the plumbing
+        that lets the card show the correct honesty label."""
+        import os
+        import sys
+        import tempfile
+        from unittest import mock
+
+        _PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if _PKG_DIR not in sys.path:
+            sys.path.insert(0, _PKG_DIR)
+
+        from live_engine import run_live
+        from smart_plan import SmartPlanError
+
+        eng_dir = tempfile.mkdtemp()
+        mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = mem_dir
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        try:
+            from tests.test_live_engine import _build_ctx
+            with mock.patch("smart_plan.smart_plan",
+                            side_effect=SmartPlanError("forced fallback for test")):
+                result = run_live(
+                    "Is TSC2 viable in tuberous sclerosis?",
+                    plan_mode="llm+approve",
+                    ctx=_build_ctx(),
+                )
+            self.assertTrue(result.get("plan_pending_approval"))
+            self.assertEqual(result.get("plan_source"), "deterministic")
+            narrative = result.get("narrative")
+            self.assertIsNotNone(narrative, "envelope must carry a narrative on fallback")
+            self.assertEqual(
+                narrative.get("source"), "deterministic",
+                f"narrative.source must be 'deterministic' on llm+approve fallback; "
+                f"got {narrative.get('source')!r}"
+            )
+        finally:
+            os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+            os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+            os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
 
 
 if __name__ == "__main__":

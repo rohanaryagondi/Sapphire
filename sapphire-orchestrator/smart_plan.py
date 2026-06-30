@@ -63,6 +63,40 @@ _SMART_PLAN_SCHEMA: dict = {
         },
         "panel_rationale": {"type": "string"},
         "notes": {"type": "string"},
+        # Narrative is OPTIONAL in the schema (the runner validates the required keys;
+        # the narrative block is a best-effort addition — callers fall back to the
+        # deterministic builder when it is absent or malformed).
+        "narrative": {
+            "type": "object",
+            "properties": {
+                "framing": {"type": "string"},
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["key", "title", "prose"],
+                        "properties": {
+                            "key": {"type": "string"},
+                            "title": {"type": "string"},
+                            "plane": {"type": "string"},
+                            "badges": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                            "prose": {"type": "string"},
+                            "expect": {"type": "string"},
+                            "skipping": {"type": "string"},
+                            "sub": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                        "additionalProperties": False,
+                    },
+                },
+            },
+            "additionalProperties": False,
+        },
     },
     "additionalProperties": False,
 }
@@ -147,11 +181,26 @@ def smart_plan(query: str, deterministic_plan: dict, registry: dict, ctx: dict) 
         "deterministic_plan": {k: v for k, v in deterministic_plan.items()
                                if not k.startswith("_")},
         "instruction": (
-            "You are the Sapphire planning agent. Select which Bucket-1 agents from the "
-            "universe below should run for this query. Include in selected_agents those "
-            "that are most relevant to the query's disease/modality/question; drop the rest "
-            "with a brief reason. Return ALL agents in either selected_agents or "
-            "dropped_agents. Public identifiers only — no Quiver internal data."
+            "You are the Sapphire planning agent. Do TWO things in one pass:\n\n"
+            "1. AGENT SELECTION — Select which Bucket-1 agents from the universe below "
+            "should run for this query. Include in selected_agents those that are most "
+            "relevant to the query's disease/modality/question; drop the rest with a brief "
+            "reason. Return ALL agents in either selected_agents or dropped_agents.\n\n"
+            "2. NARRATIVE — Also populate the optional `narrative` field with a human-readable "
+            "plan card for the user to review before approving. The narrative must cover "
+            "exactly these 5 canonical steps in order (use these exact key values):\n"
+            "  - moat: Quiver internal signal (plane='internal')\n"
+            "  - external: external dossier from the selected external agents (plane='external')\n"
+            "  - veto: FDA institutional memory + patent/IP gates\n"
+            "  - roundtable: partner deliberation (or mark as skipped if no panel)\n"
+            "  - synth: synthesize & flag knowns-unknowns\n\n"
+            "narrative.framing: 1-2 sentence strategy summary specific to this query.\n"
+            "Each step needs: key, title, prose (1-3 sentences). Optionally: plane "
+            "('internal'/'external'), badges (short label strings), expect (what a good "
+            "run should find), skipping (what is excluded and why), sub (sub-bullets).\n\n"
+            "CRITICAL — public identifiers ONLY: disease names, gene symbols, agent ids, "
+            "modality terms. NEVER include Quiver internal scores, EP values, or "
+            "proprietary model outputs. The narrative is shown to the user before any run."
         ),
     }
 

@@ -675,16 +675,26 @@ def run_live(
         try:
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
-            # Build the narrative from the LLM-selected agents (or fall back to
-            # deterministic narrative if the LLM narration is absent/invalid).
+            # Build the narrative — prefer the LLM-produced one (it's query-specific);
+            # fall back to the deterministic builder when absent/malformed.
             from plan_narrative import build_deterministic_narrative as _build_narr
-            _llm_narrative = _sp_result.get("narrative") or None
-            if not (_llm_narrative and isinstance(_llm_narrative, dict)
-                    and _llm_narrative.get("framing") and _llm_narrative.get("steps")):
-                # LLM did not produce a narrative — synthesise one from the plan.
+            _raw_narrative = _sp_result.get("narrative") or None
+            _narrative_is_llm = (
+                isinstance(_raw_narrative, dict)
+                and bool(_raw_narrative.get("framing"))
+                and isinstance(_raw_narrative.get("steps"), list)
+                and len(_raw_narrative["steps"]) > 0
+            )
+            if _narrative_is_llm:
+                # Stamp source="llm" so the card knows this prose is LLM-authored.
+                _llm_narrative = dict(_raw_narrative)
+                _llm_narrative["source"] = "llm"
+            else:
+                # LLM did not produce a narrative — synthesise deterministically.
                 _selected_ids_for_narr = [
                     a["id"] for a in _sp_result.get("selected_agents", []) if a.get("id")
                 ] or list(_BUCKET1_AGENTS)
+                # builder already stamps source="deterministic"
                 _llm_narrative = _build_narr(query, public_plan, _selected_ids_for_narr,
                                              panel=panel)
             trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "llm"})

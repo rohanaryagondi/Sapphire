@@ -159,13 +159,20 @@ export function PlanReview() {
   if (!plan) return null;
 
   const selectedCount = plan.agents.filter((a) => a.selected).length;
-  const source = plan.plan_source ?? "deterministic";
-  const isLLM = source === "llm";
-  const isError = source === "error";
+  const planSource = plan.plan_source ?? "deterministic";
+  const isError = planSource === "error";
 
   // Narrative — present in Phase B envelopes; absent in older/degraded responses.
   const narrative = plan.narrative;
   const hasNarrative = !!(narrative?.framing && narrative?.steps?.length);
+
+  // Honesty label is keyed to narrative.source (the prose author), NOT plan_source
+  // (which reflects whether the LLM *selected agents*). A plan where the LLM selected
+  // agents but the narrative was built deterministically must still show the label.
+  // narrative.source === "llm" → real LLM prose → no label.
+  // anything else (undefined / "deterministic") → templated prose → show label.
+  const narrativeIsLLM = narrative?.source === "llm";
+  const showTemplatedLabel = !narrativeIsLLM;
 
   // Meta line: N agents selected
   const metaAgents = `${selectedCount} agent${selectedCount !== 1 ? "s" : ""}`;
@@ -198,12 +205,14 @@ export function PlanReview() {
           </button>
         </div>
 
-        {/* honesty label when not LLM */}
-        {!isLLM && (
+        {/* honesty label when narrative prose is not LLM-authored */}
+        {showTemplatedLabel && (
           <div className="relative flex items-center gap-2 px-4 pb-1">
             <MockBadge label={isError ? "MOCK" : "ILLUSTRATIVE"} />
             <span className="text-[11px] text-[var(--color-fg-subtle)]">
-              {isError ? "plan unavailable — templated fallback" : "templated plan — LLM narration not available"}
+              {isError
+                ? "plan unavailable — templated fallback"
+                : "templated plan — LLM narration not available"}
             </span>
           </div>
         )}

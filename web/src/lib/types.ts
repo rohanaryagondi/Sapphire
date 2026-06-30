@@ -201,10 +201,14 @@ export interface PlanStep {
 }
 
 /** Narrated plan — framing paragraph + 5 canonical timeline steps.
- *  Added in Phase B; absent on older/degraded envelopes → card degrades gracefully. */
+ *  Added in Phase B; absent on older/degraded envelopes → card degrades gracefully.
+ *  `source` distinguishes real LLM prose from the deterministic fallback —
+ *  the card shows a "templated plan" label whenever source !== "llm". */
 export interface PlanNarrative {
   framing: string;
   steps: PlanStep[];
+  /** "llm" = prose authored by the LLM planner; "deterministic" = stdlib template fallback. */
+  source?: "llm" | "deterministic";
 }
 
 export interface PlanEnvelope {
