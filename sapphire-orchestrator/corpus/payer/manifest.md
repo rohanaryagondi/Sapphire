@@ -25,6 +25,9 @@
 ## Tiering note
 ICER reports are T2 (HTA/reimbursement body; the `validate-corpus.sh` allowlist correctly excludes ICER from T1). CMS `cms.gov` records are T1 (US primary federal payer authority — qualifies under `*.gov` suffix).
 
+## Architectural note
+Now that all 13 semantic agents have a corpus (Phase 0 complete), the Opt-2 batch path (`_batch_bucket1` in `live_engine.py`) has no production agents to batch — it correctly skips all corpus-grounded agents. This is a finding for the perf/parallelization WO, not for Phase 0 to resolve; the batch mechanism remains exercised via the test monkeypatch.
+
 ## Known gaps (the ~30% to search live)
 1. **NICE TA on lecanemab** — the appraisal is still in progress (appeal upheld March 2026; final committee meeting July 2026); cannot yet pre-ingest a final TA. Live agent call required.
 2. **G-BA early benefit assessment (AMNOG)** — no CNS anti-amyloid decision yet; live search gap.
