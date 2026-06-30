@@ -126,6 +126,8 @@ export interface ProgressEvent {
   rebuttal_conviction?: number;
   revised?: boolean;
   round?: number;
+  /** Per-step takeaway (<=18 words) stamped by the engine summarizer on done events */
+  summary?: string;
   [k: string]: unknown;
 }
 
