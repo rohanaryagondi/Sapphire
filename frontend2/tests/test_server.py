@@ -130,6 +130,7 @@ class TestServer(unittest.TestCase):
 
     def test_result_is_a_valid_run_live_dossier(self):
         from contracts.run_live_schema import validate_run_live
+        from moat.client import MoatClient
         with _ServerHarness() as h:
             raw = h.post_run({"query": "Is TSC2 a viable target in tuberous sclerosis?",
                               "profile": "demo"})
@@ -139,12 +140,25 @@ class TestServer(unittest.TestCase):
         result = results[0]
         # The streamed result conforms to the documented run_live contract (additive keys ok).
         self.assertEqual(validate_run_live(result), [])
-        # Real dossier content lands: two planes, a roundtable spread, a synthesis.
+        # Real dossier content lands: a roundtable spread, a synthesis, and a non-empty dossier.
         dossier = result["discover"]["dossier"]
         self.assertTrue(dossier)
         planes = {f.get("plane") for f in dossier}
-        self.assertIn("internal", planes)
         self.assertIn("external", planes)
+        # The internal-plane assertion needs the real Loka moat DB (gitignored,
+        # not present on every machine); the product behavior degrades to
+        # empty/mock HONESTLY without it (per CLAUDE.md). Mirrors the same
+        # MoatClient().available() guard used by
+        # tests/test_live_engine.py::test_moat_real_provenance — see dev/HELP.md
+        # (this was the one remaining unconditional "internal" assertion it
+        # flagged).
+        if MoatClient().available():
+            self.assertIn("internal", planes)
+        else:
+            print(
+                "  [skip] internal-plane assertion: RohanOnly/moat/moat.sqlite "
+                "not built — see dev/HELP.md (moat-db-test-skipguards)"
+            )
         self.assertTrue(result["consult"]["round1"])
         self.assertTrue(result["synthesize"]["recommendation"])
         self.assertEqual(result["_via"], "harness-live")
