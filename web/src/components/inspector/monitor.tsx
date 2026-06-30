@@ -103,8 +103,6 @@ function AgentRow({
     return all.find((v) => v.persona === row.agentId) ?? null;
   }, [isRT, turn, row.agentId]);
 
-  const select = useFirm((s) => s.select);
-
   return (
     <div
       ref={rowRef}

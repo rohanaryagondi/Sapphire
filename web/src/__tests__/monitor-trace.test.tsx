@@ -142,7 +142,7 @@ describe("Monitor trace panel", () => {
     expect(reactErrors, `Console errors:\n${reactErrors.join("\n")}`).toHaveLength(0);
   });
 
-  it("clicking an agent row calls setPanelTab and select", async () => {
+  it("clicking a done agent row selects it (the store opens Info)", async () => {
     const { Monitor } = await import("@/components/inspector/monitor");
     const scrollRef = { current: null } as React.RefObject<HTMLDivElement | null>;
     render(<Monitor turn={doneTurn as any} outerScrollRef={scrollRef} />);
@@ -152,9 +152,9 @@ describe("Monitor trace panel", () => {
     expect(agentBtn).not.toBeNull();
     fireEvent.click(agentBtn!);
 
-    // Row click must call setPanelTab("dossier")
-    expect(spySetPanelTab).toHaveBeenCalledWith("dossier");
-    // Row click must call select with kind:"agent"
+    // Row click selects the agent; the store's `select` reducer is what switches
+    // the panel to Info ("dossier") -- so the monitor's contract is the select
+    // call, not a direct setPanelTab (the tab switch is covered by store tests).
     expect(spySelect).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "agent", agentId: "emet-runner" })
     );
