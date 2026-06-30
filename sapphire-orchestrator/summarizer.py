@@ -128,6 +128,15 @@ def summarize_step(
     str — a ≤18-word plain-English summary, or the deterministic fallback stub.
     Never raises.
     """
+    # Opt-out: when the UI derives per-step trace summaries from each agent's own
+    # facts (WO-8 polish), this backend LLM summarizer is redundant — and firing
+    # one real ``claude`` call per agent floods a run (CPU storm) and starves the
+    # synthesis report's own claude call. With SAPPHIRE_NO_STEP_SUMMARY set we
+    # return "" (the UI treats absent summary as "derive from facts"). Default
+    # behavior is unchanged, so tests and the live path are unaffected.
+    if os.environ.get("SAPPHIRE_NO_STEP_SUMMARY", "").strip() not in ("", "0", "false", "False"):
+        return ""
+
     try:
         prompt = _build_prompt(facts)
         model = _summary_model()
