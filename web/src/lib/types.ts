@@ -182,12 +182,39 @@ export interface PlanAgent {
   selected: boolean;
 }
 
+/** One numbered step in the plan narrative (5 canonical steps). */
+export interface PlanStep {
+  /** Canonical step key: moat | external | veto | roundtable | synth */
+  key: string;
+  title: string;
+  /** Data plane: "internal" (Quiver moat), "external" (cited), or absent (cross-cutting). */
+  plane?: "internal" | "external";
+  /** Short badge labels rendered as chips (e.g. ["internal", "moat-real"], ["fda-memory ⛔"]). */
+  badges?: string[];
+  prose: string;
+  /** Expected finding — rendered in a callout box. */
+  expect?: string;
+  /** What is being skipped and why — rendered in a callout box. */
+  skipping?: string;
+  /** Optional sub-bullets (agent labels or sub-tasks). */
+  sub?: string[];
+}
+
+/** Narrated plan — framing paragraph + 5 canonical timeline steps.
+ *  Added in Phase B; absent on older/degraded envelopes → card degrades gracefully. */
+export interface PlanNarrative {
+  framing: string;
+  steps: PlanStep[];
+}
+
 export interface PlanEnvelope {
   query: string;
   plan?: Plan;
   agents: PlanAgent[];
   plan_source?: string;
   plan_pending_approval?: boolean;
+  /** Narrated plan (Phase B). Optional — absent on older envelopes; card degrades. */
+  narrative?: PlanNarrative;
   engagement_id?: string;
   _via?: string;
   _bridge_error?: string;

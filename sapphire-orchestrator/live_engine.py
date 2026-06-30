@@ -675,12 +675,25 @@ def run_live(
         try:
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
+            # Build the narrative from the LLM-selected agents (or fall back to
+            # deterministic narrative if the LLM narration is absent/invalid).
+            from plan_narrative import build_deterministic_narrative as _build_narr
+            _llm_narrative = _sp_result.get("narrative") or None
+            if not (_llm_narrative and isinstance(_llm_narrative, dict)
+                    and _llm_narrative.get("framing") and _llm_narrative.get("steps")):
+                # LLM did not produce a narrative — synthesise one from the plan.
+                _selected_ids_for_narr = [
+                    a["id"] for a in _sp_result.get("selected_agents", []) if a.get("id")
+                ] or list(_BUCKET1_AGENTS)
+                _llm_narrative = _build_narr(query, public_plan, _selected_ids_for_narr,
+                                             panel=panel)
             trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "llm"})
             return {
                 "query": query,
                 "plan": public_plan,
                 "plan_pending_approval": True,
                 "smart_plan": _sp_result,
+                "narrative": _llm_narrative,
                 "plan_source": "llm",
                 "engagement_id": eid,
                 "_via": "harness-live-plan",
@@ -688,11 +701,14 @@ def run_live(
         except Exception as _e:
             trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
             # Fall back to a deterministic plan-only envelope (no agents ran).
+            from plan_narrative import build_deterministic_narrative as _build_narr
+            _det_narrative = _build_narr(query, public_plan, list(_BUCKET1_AGENTS), panel=panel)
             trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "deterministic"})
             return {
                 "query": query,
                 "plan": public_plan,
                 "plan_pending_approval": True,
+                "narrative": _det_narrative,
                 "plan_source": "deterministic",
                 "engagement_id": eid,
                 "_via": "harness-live-plan",

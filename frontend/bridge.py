@@ -295,6 +295,21 @@ def plan(query: str, *, mock: bool = True, simulate: bool = False,
             result["plan_source"] = "deterministic"
         result.setdefault("plan_pending_approval", True)
     except Exception as exc:  # run_live is contracted not to raise; last-resort net
+        # Build a deterministic narrative even in the error path so the UI always has
+        # a well-formed narrative to render (honestly labeled via plan_source="error").
+        _err_narrative: dict = {}
+        try:
+            import sys as _sys
+            import os as _os
+            _here = _os.path.dirname(_os.path.abspath(__file__))
+            _orch = _os.path.join(_os.path.dirname(_here), "sapphire-orchestrator")
+            if _orch not in _sys.path:
+                _sys.path.insert(0, _orch)
+            from plan_narrative import build_deterministic_narrative as _build_narr  # type: ignore[import]
+            from live_engine import _BUCKET1_AGENTS as _B1  # type: ignore[import]
+            _err_narrative = _build_narr(query, {}, list(_B1), panel=[])
+        except Exception:
+            pass
         result = {
             "query": query,
             "plan": {},
@@ -304,6 +319,8 @@ def plan(query: str, *, mock: bool = True, simulate: bool = False,
             "_via": "bridge-error",
             "_bridge_error": f"{type(exc).__name__}: {exc}",
         }
+        if _err_narrative:
+            result["narrative"] = _err_narrative
     finally:
         if _prev_model is None:
             os.environ.pop("CLAUDE_MODEL", None)
