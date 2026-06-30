@@ -99,6 +99,14 @@ _BUCKET1_AGENTS_SET: frozenset = frozenset(_BUCKET1_AGENTS)
 # ---------------------------------------------------------------------------
 _MAX_BUCKET1_WORKERS: int = max(1, int(os.environ.get("SAPPHIRE_BUCKET1_CONCURRENCY", "8")))
 
+# Concurrency cap for Bucket-2 parallel dispatch (round-1 persona verdicts).
+# Threads are ideal: each `harness.run("company-partner", ...)` call shells out to a
+# `claude -p` subprocess that blocks on the GIL-releasing subprocess.run(). Default 8.
+# Set SAPPHIRE_BUCKET2_CONCURRENCY=1 to reproduce the former serial behavior exactly
+# (concurrency=1 ⇒ ThreadPoolExecutor submits one future at a time, byte-identical to
+# the old serial `for p in panel:` loop).
+_MAX_BUCKET2_WORKERS: int = max(1, int(os.environ.get("SAPPHIRE_BUCKET2_CONCURRENCY", "8")))
+
 # Lock protecting the `on_progress` callback invocation from concurrent Bucket-1 threads.
 # The callback is user-supplied and may not be thread-safe (e.g. a list.append without a
 # lock). Serialising through `_PROGRESS_LOCK` prevents interleaved calls while keeping
@@ -508,6 +516,257 @@ def _run_one_bucket1_agent(
             _annot_facts_local.append({**enriched, "_source_agent": agent_id})
 
     return (agent_id, res, corpus_cards, _n_facts, _annot_facts_local)
+
+
+def _run_persona_round1(
+    p: dict,
+    all_dossier_facts: list[dict],
+    eid: str,
+    ctx: dict,
+    registry,
+    on_progress,
+    known_ids: set,
+    veto_flags: list[str],
+) -> tuple[str, dict]:
+    """Worker for one Bucket-2 round-1 persona dispatch.
+
+    Designed for concurrent execution inside a ThreadPoolExecutor.
+
+    Thread-safety contract
+    ----------------------
+    * Pure function with respect to shared mutable state: does NOT write to any shared
+      list/dict (round1, agent_statuses, etc.) — the caller collects the return value
+      from each future and merges in ``panel`` order after all futures are joined.
+    * ``ctx_local`` is a per-thread shallow copy with its own ``_cache`` dict, so
+      harness's memoisation dict is not shared across concurrent persona dispatches.
+    * ``on_progress`` is called inside ``_PROGRESS_LOCK`` (via ``_emit``) — safe for
+      non-thread-safe callbacks like bare ``list.append``.
+    * ``trace._append`` is guarded by ``_APPEND_LOCK`` inside trace.py — safe.
+    * ``all_dossier_facts`` is READ ONLY in this worker (snapshot taken before pool
+      starts); the worker never appends to it.
+
+    Parameters
+    ----------
+    p                : one element of ``plan["panel"]`` (persona dict).
+    all_dossier_facts: the completed Bucket-1 dossier (read-only snapshot).
+    eid              : engagement id.
+    ctx              : the shared (read-mostly) harness context dict.
+    registry         : pre-loaded agents.json dict.
+    on_progress      : optional progress callback (may be None).
+    known_ids        : set of agent ids in the registry.
+    veto_flags       : list of veto fact values (may be empty).
+
+    Returns
+    -------
+    ``(persona_name, verdict_dict)`` — the caller inserts verdict_dict into round1
+    at the position corresponding to this persona in the panel.
+    """
+    persona_name = p.get("persona", "")
+    lens = p.get("lens", "")
+    veto_is_active = bool(veto_flags)
+
+    # Build a compact dossier field list for the partner to reference.
+    dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+    # VETO gate: when active, prepend VETO-adjudication markers so the
+    # persona receives the gate condition as first-class input (capped to 12).
+    if veto_is_active:
+        veto_markers = ["[VETO ADJUDICATION] " + v[:80] for v in veto_flags]
+        dossier_fields = (veto_markers + dossier_fields)[:12]
+
+    if "company-partner" not in known_ids:
+        # Return a placeholder verdict so the caller's panel-order merge still sees an
+        # entry for this persona (no silent drop, no KeyError in the results dict).
+        return (persona_name, {
+            "persona": persona_name,
+            "lens": lens,
+            "stance": "hold",
+            "conviction": 0,
+            "rationale": "abstained (company-partner not in registry)",
+            "fact_claims": [],
+            "provenance": "unknown",
+            "status": "abstained",
+        })
+
+    # Live progress: this persona is deliberating (round 1).
+    # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    _emit(on_progress, eid, {"stage": "roundtable", "agent_id": persona_name,
+                             "phase": "start", "round": 1})
+    _t0 = time.monotonic()
+
+    persona_inputs: dict = {
+        "persona": persona_name,
+        "lens": lens,
+        "dossier_fields": dossier_fields,
+    }
+    if veto_is_active:
+        persona_inputs["veto_adjudication"] = veto_flags
+
+    # Per-thread ctx: shallow copy + isolated _cache dict.
+    ctx_local = {**ctx, "_cache": {}}
+
+    res = harness.run(
+        "company-partner",
+        persona_inputs,
+        engagement_id=eid,
+        ctx={**ctx_local, "dossier_fields": dossier_fields},
+        registry=registry,
+    )
+
+    _elapsed = round(time.monotonic() - _t0, 2)
+    if res.ok and res.output:
+        verdict = dict(res.output)
+        verdict.setdefault("provenance", res.provenance)
+        verdict["status"] = res.status
+    else:
+        verdict = {
+            "persona": persona_name,
+            "lens": lens,
+            "stance": "hold",
+            "conviction": 0,
+            "rationale": f"abstained ({res.error or 'unknown'})",
+            "fact_claims": [],
+            "provenance": res.provenance,
+            "status": res.status,
+        }
+
+    # Live progress: this persona's verdict landed — stance·conviction, or honest abstention.
+    # _emit acquires _PROGRESS_LOCK internally for the on_progress call; no outer lock needed.
+    _emit(on_progress, eid, {
+        "stage": "roundtable", "agent_id": persona_name, "phase": "done", "round": 1,
+        "status": verdict.get("status", res.status),
+        "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
+        "elapsed_s": _elapsed,
+    })
+
+    return (persona_name, verdict)
+
+
+def _run_persona_round2(
+    p: dict,
+    all_dossier_facts: list[dict],
+    round1: list[dict],
+    round1_verdicts: list[dict],
+    eid: str,
+    ctx: dict,
+    registry,
+    on_progress,
+    known_ids: set,
+) -> tuple[str, dict]:
+    """Worker for one Bucket-2 round-2 (rebuttal) persona dispatch.
+
+    Designed for concurrent execution inside a ThreadPoolExecutor, exactly
+    mirroring _run_persona_round1.
+
+    Thread-safety contract
+    ----------------------
+    * Pure w.r.t. shared mutable state: reads ``round1`` and ``round1_verdicts``
+      as snapshots (built by the caller AFTER round-1 is fully joined) and returns
+      ``(persona_name, rebuttal_dict)``; it NEVER writes to any shared list/dict.
+    * ``ctx_local`` is a per-thread shallow copy with its own ``_cache`` dict.
+    * ``on_progress`` is called inside ``_PROGRESS_LOCK`` via ``_emit`` — safe for
+      non-thread-safe callbacks like bare ``list.append``.
+    * ``trace._append`` is guarded by ``_APPEND_LOCK`` inside trace.py — safe.
+    * ``round1`` and ``round1_verdicts`` are READ ONLY in this worker.
+
+    Parameters
+    ----------
+    p                : one element of ``plan["panel"]``.
+    all_dossier_facts: the completed Bucket-1 dossier (read-only snapshot).
+    round1           : the completed round-1 verdict list (read-only snapshot).
+    round1_verdicts  : the compact round-1 summary list (read-only snapshot).
+    eid              : engagement id.
+    ctx              : the shared (read-mostly) harness context dict.
+    registry         : pre-loaded agents.json dict.
+    on_progress      : optional progress callback (may be None).
+    known_ids        : set of agent ids in the registry.
+
+    Returns
+    -------
+    ``(persona_name, rebuttal_dict)`` — the caller inserts rebuttal_dict into round2
+    at the position corresponding to this persona in the panel.
+    """
+    persona_name = p.get("persona", "")
+    lens = p.get("lens", "")
+
+    dossier_fields_r2 = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
+
+    if "company-partner" not in known_ids:
+        return (persona_name, {
+            "persona": persona_name,
+            "revised": False,
+            "conviction": 0,
+            "shift": "abstained (company-partner not in registry)",
+        })
+
+    # Locate this persona's round-1 entry for comparison (revised detection).
+    r1_verdict = next(
+        (v for v in round1 if v.get("persona") == persona_name), {}
+    )
+    r1_stance = r1_verdict.get("stance", "hold")
+    r1_conviction = r1_verdict.get("conviction", 0)
+
+    # Live progress: round-2 rebuttal starting.
+    with _PROGRESS_LOCK:
+        try:
+            _emit(on_progress, eid, {
+                "stage": "roundtable", "agent_id": persona_name,
+                "phase": "rebuttal_start", "round": 2,
+            })
+        except Exception:
+            pass
+    _t0 = time.monotonic()
+
+    # Per-thread ctx: shallow copy + isolated _cache dict.
+    ctx_local = {**ctx, "_cache": {}}
+
+    res = harness.run(
+        "company-partner",
+        {
+            "persona": persona_name,
+            "lens": lens,
+            "dossier_fields": dossier_fields_r2,
+            "round1_verdicts": round1_verdicts,
+        },
+        engagement_id=eid,
+        ctx={**ctx_local, "dossier_fields": dossier_fields_r2},
+        registry=registry,
+    )
+
+    _elapsed = round(time.monotonic() - _t0, 2)
+
+    if res.ok and res.output:
+        r2_stance = res.output.get("stance", "conditional")
+        r2_conviction = res.output.get("conviction", 0)
+        r2_rationale = res.output.get("rationale", "")
+    else:
+        r2_stance = r1_stance
+        r2_conviction = r1_conviction
+        r2_rationale = f"abstained ({res.error or 'unknown'})"
+
+    revised = (r2_conviction != r1_conviction or r2_stance != r1_stance)
+    shift = r2_rationale[:200]
+
+    rebuttal_entry: dict = {
+        "persona": persona_name,
+        "revised": revised,
+        "conviction": r2_conviction,
+        "shift": shift,
+    }
+
+    # Live progress: rebuttal landed.
+    with _PROGRESS_LOCK:
+        try:
+            _emit(on_progress, eid, {
+                "stage": "roundtable", "agent_id": persona_name,
+                "phase": "rebuttal_done", "round": 2,
+                "revised": revised, "conviction": r2_conviction,
+                "elapsed_s": _elapsed,
+            })
+        except Exception:
+            pass
+
+    return (persona_name, rebuttal_entry)
 
 
 def run_live(
@@ -1205,69 +1464,46 @@ def run_live(
 
     round1: list[dict] = []
 
+    # ── Parallel Bucket-2 round-1 dispatch ──────────────────────────────────
+    # Submit all seated personas concurrently via ThreadPoolExecutor.
+    # Each worker (_run_persona_round1) is pure w.r.t. shared state — it reads
+    # all_dossier_facts (snapshot) and returns (persona_name, verdict_dict).
+    # Results are joined BEFORE synthesis (the round-2 barrier is implicit:
+    # executor.__exit__ waits for all futures, so the merge below is safe).
+    #
+    # Concurrency cap: SAPPHIRE_BUCKET2_CONCURRENCY (default 8, module constant
+    # _MAX_BUCKET2_WORKERS). Set to 1 to reproduce the serial behavior exactly
+    # (ThreadPoolExecutor with max_workers=1 submits one future at a time).
+    #
+    # Determinism: after all futures are joined, results are collected keyed by
+    # persona_name and then assembled in `panel` order — independent of thread
+    # completion order.
+    _b2_n_workers = min(_MAX_BUCKET2_WORKERS, max(1, len(panel)))
+
+    # Map persona_name → Future (submitted in panel order; insertion-ordered dict).
+    _b2_futures: dict[str, concurrent.futures.Future] = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=_b2_n_workers) as _b2_pool:
+        for p in panel:
+            fut = _b2_pool.submit(
+                _run_persona_round1,
+                p, all_dossier_facts, eid, ctx, registry,
+                on_progress, known_ids, veto_flags,
+            )
+            _b2_futures[p.get("persona", "")] = fut
+    # Pool __exit__ blocks until all futures complete (barrier). Synthesis happens
+    # only after this point — the round-1→round-2 barrier is preserved by construction.
+
+    # Merge results in seated-persona (panel) order for deterministic round1 list.
+    # A persona not in _b2_futures means panel was empty or re-used a duplicate name —
+    # silently skip (identical to the old serial `continue` for unknown personas).
     for p in panel:
         persona_name = p.get("persona", "")
-        lens = p.get("lens", "")
-
-        # Build a compact dossier field list for the partner to reference.
-        dossier_fields = list({f.get("value", "")[:80] for f in all_dossier_facts})[:10]
-
-        # VETO gate: when active, prepend VETO-adjudication markers so the
-        # persona receives the gate condition as first-class input (capped to 12).
-        if veto_is_active:
-            veto_markers = ["[VETO ADJUDICATION] " + v[:80] for v in veto_flags]
-            dossier_fields = (veto_markers + dossier_fields)[:12]
-
-        if "company-partner" not in known_ids:
+        if persona_name not in _b2_futures:
             continue
-
-        # Live progress: this persona is deliberating (round 1).
-        _emit(on_progress, eid, {"stage": "roundtable", "agent_id": persona_name,
-                                 "phase": "start", "round": 1})
-        _t0 = time.monotonic()
-
-        persona_inputs: dict = {
-            "persona": persona_name,
-            "lens": lens,
-            "dossier_fields": dossier_fields,
-        }
-        if veto_is_active:
-            persona_inputs["veto_adjudication"] = veto_flags
-
-        res = harness.run(
-            "company-partner",
-            persona_inputs,
-            engagement_id=eid,
-            ctx={**ctx, "dossier_fields": dossier_fields},
-            registry=registry,
-        )
-
-        _elapsed = round(time.monotonic() - _t0, 2)
-        if res.ok and res.output:
-            verdict = dict(res.output)
-            verdict.setdefault("provenance", res.provenance)
-            verdict["status"] = res.status
-            round1.append(verdict)
-        else:
-            verdict = {
-                "persona": persona_name,
-                "lens": lens,
-                "stance": "hold",
-                "conviction": 0,
-                "rationale": f"abstained ({res.error or 'unknown'})",
-                "fact_claims": [],
-                "provenance": res.provenance,
-                "status": res.status,
-            }
-            round1.append(verdict)
-
-        # Live progress: this persona's verdict landed — stance·conviction, or honest abstention.
-        _emit(on_progress, eid, {
-            "stage": "roundtable", "agent_id": persona_name, "phase": "done", "round": 1,
-            "status": verdict.get("status", res.status),
-            "stance": verdict.get("stance"), "conviction": verdict.get("conviction"),
-            "elapsed_s": _elapsed,
-        })
+        # re-raises any unhandled worker exception so the engagement fails loudly
+        # rather than silently producing a partial round1.
+        _, verdict = _b2_futures[persona_name].result()
+        round1.append(verdict)
 
     # -----------------------------------------------------------------------
     # 5b. Bucket 2 — Round 2 (rebuttal) + spread
