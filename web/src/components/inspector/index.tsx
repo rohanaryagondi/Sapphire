@@ -1,21 +1,20 @@
 "use client";
-import { Activity, Search, X } from "lucide-react";
+import { Activity } from "lucide-react";
 import { useFirm } from "@/lib/store";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Monitor } from "./monitor";
-import { Investigate } from "./investigate";
+import { DossierTab } from "./dossier-tab";
 
 export function Inspector() {
   const turns = useFirm((s) => s.turns);
   const running = useFirm((s) => s.running);
-  const tab = useFirm((s) => s.inspectorTab);
-  const setTab = useFirm((s) => s.setInspectorTab);
-  const setOpen = useFirm((s) => s.setInspectorOpen);
-  const selection = useFirm((s) => s.selection);
+  const tab = useFirm((s) => s.panelTab);
+  const setTab = useFirm((s) => s.setPanelTab);
+  const setPanelOpen = useFirm((s) => s.setPanelOpen);
+  const setPanelWide = useFirm((s) => s.setPanelWide);
+  const panelWide = useFirm((s) => s.panelWide);
   const monitorTurnId = useFirm((s) => s.monitorTurnId);
 
-  // the Monitor shows the pinned turn (#10) if one is selected, else follows the latest
   const activeTurn =
     (monitorTurnId && turns.find((t) => t.id === monitorTurnId)) ||
     turns[turns.length - 1];
@@ -24,81 +23,76 @@ export function Inspector() {
     <div className="flex h-full flex-col">
       {/* tab header */}
       <div className="flex h-11 shrink-0 items-center gap-1 border-b border-[var(--color-border)] px-2">
-        <TabBtn
-          active={tab === "monitor"}
-          onClick={() => setTab("monitor")}
-          icon={<Activity className="size-3.5" />}
-          label="Monitor"
-          live={running}
-        />
-        <TabBtn
-          active={tab === "investigate"}
-          onClick={() => setTab("investigate")}
-          icon={<Search className="size-3.5" />}
-          label="Investigate"
-          badge={selection.kind !== "none" ? "•" : undefined}
-        />
-        <div className="flex-1" />
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => setOpen(false)}
-          aria-label="Close inspector"
+        <button
+          onClick={() => setTab("trace")}
+          className={cn(
+            "relative flex h-7 items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 text-[12.5px] font-medium transition-colors",
+            tab === "trace"
+              ? "bg-[var(--color-elevated)] text-[var(--color-fg)]"
+              : "text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
+          )}
         >
-          <X className="size-3.5" />
-        </Button>
+          <Activity className="size-3.5" />
+          Trace
+          {running && (
+            <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-[var(--color-ok)] live-dot" />
+          )}
+        </button>
+        <button
+          onClick={() => setTab("dossier")}
+          className={cn(
+            "relative flex h-7 items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 text-[12.5px] font-medium transition-colors",
+            tab === "dossier"
+              ? "bg-[var(--color-elevated)] text-[var(--color-fg)]"
+              : "text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
+          )}
+        >
+          Dossier
+          {activeTurn?.result?.discover?.dossier?.length ? (
+            <span className="ml-0.5 font-mono text-[10px] text-[var(--color-fg-faint)]">
+              {activeTurn.result.discover.dossier.length}
+            </span>
+          ) : null}
+        </button>
+        <div className="flex-1" />
+        {/* ⤢ widen */}
+        <button
+          onClick={() => setPanelWide(!panelWide)}
+          className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[13px] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-fg)]"
+          title="Widen panel"
+          aria-label="Widen panel"
+        >
+          ⤢
+        </button>
+        {/* › close */}
+        <button
+          onClick={() => setPanelOpen(false)}
+          className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[13px] text-[var(--color-fg-muted)] transition-colors hover:bg-[var(--color-elevated)] hover:text-[var(--color-fg)]"
+          title="Hide panel"
+          aria-label="Hide panel"
+        >
+          ›
+        </button>
       </div>
 
-      {/* live shimmer under the header while running */}
+      {/* live shimmer */}
       <div className="h-px shrink-0 bg-[var(--color-border)]">
         {running && <div className="streamline h-px" />}
       </div>
 
       {/* body */}
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {tab === "monitor" ? (
+        {tab === "trace" ? (
           <Monitor turn={activeTurn} />
         ) : (
-          <Investigate turns={turns} />
+          <DossierTab turn={activeTurn} />
         )}
       </div>
-    </div>
-  );
-}
 
-function TabBtn({
-  active,
-  onClick,
-  icon,
-  label,
-  live,
-  badge,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-  live?: boolean;
-  badge?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "relative flex h-7 items-center gap-1.5 rounded-[var(--radius-sm)] px-2.5 text-[12.5px] font-medium transition-colors",
-        active
-          ? "bg-[var(--color-elevated)] text-[var(--color-fg)]"
-          : "text-[var(--color-fg-subtle)] hover:text-[var(--color-fg-muted)]",
-      )}
-    >
-      {icon}
-      {label}
-      {live && (
-        <span className="ml-0.5 h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] live-dot" />
-      )}
-      {badge && !live && (
-        <span className="ml-0.5 text-[var(--color-accent)]">{badge}</span>
-      )}
-    </button>
+      {/* hintbar */}
+      <div className="shrink-0 border-t border-[var(--color-border)] px-3 py-2 text-[11px] text-[var(--color-fg-faint)]">
+        ↳ click any row to expand · ⤢ widen the panel
+      </div>
+    </div>
   );
 }

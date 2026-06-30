@@ -89,6 +89,11 @@ export async function fetchPlan(
   }
 }
 
+// We use fetch + ReadableStream (NOT EventSource) because:
+// EventSource is GET-only and cannot carry a POST body. Our /api/run
+// endpoint requires a POST with the query/profile/model payload.
+// fetch() gives us full control: POST body, abort signal, and we parse
+// the SSE wire format manually in consumeSSE().
 async function consumeSSE(body: ReadableStream<Uint8Array>, cb: RunCallbacks) {
   const reader = body.getReader();
   const dec = new TextDecoder();

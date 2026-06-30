@@ -40,8 +40,9 @@ export function buildTrace(trace: ProgressEvent[]): TraceModel {
       tops[stage] = node;
       continue;
     }
-    if (stage === "bucket1" || stage === "roundtable") {
-      const map = stage === "bucket1" ? b1 : rt;
+    if (stage === "bucket1" || stage === "redispatch" || stage === "roundtable") {
+      // "redispatch" is treated as bucket1 (re-dispatch of a bucket1 agent after a gap)
+      const map = stage === "roundtable" ? rt : b1;
       const id = String(ev.agent_id ?? "");
       const row = map.get(id) ?? { agentId: id, started: false, done: false, ev };
       row.started = true;

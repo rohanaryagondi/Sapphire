@@ -41,6 +41,7 @@ export interface Turn {
 }
 
 export type InspectorTab = "monitor" | "investigate";
+export type PanelTab = "trace" | "dossier";
 
 export type InspectorSelection =
   | { kind: "none" }
@@ -61,7 +62,7 @@ interface FirmState {
   running: boolean;
   activeConversationId: string | null;
 
-  // inspector
+  // inspector (legacy — kept for backward compat with command-palette etc.)
   inspectorTab: InspectorTab;
   inspectorOpen: boolean;
   selection: InspectorSelection;
@@ -71,6 +72,18 @@ interface FirmState {
   setInspectorOpen: (open: boolean) => void;
   setMonitorTurn: (id: string | null) => void;
   select: (sel: InspectorSelection) => void;
+
+  // new panel state (WO-7)
+  railOpen: boolean;
+  panelOpen: boolean;
+  panelWide: boolean;
+  panelTab: PanelTab;
+  focusRowId: string | null;
+  setRailOpen: (open: boolean) => void;
+  setPanelOpen: (open: boolean) => void;
+  setPanelWide: (wide: boolean) => void;
+  setPanelTab: (t: PanelTab) => void;
+  setFocusRowId: (id: string | null) => void;
 
   // command palette
   paletteOpen: boolean;
@@ -108,8 +121,8 @@ let _seq = 0;
 const uid = (p: string) => `${p}_${Date.now().toString(36)}_${(_seq++).toString(36)}`;
 
 export const useFirm = create<FirmState>((set, get) => ({
-  profile: "demo",
-  model: "default",
+  profile: "live",
+  model: "haiku",
   setProfile: (profile) => set({ profile }),
   setModel: (model) => set({ model }),
 
@@ -122,15 +135,43 @@ export const useFirm = create<FirmState>((set, get) => ({
   selection: { kind: "none" },
   monitorTurnId: null,
   setInspectorTab: (inspectorTab) => set({ inspectorTab }),
-  setInspectorOpen: (inspectorOpen) => set({ inspectorOpen }),
+  setInspectorOpen: (inspectorOpen) => set({ inspectorOpen, panelOpen: inspectorOpen }),
   setMonitorTurn: (monitorTurnId) =>
-    set({ monitorTurnId, inspectorTab: "monitor", inspectorOpen: true }),
+    set({ monitorTurnId, inspectorTab: "monitor", inspectorOpen: true, panelOpen: true }),
   select: (selection) =>
     set({
       selection,
       inspectorOpen: true,
+      panelOpen: true,
+      // Legacy: kept for backward compat with command-palette / investigate.tsx
       inspectorTab: selection.kind === "none" ? get().inspectorTab : "investigate",
+      // New panel deep-link: agent/verdict selections open the Trace tab and
+      // focus the matching row; fact selections open the Dossier tab.
+      panelTab:
+        selection.kind === "none"
+          ? get().panelTab
+          : selection.kind === "fact"
+            ? "dossier"
+            : "trace",
+      focusRowId:
+        selection.kind === "agent"
+          ? selection.agentId
+          : selection.kind === "verdict"
+            ? selection.persona
+            : null,
     }),
+
+  // new panel state (WO-7)
+  railOpen: true,
+  panelOpen: true,
+  panelWide: false,
+  panelTab: "trace",
+  focusRowId: null,
+  setRailOpen: (railOpen) => set({ railOpen }),
+  setPanelOpen: (panelOpen) => set({ panelOpen, inspectorOpen: panelOpen }),
+  setPanelWide: (panelWide) => set({ panelWide }),
+  setPanelTab: (panelTab) => set({ panelTab }),
+  setFocusRowId: (focusRowId) => set({ focusRowId }),
 
   paletteOpen: false,
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
@@ -205,6 +246,7 @@ export const useFirm = create<FirmState>((set, get) => ({
       activeConversationId: null,
       selection: { kind: "none" },
       inspectorTab: "monitor",
+      panelTab: "trace",
       monitorTurnId: null,
       pendingPlan: null,
       planError: null,
@@ -224,7 +266,7 @@ export const useFirm = create<FirmState>((set, get) => ({
     });
     if (!detail) {
       // backend returned nothing (404 / offline) — show an empty restored thread
-      set({ turns: [], inspectorTab: "monitor" });
+      set({ turns: [], inspectorTab: "monitor", panelTab: "trace" });
       return;
     }
     // Map each persisted RUN → a fully-rendered, complete Turn. The result dict the
@@ -251,7 +293,7 @@ export const useFirm = create<FirmState>((set, get) => ({
         startedAt: 0,
       };
     });
-    set({ turns, selection: { kind: "none" }, inspectorTab: "monitor" });
+    set({ turns, selection: { kind: "none" }, inspectorTab: "monitor", panelTab: "trace" });
   },
 
   renameConversation: async (id, title) => {
@@ -297,7 +339,9 @@ export const useFirm = create<FirmState>((set, get) => ({
       running: true,
       selection: { kind: "none" },
       inspectorTab: "monitor",
+      panelTab: "trace",
       inspectorOpen: true,
+      panelOpen: true,
       monitorTurnId: null, // a new turn returns the Monitor to "follow latest"
     }));
 
@@ -305,12 +349,25 @@ export const useFirm = create<FirmState>((set, get) => ({
       set((s) => ({
         turns: s.turns.map((t) => (t.id === turn.id ? { ...t, ...patch } : t)),
       }));
-    const pushTrace = (ev: ProgressEvent) =>
+    const pushTrace = (ev: ProgressEvent) => {
       set((s) => ({
         turns: s.turns.map((t) =>
           t.id === turn.id ? { ...t, trace: [...t.trace, ev] } : t,
         ),
       }));
+      // RAM cap: keep full trace for the last 3 turns; trim older turns to "done" events only
+      set((s) => {
+        const n = s.turns.length;
+        if (n <= 3) return {};
+        const trimmed = s.turns.map((t, i) => {
+          if (i >= n - 3) return t; // keep last 3 full
+          const doneOnly = t.trace.filter((e) => e.phase === "done");
+          if (doneOnly.length === t.trace.length) return t; // already trimmed
+          return { ...t, trace: doneOnly };
+        });
+        return { turns: trimmed };
+      });
+    };
 
     // ensure a conversation exists for persistence (best-effort; degrades to null)
     let convId = get().activeConversationId;
