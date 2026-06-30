@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sapphire — Plan first (in web/)</title>
+<style>
+  :root{
+    --bg:#08090a; --bg-subtle:#0c0d0f; --panel:#0e0f11; --panel-raised:#131417; --elevated:#17181b;
+    --border:rgba(255,255,255,.07); --border-strong:rgba(255,255,255,.12); --border-focus:rgba(93,141,255,.45);
+    --fg:#f4f5f6; --fg-muted:#9ca0a8; --fg-subtle:#6b6f78; --fg-faint:#4a4d55;
+    --accent:#4d8dff; --accent-hover:#6b9eff; --accent-soft:rgba(77,141,255,.12); --accent-ring:rgba(77,141,255,.30);
+    --ok:#3fb950; --warn:#d29922; --danger:#f85149; --internal:#c084fc; --external:#56b6ff;
+    --r:.5rem; --r-sm:.375rem; --r-lg:.75rem;
+    --font:ui-sans-serif,-apple-system,"Segoe UI","Geist",Inter,sans-serif;
+    --mono:ui-monospace,"Geist Mono","SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100vh;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;font-feature-settings:"cv01","ss01"}
+  ::-webkit-scrollbar{width:9px;height:9px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:9px;background-clip:content-box;border:2px solid transparent}
+  .mono{font-family:var(--mono)}
+  .app{display:grid;grid-template-rows:56px 1fr;height:100vh}
+  /* topbar */
+  .top{display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .gem{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,#c084fc,#4d8dff);display:grid;place-items:center}
+  .gem::after{content:"";width:7px;height:7px;background:#0b0c0e;border-radius:2px;transform:rotate(45deg);opacity:.55}
+  .brand{font-weight:600;font-size:14px;letter-spacing:-.01em}.brand small{color:var(--fg-subtle);font-weight:400;margin-left:7px;font-size:12px}
+  .sp{flex:1}
+  .pill{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--fg-muted);border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--bg-subtle)}
+  .pill .k{color:var(--fg-faint)} .pill b{color:var(--fg);font-weight:500} .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .kbd{font-family:var(--mono);font-size:10px;color:var(--fg-subtle);border:1px solid var(--border);border-radius:4px;padding:1px 4px}
+  .body{display:grid;grid-template-columns:248px 1fr;min-height:0}
+  /* history rail */
+  .rail{border-right:1px solid var(--border);background:var(--bg-subtle);display:flex;flex-direction:column;min-height:0}
+  .rh{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px}
+  .rh .l{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle)}
+  .newb{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--fg-muted);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;cursor:pointer}
+  .newb:hover{color:var(--fg);background:var(--elevated)}
+  .search{margin:0 12px 8px;display:flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:7px;padding:6px 9px;color:var(--fg-faint);font-size:12px}
+  .convs{overflow-y:auto;padding:2px 8px}
+  .conv{padding:9px 10px;border-radius:7px;cursor:pointer}.conv:hover{background:var(--elevated)}
+  .conv.on{background:var(--panel-raised);border:1px solid var(--border)}
+  .conv .t{font-size:12.5px;color:var(--fg);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conv .p{font-size:11px;color:var(--fg-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .conv .a{font-size:10.5px;color:var(--fg-faint);margin-top:3px}
+  /* chat column */
+  .chat{display:flex;flex-direction:column;min-height:0;background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px}
+  .scroll{flex:1;overflow-y:auto;min-height:0}
+  .thread{max-width:780px;margin:0 auto;padding:26px 24px 30px}
+  .userrow{display:flex;justify-content:flex-end;margin:4px 0 22px}
+  .userrow .b{background:var(--panel-raised);border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 15px;font-size:14px;max-width:80%}
+  .turn{display:flex;gap:13px;align-items:flex-start}
+  .av{width:25px;height:25px;flex:none;margin-top:1px}.av .gem{width:25px;height:25px;border-radius:6px}.av .gem::after{width:9px;height:9px}
+  .ai{flex:1;min-width:0}
+  .lead{font-size:14px;line-height:1.62;color:var(--fg-muted);margin:2px 0 14px}.lead b{color:var(--fg);font-weight:600}.lead .cl{color:var(--accent)}
+  /* ── PLAN card (synthesis-card grammar) ── */
+  .plan{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:var(--r-lg);
+    background:linear-gradient(180deg,rgba(77,141,255,.06),var(--panel));
+    box-shadow:0 1px 0 rgba(255,255,255,.03),0 18px 44px -26px rgba(77,141,255,.5)}
+  .plan .glow{pointer-events:none;position:absolute;right:-48px;top:-48px;width:150px;height:150px;border-radius:50%;
+    background:radial-gradient(circle,rgba(77,141,255,.16),transparent 70%)}
+  .pin{position:relative;padding:16px 18px}
+  .phd{display:flex;align-items:center;gap:7px;margin-bottom:10px}
+  .phd .l{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:6px}
+  .phd .meta{margin-left:auto;font-size:11px;color:var(--fg-muted);font-family:var(--mono);font-variant-numeric:tabular-nums}.phd .meta b{color:var(--fg)}
+  .framing{font-size:14.5px;line-height:1.6;font-weight:450;color:var(--fg);margin:0 0 4px}
+  .framing .hl{color:var(--accent)}
+  /* steps */
+  .step{display:flex;gap:13px;padding:14px 0 4px;position:relative}
+  .step:not(:last-of-type)::before{content:"";position:absolute;left:11.5px;top:30px;bottom:-10px;width:1px;background:var(--border)}
+  .num{width:24px;height:24px;flex:none;border-radius:7px;border:1px solid var(--border-strong);background:var(--bg-subtle);display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--fg-muted);z-index:1;font-variant-numeric:tabular-nums}
+  .step.int .num{border-color:rgba(192,132,252,.5);color:var(--internal);background:rgba(192,132,252,.08)}
+  .step.veto .num{border-color:rgba(248,81,73,.45);color:var(--danger);background:rgba(248,81,73,.07)}
+  .sb{flex:1;min-width:0;padding-bottom:8px;border-bottom:1px solid var(--border)}
+  .step:last-of-type .sb{border-bottom:0}
+  .stt{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px}
+  .stt .h{font-size:13.5px;font-weight:600;color:var(--fg)}
+  .stxt{font-size:13px;line-height:1.6;color:var(--fg-muted)}
+  .stxt b{color:var(--fg);font-weight:600}.stxt .pp{color:#d6b4fe}.stxt .em{color:var(--warn)}.stxt .src{color:var(--external)}
+  .sub{margin-top:7px;display:flex;flex-direction:column;gap:6px}
+  .sub .li{display:flex;gap:8px;font-size:12.5px;line-height:1.5;color:var(--fg-muted)}
+  .sub .li .d{color:var(--fg-faint);flex:none}.sub .li b{color:var(--fg-subtle);font-weight:600}
+  .sub .li.em b{color:var(--warn)}
+  .expect{margin-top:7px;font-size:12px;color:var(--fg-subtle);background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--r);padding:7px 10px;line-height:1.5}
+  .expect .x{color:var(--fg-faint);text-transform:uppercase;letter-spacing:.05em;font-size:9.5px;font-weight:600;margin-right:6px}
+  /* badges (chips.tsx) */
+  .bg{display:inline-flex;align-items:center;gap:4px;border-radius:5px;border:1px solid;padding:0 6px;height:18px;font-size:10.5px;font-weight:500;font-family:var(--mono);line-height:1;white-space:nowrap}
+  .bg.real{border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.08);color:#7ee787}
+  .bg.cap{border-color:rgba(86,182,255,.28);background:rgba(86,182,255,.08);color:#79c0ff}
+  .bg.t2{border-color:rgba(125,133,255,.32);background:rgba(125,133,255,.1);color:#b3b8ff}
+  .bg.t1{border-color:rgba(77,141,255,.4);background:rgba(77,141,255,.12);color:#9cc1ff}
+  .bg.int{border-color:rgba(192,132,252,.32);background:rgba(192,132,252,.1);color:#d6b4fe}
+  .bg.ext{border-color:rgba(86,182,255,.28);background:rgba(86,182,255,.08);color:#79c0ff}
+  .bg.veto{border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.12);color:#ff7b72}
+  .bg .m{font-size:8px}
+  /* controls + footer */
+  .ctrls{display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--border);background:var(--bg-subtle);flex-wrap:wrap;position:relative}
+  .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--fg-faint);font-weight:600}
+  .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:var(--r-sm);overflow:hidden}
+  .seg button{appearance:none;border:0;border-right:1px solid var(--border-strong);background:transparent;color:var(--fg-muted);font:inherit;font-size:12px;padding:4px 12px;cursor:pointer}
+  .seg button:last-child{border-right:0}.seg button.on{background:var(--accent);color:#fff}.seg button:hover:not(.on){color:var(--fg);background:var(--elevated)}
+  .swrap{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--fg-muted)}
+  .sw{width:34px;height:19px;border-radius:999px;background:#26282c;border:1px solid var(--border-strong);position:relative;cursor:pointer;transition:.13s;flex:none}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#7d818a;transition:.13s}
+  .sw.on{background:var(--accent);border-color:var(--accent)}.sw.on::after{left:16px;background:#fff}
+  .pf{display:flex;align-items:center;gap:12px;padding:13px 18px;position:relative}
+  .run{appearance:none;border:0;border-radius:var(--r-sm);font:inherit;font-weight:600;font-size:13px;color:#fff;background:var(--accent);padding:8px 15px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .run:hover{background:var(--accent-hover)}
+  .pf .alt{font-size:12px;color:var(--fg-subtle);cursor:pointer}.pf .alt:hover{color:var(--accent)}
+  .pf .jbtn{margin-left:auto;font-size:11px;color:var(--fg-faint);border:1px solid var(--border);border-radius:5px;padding:4px 9px;font-family:var(--mono);cursor:pointer}
+  .advt{padding:9px 18px;border-top:1px solid var(--border);font-size:11.5px;color:var(--fg-subtle);cursor:pointer;display:flex;align-items:center;gap:7px;user-select:none}
+  .advt:hover{color:var(--fg)}.advt .cv{transition:.15s}.advt.open .cv{transform:rotate(90deg);color:var(--accent)}
+  .adv{max-height:0;overflow:hidden;transition:max-height .22s}.adv.open{max-height:340px;overflow:auto;border-top:1px solid var(--border)}
+  .adv-in{padding:11px 14px;display:flex;gap:6px;flex-wrap:wrap}
+  .ap{font-size:11.5px;font-family:var(--mono);padding:4px 9px;border-radius:7px;border:1px solid var(--border);color:var(--fg-muted);background:var(--bg-subtle);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .ap.on{color:#d6b4fe;border-color:rgba(192,132,252,.3);background:rgba(192,132,252,.08)}
+  .ap.lock{color:#ff9b94;border-color:rgba(248,81,73,.3);background:rgba(248,81,73,.07);cursor:not-allowed}
+  .ap .d{width:5px;height:5px;border-radius:50%;background:currentColor;opacity:.8}
+  /* composer */
+  .composer{border-top:1px solid var(--border);padding:12px 24px 14px;background:var(--bg)}
+  .ci{max-width:780px;margin:0 auto}
+  .cw{display:flex;align-items:center;gap:10px;background:var(--panel-raised);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:11px 11px 11px 16px}
+  .cw:focus-within{border-color:var(--border-focus);box-shadow:0 0 0 3px var(--accent-soft)}
+  .cw input{flex:1;background:transparent;border:0;color:var(--fg);font:inherit;font-size:14px;outline:none}
+  .cw .up{width:28px;height:28px;border-radius:7px;background:var(--accent);color:#fff;border:0;display:grid;place-items:center;cursor:pointer}
+  .cmeta{display:flex;align-items:center;gap:12px;margin-top:9px;font-size:11.5px;color:var(--fg-subtle)}
+  .pf2{display:flex;align-items:center;gap:7px;border:1px solid var(--border-strong);border-radius:7px;padding:4px 9px;color:var(--fg-muted)}
+  .sw-sm{width:30px;height:17px;border-radius:999px;background:var(--accent);border:1px solid var(--accent);position:relative;flex:none}
+  .sw-sm::after{content:"";position:absolute;top:1.5px;left:14px;width:12px;height:12px;border-radius:50%;background:#fff}
+  .cmeta .far{margin-left:auto;color:var(--fg-faint)}
+  /* toast / modal */
+  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--elevated);border:1px solid var(--border-strong);border-radius:var(--r);padding:9px 14px;font-size:12px;color:var(--fg-muted);box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:.2s;z-index:40;max-width:540px}
+  .toast.show{opacity:1;bottom:106px}
+  .scrim{position:fixed;inset:0;background:rgba(4,5,7,.66);z-index:50;display:none;place-items:center}.scrim.show{display:grid}
+  .modal{background:var(--panel);border:1px solid var(--border-strong);border-radius:var(--r-lg);max-width:500px;width:90%;padding:18px}
+  .modal h2{margin:0 0 3px;font-size:15px}.modal p{color:var(--fg-muted);margin:0 0 13px;font-size:12px}
+  .modal .row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px}.modal .row span{color:var(--fg-muted)}
+  .modal .acts{display:flex;gap:8px;justify-content:flex-end;margin-top:15px}
+  .ghost{appearance:none;border:1px solid var(--border-strong);background:transparent;color:var(--fg-muted);border-radius:var(--r-sm);font:inherit;font-size:12.5px;padding:7px 12px;cursor:pointer}
+  .wm{position:fixed;left:256px;bottom:8px;font-size:10px;color:var(--fg-faint);background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:3px 8px;z-index:60}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <span class="gem"></span><span class="brand">Sapphire<small>CNS decision firm</small></span>
+    <span class="sp"></span>
+    <span class="pill"><span class="kbd">⌘K</span> Search</span>
+    <span class="pill"><span class="k">model</span> <b>Default</b></span>
+    <span class="pill"><span class="k">profile</span> <span class="dot"></span><b>Demo</b></span>
+  </div>
+  <div class="body">
+    <div class="rail">
+      <div class="rh"><span class="l">History</span><span class="newb">+ New</span></div>
+      <div class="search">⌕ Search conversations…</div>
+      <div class="convs">
+        <div class="conv on"><div class="t">Which genes rescue the TSC2 phenotype?</div><div class="p">Plan first — reviewing the approach…</div><div class="a">now</div></div>
+        <div class="conv"><div class="t">Is TSC2 a viable CNS target?</div><div class="p">Is TSC2 a viable CNS target?</div><div class="a">7h ago</div></div>
+        <div class="conv"><div class="t">Regulatory pathway for an ASO?</div><div class="p">What is the regulatory pathway for an ASO…</div><div class="a">1h ago</div></div>
+        <div class="conv"><div class="t">Which genes rescue the TSC2 pheno…</div><div class="p">Which genes rescue the TSC2 phenotype t…</div><div class="a">8h ago</div></div>
+      </div>
+    </div>
+    <div class="chat">
+      <div class="scroll"><div class="thread">
+        <div class="userrow"><div class="b">Which genes rescue the TSC2 phenotype the most?</div></div>
+        <div class="turn">
+          <div class="av"><span class="gem"></span></div>
+          <div class="ai">
+            <div class="lead">Before I convene the firm, here's <b>how I plan to work this</b> — the actual approach, step by step. Review it, adjust the depth, or tell me to rethink any step; nothing runs until you approve.</div>
+            <div class="plan" id="plan"></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="composer"><div class="ci">
+        <div class="cw"><input placeholder="adjust a step — “go deeper on safety”, “add freedom-to-operate detail”, “skip the roundtable”…"><button class="up">↑</button></div>
+        <div class="cmeta"><span class="pf2"><span class="sw-sm"></span>Plan first</span><span>send · ⏎ newline</span><span class="far">Sapphire never fabricates — unknowns are flagged, not faked.</span></div>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="scrim" id="scrim"><div class="modal">
+  <h2>Approve &amp; convene the firm?</h2><p>Mockup — the real build freezes this plan and streams the firm; each step lights up as it runs, the dossier + synthesis fill in.</p>
+  <div id="mrows"></div>
+  <div class="acts"><button class="ghost" id="mcancel">Keep editing</button><button class="run" id="mgo">Approve &amp; Run ▶</button></div>
+</div></div>
+<div class="wm">mockup · the plan card inside web/ · Geist in the real build · for feedback</div>
+
+<script>
+const DEPTH={quick:{mins:"~1m",cost:0.07,partners:3,rounds:1,ext:7},standard:{mins:"~3m",cost:0.18,partners:4,rounds:2,ext:12},deep:{mins:"~6m",cost:0.34,partners:6,rounds:3,ext:18}};
+const S={depth:"standard",roundtable:true,adv:false,focus:null};
+const AGENTS=["internal-science-lead","emet-runner","q-models-runner","post-market-safety","global-regulatory-divergence","clinical-trial-registry","payer","financial","kol-social","patient-advocacy","dea-scheduling","manufacturing-cmc","policy-legislative","reputational"];
+const OFF=new Set(["dea-scheduling","manufacturing-cmc","policy-legislative","reputational"]);
+const $=s=>document.querySelector(s);const d=()=>DEPTH[S.depth];
+const tot=()=>1+d().ext+(S.roundtable?d().partners:0);
+
+function planHTML(){const x=d();const safetyOn=!OFF.has("post-market-safety");
+  return `<div class="glow"></div><div class="pin">
+   <div class="phd"><span class="l">◆ Plan — how I'll work this</span>
+     <span class="meta">diligence · <b>${1+x.ext}</b> agents · <b>${x.mins}</b> · <b>$${x.cost.toFixed(2)}</b></span></div>
+   <p class="framing">A <span class="hl">rescue-ranking</span> question on TSC2-KO. My strategy: lead with Quiver's proprietary signal, ground it in the external mechanism, stress-test it against the partners, then rank — flagging anything I can't establish rather than guessing.</p>
+
+   <div class="step int"><div class="num">1</div><div class="sb">
+     <div class="stt"><span class="h">Establish the proprietary signal</span><span class="bg int">🔒 internal</span><span class="bg real"><span class="m">●</span>moat-real</span></div>
+     <div class="stxt">Pull the <b>Quiver CNS_DFP</b> EP-signature reversal ranking for TSC2-KO — which gene perturbations most reverse the knockout's expression signature. This is the edge and frames everything; <span class="pp">only public gene symbols ever leave, never the scores.</span></div>
+     <div class="expect"><span class="x">expect</span>a ranked list — e.g. DCTN6, FZD7, RALA, RRAD, GPN3 — with cosine reversal strengths.</div>
+   </div></div>
+
+   <div class="step"><div class="num">2</div><div class="sb">
+     <div class="stt"><span class="h">Gather &amp; corroborate the external dossier</span><span class="bg ext">🌐 external</span><span class="bg t2">T1/T2 cited</span></div>
+     <div class="stxt">${x.ext} agents in parallel, corpus-first then search the gap. The point: turn the internal ranking from a correlation into a mechanism with public, cited evidence.</div>
+     <div class="sub">
+       <div class="li"><span class="d">›</span><div><b>Mechanism</b> — EMET (live) on the TSC2→tuberin→mTORC1 axis. <span class="src">I expect the Inoki-2002 linchpin (PMID 12172553)</span> and the constitutive-mTORC1 activation story.</div></div>
+       <div class="li em"><span class="d">›</span><div><b>Safety — flagging ON</b> (the query didn't ask, but it's load-bearing): mTOR-pathway modulation carries class liabilities — immunosuppression, metabolic, wound-healing.</div></div>
+       <div class="li"><span class="d">›</span><div><b>Regulatory &amp; trials</b> — precedent for mTOR-axis CNS programs + the competitive trial landscape.</div></div>
+       <div class="li"><span class="d">›</span><div><b>Commercial</b> — payer access and market comps for a CNS rare-disease asset.</div></div>
+     </div>
+     <div class="expect"><span class="x">skipping</span>DEA scheduling, CMC, policy, reputational — not load-bearing for a target-viability read. <span style="color:var(--accent);cursor:pointer" id="reAdd">reconsider ↓</span></div>
+   </div></div>
+
+   <div class="step veto"><div class="num">⛔</div><div class="sb">
+     <div class="stt"><span class="h">Run the veto gates</span><span class="bg veto"><span class="m">⛔</span>fda-memory</span><span class="bg veto"><span class="m">⛔</span>patent-ip</span></div>
+     <div class="stxt">FDA institutional memory + IP run as <b>gates, not filters</b>: I'll check for prior CRLs / program deaths on the mTOR MOA, and freedom-to-operate on the top rescue genes. <b>If either fires, the roundtable adjudicates it</b> — I never kill a program on a veto silently.</div>
+   </div></div>
+
+   ${S.roundtable?`<div class="step"><div class="num">4</div><div class="sb">
+     <div class="stt"><span class="h">Convene the partner roundtable</span><span class="bg cap">${x.partners} partners · ${x.rounds} round${x.rounds>1?'s':''}</span></div>
+     <div class="stxt">The <b>ex-FDA regulator</b> presses the safety/reg path; the <b>adversarial red-team</b> attacks the weakest link — is EP-reversal mechanistic or just correlational?; the <b>payer</b> on access; the <b>KOL</b> on clinical plausibility. <b>No forced consensus</b> — the spread between them is the signal.</div>
+   </div></div>`:`<div class="step"><div class="num">—</div><div class="sb">
+     <div class="stt"><span class="h">Roundtable — skipped</span></div>
+     <div class="stxt">You asked for a facts-only run; I'll return the cited dossier without the partner deliberation.</div></div></div>`}
+
+   <div class="step"><div class="num">${S.roundtable?'5':'4'}</div><div class="sb">
+     <div class="stt"><span class="h">Synthesize &amp; flag the unknowns</span></div>
+     <div class="stxt">Rank the rescue candidates by internal signal, grounded in external mechanism; propose the validating experiment${S.roundtable?'; and report how each partner reacted':''}. <b>What I can't establish — e.g. the rescue mechanism itself — I'll flag as a known-unknown, not fake.</b></div>
+   </div></div>
+  </div>
+
+  <div class="advt ${S.adv?'open':''}" id="advt"><span class="cv">▸</span> ${S.adv?'hide':'edit'} the ${AGENTS.length+2} agents &amp; gates Sapphire selected</div>
+  <div class="adv ${S.adv?'open':''}"><div class="adv-in">
+    ${AGENTS.map(id=>`<span class="ap ${OFF.has(id)?'':'on'}" data-ag="${id}"><span class="d"></span>${id}</span>`).join("")}
+    <span class="ap lock"><span class="d"></span>fda-institutional-memory ⛔</span><span class="ap lock"><span class="d"></span>patent-ip ⛔</span>
+  </div></div>
+
+  <div class="ctrls"><span class="lbl">depth</span>
+    <span class="seg" id="seg">${["quick","standard","deep"].map(k=>`<button data-dep="${k}" class="${k===S.depth?'on':''}">${k}</button>`).join("")}</span>
+    <span class="swrap"><span class="sw ${S.roundtable?'on':''}" id="rt"></span>roundtable</span>
+    <span style="margin-left:auto;font-size:11px;color:var(--fg-faint)">${S.depth==='deep'?'+ tool seams · extra rebuttal round':'full fact firm'}</span></div>
+
+  <div class="pf"><button class="run" id="run">▶ Approve &amp; Run</button>
+    <span class="alt" id="rethink">or tell me to rethink a step</span>
+    <span class="jbtn" id="jbtn">{ } plan</span></div>`;}
+
+function render(){$("#plan").innerHTML=planHTML();wire();}
+function wire(){
+  $("#seg").querySelectorAll("[data-dep]").forEach(b=>b.onclick=()=>{S.depth=b.dataset.dep;toast(`depth → ${S.depth} · ${1+d().ext} agents, ${S.roundtable?d().partners:0} partners, ${d().rounds} round${d().rounds>1?'s':''}`);render();});
+  $("#rt").onclick=()=>{S.roundtable=!S.roundtable;toast(S.roundtable?"roundtable on":"facts-only run");render();};
+  $("#advt").onclick=()=>{S.adv=!S.adv;render();};
+  const re=$("#reAdd");if(re)re.onclick=()=>{S.adv=true;render();};
+  document.querySelectorAll("[data-ag]").forEach(el=>el.onclick=()=>{const id=el.dataset.ag;OFF.has(id)?OFF.delete(id):OFF.add(id);render();});
+  $("#run").onclick=openRun;$("#rethink").onclick=()=>$(".cw input").focus();
+  $("#jbtn").onclick=()=>toast("{ } the live Plan object — the contract handed to run_live(plan=…)");
+}
+let tt;function toast(s){$("#toast").textContent=s;const e=$("#toast");e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2400);}
+function openRun(){const x=d();$("#mrows").innerHTML=`
+  <div class="row"><span>Fact agents</span><b>${1+x.ext} on${S.focus?` · focus ${S.focus}`:''}</b></div>
+  <div class="row"><span>Roundtable</span><b>${S.roundtable?`${x.partners} partners · ${x.rounds} rounds · spread kept`:"skipped"}</b></div>
+  <div class="row"><span>Gates</span><b>FDA-memory · patent-IP (locked)</b></div>
+  <div class="row"><span>Estimate</span><b>${x.mins} · $${x.cost.toFixed(2)}</b></div>`;$("#scrim").classList.add("show");}
+$("#mcancel").onclick=()=>$("#scrim").classList.remove("show");
+$("#scrim").onclick=e=>{if(e.target===$("#scrim"))$("#scrim").classList.remove("show");};
+$("#mgo").onclick=()=>{$("#scrim").classList.remove("show");toast("▶ (mockup) freezes the plan and streams the firm — steps light up, dossier + synthesis fill in");};
+// composer adjust
+$(".cw input").addEventListener("keydown",e=>{if(e.key!=="Enter")return;const t=e.target.value.trim().toLowerCase();if(!t)return;let m=false;
+  if(/deep|deeper|thorough/.test(t)){S.depth="deep";m=true;} if(/quick|fast|light/.test(t)){S.depth="quick";m=true;}
+  if(/skip.*roundtable|facts.?only/.test(t)){S.roundtable=false;m=true;}
+  if(/safety/.test(t)){OFF.delete("post-market-safety");S.focus="safety";m=true;}
+  if(/freedom.to.operate|fto|patent|ip/.test(t)){S.focus="IP/FTO";m=true;}
+  e.target.value="";toast(m?"✦ updated the plan ↑":"✦ mockup parses a fixed set — real planner handles free-form");if(m)render();});
+render();
+</script>
+</body>
+</html>
