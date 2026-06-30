@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sapphire — chat-center + expandable work panel</title>
+<style>
+  :root{
+    --bg:#08090a; --bg-subtle:#0c0d0f; --panel:#0e0f11; --panel-raised:#131417; --elevated:#17181b;
+    --border:rgba(255,255,255,.07); --border-strong:rgba(255,255,255,.12); --border-focus:rgba(93,141,255,.45);
+    --fg:#f4f5f6; --fg-muted:#9ca0a8; --fg-subtle:#6b6f78; --fg-faint:#4a4d55;
+    --accent:#4d8dff; --accent-hover:#6b9eff; --accent-soft:rgba(77,141,255,.12); --accent-ring:rgba(77,141,255,.30);
+    --ok:#3fb950; --warn:#d29922; --danger:#f85149; --internal:#c084fc; --external:#56b6ff;
+    --r:.5rem; --r-sm:.375rem; --r-lg:.75rem;
+    --font:ui-sans-serif,-apple-system,"Segoe UI","Geist",Inter,sans-serif;
+    --mono:ui-monospace,"Geist Mono","SF Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100vh;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;font-feature-settings:"cv01","ss01"}
+  ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:8px;background-clip:content-box;border:2px solid transparent}
+  .mono{font-family:var(--mono)}
+  .app{display:grid;grid-template-rows:52px 1fr;height:100vh}
+  /* topbar */
+  .top{display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--border);background:var(--bg)}
+  .gem{width:18px;height:18px;border-radius:5px;background:linear-gradient(135deg,#c084fc,#4d8dff);display:grid;place-items:center}
+  .gem::after{content:"";width:7px;height:7px;background:#0b0c0e;border-radius:2px;transform:rotate(45deg);opacity:.55}
+  .brand{font-weight:600;font-size:14px;letter-spacing:-.01em}.brand small{color:var(--fg-subtle);font-weight:400;margin-left:7px;font-size:12px}
+  .sp{flex:1}
+  .icobtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--bg-subtle);color:var(--fg-muted);display:grid;place-items:center;cursor:pointer;font-size:14px}
+  .icobtn:hover{color:var(--fg);background:var(--elevated)}.icobtn.on{color:var(--accent);border-color:var(--accent-ring);background:var(--accent-soft)}
+  .pill{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--fg-muted);border:1px solid var(--border);border-radius:7px;padding:5px 10px;background:var(--bg-subtle)}
+  .pill .k{color:var(--fg-faint)}.pill b{color:var(--fg);font-weight:500}.pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  .kbd{font-family:var(--mono);font-size:10px;color:var(--fg-subtle);border:1px solid var(--border);border-radius:4px;padding:1px 4px}
+  /* body grid — rail | chat | work panel; columns animate */
+  .body{display:grid;grid-template-columns:236px 1fr 400px;min-height:0;transition:grid-template-columns .22s ease}
+  .body.rail-collapsed{grid-template-columns:0px 1fr 400px}
+  .body.panel-expanded{grid-template-columns:236px 1fr 600px}
+  .body.rail-collapsed.panel-expanded{grid-template-columns:0px 1fr 600px}
+  .body.panel-hidden{grid-template-columns:236px 1fr 0px}
+  /* history rail */
+  .rail{border-right:1px solid var(--border);background:var(--bg-subtle);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .rh{display:flex;align-items:center;justify-content:space-between;padding:13px 13px 8px}
+  .rh .l{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-subtle)}
+  .newb{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--fg-muted);border:1px solid var(--border-strong);border-radius:6px;padding:4px 8px;cursor:pointer;white-space:nowrap}.newb:hover{color:var(--fg);background:var(--elevated)}
+  .convs{overflow-y:auto;padding:2px 8px}
+  .conv{padding:8px 10px;border-radius:7px;cursor:pointer}.conv:hover{background:var(--elevated)}.conv.on{background:var(--panel-raised);border:1px solid var(--border)}
+  .conv .t{font-size:12.5px;color:var(--fg);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .conv .p{font-size:11px;color:var(--fg-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .conv .a{font-size:10.5px;color:var(--fg-faint);margin-top:2px}
+  /* chat column */
+  .chat{display:flex;flex-direction:column;min-height:0;min-width:0;background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:22px 22px}
+  .scroll{flex:1;overflow-y:auto;min-height:0}
+  .thread{max-width:720px;margin:0 auto;padding:24px 24px 24px}
+  .userrow{display:flex;justify-content:flex-end;margin:4px 0 20px}
+  .userrow .b{background:var(--panel-raised);border:1px solid var(--border);border-radius:var(--r-lg);padding:10px 15px;font-size:14px;max-width:82%}
+  .turn{display:flex;gap:12px;align-items:flex-start;margin-bottom:18px}
+  .av{width:24px;height:24px;flex:none;margin-top:1px}.av .gem{width:24px;height:24px;border-radius:6px}.av .gem::after{width:9px;height:9px}
+  .ai{flex:1;min-width:0}
+  .lead{font-size:14px;line-height:1.6;color:var(--fg-muted);margin:2px 0 13px}.lead b{color:var(--fg);font-weight:600}.lead .cl{color:var(--accent)}
+  .lead .ref{color:var(--accent);cursor:pointer;font-size:11px;border:1px solid var(--accent-ring);border-radius:5px;padding:0 5px;background:var(--accent-soft);font-family:var(--mono)}
+  /* synthesis card (in chat) */
+  .synth{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:var(--r-lg);background:linear-gradient(180deg,rgba(77,141,255,.06),var(--panel));box-shadow:0 1px 0 rgba(255,255,255,.03),0 18px 44px -26px rgba(77,141,255,.5);padding:16px 18px;margin-bottom:14px}
+  .synth .glow{pointer-events:none;position:absolute;right:-48px;top:-48px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(77,141,255,.16),transparent 70%)}
+  .synth .hd{position:relative;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:6px;margin-bottom:9px}
+  .synth p{position:relative;font-size:14.5px;line-height:1.6;color:var(--fg);margin:0}
+  .synth .sup{color:var(--accent);font-size:10px;vertical-align:super;cursor:pointer;font-family:var(--mono);padding:0 1px}
+  .synth .conf{position:relative;margin-top:10px;font-size:12px;color:var(--fg-subtle)}.synth .conf b{color:var(--warn)}
+  /* spread strip (in chat) */
+  .spreadstrip{border:1px solid var(--border);border-radius:var(--r);background:var(--bg-subtle);padding:11px 14px;margin-bottom:6px}
+  .spreadstrip .h{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--fg-subtle);margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .spreadstrip .h .tag{color:var(--fg-faint);font-weight:400;letter-spacing:0;text-transform:none}
+  .verds{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+  .verd{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:7px;background:var(--panel);border:1px solid var(--border);cursor:pointer}
+  .verd:hover{border-color:var(--border-strong)}
+  .verd .bar{width:3px;align-self:stretch;border-radius:3px}
+  .verd .nm{font-size:12px;font-weight:550;flex:1}.verd .st{font-size:10.5px;font-weight:700;font-family:var(--mono);letter-spacing:.02em}
+  .st.adv{color:var(--ok)}.st.cau{color:var(--warn)}.st.blk{color:var(--danger)}
+  .bar.adv{background:var(--ok)}.bar.cau{background:var(--warn)}.bar.blk{background:var(--danger)}
+  .spreadstrip .ft{margin-top:9px;font-size:11px;color:var(--fg-faint);display:flex;gap:8px}
+  .spreadstrip .ft b{color:var(--fg-muted)}
+  /* composer */
+  .composer{border-top:1px solid var(--border);padding:11px 24px 13px;background:var(--bg)}
+  .ci{max-width:720px;margin:0 auto}
+  .cw{display:flex;align-items:center;gap:10px;background:var(--panel-raised);border:1px solid var(--border-strong);border-radius:var(--r-lg);padding:10px 10px 10px 15px}
+  .cw:focus-within{border-color:var(--border-focus);box-shadow:0 0 0 3px var(--accent-soft)}
+  .cw input{flex:1;background:transparent;border:0;color:var(--fg);font:inherit;font-size:14px;outline:none}
+  .cw .up{width:28px;height:28px;border-radius:7px;background:var(--accent);color:#fff;border:0;display:grid;place-items:center;cursor:pointer}
+  .cmeta{display:flex;align-items:center;gap:12px;margin-top:8px;font-size:11.5px;color:var(--fg-subtle)}
+  .pf2{display:flex;align-items:center;gap:7px;border:1px solid var(--border-strong);border-radius:7px;padding:3px 9px;color:var(--fg-muted)}
+  .sw-sm{width:28px;height:16px;border-radius:999px;background:var(--accent);border:1px solid var(--accent);position:relative;flex:none}.sw-sm::after{content:"";position:absolute;top:1.5px;left:13px;width:11px;height:11px;border-radius:50%;background:#fff}
+  .cmeta .far{margin-left:auto;color:var(--fg-faint)}
+  /* ───────── right work panel ───────── */
+  .work{border-left:1px solid var(--border);background:var(--bg-subtle);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+  .wh{display:flex;align-items:center;gap:8px;padding:11px 12px;border-bottom:1px solid var(--border)}
+  .wtabs{display:inline-flex;border:1px solid var(--border-strong);border-radius:var(--r-sm);overflow:hidden}
+  .wtabs button{appearance:none;border:0;border-right:1px solid var(--border-strong);background:transparent;color:var(--fg-muted);font:inherit;font-size:12px;padding:4px 11px;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .wtabs button:last-child{border-right:0}.wtabs button.on{background:var(--accent);color:#fff}.wtabs button:hover:not(.on){color:var(--fg)}
+  .wtabs .live{width:6px;height:6px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(63,185,80,.18)}
+  .wbody{flex:1;overflow-y:auto;min-height:0;padding:8px 8px 24px}
+  .wsec{margin:8px 4px 4px;font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--fg-faint);display:flex;align-items:center;gap:8px}
+  .wsec .c{color:var(--fg-subtle);font-weight:500;letter-spacing:0;text-transform:none;font-family:var(--mono)}
+  .wsec .ln{flex:1;height:1px;background:var(--border)}
+  /* trace row (expandable, Claude-Desktop style) */
+  .trow{border:1px solid var(--border);border-radius:8px;background:var(--panel);margin:5px 2px;overflow:hidden;transition:border-color .12s}
+  .trow:hover{border-color:var(--border-strong)}
+  .trow.open{border-color:var(--border-strong)}
+  .th2{display:flex;align-items:center;gap:9px;padding:8px 10px;cursor:pointer}
+  .stat{width:15px;height:15px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:9px}
+  .stat.done{background:rgba(63,185,80,.12);color:#7ee787;border:1px solid rgba(63,185,80,.35)}
+  .stat.run{background:rgba(77,141,255,.12);color:#79c0ff;border:1px solid rgba(77,141,255,.4);animation:pulse 1.4s infinite}
+  .stat.gate{background:rgba(248,81,73,.1);color:#ff9b94;border:1px solid rgba(248,81,73,.35)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .th2 .nm{font-size:12.5px;font-weight:550;font-family:var(--mono);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .th2 .desc{font-size:11px;color:var(--fg-subtle);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+  .th2 .rt{display:flex;align-items:center;gap:6px;flex:none}
+  .th2 .cnt{font-size:11px;color:var(--fg-muted);font-family:var(--mono)}
+  .th2 .cv{color:var(--fg-faint);font-size:10px;transition:.15s}.trow.open .cv{transform:rotate(90deg);color:var(--accent)}
+  .tdet{max-height:0;overflow:hidden;transition:max-height .2s ease}.trow.open .tdet{max-height:520px}
+  .tdet-in{padding:2px 10px 10px 34px;border-top:1px solid var(--border)}
+  .tdet-in .mini{font-size:11.5px;color:var(--fg-muted);line-height:1.5;padding:7px 0;border-bottom:1px solid var(--border);display:flex;gap:8px}
+  .tdet-in .mini:last-child{border-bottom:0}.tdet-in .mini .d{color:var(--fg-faint);flex:none}
+  .tdet-in .mini .src{color:var(--external);font-family:var(--mono);font-size:10px}
+  .tdet-in .meta{font-size:10.5px;color:var(--fg-faint);font-family:var(--mono);padding-top:7px;display:flex;flex-wrap:wrap;gap:5px}
+  /* badges */
+  .bg{display:inline-flex;align-items:center;gap:4px;border-radius:5px;border:1px solid;padding:0 6px;height:18px;font-size:10px;font-weight:500;font-family:var(--mono);line-height:1;white-space:nowrap}
+  .bg.real{border-color:rgba(63,185,80,.3);background:rgba(63,185,80,.08);color:#7ee787}
+  .bg.cap{border-color:rgba(86,182,255,.28);background:rgba(86,182,255,.08);color:#79c0ff}
+  .bg.t2{border-color:rgba(125,133,255,.32);background:rgba(125,133,255,.1);color:#b3b8ff}
+  .bg.t1{border-color:rgba(77,141,255,.4);background:rgba(77,141,255,.12);color:#9cc1ff}
+  .bg.int{border-color:rgba(192,132,252,.32);background:rgba(192,132,252,.1);color:#d6b4fe}
+  .bg.ext{border-color:rgba(86,182,255,.28);background:rgba(86,182,255,.08);color:#79c0ff}
+  .bg.veto{border-color:rgba(248,81,73,.4);background:rgba(248,81,73,.12);color:#ff7b72}
+  .bg.div{border-color:rgba(210,153,34,.38);background:rgba(210,153,34,.12);color:#e3b341}
+  .bg .m{font-size:8px}
+  /* verdict trace row */
+  .vbar{width:3px;height:15px;border-radius:3px;flex:none}
+  .tdet-in .reason{font-size:12px;color:var(--fg-muted);line-height:1.55;padding:8px 0 6px}
+  /* dossier tab */
+  .planehd{display:flex;align-items:center;gap:8px;margin:10px 4px 6px;font-size:11px;font-weight:600}
+  .planehd.int{color:#d6b4fe}.planehd.ext{color:#79c0ff}.planehd .c{margin-left:auto;color:var(--fg-faint);font-family:var(--mono);font-weight:400;font-size:10.5px}
+  .fcard{border:1px solid var(--border);border-radius:8px;background:var(--panel);margin:5px 2px;padding:9px 11px;cursor:pointer}
+  .fcard:hover{border-color:var(--border-strong)}.fcard.caveat{border-style:dashed;border-color:rgba(210,153,34,.35);background:rgba(210,153,34,.04)}
+  .fcard .v{font-size:12px;line-height:1.45;color:var(--fg)}.fcard.caveat .v{font-style:italic;color:var(--fg-muted)}
+  .fcard .bd{margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+  .fcard .sc{font-size:10px;color:var(--fg-subtle);font-family:var(--mono);margin-left:2px}
+  .wm{position:fixed;left:12px;bottom:8px;font-size:10px;color:var(--fg-faint);background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:3px 8px;z-index:60}
+  .hintbar{padding:8px 12px;font-size:11px;color:var(--fg-faint);border-top:1px solid var(--border);background:var(--bg);display:flex;gap:6px;align-items:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="icobtn" id="railToggle" title="Toggle history">☰</div>
+    <span class="gem"></span><span class="brand">Sapphire<small>CNS decision firm</small></span>
+    <span class="sp"></span>
+    <span class="pill"><span class="kbd">⌘K</span> Search</span>
+    <span class="pill"><span class="k">model</span> <b>Claude 4</b></span>
+    <span class="pill"><span class="k">profile</span> <span class="dot"></span><b>Demo</b></span>
+    <div class="icobtn on" id="panelToggle" title="Toggle work panel">⊟</div>
+  </div>
+  <div class="body" id="body">
+    <!-- history -->
+    <div class="rail">
+      <div class="rh"><span class="l">History</span><span class="newb">+ New</span></div>
+      <div class="convs">
+        <div class="conv on"><div class="t">Which genes rescue TSC2?</div><div class="p">Synthesis · 2 advance · 2 caution</div><div class="a">now</div></div>
+        <div class="conv"><div class="t">Is Nav1.8 a viable CNS target?</div><div class="p">advance with caveats</div><div class="a">2h ago</div></div>
+        <div class="conv"><div class="t">Regulatory pathway for an ASO?</div><div class="p">spread: 2 advance · 1 block</div><div class="a">4h ago</div></div>
+        <div class="conv"><div class="t">mTOR pathway liabilities in CNS</div><div class="p">DIVERGENCE flagged</div><div class="a">1d ago</div></div>
+      </div>
+    </div>
+    <!-- chat (center) -->
+    <div class="chat">
+      <div class="scroll"><div class="thread">
+        <div class="userrow"><div class="b">Which genes rescue the TSC2 phenotype the most?</div></div>
+        <div class="turn">
+          <div class="av"><span class="gem"></span></div>
+          <div class="ai">
+            <div class="lead">I convened the firm — <b>13 fact agents</b>, two veto gates, and a <b>4-partner roundtable</b>. The full live trace and the cited dossier are on the right <span class="ref" id="openTrace">trace ↗</span> <span class="ref" id="openDoss">dossier ↗</span>. Here's the recommendation.</div>
+
+            <div class="synth"><div class="glow"></div>
+              <div class="hd">◆ Synthesis — the recommendation</div>
+              <p>Three genes are credibly supported for TSC2-rescue, by confidence: <b>DCTN6</b><span class="sup" data-cite="1">1</span> (strongest EP-reversal, partial mechanistic grounding via the dynactin/mTOR axis), <b>FZD7</b><span class="sup" data-cite="2">2</span> (WNT/mTOR crosstalk — the KOL's preferred candidate), and <b>RALA</b><span class="sup" data-cite="3">3</span>. <b>GPN3 is excluded</b>: the EP-reversal signal is real but has no mechanistic grounding and the adversarial partner's objection<span class="sup" data-cite="r">↗</span> held through rebuttal.</p>
+              <div class="conf">Confidence <b>Low → Medium</b> · EP-reversal is real; causal mechanisms are hypothesis-level; roundtable split 2A / 2C.</div>
+            </div>
+
+            <div class="spreadstrip">
+              <div class="h">The spread <span class="tag">· 4 partners · 2 rounds · no forced consensus</span></div>
+              <div class="verds">
+                <div class="verd" data-cite="r"><span class="bar adv"></span><span class="nm">ex-FDA Regulator</span><span class="st adv">ADVANCE</span></div>
+                <div class="verd" data-cite="r"><span class="bar cau"></span><span class="nm">Adversarial Red-Team</span><span class="st cau">CAUTION</span></div>
+                <div class="verd" data-cite="r"><span class="bar adv"></span><span class="nm">KOL / Clinical</span><span class="st adv">ADVANCE</span></div>
+                <div class="verd" data-cite="r"><span class="bar cau"></span><span class="nm">Payer Partner</span><span class="st cau">CAUTION</span></div>
+              </div>
+              <div class="ft"><span><b>2</b> advance</span><span><b>2</b> caution</span><span><b>0</b> block</span><span style="margin-left:auto">the spread IS the answer — click a partner to inspect →</span></div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+      <div class="composer"><div class="ci">
+        <div class="cw"><input placeholder="follow up, or drill into a fact / partner on the right…"><button class="up">↑</button></div>
+        <div class="cmeta"><span class="pf2"><span class="sw-sm"></span>Plan first</span><span>↵ send</span><span class="far">Sapphire never fabricates — unknowns are flagged, not faked.</span></div>
+      </div></div>
+    </div>
+    <!-- work panel (right, expandable) -->
+    <div class="work">
+      <div class="wh">
+        <div class="wtabs" id="wtabs">
+          <button data-tab="trace" class="on"><span class="live"></span>Trace</button>
+          <button data-tab="dossier">Dossier <span style="color:var(--fg-faint)">21</span></button>
+        </div>
+        <span class="sp"></span>
+        <div class="icobtn" id="expandBtn" title="Expand panel">⤢</div>
+        <div class="icobtn" id="closeBtn" title="Hide panel">›</div>
+      </div>
+      <div class="wbody" id="wbody"></div>
+      <div class="hintbar">↳ click any row to expand · ⤢ widen the panel</div>
+    </div>
+  </div>
+</div>
+<div class="wm">mockup · chat-center + expandable right work panel · for feedback</div>
+
+<script>
+const FACTS={
+  "internal-science-lead":{plane:"int",prov:"moat-real",n:5,desc:"Quiver CNS_DFP EP-reversal ranking for TSC2-KO",items:[
+    ["DCTN6 — strongest EP-signature reversal (cosine 0.847), #1 of 3,039 perturbations","moat · T2 · internal"],
+    ["FZD7 — #2 (cosine 0.831); WNT/β-catenin axis","moat · T2 · internal"],
+    ["RALA (0.819) & RRAD (0.804) round out the top-4 — small GTPases in mTOR assembly","moat · T2 · internal"],
+    ["GPN3 — #5 (0.791); function in rescue context unclear — annotated KNOWN_UNKNOWN","moat · T1 · internal · ⚠"],
+    ["Cosine reversal = EP-signature correlation, not causal. Must be externally corroborated.","caveat · internal"]]},
+  "emet-analyst":{plane:"ext",prov:"emet-live",n:8,desc:"TSC2→tuberin→mTORC1 mechanism, literature",items:[
+    ["TSC2 encodes tuberin (GAP for Rheb); LoF → constitutive mTORC1 activation — the canonical linchpin","emet · T2 · external · PMID 12172553"],
+    ["Rapamycin partially rescues TSC2-null proliferation in vitro — validates mTOR as a node","emet · T2 · external · PMID 12172560"],
+    ["mTOR-pathway modulation carries class-effect liabilities (immunosuppression, metabolic)","emet · T2 · external · ⚠ DIVERGENCE"]]},
+  "q-models-runner":{plane:null,prov:"live-local",n:2,desc:"ESM-2 embedding similarity for DCTN6/FZD7/RALA",items:[
+    ["DCTN6 / FZD7 cluster with axonal-transport & WNT effectors (ESM-2 cosine > 0.6)","q-models · live-local"]]},
+  "post-market-safety":{plane:"ext",prov:"T2",n:4,desc:"mTOR class liabilities in CNS programs",items:[
+    ["No prior CRL on mTOR MOA in TSC CNS indications (FDA advisory DB, 2010–2024)","external · T2"]]},
+};
+const GATES={
+  "fda-institutional-memory":{desc:"Prior CRLs / program deaths on mTOR MOA",result:"0 VETOs — no blocking precedent found"},
+  "patent-ip":{desc:"Freedom-to-operate on DCTN6/FZD7/RALA rescue",result:"0 VETOs — clear; 1 watch (FZD7 method claim)"},
+};
+const PARTNERS={
+  "ex-FDA Regulator":{st:"adv",lbl:"ADVANCE",conv:"4/5",reason:"The mTOR safety profile is known and manageable in a CNS rare-disease context; the lack of prior CRL is materially positive. I'd advance DCTN6 and FZD7 to mechanistic validation."},
+  "Adversarial Red-Team":{st:"cau",lbl:"CAUTION",conv:"5/5",reason:"EP-reversal is correlational, not causal rescue. GPN3 specifically has zero mechanistic grounding — I held my objection through rebuttal; exclude it. DCTN6/FZD7 are hypotheses until the validation screen runs."},
+  "KOL / Clinical":{st:"adv",lbl:"ADVANCE",conv:"4/5",reason:"TSC patients have very limited options. The Inoki/Kwiatkowski mechanistic chain is solid; FZD7 is my preferred candidate clinically given the WNT/mTOR crosstalk."},
+  "Payer Partner":{st:"cau",lbl:"CAUTION",conv:"3/5",reason:"A CNS rare-disease asset is commercially viable IF the efficacy story is clean. The mTOR class liabilities are a coverage concern — not a block, but durability data will be required."},
+};
+const DOSS={int:[
+  ["DCTN6 shows the strongest EP-signature reversal for TSC2-KO (cosine 0.847), #1 of 3,039.",["t2","real","int"],"Quiver CNS_DFP"],
+  ["FZD7 ranks #2 (cosine 0.831); part of the WNT/β-catenin axis interacting with mTORC1.",["t2","real","int"],""],
+  ["RALA (0.819) and RRAD (0.804) round out the top-4 — small GTPases in mTOR assembly.",["t2","real","int"],""],
+  ["GPN3 at #5 (0.791); rescue role unclear — annotated known-unknown.",["t1","real","int","kuw"],""],
+  ["Cosine reversal scores are EP-signature correlations, not causal evidence.",["caveat","int"],""]],
+ext:[
+  ["TSC2 encodes tuberin, a GAP for Rheb; LoF → constitutive mTORC1 activation — the canonical linchpin.",["t2","cap","ext"],"Inoki 2002 · PMID 12172553"],
+  ["Rapamycin partially rescues TSC2-null proliferation in vitro, establishing mTOR as a validated node.",["t2","cap","ext"],"Kwiatkowski 2002 · PMID 12172560"],
+  ["mTOR-pathway modulation carries class-effect immunosuppression, metabolic & wound-healing liabilities.",["t2","cap","ext","div"],"FDA Safety Review 2013"],
+  ["NCT04906317 (everolimus, TSC epilepsy): active Phase 3, no CNS-specific competitors on registry.",["t2","cap","ext"],"ClinicalTrials.gov 2024"]]};
+
+const $=s=>document.querySelector(s);
+const badge=(k)=>({t1:'<span class="bg t1">T1</span>',t2:'<span class="bg t2">T2</span>',real:'<span class="bg real"><span class="m">●</span>moat-real</span>',cap:'<span class="bg cap"><span class="m">●</span>emet-live</span>',int:'<span class="bg int">🔒 internal</span>',ext:'<span class="bg ext">🌐 external</span>',kuw:'<span class="bg div">? known-unknown</span>',div:'<span class="bg div">⚠ DIVERGENCE</span>',caveat:'<span class="bg div">✎ caveat</span>'}[k]||'');
+
+function provBadge(p){return p==="moat-real"?'<span class="bg real"><span class="m">●</span>moat-real</span>':p==="emet-live"?'<span class="bg cap"><span class="m">●</span>emet-live</span>':p==="live-local"?'<span class="bg cap"><span class="m">●</span>live-local</span>':p==="T2"?'<span class="bg t2">T2</span>':'';}
+function planeBadge(p){return p==="int"?'<span class="bg int">🔒</span>':p==="ext"?'<span class="bg ext">🌐</span>':'';}
+
+function traceRow(id,o,kind){
+  const stat=kind==="gate"?'<span class="stat gate">⛔</span>':kind==="run"?'<span class="stat run">●</span>':'<span class="stat done">✓</span>';
+  let right,det;
+  if(kind==="gate"){right=`<span class="bg veto">gate</span><span class="cnt">${o.result.split(' ')[0]} VETO</span>`;det=`<div class="reason">${o.result}</div>`;}
+  else if(kind==="partner"){right=`<span class="vbar ${o.st}"></span><span class="st ${o.st}" style="font-size:10px">${o.lbl}</span>`;det=`<div class="reason">${o.reason}</div><div class="meta"><span class="bg real">● persona-live</span><span class="bg cap">cites dossier</span><span>conviction ${o.conv}</span></div>`;}
+  else{right=`${planeBadge(o.plane)}${provBadge(o.prov)}<span class="cnt">${o.n} facts</span>`;
+    det=(o.items||[]).map(it=>`<div class="mini"><span class="d">›</span><div>${it[0]}<div class="meta">${it[1]}</div></div></div>`).join("");}
+  return `<div class="trow" data-trow><div class="th2">${stat}<span class="nm">${id}</span><span class="desc">${o.desc||''}</span><span class="rt">${right}<span class="cv">▸</span></span></div>
+    <div class="tdet"><div class="tdet-in">${det}</div></div></div>`;
+}
+function renderTrace(){
+  let h=`<div class="wsec">✓ Plan <span class="c">diligence · 13 agents · approved</span><span class="ln"></span></div>`;
+  h+=`<div class="wsec">Bucket 1 — Facts <span class="c">12/13 · 19 facts</span><span class="ln"></span></div>`;
+  for(const id in FACTS) h+=traceRow(id,FACTS[id],"done");
+  h+=traceRow("global-regulatory-divergence",{plane:"ext",prov:"",n:0,desc:"EU/JP/US divergence on mTOR-CNS dev path",items:[]},"run");
+  for(const id in GATES) h+=traceRow(id,GATES[id],"gate");
+  h+=`<div class="wsec">Flags <span class="c">0 VETO · 1 DIVERGENCE · 3 known-unknowns</span><span class="ln"></span></div>`;
+  h+=`<div class="wsec">Bucket 2 — Roundtable <span class="c">4 partners · 2 rounds</span><span class="ln"></span></div>`;
+  for(const p in PARTNERS) h+=traceRow(p,PARTNERS[p],"partner");
+  h+=`<div class="wsec">✓ Synthesis <span class="c">confidence Low → Medium</span><span class="ln"></span></div>`;
+  $("#wbody").innerHTML=h;wireRows();
+}
+function fcard(f){return `<div class="fcard ${f[1].includes('caveat')?'caveat':''}"><div class="v">${f[0]}</div>
+  <div class="bd">${f[1].map(badge).join("")}${f[2]?`<span class="sc">${f[2]}</span>`:''}</div></div>`;}
+function renderDossier(){
+  $("#wbody").innerHTML=`<div class="planehd int">🔒 Quiver moat <span class="c">5 private</span></div>${DOSS.int.map(fcard).join("")}
+    <div class="planehd ext">🌐 Public literature <span class="c">16 public</span></div>${DOSS.ext.map(fcard).join("")}`;
+}
+function wireRows(){document.querySelectorAll("[data-trow]").forEach(el=>el.querySelector(".th2").onclick=()=>el.classList.toggle("open"));}
+
+// tabs
+let tab="trace";
+function setTab(t){tab=t;document.querySelectorAll("#wtabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));t==="trace"?renderTrace():renderDossier();}
+document.querySelectorAll("#wtabs button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
+// panel controls
+$("#expandBtn").onclick=()=>{$("#body").classList.toggle("panel-expanded");$("#expandBtn").classList.toggle("on");};
+$("#closeBtn").onclick=()=>{$("#body").classList.add("panel-hidden");$("#panelToggle").classList.remove("on");};
+$("#panelToggle").onclick=()=>{const b=$("#body");b.classList.toggle("panel-hidden");$("#panelToggle").classList.toggle("on",!b.classList.contains("panel-hidden"));};
+$("#railToggle").onclick=()=>$("#body").classList.toggle("rail-collapsed");
+// chat → panel deep-links
+$("#openTrace").onclick=()=>{showPanel();setTab("trace");};
+$("#openDoss").onclick=()=>{showPanel();setTab("dossier");};
+function showPanel(){$("#body").classList.remove("panel-hidden");$("#panelToggle").classList.add("on");}
+function expandPartner(){showPanel();setTab("trace");setTimeout(()=>{const rows=[...document.querySelectorAll("[data-trow]")];const pr=rows.find(r=>r.querySelector(".nm").textContent.includes("Regulator"));},60);}
+document.querySelectorAll("[data-cite]").forEach(el=>el.onclick=()=>{const c=el.dataset.cite;if(c==="r"){showPanel();setTab("trace");setTimeout(()=>{const rows=[...document.querySelectorAll('[data-trow]')];const pr=rows.find(r=>/Regulator|Red-Team|KOL|Payer/.test(r.querySelector('.nm').textContent));if(pr){pr.classList.add('open');pr.scrollIntoView({block:'center'});}},80);}else{showPanel();setTab("dossier");}});
+renderTrace();
+</script>
+</body>
+</html>
