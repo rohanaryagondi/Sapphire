@@ -1,0 +1,411 @@
+"""Offline unit tests for plan_narrative.build_deterministic_narrative.
+
+Tests that the deterministic narrative helper produces a well-formed ``narrative``
+dict (framing + 5 steps, correct plane/veto tagging, roundtable-on vs off) from a
+synthetic plan — no network, no LLM.
+
+Run from sapphire-orchestrator/:
+    python -m unittest tests.test_plan_narrative -v
+"""
+from __future__ import annotations
+
+import os
+import sys
+import unittest
+
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_PKG = os.path.dirname(_HERE)
+if _PKG not in sys.path:
+    sys.path.insert(0, _PKG)
+
+from plan_narrative import (build_deterministic_narrative,
+                            FORBIDDEN_NARRATIVE_TERMS,
+                            _scrub_narrative_text)
+from live_engine import _BUCKET1_AGENTS
+
+_CANONICAL_KEYS = {"moat", "external", "veto", "roundtable", "synth"}
+
+
+class TestDeterministicNarrative(unittest.TestCase):
+    """Tests for the stdlib deterministic fallback narrative builder."""
+
+    def _plan(self, disease="tuberous sclerosis", modality="ASO", deliverable="diligence"):
+        return {"disease": disease, "modality": modality, "deliverable": deliverable}
+
+    # ── test 1: basic structure ───────────────────────────────────────────────
+    def test_returns_framing_and_five_steps(self):
+        """build_deterministic_narrative must return a dict with 'framing' (non-empty str)
+        and exactly 5 steps with the canonical keys."""
+        result = build_deterministic_narrative(
+            "Which genes rescue the TSC2 phenotype?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+            panel=["ex-fda-regulator", "adversarial-red-team", "payer", "kol"],
+        )
+        self.assertIsInstance(result, dict, "narrative must be a dict")
+        self.assertIn("framing", result)
+        self.assertIsInstance(result["framing"], str)
+        self.assertTrue(len(result["framing"]) > 20,
+                        f"framing must be a meaningful sentence; got {result['framing']!r}")
+        self.assertIn("steps", result)
+        steps = result["steps"]
+        self.assertEqual(len(steps), 5,
+                         f"Expected exactly 5 steps; got {len(steps)}: {[s['key'] for s in steps]}")
+        step_keys = {s["key"] for s in steps}
+        self.assertEqual(step_keys, _CANONICAL_KEYS,
+                         f"Steps must have the 5 canonical keys; got {step_keys}")
+        # FIX 2: deterministic builder must stamp source="deterministic"
+        self.assertEqual(result.get("source"), "deterministic",
+                         f"deterministic builder must set source='deterministic'; "
+                         f"got {result.get('source')!r}")
+
+    # ── test 2: step shapes ───────────────────────────────────────────────────
+    def test_each_step_has_required_fields(self):
+        """Every step must have 'key', 'title', 'prose' (non-empty strings)."""
+        result = build_deterministic_narrative(
+            "Is TSC2 a viable target?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        for step in result["steps"]:
+            self.assertIn("key", step, f"Step missing 'key': {step}")
+            self.assertIn("title", step, f"Step missing 'title': {step}")
+            self.assertIn("prose", step, f"Step missing 'prose': {step}")
+            self.assertIsInstance(step["key"], str)
+            self.assertIsInstance(step["title"], str)
+            self.assertIsInstance(step["prose"], str)
+            self.assertTrue(len(step["prose"]) > 10,
+                            f"Step prose must not be empty; step={step['key']!r}")
+
+    # ── test 3: plane tagging ─────────────────────────────────────────────────
+    def test_moat_step_has_internal_plane(self):
+        """The 'moat' step must have plane='internal'."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        moat = next(s for s in result["steps"] if s["key"] == "moat")
+        self.assertEqual(moat.get("plane"), "internal",
+                         f"moat step must have plane='internal'; got {moat.get('plane')!r}")
+
+    def test_external_step_has_external_plane(self):
+        """The 'external' step must have plane='external'."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        ext = next(s for s in result["steps"] if s["key"] == "external")
+        self.assertEqual(ext.get("plane"), "external",
+                         f"external step must have plane='external'; got {ext.get('plane')!r}")
+
+    # ── test 4: veto step tagging ─────────────────────────────────────────────
+    def test_veto_step_references_veto_agents(self):
+        """The 'veto' step prose/badges must reference fda-memory or patent-ip."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        veto = next(s for s in result["steps"] if s["key"] == "veto")
+        # At least one badge should carry a veto marker
+        badges = veto.get("badges") or []
+        prose = veto.get("prose", "")
+        veto_mentioned = any("⛔" in b or "fda" in b.lower() or "patent" in b.lower()
+                             for b in badges)
+        veto_in_prose = ("fda" in prose.lower() or "patent" in prose.lower()
+                         or "ip" in prose.lower())
+        self.assertTrue(veto_mentioned or veto_in_prose,
+                        f"veto step must reference fda or patent; badges={badges}, prose={prose!r}")
+
+    # ── test 5: roundtable ON ─────────────────────────────────────────────────
+    def test_roundtable_on_when_panel_given(self):
+        """When panel is non-empty, the roundtable step must NOT describe it as skipped."""
+        partners = ["ex-fda-regulator", "adversarial-red-team", "payer", "kol"]
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+            panel=partners,
+        )
+        rt = next(s for s in result["steps"] if s["key"] == "roundtable")
+        prose_lower = rt["prose"].lower()
+        self.assertNotIn("skipped", prose_lower,
+                         f"roundtable step must NOT say 'skipped' when panel present; got {rt['prose']!r}")
+        # Should mention the number of partners or the partner names
+        has_partner_mention = any(p.lower() in prose_lower for p in partners) or \
+            str(len(partners)) in rt["prose"]
+        self.assertTrue(has_partner_mention,
+                        f"roundtable prose should mention partners; got {rt['prose']!r}")
+
+    # ── test 6: roundtable OFF ────────────────────────────────────────────────
+    def test_roundtable_off_when_panel_empty(self):
+        """When panel is empty/None, the roundtable step must describe it as skipped."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+            panel=[],
+        )
+        rt = next(s for s in result["steps"] if s["key"] == "roundtable")
+        # Title or prose should mention 'skipped'
+        skipped_mention = "skipped" in rt["title"].lower() or "skipped" in rt.get("prose", "").lower() \
+                          or rt.get("skipping")
+        self.assertTrue(skipped_mention,
+                        f"roundtable step must indicate skipped when panel empty; got {rt!r}")
+
+    # ── test 7: disease + modality from plan ─────────────────────────────────
+    def test_framing_includes_plan_fields(self):
+        """Framing must reference the disease and/or deliverable from the plan dict."""
+        result = build_deterministic_narrative(
+            "Is ALS viable?",
+            {"disease": "ALS", "modality": "small-molecule", "deliverable": "diligence"},
+            list(_BUCKET1_AGENTS),
+        )
+        framing = result["framing"]
+        # At least one of disease/modality/deliverable should appear in framing
+        found = ("ALS" in framing or "small-molecule" in framing or "diligence" in framing)
+        self.assertTrue(found,
+                        f"framing should reference plan fields; got {framing!r}")
+
+    # ── test 8: no internal scores (values) in output ────────────────────────
+    def test_no_internal_score_values_in_output(self):
+        """Data boundary: no actual internal score *values* or model-specific field names
+        should appear in the narrative. Uses the shared FORBIDDEN_NARRATIVE_TERMS list."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        blob = str(result).lower()
+        for word in FORBIDDEN_NARRATIVE_TERMS:
+            self.assertNotIn(word, blob,
+                             f"Forbidden internal-score field name {word!r} found in narrative")
+
+    # ── test 9: badges are lists of strings ──────────────────────────────────
+    def test_badges_are_string_lists(self):
+        """Any 'badges' field must be a list of strings."""
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            list(_BUCKET1_AGENTS),
+        )
+        for step in result["steps"]:
+            if "badges" in step:
+                self.assertIsInstance(step["badges"], list,
+                                      f"badges must be a list; step={step['key']!r}")
+                for b in step["badges"]:
+                    self.assertIsInstance(b, str,
+                                          f"each badge must be a str; step={step['key']!r}, badge={b!r}")
+
+    # ── test 10: subset of agents (fewer external) ────────────────────────────
+    def test_works_with_subset_of_agents(self):
+        """Works correctly when only a subset of _BUCKET1_AGENTS is passed."""
+        subset = ["internal-science-lead", "emet-runner", "fda-institutional-memory", "patent-ip"]
+        result = build_deterministic_narrative(
+            "Is TSC2 viable?",
+            self._plan(),
+            subset,
+        )
+        self.assertEqual(len(result["steps"]), 5)
+        # External step should reflect only emet-runner (not the full panel)
+        ext = next(s for s in result["steps"] if s["key"] == "external")
+        # The step should mention 1 agent (emet-runner) not the full 15+
+        self.assertIn("1 agent", ext["prose"] or "")
+
+    # ── test 11: source field is always "deterministic" ───────────────────────
+    def test_deterministic_builder_always_stamps_source(self):
+        """build_deterministic_narrative must ALWAYS set source='deterministic' —
+        every call variant (roundtable on, roundtable off, subset agents). This is
+        the key plumbing for Fix 2: the card uses narrative.source, not plan_source,
+        to decide whether to show the honesty label."""
+        for panel, name in [
+            ([], "roundtable-off"),
+            (["ex-fda-regulator", "kol"], "roundtable-on"),
+        ]:
+            with self.subTest(variant=name):
+                result = build_deterministic_narrative(
+                    "Is TSC2 viable?",
+                    self._plan(),
+                    list(_BUCKET1_AGENTS),
+                    panel=panel,
+                )
+                self.assertEqual(
+                    result.get("source"), "deterministic",
+                    f"[{name}] narrative.source must be 'deterministic'; got {result.get('source')!r}"
+                )
+
+    # ── test 12: live_engine deterministic fallback carries narrative.source ──
+    def test_live_engine_deterministic_fallback_carries_narrative_source(self):
+        """When live_engine llm+approve falls back to deterministic (smart_plan raises),
+        the returned envelope carries narrative.source='deterministic' — the plumbing
+        that lets the card show the correct honesty label."""
+        import os
+        import sys
+        import tempfile
+        from unittest import mock
+
+        _PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if _PKG_DIR not in sys.path:
+            sys.path.insert(0, _PKG_DIR)
+
+        from live_engine import run_live
+        from smart_plan import SmartPlanError
+
+        eng_dir = tempfile.mkdtemp()
+        mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = mem_dir
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        try:
+            from tests.test_live_engine import _build_ctx
+            with mock.patch("smart_plan.smart_plan",
+                            side_effect=SmartPlanError("forced fallback for test")):
+                result = run_live(
+                    "Is TSC2 viable in tuberous sclerosis?",
+                    plan_mode="llm+approve",
+                    ctx=_build_ctx(),
+                )
+            self.assertTrue(result.get("plan_pending_approval"))
+            self.assertEqual(result.get("plan_source"), "deterministic")
+            narrative = result.get("narrative")
+            self.assertIsNotNone(narrative, "envelope must carry a narrative on fallback")
+            self.assertEqual(
+                narrative.get("source"), "deterministic",
+                f"narrative.source must be 'deterministic' on llm+approve fallback; "
+                f"got {narrative.get('source')!r}"
+            )
+        finally:
+            os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+            os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+            os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+
+
+    # ── test 13: _scrub_narrative_text detects forbidden terms ───────────────
+    def test_scrub_detects_forbidden_term_in_framing(self):
+        """_scrub_narrative_text must return True when framing contains a forbidden term."""
+        dirty = {
+            "framing": "Lead with the cosine reversal score from the moat.",
+            "steps": [{"key": "moat", "title": "Moat signal", "prose": "Normal prose."}],
+        }
+        self.assertTrue(_scrub_narrative_text(dirty),
+                        "scrub must return True (reject) when 'cosine' appears in framing")
+
+    def test_scrub_detects_forbidden_term_in_step_prose(self):
+        """_scrub_narrative_text must return True when a step's prose contains a forbidden term."""
+        dirty = {
+            "framing": "A clean framing sentence.",
+            "steps": [
+                {"key": "moat", "title": "Signal", "prose": "The ep_score ranking drives this."},
+            ],
+        }
+        self.assertTrue(_scrub_narrative_text(dirty),
+                        "scrub must return True when 'ep_score' appears in step prose")
+
+    def test_scrub_accepts_clean_narrative(self):
+        """_scrub_narrative_text must return False (accept) for a narrative with no forbidden terms."""
+        clean = {
+            "framing": "A rescue-ranking question on TSC2-KO.",
+            "steps": [
+                {"key": "moat", "title": "Internal signal",
+                 "prose": "Pull Quiver CNS_DFP signal. Public gene symbols only."},
+                {"key": "external", "title": "External dossier",
+                 "prose": "Corroborate with cited evidence."},
+            ],
+        }
+        self.assertFalse(_scrub_narrative_text(clean),
+                         "scrub must return False (accept) for a clean narrative")
+
+    def test_scrub_checks_all_text_fields(self):
+        """_scrub_narrative_text must catch forbidden terms in badges, sub, expect, skipping."""
+        for field, value in [
+            ("badges", ["reversal_strength badge"]),
+            ("sub", ["uses dfp_score internally"]),
+            ("expect", "expect cnsdp output"),
+            ("skipping", "skipping because of ep_score"),
+        ]:
+            with self.subTest(field=field):
+                step: dict = {"key": "moat", "title": "T", "prose": "P"}
+                step[field] = value
+                dirty = {"framing": "clean", "steps": [step]}
+                self.assertTrue(_scrub_narrative_text(dirty),
+                                f"scrub must detect forbidden term in step.{field}")
+
+    # ── test 14: live_engine scrubs tainted LLM narrative → deterministic ────
+    def test_live_engine_scrubs_tainted_llm_narrative(self):
+        """When smart_plan returns a narrative containing a forbidden term (e.g. 'cosine'),
+        live_engine must reject it and fall back to the deterministic builder
+        (narrative.source='deterministic'), even though plan_source='llm'."""
+        import os
+        import sys
+        import json
+        import types
+        import tempfile
+        from unittest import mock
+
+        _PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if _PKG_DIR not in sys.path:
+            sys.path.insert(0, _PKG_DIR)
+
+        from live_engine import run_live, _BUCKET1_AGENTS as _B1
+        from harness.contracts import load_registry
+        from tests.test_live_engine import _build_ctx
+
+        registry = load_registry()
+        known_ids = {a["id"] for a in registry.get("agents", [])}
+        universe = [aid for aid in _B1 if aid in known_ids]
+
+        # Build a synthetic smart_plan result with a tainted narrative.
+        tainted_narrative = {
+            "framing": "The cosine reversal score drives the ranking.",  # FORBIDDEN
+            "steps": [
+                {"key": "moat", "title": "Internal signal", "prose": "Clean prose."},
+                {"key": "external", "title": "External", "prose": "Cited evidence."},
+                {"key": "veto", "title": "Veto gates", "prose": "FDA + IP gates."},
+                {"key": "roundtable", "title": "Roundtable", "prose": "Partners deliberate."},
+                {"key": "synth", "title": "Synthesis", "prose": "Flag unknowns."},
+            ],
+        }
+        sp_result = {
+            "selected_agents": [{"id": universe[0], "why": "primary"}] if universe else [],
+            "dropped_agents": [],
+            "panel_rationale": "test",
+            "notes": "tainted narrative test",
+            "narrative": tainted_narrative,
+        }
+
+        eng_dir = tempfile.mkdtemp()
+        mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = mem_dir
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        try:
+            with mock.patch("smart_plan.smart_plan", return_value=sp_result):
+                result = run_live(
+                    "Is TSC2 viable in tuberous sclerosis?",
+                    plan_mode="llm+approve",
+                    ctx=_build_ctx(),
+                )
+            # plan_source is still "llm" (agent selection succeeded)
+            self.assertEqual(result.get("plan_source"), "llm")
+            # But narrative.source must be "deterministic" (tainted narrative was scrubbed)
+            narrative = result.get("narrative")
+            self.assertIsNotNone(narrative, "envelope must carry a narrative")
+            self.assertEqual(
+                narrative.get("source"), "deterministic",
+                f"tainted LLM narrative must be scrubbed → source='deterministic'; "
+                f"got {narrative.get('source')!r}"
+            )
+            # And 'cosine' must NOT appear anywhere in the narrative
+            narrative_blob = str(narrative).lower()
+            self.assertNotIn("cosine", narrative_blob,
+                             "scrubbed narrative must not contain the forbidden term 'cosine'")
+        finally:
+            os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+            os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+            os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+
+
+if __name__ == "__main__":
+    unittest.main()
