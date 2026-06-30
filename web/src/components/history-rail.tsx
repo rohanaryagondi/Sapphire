@@ -6,6 +6,8 @@ import {
   MessageSquarePlus,
   MoreHorizontal,
   Pencil,
+  Pin,
+  PinOff,
   Search,
   Star,
   Trash2,
@@ -25,6 +27,9 @@ export function HistoryRail() {
   const refresh = useFirm((s) => s.refreshConversations);
   const newChat = useFirm((s) => s.newChat);
   const open = useFirm((s) => s.openConversation);
+  // Phase 5: pinned
+  const pinned = useFirm((s) => s.pinned);
+  const unpinConversation = useFirm((s) => s.unpinConversation);
 
   React.useEffect(() => {
     refresh();
@@ -74,11 +79,15 @@ export function HistoryRail() {
         </div>
       </div>
 
-      {/* Pinned section — empty placeholder for Phase 5 */}
-      <div className="shrink-0 px-3 pb-1 pt-2">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--color-fg-faint)]">Pinned</div>
-        <div className="py-2 text-[11.5px] text-[var(--color-fg-faint)] italic">Nothing pinned yet</div>
-      </div>
+      {/* Phase 5: Pinned section */}
+      <PinnedSection
+        pinned={pinned}
+        conversations={conversations}
+        activeId={activeId}
+        running={running}
+        onOpen={open}
+        onUnpin={unpinConversation}
+      />
 
       {/* list */}
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-3">
@@ -121,6 +130,10 @@ function HistoryItem({
   const rename = useFirm((s) => s.renameConversation);
   const star = useFirm((s) => s.starConversation);
   const remove = useFirm((s) => s.removeConversation);
+  const pinConversation = useFirm((s) => s.pinConversation);
+  const unpinConversation = useFirm((s) => s.unpinConversation);
+  const pinned = useFirm((s) => s.pinned);
+  const isPinned = pinned.includes(conv.id);
   const [editing, setEditing] = React.useState(false);
   const [draft, setDraft] = React.useState(conv.title ?? "");
   const [confirmOpen, setConfirmOpen] = React.useState(false);
@@ -244,6 +257,12 @@ function HistoryItem({
                   label={conv.starred ? "Unstar" : "Star"}
                   onSelect={() => star(conv.id, !conv.starred)}
                 />
+                {/* Phase 5: pin action */}
+                <MenuItem
+                  icon={isPinned ? <PinOff className="size-3.5" /> : <Pin className="size-3.5" />}
+                  label={isPinned ? "Unpin" : "Pin"}
+                  onSelect={() => isPinned ? unpinConversation(conv.id) : pinConversation(conv.id)}
+                />
                 <DropdownMenu.Separator className="my-1 h-px bg-[var(--color-border)]" />
                 <MenuItem
                   icon={<Trash2 className="size-3.5" />}
@@ -312,6 +331,71 @@ function DeleteConfirm({
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
+  );
+}
+
+// ── Phase 5: Pinned section ────────────────────────────────────────────────
+function PinnedSection({
+  pinned,
+  conversations,
+  activeId,
+  running,
+  onOpen,
+  onUnpin,
+}: {
+  pinned: string[];
+  conversations: Conversation[];
+  activeId: string | null;
+  running: boolean;
+  onOpen: (id: string) => void;
+  onUnpin: (id: string) => void;
+}) {
+  const pinnedConvs = React.useMemo(() => {
+    const map = new Map(conversations.map((c) => [c.id, c]));
+    return pinned.map((id) => map.get(id)).filter(Boolean) as Conversation[];
+  }, [pinned, conversations]);
+
+  return (
+    <div className="shrink-0 px-3 pb-1 pt-2">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.07em] text-[var(--color-fg-faint)]">
+        Pinned
+      </div>
+      {pinnedConvs.length === 0 ? (
+        <div className="py-2 text-[11.5px] italic text-[var(--color-fg-faint)]">
+          Nothing pinned yet
+        </div>
+      ) : (
+        <div className="mt-1 space-y-0.5">
+          {pinnedConvs.map((c) => (
+            <div
+              key={c.id}
+              className={cn(
+                "group relative flex items-center gap-1.5 rounded-[var(--radius-sm)] px-2 py-1.5 transition-colors",
+                c.id === activeId
+                  ? "bg-[var(--color-elevated)]"
+                  : "hover:bg-[var(--color-bg-subtle)]",
+              )}
+            >
+              <Pin className="size-3 shrink-0 text-[var(--color-fg-faint)]" />
+              <button
+                className="min-w-0 flex-1 truncate text-left text-[12px] text-[var(--color-fg-muted)]"
+                onClick={() => !running && onOpen(c.id)}
+                aria-label={`Open pinned conversation: ${c.title || "Untitled"}`}
+              >
+                {c.title || "Untitled"}
+              </button>
+              <button
+                onClick={() => onUnpin(c.id)}
+                aria-label={`Unpin ${c.title || "Untitled"}`}
+                className="ml-auto hidden shrink-0 rounded-[4px] p-0.5 text-[var(--color-fg-faint)] hover:text-[var(--color-fg)] group-hover:block"
+              >
+                <PinOff className="size-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

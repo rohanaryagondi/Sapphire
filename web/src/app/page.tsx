@@ -7,6 +7,7 @@ import { PlanReview } from "@/components/plan-review";
 import { Composer } from "@/components/composer";
 import { Inspector } from "@/components/inspector";
 import { CommandPalette } from "@/components/command-palette";
+import { ToastContainer } from "@/components/toasts";
 import { useFirm } from "@/lib/store";
 
 export default function Home() {
@@ -58,6 +59,8 @@ export default function Home() {
       </div>
 
       <CommandPalette />
+      {/* Phase 5: run notification toasts — mounted at root so they survive navigation */}
+      <ToastContainer />
     </div>
   );
 }
