@@ -1861,5 +1861,164 @@ class TestLiveProgress(unittest.TestCase):
         self.assertLess(first_progress, close_idx)
 
 
+class TestBucket1Parallelization(unittest.TestCase):
+    """Tests that Bucket-1 parallel dispatch (ThreadPoolExecutor) produces the same
+    correct results as serial dispatch, is deterministically ordered, and has no
+    thread-safety issues in the trace or dossier.
+
+    All backends are mocked — no real claude/EMET/AWS. The fake runner is fast
+    (in-process), so these tests complete in milliseconds and are fully offline/$0.
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+        # Always reset the concurrency env so tests are independent.
+        os.environ.pop("SAPPHIRE_BUCKET1_CONCURRENCY", None)
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+        os.environ.pop("SAPPHIRE_BUCKET1_CONCURRENCY", None)
+
+    # Force the module constant to re-read the env for each test.
+    # (The constant is computed once at import time; we patch it here per-test.)
+    def _run(self, concurrency):
+        import live_engine
+        old = live_engine._MAX_BUCKET1_WORKERS
+        live_engine._MAX_BUCKET1_WORKERS = concurrency
+        try:
+            return run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=_build_ctx(),
+            )
+        finally:
+            live_engine._MAX_BUCKET1_WORKERS = old
+
+    def test_concurrency_one_regression(self):
+        """concurrency=1 (serial path) must produce a well-formed result identical in
+        structure to what the pre-parallelization serial loop produced."""
+        result = self._run(concurrency=1)
+        # Basic structure
+        for key in ("query", "plan", "priors", "discover", "consult", "synthesize",
+                    "engagement_id", "reflection", "_via"):
+            self.assertIn(key, result, f"Missing key '{key}' with concurrency=1")
+        self.assertEqual(result["_via"], "harness-live",
+                         "concurrency=1 must still use harness-live path")
+        agents = result["discover"]["agents"]
+        self.assertGreater(len(agents), 0,
+                           "concurrency=1 must dispatch at least one agent")
+        self.assertIsInstance(result["discover"]["dossier"], list)
+
+    def test_parallel_same_agent_set_as_serial(self):
+        """Parallel (concurrency=8) must dispatch the exact same set of agents as
+        serial (concurrency=1) — no silent drops, no extras."""
+        serial_result = self._run(concurrency=1)
+        parallel_result = self._run(concurrency=8)
+        serial_ids = {a["id"] for a in serial_result["discover"]["agents"]}
+        parallel_ids = {a["id"] for a in parallel_result["discover"]["agents"]}
+        self.assertEqual(
+            serial_ids, parallel_ids,
+            f"Parallel dropped or added agents vs serial:\n"
+            f"  serial={sorted(serial_ids)}\n  parallel={sorted(parallel_ids)}"
+        )
+
+    def test_deterministic_agent_order_in_discover(self):
+        """discover.agents must be in _BUCKET1_AGENTS order regardless of thread
+        completion order. Verified across 3 runs to surface any ordering flakiness."""
+        from live_engine import _BUCKET1_AGENTS
+        from harness.contracts import load_registry
+        registry = load_registry()
+        known = {a["id"] for a in registry.get("agents", [])}
+        expected_order = [aid for aid in _BUCKET1_AGENTS if aid in known]
+
+        import live_engine
+        old = live_engine._MAX_BUCKET1_WORKERS
+        live_engine._MAX_BUCKET1_WORKERS = 8
+        try:
+            for run_num in range(3):
+                result = run_live(
+                    "Is TSC2 a viable target in tuberous sclerosis?",
+                    ctx=_build_ctx(),
+                )
+                actual_order = [a["id"] for a in result["discover"]["agents"]]
+                self.assertEqual(
+                    actual_order, expected_order,
+                    f"Run {run_num + 1}: agent order not deterministic.\n"
+                    f"  expected={expected_order}\n  actual={actual_order}"
+                )
+        finally:
+            live_engine._MAX_BUCKET1_WORKERS = old
+
+    def test_no_dropped_agents_parallel(self):
+        """All registered Bucket-1 agents must appear in discover.agents in parallel mode.
+        Non-vacuous: checks the actual set, not just that it's non-empty."""
+        from live_engine import _BUCKET1_AGENTS
+        from harness.contracts import load_registry
+        registry = load_registry()
+        known = {a["id"] for a in registry.get("agents", [])}
+        expected_ids = {aid for aid in _BUCKET1_AGENTS if aid in known}
+
+        result = self._run(concurrency=8)
+        actual_ids = {a["id"] for a in result["discover"]["agents"]}
+        self.assertEqual(
+            actual_ids, expected_ids,
+            f"Parallel dispatch dropped agents:\n"
+            f"  missing={sorted(expected_ids - actual_ids)}\n"
+            f"  extra={sorted(actual_ids - expected_ids)}"
+        )
+
+    def test_parallel_no_agent_dispatched_twice(self):
+        """Each Bucket-1 agent must appear exactly once in discover.agents — parallel
+        dispatch must not double-submit any agent. This is the core no-duplicate-dispatch
+        invariant (distinct from 'unique fact values', which vary by agent output)."""
+        result = self._run(concurrency=8)
+        agent_ids = [a["id"] for a in result["discover"]["agents"]]
+        self.assertEqual(
+            len(agent_ids), len(set(agent_ids)),
+            f"Agent dispatched more than once in parallel mode:\n"
+            f"  duplicates={[aid for aid in agent_ids if agent_ids.count(aid) > 1]}"
+        )
+
+    def test_trace_valid_jsonl_parallel(self):
+        """Trace file must be valid JSONL (no interleaved garbage lines) when multiple
+        agents write concurrently. Every line must be a parseable JSON object."""
+        result = self._run(concurrency=8)
+        eid = result["engagement_id"]
+        trace_file = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_file),
+                        f"Trace file not found: {trace_file}")
+        with open(trace_file, encoding="utf-8") as fh:
+            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+        self.assertGreater(len(lines), 2,
+                           "Trace must have at least engagement_open + agent + engagement_close")
+        for i, line in enumerate(lines):
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as exc:
+                self.fail(
+                    f"Trace line {i} is not valid JSON (interleaved write?): {exc}\n"
+                    f"  Line content: {line[:160]}"
+                )
+            self.assertIsInstance(obj, dict,
+                                  f"Trace line {i} parsed but is not a JSON object: {type(obj)}")
+
+    def test_parallel_same_dossier_size_as_serial(self):
+        """Parallel dispatch must yield the same total dossier size as serial dispatch
+        for the same mocked backends. Non-vacuous: a dropped or duplicated agent would
+        change the count."""
+        serial = self._run(concurrency=1)
+        parallel = self._run(concurrency=8)
+        s_count = len(serial["discover"]["dossier"])
+        p_count = len(parallel["discover"]["dossier"])
+        self.assertEqual(
+            s_count, p_count,
+            f"Dossier size mismatch: serial={s_count} parallel={p_count}. "
+            "A dropped agent would make parallel smaller; a duplicate would make it larger."
+        )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
