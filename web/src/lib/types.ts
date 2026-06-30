@@ -77,6 +77,7 @@ export interface Synthesize {
   confidence: string;
   proposed_experiment: string;
   entities: Record<string, unknown>;
+  report?: string;  // Claude-synthesized Markdown diligence report (WO-8 Phase 4)
 }
 
 export interface RunResult {

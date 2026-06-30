@@ -138,14 +138,13 @@ describe("Synthesis component", () => {
     ).toBeInTheDocument();
   });
 
-  // 2. Synthesis renders the evidence section with dossier facts
-  it("renders evidence section with dossier facts when present", async () => {
+  // 2. Synthesis without a report field shows the fallback note
+  it("renders fallback note when report is absent", async () => {
     const { Synthesis } = await import("@/components/run/synthesis");
-    const result = makeResult();
+    const result = makeResult(); // no report field
     render(<Synthesis result={result} />);
-    // The report now shows "What the firm found" section with the dossier fact value
-    expect(screen.getByText(/what the firm found/i)).toBeInTheDocument();
-    expect(screen.getByText(/Nav1.8 is highly expressed in nociceptors/i)).toBeInTheDocument();
+    // WO-8 Phase 4: when report is absent, show terse fallback (not the old fact dump)
+    expect(screen.getByText(/full narrative not available/i)).toBeInTheDocument();
   });
 
   it("does not render ranked candidates section (moved out of synthesis report)", async () => {

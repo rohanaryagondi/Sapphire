@@ -1707,6 +1707,24 @@ def run_live(
         "recommendation": recommendation, "confidence": confidence,
     })
 
+    # Synthesize written narrative report (best-effort, never blocks the run).
+    try:
+        from report import synthesize_report
+        _report_md = synthesize_report(
+            query=query,
+            dossier=all_dossier_facts,
+            round1=round1,
+            round2=round2,
+            recommendation=recommendation,
+            confidence=confidence,
+            known_unknowns=known_unknowns,
+            runner=ctx.get("runner"),
+        )
+        if _report_md:
+            syn["report"] = _report_md
+    except Exception:
+        pass  # report is best-effort; never blocks the engagement
+
     # Close the trace and run the self-improvement reflection loop.
     trace.close_engagement(eid, syn)
     reflection = reflect(eid)

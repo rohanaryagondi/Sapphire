@@ -17,6 +17,13 @@ export function buildSynthesisMarkdown(result: RunResult): string {
   const s = result.synthesize;
   const parts: string[] = [];
 
+  // Prefer the Claude-synthesized narrative report when present.
+  if (s?.report) {
+    const header = `# Sapphire Analysis: ${result.query || result.engagement_id || ""}\n\n_Exported ${new Date().toISOString()}_\n\n`;
+    const footer = `\n\n---\n_Sapphire -- Quiver Bioscience CNS drug-discovery firm_\n_Engine: run_live | Provenance preserved | No facts fabricated_\n`;
+    return header + s.report + footer;
+  }
+
   const query = result.query || result.engagement_id || "";
   parts.push(`# Sapphire Analysis: ${query}`);
   parts.push("");
