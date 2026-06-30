@@ -68,8 +68,12 @@ gh pr create --base main                    # open the PR yourself IF you have g
 # rohan's Claude approves and merges. You never merge.
 ```
 Two musts that have slipped before: **(1) branch from the latest `main`** (and merge `origin/main` in if it
-moves) — stale branches cause merge conflicts the approver has to clean up; **(2) get your branch in front of
-the approver**:
+moves) — stale branches cause merge conflicts the approver has to clean up. **This clone's local `main` tree
+is often left stale by design, so even `git checkout main` / the local `origin/main` ref can be behind — run
+`git fetch origin` immediately before cutting a branch.** The **pre-push hook (Gate 3.6)** now *warns* when your
+branch base is behind `origin/main` (it fetches the real remote tip first); rebase before pushing
+(`git fetch origin && git rebase origin/main`). Strict mode: `export SAPPHIRE_BASEGATE=block`. **(2) get your
+branch in front of the approver**:
 - **If you have `gh`/a token:** open the PR yourself (`gh pr create --base main`) — don't just push and stop.
 - **If your environment has no `gh`/token** (e.g. a sandboxed Windows box — see the resolved HELP entry): this
   is the **sanctioned token-less flow** — push the fully-gated `hayes/<slug>` branch and put the complete PR
