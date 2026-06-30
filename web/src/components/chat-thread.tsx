@@ -238,7 +238,7 @@ export function TurnView({ turn }: { turn: Turn }) {
 
         {result && (
           <>
-            <Synthesis result={result} />
+            <Synthesis result={result} turnId={turn.id} />
             <Flags flags={result.discover?.flags} />
             <Dossier result={result} turnId={turn.id} />
           </>

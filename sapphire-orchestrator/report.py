@@ -38,6 +38,58 @@ except ImportError:
     CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 
 
+_PROV_TO_LABEL = {
+    "emet-live": "EMET",
+    "emet": "EMET",
+    "moat-real": "Internal moat",
+    "moat": "Internal moat",
+    "internal": "Internal moat",
+    "qmodels": "External Models",
+    "q-models": "External Models",
+    "live-local": "External Models",
+    "fda-memory": "FDA memory",
+    "fda_memory": "FDA memory",
+    "fda-institutional": "FDA memory",
+    "patent-ip": "Patent/IP",
+    "patent_ip": "Patent/IP",
+    "ip": "Patent/IP",
+    "clinical-trial": "Clinical-trial registry",
+    "clinical_trial": "Clinical-trial registry",
+    "post-market": "Post-market safety",
+    "post_market": "Post-market safety",
+    "payer": "Payer",
+    "manufacturing": "Manufacturing/CMC",
+    "cmc": "Manufacturing/CMC",
+    "patient-advocacy": "Patient advocacy",
+    "patient_advocacy": "Patient advocacy",
+    "kol": "KOL/social",
+    "kol-social": "KOL/social",
+    "policy": "Policy/legislative",
+    "dea": "DEA",
+    "dea-scheduling": "DEA",
+    "global-regulatory": "Global regulatory",
+    "regulatory-divergence": "Global regulatory",
+}
+
+_CITATION_LABEL_ORDER = [
+    "EMET", "Internal moat", "External Models", "FDA memory", "Patent/IP",
+    "Clinical-trial registry", "Post-market safety", "Payer", "Manufacturing/CMC",
+    "Patient advocacy", "KOL/social", "Policy/legislative", "DEA", "Global regulatory",
+]
+
+
+def _derive_citation_labels(dossier: list[dict]) -> list[str]:
+    """Derive the set of source labels present in this dossier."""
+    seen: set[str] = set()
+    for f in dossier:
+        prov = str(f.get("provenance", "")).lower()
+        for key, label in _PROV_TO_LABEL.items():
+            if key in prov:
+                seen.add(label)
+                break
+    return [lbl for lbl in _CITATION_LABEL_ORDER if lbl in seen]
+
+
 def _report_model() -> str:
     return (os.environ.get("CLAUDE_MODEL") or "claude-sonnet-4-6").strip() or "claude-sonnet-4-6"
 
@@ -83,6 +135,38 @@ def _build_prompt(
     round2_block = json.dumps(safe_round2, indent=2) if safe_round2 else "(none)"
     ku_block = "\n".join(f"- {ku}" for ku in known_unknowns) if known_unknowns else "(none)"
 
+    # Derive citation labels from provenance in the dossier
+    citation_labels = _derive_citation_labels(dossier)
+    if citation_labels:
+        _label_descriptions = {
+            "EMET": "published literature",
+            "Internal moat": "Quiver CNS_DFP",
+            "External Models": "predictive models",
+            "FDA memory": "FDA institutional memory",
+            "Patent/IP": "patent and IP landscape",
+            "Clinical-trial registry": "clinical trial registry",
+            "Post-market safety": "post-market safety data",
+            "Payer": "payer coverage data",
+            "Manufacturing/CMC": "manufacturing and CMC data",
+            "Patient advocacy": "patient advocacy landscape",
+            "KOL/social": "KOL and social sentiment",
+            "Policy/legislative": "policy and legislative context",
+            "DEA": "DEA scheduling",
+            "Global regulatory": "global regulatory landscape",
+        }
+        label_list_str = ", ".join(
+            f"[[{lbl}]] ({_label_descriptions.get(lbl, lbl)})"
+            for lbl in citation_labels
+        )
+        citation_instruction = (
+            f"\nCITATION INSTRUCTION: Cite evidence inline using EXACT bracket tokens placed at the END of the sentence or clause the evidence supports. "
+            f"Use ONLY these tokens (derived from the evidence below): {label_list_str}. "
+            f"Rules: cite ONCE per sentence; if a whole paragraph rests on one source, cite once at the paragraph end. "
+            f"Do NOT cite general reasoning — only evidence-derived claims. Never invent a source label not in this list."
+        )
+    else:
+        citation_instruction = ""
+
     prompt = f"""You are a senior CNS drug-discovery analyst at Quiver Bioscience. Write a detailed Markdown diligence report for the following query.
 
 QUERY: {query}
@@ -116,7 +200,7 @@ Restate the recommendation with confidence level. Enumerate the top 2–3 risks.
 
 ---
 
-HONESTY GUARD: Synthesize ONLY from the evidence provided below. Do not invent facts, numbers, citations, or partner opinions. Refer to sources by name (e.g. 'EMET', 'the internal moat', 'External Models') — never quote DOIs/PMIDs. If the partner verdicts are marked simulated/placeholder, state in ONE sentence that partner reasoning is pending a live run rather than inventing stances.
+HONESTY GUARD: Synthesize ONLY from the evidence provided below. Do not invent facts, numbers, citations, or partner opinions. Refer to sources by name (e.g. 'EMET', 'the internal moat', 'External Models') — never quote DOIs/PMIDs. If the partner verdicts are marked simulated/placeholder, state in ONE sentence that partner reasoning is pending a live run rather than inventing stances.{citation_instruction}
 
 DOSSIER FACTS (public fields only, capped at 30):
 {dossier_block}

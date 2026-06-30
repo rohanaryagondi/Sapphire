@@ -270,7 +270,7 @@ function AgentList({
     count: rows.length,
     // Use the outer panel scroll container so there's only one scrollbar.
     getScrollElement: () => outerScrollRef?.current ?? null,
-    estimateSize: () => 52,
+    estimateSize: () => 64,
     enabled: shouldVirtualize,
   });
 
@@ -289,7 +289,9 @@ function AgentList({
       {virtualizer.getVirtualItems().map((vi) => (
         <div
           key={vi.key}
-          style={{ position: "absolute", top: vi.start, left: 0, right: 0, height: vi.size }}
+          data-index={vi.index}
+          ref={virtualizer.measureElement}
+          style={{ position: "absolute", top: vi.start, left: 0, right: 0 }}
         >
           <AgentRow row={rows[vi.index]!} turn={turn} registerRow={registerRow} />
         </div>

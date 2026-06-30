@@ -14,7 +14,7 @@ import { MarkdownDoc } from "./markdown";
  * When report is absent (old cached run):
  *   Renders a terse fallback: recommendation + confidence + a note.
  */
-export function Synthesis({ result }: { result: RunResult }) {
+export function Synthesis({ result, turnId }: { result: RunResult; turnId?: string }) {
   const s = result.synthesize;
   const [copied, setCopied] = React.useState(false);
 
@@ -47,7 +47,7 @@ export function Synthesis({ result }: { result: RunResult }) {
 
       {report ? (
         /* Full Claude-synthesized narrative report */
-        <MarkdownDoc text={report} />
+        <MarkdownDoc text={report} turnId={turnId} />
       ) : (
         /* Terse fallback for old cached runs */
         <div className="space-y-3">

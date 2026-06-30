@@ -33,6 +33,7 @@ vi.mock("@tanstack/react-virtual", () => ({
           end: (i + 1) * size,
         })),
       getTotalSize: () => count * size,
+      measureElement: vi.fn(), // dynamic measurement callback
     };
   },
 }));
@@ -140,6 +141,41 @@ describe("Monitor trace panel", () => {
       (e) => e.includes("Warning:") || e.includes("Error:") || e.includes("hook")
     );
     expect(reactErrors, `Console errors:\n${reactErrors.join("\n")}`).toHaveLength(0);
+  });
+
+  it("virtual rows use data-index for dynamic measurement (no fixed height)", async () => {
+    const { Monitor } = await import("@/components/inspector/monitor");
+    const scrollRef = { current: null } as React.RefObject<HTMLDivElement | null>;
+
+    // Create a turn with >20 rows to trigger virtualization
+    const manyRowTurn = {
+      ...doneTurn,
+      id: "turn-virtual",
+      trace: Array.from({ length: 25 }, (_, i) => ({
+        stage: "bucket1",
+        phase: "done" as const,
+        agent_id: `agent-${i}`,
+        status: "ok",
+        n_facts: i + 1,
+        provenance: "emet-live",
+        summary: i % 2 === 0
+          ? "Short summary."
+          : "A longer two-line summary that wraps around because it is longer than 52px of content.",
+      })),
+    };
+
+    render(<Monitor turn={manyRowTurn as any} outerScrollRef={scrollRef} />);
+
+    // Virtual rows should have data-index attribute but NOT inline height style
+    const virtualRows = document.querySelectorAll("[data-index]");
+    expect(virtualRows.length).toBeGreaterThan(0);
+
+    for (const row of virtualRows) {
+      const el = row as HTMLElement;
+      // Should have position:absolute and top but NO fixed height
+      expect(el.style.height).toBe("");
+      expect(el.style.position).toBe("absolute");
+    }
   });
 
   it("clicking a done agent row selects it (the store opens Info)", async () => {
