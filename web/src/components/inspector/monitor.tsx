@@ -5,9 +5,8 @@ import { AlertTriangle, Check, ChevronRight, ClipboardList, FlagTriangleRight, L
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isVetoAgent } from "@/lib/utils";
+import { agentLabel, cn, fmtElapsed, isVetoAgent, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
-import { ProvChip } from "@/components/ui/chips";
 import { buildTrace, type TraceNode, type TraceRow } from "./trace-model";
 import type { Verdict } from "@/lib/types";
 
@@ -130,12 +129,12 @@ function AgentRow({
         </span>
         <span className="flex-1 min-w-0">
           <span className="block truncate font-sans text-[12.5px] font-medium text-[var(--color-fg)]">
-            {isRT ? row.agentId || "partner" : agentLabel(row.agentId)}
+            {isRT ? stripEmoji(row.agentId || "partner") : stripEmoji(agentLabel(row.agentId))}
           </span>
-          {row.done && ev.summary && (
-            <span className="block truncate text-[11.5px] leading-snug text-[var(--color-fg-muted)] mt-0.5">
-              {ev.summary}
-            </span>
+          {row.done && (
+            <p className="text-xs text-[var(--color-fg-muted)] mt-0.5">
+              {ev.summary ? stripEmoji(ev.summary) : "Step completed."}
+            </p>
           )}
         </span>
         {/* right badges */}
@@ -185,7 +184,9 @@ function AgentRow({
                 </p>
               )}
               <div className="flex flex-wrap gap-1">
-                {ev.provenance && <ProvChip prov={ev.provenance} />}
+                {ev.provenance && (
+                  <span className="text-[10.5px] text-[var(--color-fg-faint)]">{ev.provenance}</span>
+                )}
                 {ev.conviction != null && (
                   <span className="text-[10.5px] text-[var(--color-fg-faint)]">
                     conviction {ev.conviction}/5

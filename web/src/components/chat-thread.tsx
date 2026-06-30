@@ -2,7 +2,7 @@
 import * as React from "react";
 import { AlertCircle, FlaskConical } from "lucide-react";
 import { useFirm, type Turn } from "@/lib/store";
-import { agentLabel, fmtElapsed } from "@/lib/utils";
+import { agentLabel, fmtElapsed, stripEmoji } from "@/lib/utils";
 import type { ProgressEvent } from "@/lib/types";
 import { EmptyState } from "@/components/empty-state";
 import { Synthesis } from "@/components/run/synthesis";
@@ -226,7 +226,7 @@ export function TurnView({ turn }: { turn: Turn }) {
 
         {result?._simulated && (
           <Banner tone="sim">
-            <b>Simulated-models run.</b> Real moat, EMET PMIDs, seams and Q-Models -- but the
+            <b>Simulated-models run.</b> Real moat, EMET PMIDs, seams and External Models -- but the
             roundtable verdicts and any claude fact-agent reasoning are{" "}
             <b>simulated</b> (labeled <code className="font-mono">simulated</code>), not real
             model output.

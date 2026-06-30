@@ -14,11 +14,11 @@ import { useMemo, useState } from "react";
 import { MousePointerClick, Pin, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent } from "@/lib/utils";
+import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import { FactList } from "./dossier-tab";
-import { Chip, PlaneChip, ProvChip, StatusDot, TierChip } from "@/components/ui/chips";
+import { Chip, StatusDot } from "@/components/ui/chips";
 import type { Fact } from "@/lib/types";
 import { SideChat } from "./side-chat";
 
@@ -97,17 +97,9 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
     ? byAgentId
     : dossier.filter((f) => prov && f.provenance === prov);
 
-  // tier: the predominant tier among this step's facts (derived, not asserted —
-  // mixed-tier steps show the most common tier; never fabricated when no facts).
-  const tier = useMemo(() => {
-    if (!facts.length) return undefined;
-    const counts = new Map<string, number>();
-    for (const f of facts) if (f.tier) counts.set(f.tier, (counts.get(f.tier) ?? 0) + 1);
-    let best: string | undefined;
-    let bestN = 0;
-    for (const [t, n] of counts) if (n > bestN) { best = t; bestN = n; }
-    return best;
-  }, [facts]);
+  // tier chip removed per UI polish spec; useMemo kept to avoid hook reorder
+  // if callers later re-add tier display — just drop the computed value.
+  void useMemo(() => undefined, [facts]);
 
   const via = result?._via === "replay" || result?._replay ? "replay" : undefined;
   const takeaway = typeof ev?.summary === "string" ? ev.summary : undefined;
@@ -146,12 +138,7 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
           />
           <KV
             k="provenance"
-            v={
-              <span className="flex flex-wrap items-center gap-1">
-                {prov && <ProvChip prov={prov} via={via} />}
-                {tier && <TierChip tier={tier} />}
-              </span>
-            }
+            v={prov ?? undefined}
           />
           <KV k="facts · time" v={`${facts.length} fact${facts.length === 1 ? "" : "s"} · ${fmtElapsed(ev?.elapsed_s)}`} />
           {/* "query" per the design spec — the engagement query that drove this
@@ -249,7 +236,7 @@ function PartnerInfo({ turn, persona }: { turn: Turn; persona: string }) {
               )
             }
           />
-          <KV k="provenance" v={v.provenance && <ProvChip prov={v.provenance} via={via} />} />
+          <KV k="provenance" v={v.provenance ?? undefined} />
         </div>
 
         {(round1 || round2) && (

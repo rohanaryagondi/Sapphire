@@ -41,7 +41,7 @@ export const AGENT_LABEL: Record<string, string> = {
   "internal-science-lead": "Internal moat — Quiver CNS_DFP",
   "emet-runner": "EMET — live BenchSci",
   "emet-analyst": "EMET analyst",
-  "q-models-runner": "Q-Models launchpad",
+  "q-models-runner": "External Models",
   "fda-institutional-memory": "FDA institutional memory",
   "patent-ip": "Patent / IP",
   "global-regulatory-divergence": "Global regulatory divergence",
@@ -99,6 +99,21 @@ export function isPlaceholderCitation(s?: string): boolean {
   if (!t) return false;
   const m = t.match(/^pmid:?\s*0*(\d+)$/i);
   return !!m && m[1].length <= 3;
+}
+
+/**
+ * Remove pictographic/emoji glyphs from engine-derived strings before rendering.
+ * Covers: Misc Symbols (U+2600-U+27BF), Dingbats-adjacent (U+2300-U+23FF),
+ * Supplemental Arrows-B (U+2B00-U+2BFF), Variation Selectors (U+FE00-U+FE0F),
+ * and the full Emoji/Supplemental blocks (U+1F000-U+1FFFF).
+ * The no-entry sign U+26D4 (veto glyph emitted by engine) is covered by the
+ * U+2600-U+27BF range above.
+ */
+export function stripEmoji(s: string): string {
+  return s.replace(
+    /[\u{2300}-\u{23FF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1FFFF}]/gu,
+    "",
+  ).trim();
 }
 
 /* ── time / misc ──────────────────────────────────────────────────────────── */

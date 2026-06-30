@@ -2,17 +2,14 @@
 import { MousePointerClick, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm, type InspectorSelection } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind } from "@/lib/utils";
+import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, mockLabel, stanceKind, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import {
   Chip,
   FlagChip,
   MockBadge,
-  PlaneChip,
-  ProvChip,
   StatusDot,
-  TierChip,
 } from "@/components/ui/chips";
 
 function KV({ k, v }: { k: string; v: React.ReactNode }) {
@@ -73,7 +70,6 @@ function FactDetail({ turn, index }: { turn: Turn; index: number }) {
       <Header
         eyebrow={mock ? "Dossier fact · mock/illustrative" : "Dossier fact"}
         title={fact.field || fact.source || "fact"}
-        right={<PlaneChip plane={fact.plane === "internal" ? "internal" : "external"} />}
       />
       <p
         className={cn(
@@ -83,12 +79,10 @@ function FactDetail({ turn, index }: { turn: Turn; index: number }) {
             : "border-[var(--color-border)] bg-[var(--color-bg-subtle)] text-[var(--color-fg)]",
         )}
       >
-        {fact.value}
+        {stripEmoji(fact.value)}
       </p>
       <div className="mb-3 flex flex-wrap gap-1">
         {mock && <MockBadge label={mock} />}
-        <TierChip tier={fact.tier} />
-        <ProvChip prov={fact.provenance} via={via} />
         {fact.flag && <FlagChip flag={fact.flag} />}
       </div>
       <KV
@@ -145,7 +139,7 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
       />
       <KV k="agent id" v={<span className="font-mono text-[11.5px]">{agentId}</span>} />
       <KV k="status" v={status} />
-      <KV k="provenance" v={prov ? <ProvChip prov={prov} /> : "—"} />
+      <KV k="provenance" v={prov ?? "—"} />
       <KV k="facts" v={ev?.n_facts != null ? `${ev.n_facts}` : `${facts.length}`} />
       <KV k="elapsed" v={ev?.elapsed_s != null ? fmtElapsed(ev.elapsed_s) : undefined} />
       {ev?.error ? <KV k="note" v={String(ev.error)} /> : null}
@@ -163,8 +157,6 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
               >
                 <p className="text-[12px] leading-snug text-[var(--color-fg)]">{f.value}</p>
                 <div className="mt-1.5 flex flex-wrap gap-1">
-                  <TierChip tier={f.tier} />
-                  <PlaneChip plane={f.plane === "internal" ? "internal" : "external"} />
                   {f.flag && <FlagChip flag={f.flag} />}
                 </div>
               </div>
@@ -221,7 +213,7 @@ function VerdictDetail({ turn, persona }: { turn: Turn; persona: string }) {
       <KV k="stance" v={v.stance} />
       <KV k="conviction" v={v.conviction != null ? String(v.conviction) : undefined} />
       <KV k="lens" v={v.lens} />
-      <KV k="provenance" v={v.provenance ? <ProvChip prov={v.provenance} /> : "—"} />
+      <KV k="provenance" v={v.provenance ?? "—"} />
       <KV k="status" v={v.status} />
       {(v.fact_claims ?? []).length > 0 && (
         <div className="mt-3">

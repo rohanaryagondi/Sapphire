@@ -1,9 +1,8 @@
 "use client";
 import { Users } from "lucide-react";
 import type { RunResult, Verdict } from "@/lib/types";
-import { cn, stanceKind } from "@/lib/utils";
+import { cn, stanceKind, stripEmoji } from "@/lib/utils";
 import { finalVerdicts, isRebuttalRound } from "@/lib/verdicts";
-import { Chip, ProvChip } from "@/components/ui/chips";
 import { useFirm } from "@/lib/store";
 
 const stanceStyle: Record<string, { bar: string; text: string; fill: string }> = {
@@ -47,12 +46,10 @@ function ConvictionBar({ conviction, fill }: { conviction: number; fill: string 
 function VerdictCard({
   v,
   turnId,
-  via,
   compact,
 }: {
   v: Verdict;
   turnId: string;
-  via?: string;
   compact?: boolean;
 }) {
   const select = useFirm((s) => s.select);
@@ -77,11 +74,11 @@ function VerdictCard({
       <span className={cn("absolute inset-y-0 left-0 w-[3px]", st.bar)} />
       <div className="mb-1 flex items-center gap-2">
         <span className="flex-1 truncate text-[13px] font-semibold text-[var(--color-fg)]">
-          {v.persona || "partner"}
+          {stripEmoji(v.persona || "partner")}
         </span>
         {ok && v.stance && (
           <span className={cn("text-[11.5px] font-semibold uppercase tracking-tight", st.text)}>
-            {v.stance}
+            {stripEmoji(v.stance)}
           </span>
         )}
         {!ok && (
@@ -102,14 +99,9 @@ function VerdictCard({
             compact ? "line-clamp-2" : "",
           )}
         >
-          {v.rationale}
+          {stripEmoji(v.rationale)}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap items-center gap-1">
-        {v.provenance && <ProvChip prov={v.provenance} via={via} />}
-        {ok && v.conviction != null && <Chip>conviction {v.conviction}</Chip>}
-        {v.lens && <Chip>{v.lens}</Chip>}
-      </div>
     </button>
   );
 }
@@ -120,7 +112,6 @@ export function Spread({ result, turnId }: { result: RunResult; turnId: string }
   const label = isRebuttalRound(result)
     ? "round 2 · rebuttal"
     : "round 1 · independent verdicts";
-  const via = result._via === "replay" || result._replay ? "replay" : undefined;
   if (!round.length) return null;
 
   return (
@@ -140,7 +131,6 @@ export function Spread({ result, turnId }: { result: RunResult; turnId: string }
             key={`${v.persona}_${i}`}
             v={v}
             turnId={turnId}
-            via={via}
             compact={panelOpen}
           />
         ))}
