@@ -346,33 +346,21 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
     return () => clearTimeout(t);
   }, [focusRowId, setFocusRowId]);
 
-  if (!turn) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center px-6 text-center">
-        <ClipboardList className="mb-2 size-5 text-[var(--color-fg-faint)]" />
-        <p className="text-[12.5px] text-[var(--color-fg-subtle)]">
-          The live trace will appear here once you convene the firm.
-        </p>
-      </div>
-    );
-  }
+  // ── ALL hooks must fire unconditionally, before any early return (Rules of Hooks) ──
 
   // Memoize buildTrace — it iterates the full trace on every call; during a live run
   // the store pushes a new ProgressEvent on every SSE frame, which would re-render Monitor.
+  // Null-safe: when turn is undefined we pass [] and get a well-typed empty TraceModel.
   // Keyed to trace.length so we recompute only when a new event arrives.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const m = useMemo(() => buildTrace(turn.trace), [turn.trace.length]);
-  const plan = m.plan?.ev;
-  const flagsEv = m.flags?.ev;
-  const synthEv = m.synthesis?.ev;
+  const m = useMemo(() => buildTrace(turn?.trace ?? []), [turn?.trace?.length]);
 
   // Once the run has a result, the roundtable rows are derived from the SAME
-  // normalised verdicts the spread renders — so the Monitor can never contradict
-  // it (e.g. show "conditional · conviction 3" next to a spread "abstained").
+  // normalised verdicts the spread renders — so Monitor can never contradict it.
   // While still streaming (no result yet), fall back to the live trace rows.
-  const verdicts = finalVerdicts(turn.result);
+  const verdicts = finalVerdicts(turn?.result);
   const roundtable: TraceRow[] =
-    turn.result && verdicts.length
+    turn?.result && verdicts.length
       ? verdicts.map((v) => ({
           agentId: v.persona,
           started: true,
@@ -389,6 +377,22 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
         }))
       : m.roundtable;
   const rtDone = roundtable.filter((r) => r.done).length;
+
+  // ── Early return — only AFTER all hooks have been called ──────────────────
+  if (!turn) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center px-6 text-center">
+        <ClipboardList className="mb-2 size-5 text-[var(--color-fg-faint)]" />
+        <p className="text-[12.5px] text-[var(--color-fg-subtle)]">
+          The live trace will appear here once you convene the firm.
+        </p>
+      </div>
+    );
+  }
+
+  const plan = m.plan?.ev;
+  const flagsEv = m.flags?.ev;
+  const synthEv = m.synthesis?.ev;
 
   return (
     <div className="space-y-1 p-3">
