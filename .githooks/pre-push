@@ -10,6 +10,11 @@
 #      (so hayes can't push a `gavin/...` branch).
 # Tag pushes pass through (not a branch-rule concern).
 #
+# And WARNS (never blocks by default) on:
+#   • Gate 1     — Python changed → full suite must be green (this one DOES block on RED).
+#   • Gate 3.5   — doc-freshness (warn; block via SAPPHIRE_DOCGATE=block).
+#   • Gate 3.6   — base-freshness: branch base behind origin/main (warn; block via SAPPHIRE_BASEGATE=block).
+#
 # This is a guardrail for cooperating agents. It is bypassable with `git push --no-verify`
 # — doing so is a hard violation of dev/CONTRIBUTOR_RULES.md; the detective backstop
 # `dev/audit-history.sh` catches a direct push to main after the fact.
@@ -128,6 +133,30 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     else
       # Warn mode (default): --warn flag makes check-docs always exit 0.
       bash "$root/dev/check-docs.sh" --warn "$doc_range" >&2 || true
+    fi
+  fi
+
+  # Gate 3.6 — base-freshness (staleness) check.
+  # Catches the "branched off a STALE local origin/main" footgun BEFORE it costs the
+  # approver a gate cycle (a stale base parallelizes/edits an old engine → merge conflicts
+  # or, worse, tests that validated against the wrong base). This clone's local main tree
+  # is often left behind by design, so the local `origin/main` ref can be stale too — we
+  # therefore FETCH the real remote tip and measure how far this branch's merge-base lags it.
+  # Default warn mode (never blocks). Strict shops: export SAPPHIRE_BASEGATE=block
+  # (blocks at >= SAPPHIRE_BASEGATE_MAX commits behind, default 1). Offline → silently skips.
+  git fetch -q origin main 2>/dev/null || true
+  _rmain="$(git rev-parse --verify --quiet FETCH_HEAD || git rev-parse --verify --quiet origin/main || true)"
+  if [[ -n "$_rmain" ]]; then
+    _mb="$(git merge-base "$local_sha" "$_rmain" 2>/dev/null || true)"
+    if [[ -n "$_mb" ]]; then
+      _behind="$(git rev-list --count "$_mb..$_rmain" 2>/dev/null || echo 0)"
+      if [[ "$_behind" -gt 0 ]]; then
+        echo "  • Gate 3.6: branch base is $_behind commit(s) behind origin/main." >&2
+        echo "    Rebase before the approver gates:  git fetch origin && git rebase origin/main" >&2
+        if [[ "${SAPPHIRE_BASEGATE:-warn}" == "block" && "$_behind" -ge "${SAPPHIRE_BASEGATE_MAX:-1}" ]]; then
+          block "Gate 3.6 — base is $_behind commit(s) behind origin/main (block mode). Rebase onto origin/main and re-push."
+        fi
+      fi
     fi
   fi
 done
