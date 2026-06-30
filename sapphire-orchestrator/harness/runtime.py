@@ -89,7 +89,9 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
         except Exception as ex:
             code = "timeout" if ex.__class__.__name__ == "TimeoutExpired" else "tool-failure"
             errs = [f"{code}: {ex}"]
-            if attempt < contract.max_repair:
+            # Timeouts are not retried — a same-cost retry would block for the full timeout again.
+            # tool-failure may retry up to max_repair times (prompt-repair can fix malformed output).
+            if attempt < contract.max_repair and code != "timeout":
                 out = None
                 continue
             status = "escalated" if contract.on_hard_fail == "escalate" else "abstained"

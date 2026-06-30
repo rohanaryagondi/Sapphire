@@ -96,5 +96,27 @@ class TestRuntime(unittest.TestCase):
         self.assertEqual(r.status, "abstained")
         self.assertEqual(calls["n"], 2)
 
+    def test_timeout_abstains_without_retry(self):
+        """A TimeoutExpired exception must cause an immediate abstain — NOT a retry that
+        would block for another full timeout period. This is the core fix for the parallel
+        Bucket-1 dispatch: a stuck claude subprocess should not double the wait time."""
+        import subprocess
+        calls = {"n": 0}
+
+        def boom(contract, inputs, ctx):
+            calls["n"] += 1
+            raise subprocess.TimeoutExpired(cmd="claude", timeout=300)
+
+        r = run("t", {"g": 1}, engagement_id="eng8", ctx={}, registry=reg(max_repair=1),
+                dispatch_fn=boom)
+        self.assertFalse(r.ok)
+        self.assertEqual(r.error, "timeout",
+                         f"Expected 'timeout' error; got {r.error!r}")
+        self.assertIn(r.status, ("abstained", "escalated"),
+                      f"Expected abstained/escalated; got {r.status!r}")
+        # Non-vacuous: the backend must have been called EXACTLY ONCE — no retry.
+        self.assertEqual(calls["n"], 1,
+                         f"Timeout must not retry; got {calls['n']} calls (expected 1)")
+
 if __name__ == "__main__":
     unittest.main()
