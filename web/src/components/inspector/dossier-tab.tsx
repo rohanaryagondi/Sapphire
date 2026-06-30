@@ -7,7 +7,19 @@ import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Fact } from "@/lib/types";
 
-function FactCard({ fact, via }: { fact: Fact; via?: string }) {
+export function FactCard({
+  fact,
+  via,
+  onAsk,
+}: {
+  fact: Fact;
+  via?: string;
+  /** WO-8 Phase 3: per-fact "ask" affordance (Info tab scoped side-chat) — when
+   *  provided, a small "ask" button pre-fills the side-chat input scoped to
+   *  just this fact. Omitted in contexts (e.g. a plain dossier dump) that have
+   *  no side-chat. */
+  onAsk?: (fact: Fact) => void;
+}) {
   const mock = mockLabel(fact.provenance, fact.value, fact.source);
   const placeholderSrc = isPlaceholderCitation(fact.source);
   return (
@@ -19,9 +31,21 @@ function FactCard({ fact, via }: { fact: Fact; via?: string }) {
           : "border-[var(--color-border)] bg-[var(--color-panel)]",
       )}
     >
-      <p className={cn("text-[12px] leading-snug", mock ? "italic text-[var(--color-fg-muted)]" : "text-[var(--color-fg)]")}>
-        {fact.value}
-      </p>
+      <div className="flex items-start gap-2">
+        <p className={cn("flex-1 text-[12px] leading-snug", mock ? "italic text-[var(--color-fg-muted)]" : "text-[var(--color-fg)]")}>
+          {fact.value}
+        </p>
+        {onAsk && (
+          <button
+            onClick={() => onAsk(fact)}
+            className="shrink-0 rounded-[5px] border border-[var(--color-border)] px-1.5 py-0.5 text-[10px] text-[var(--color-fg-subtle)] transition-colors hover:border-[var(--color-q-bd)] hover:text-[var(--color-q-text)]"
+            title="Ask about this fact"
+            aria-label="Ask about this fact"
+          >
+            ask
+          </button>
+        )}
+      </div>
       <div className="mt-1.5 flex flex-wrap items-center gap-1">
         {mock && <MockBadge label={mock} />}
         <TierChip tier={fact.tier} />
@@ -38,7 +62,15 @@ function FactCard({ fact, via }: { fact: Fact; via?: string }) {
   );
 }
 
-function FactList({ facts, via }: { facts: Fact[]; via?: string }) {
+export function FactList({
+  facts,
+  via,
+  onAsk,
+}: {
+  facts: Fact[];
+  via?: string;
+  onAsk?: (fact: Fact) => void;
+}) {
   const parentRef = useRef<HTMLDivElement>(null);
   const shouldVirtualize = facts.length > 20;
   const virtualizer = useVirtualizer({
@@ -51,7 +83,7 @@ function FactList({ facts, via }: { facts: Fact[]; via?: string }) {
   if (!shouldVirtualize) {
     return (
       <>
-        {facts.map((f, i) => <FactCard key={i} fact={f} via={via} />)}
+        {facts.map((f, i) => <FactCard key={i} fact={f} via={via} onAsk={onAsk} />)}
       </>
     );
   }
@@ -61,7 +93,7 @@ function FactList({ facts, via }: { facts: Fact[]; via?: string }) {
       <div style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
         {virtualizer.getVirtualItems().map((vi) => (
           <div key={vi.key} style={{ position: "absolute", top: vi.start, left: 0, right: 0 }}>
-            <FactCard fact={facts[vi.index]!} via={via} />
+            <FactCard fact={facts[vi.index]!} via={via} onAsk={onAsk} />
           </div>
         ))}
       </div>

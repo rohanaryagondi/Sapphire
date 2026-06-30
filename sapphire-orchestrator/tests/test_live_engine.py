@@ -309,6 +309,40 @@ class TestRunLive(unittest.TestCase):
             f"Expected ≥1 abstained/escalated agent due to QS00123; got: {agents}"
         )
 
+    # ── test 8: dossier facts stamped with agent_id (WO-8 Phase 3) ───────────
+    def test_dossier_facts_stamped_with_agent_id(self):
+        """Every dossier fact appended to all_dossier_facts must carry a non-empty
+        `agent_id` matching the id of a dispatched Bucket-1 agent — this is the ONLY
+        way the web Info tab can show a step's complete contributed-facts list.
+        Stamped UNCONDITIONALLY (not gated behind adaptive=True, unlike the
+        internal-only `_source_agent` key on `_annot_facts`)."""
+        result = self._run()
+        dossier = result["discover"]["dossier"]
+        agent_ids = {a["id"] for a in result["discover"]["agents"]}
+        self.assertTrue(dossier, "expected a non-empty dossier for this query")
+
+        missing = [f for f in dossier if not f.get("agent_id")]
+        self.assertEqual(
+            missing, [],
+            f"Expected every dossier fact to carry agent_id; facts missing it: {missing}"
+        )
+        bad = [f for f in dossier if f.get("agent_id") not in agent_ids]
+        self.assertEqual(
+            bad, [],
+            f"agent_id must match a dispatched Bucket-1 agent id; got "
+            f"{[f.get('agent_id') for f in bad]} not in {agent_ids}"
+        )
+        # Spot-check a known attribution: the fake EMET handler returns exactly one
+        # fact per dispatch, with provenance 'emet-live' — it must attribute to
+        # 'emet-runner' (the only agent that calls the emet handler), proving the
+        # stamp isn't just "present" but actually correct per-agent.
+        emet_facts = [f for f in dossier if f.get("provenance") == "emet-live"]
+        if emet_facts:
+            self.assertTrue(
+                all(f.get("agent_id") == "emet-runner" for f in emet_facts),
+                f"Expected emet-live facts attributed to emet-runner; got: {emet_facts}"
+            )
+
 
 class TestAsoSequenceWiring(unittest.TestCase):
     """

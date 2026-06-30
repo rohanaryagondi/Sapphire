@@ -90,6 +90,17 @@ class _ServerHarness:
         with urllib.request.urlopen(self.base + path, timeout=timeout) as resp:
             return resp.status, resp.read().decode("utf-8"), resp.headers
 
+    def post_json(self, path: str, body: dict, timeout: float = 10.0):
+        """POST a JSON body and return (status, body_text, headers)."""
+        req = urllib.request.Request(
+            self.base + path,
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return resp.status, resp.read().decode("utf-8"), resp.headers
+
 
 class TestServer(unittest.TestCase):
     def setUp(self):
@@ -431,6 +442,78 @@ class TestSSEEncoding(unittest.TestCase):
         self.assertEqual(server._profile_kwargs("simulate"), {"mock": False, "simulate": True})
         # unknown profile → safe offline default
         self.assertEqual(server._profile_kwargs("???"), {"mock": True})
+
+
+class TestStepChat(unittest.TestCase):
+    """POST /api/step-chat — the scoped side-chat endpoint (WO-8 Phase 3).
+
+    `scoped_chat.answer_scoped` is mocked here (it shells out to `claude`); the
+    point of these tests is the HTTP plumbing — request parsing, response shape,
+    and that the handler forwards exactly the `facts` list it was given (never
+    widens scope), not re-testing answer_scoped's own honesty guard (that's
+    sapphire-orchestrator/tests/test_scoped_chat.py's job)."""
+
+    def test_step_chat_returns_answer_json(self):
+        import scoped_chat
+        from unittest.mock import patch
+
+        with patch.object(scoped_chat, "answer_scoped", return_value="TSC2 suppresses mTORC1.") as mock_answer:
+            with _ServerHarness() as h:
+                status, body, _ = h.post_json("/api/step-chat", {
+                    "question": "What does TSC2 do?",
+                    "facts": [{"value": "TSC2 suppresses mTORC1", "source": "PMID:12345",
+                               "tier": "T2", "provenance": "emet-live"}],
+                    "agent_id": "emet-runner",
+                })
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data["answer"], "TSC2 suppresses mTORC1.")
+        mock_answer.assert_called_once()
+
+    def test_step_chat_forwards_only_the_given_facts_never_widens_scope(self):
+        """The handler must pass through EXACTLY the `facts` array the client
+        sent — proving the server-side seam doesn't substitute the whole
+        dossier or any other facts behind the client's back."""
+        import scoped_chat
+        from unittest.mock import patch
+
+        scoped_facts = [
+            {"value": "TSC2 suppresses mTORC1", "source": "PMID:12345",
+             "tier": "T2", "provenance": "emet-live"},
+        ]
+        with patch.object(scoped_chat, "answer_scoped", return_value="ok") as mock_answer:
+            with _ServerHarness() as h:
+                h.post_json("/api/step-chat", {
+                    "question": "explain",
+                    "facts": scoped_facts,
+                    "agent_id": "emet-runner",
+                })
+        called_question, called_facts = mock_answer.call_args[0][:2]
+        self.assertEqual(called_question, "explain")
+        self.assertEqual(called_facts, scoped_facts)
+
+    def test_step_chat_missing_facts_degrades_to_empty_list(self):
+        """A malformed/absent `facts` key must not crash the handler — it
+        degrades to an empty list (honest: no evidence), never a 500."""
+        import scoped_chat
+        from unittest.mock import patch
+
+        with patch.object(scoped_chat, "answer_scoped", return_value="No evidence available.") as mock_answer:
+            with _ServerHarness() as h:
+                status, body, _ = h.post_json("/api/step-chat", {"question": "explain"})
+        self.assertEqual(status, 200)
+        data = json.loads(body)
+        self.assertEqual(data["answer"], "No evidence available.")
+        called_facts = mock_answer.call_args[0][1]
+        self.assertEqual(called_facts, [])
+
+    def test_step_chat_unknown_path_is_404(self):
+        with _ServerHarness() as h:
+            try:
+                h.post_json("/api/step-chat-typo", {"question": "x"})
+                self.fail("unknown path should 404")
+            except urllib.error.HTTPError as e:
+                self.assertEqual(e.code, 404)
 
 
 if __name__ == "__main__":

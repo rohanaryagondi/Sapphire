@@ -333,6 +333,9 @@ def _corpus_card_to_fact(agent_id: str, card: dict) -> dict:
         "plane": plane_for("corpus"),   # "external" — additive A3 field
         "from_corpus": True,
         "field": agent_id,
+        # WO-8 Phase 3: stamp the contributing agent id unconditionally (see the
+        # per-agent loop above for the same pattern on live-dispatched facts).
+        "agent_id": agent_id,
     }
 
 
@@ -1145,6 +1148,12 @@ def run_live(
                     enriched["plane"] = plane_for(fact_prov)
                 except KeyError:
                     enriched["plane"] = "external"
+                # WO-8 Phase 3: stamp the contributing Bucket-1 agent id UNCONDITIONALLY
+                # (not gated behind adaptive=True) so the Info tab can show the complete
+                # contributed-facts list for a clicked step. Mirrors the plane-enrichment
+                # pattern above; distinct from the internal-only `_source_agent` key used
+                # by the adaptive salience computation (_annot_facts).
+                enriched["agent_id"] = agent_id
                 all_dossier_facts.append(enriched)
                 flag = f.get("flag")
                 if flag == "VETO":
@@ -1238,6 +1247,8 @@ def run_live(
                     "provenance": "scientific-reasoning",
                     "plane": plane_for("scientific-reasoning"),
                     "field": "rescue mechanism",
+                    # WO-8 Phase 3: stamp the contributing agent id unconditionally.
+                    "agent_id": "rescue-mechanism",
                 })
                 if adaptive:
                     _annot_facts.append({
@@ -1375,6 +1386,8 @@ def run_live(
                                 _enriched["plane"] = plane_for(_f_prov)
                             except KeyError:
                                 _enriched["plane"] = "external"
+                            # WO-8 Phase 3: stamp the contributing agent id unconditionally.
+                            _enriched["agent_id"] = _target_id
                             all_dossier_facts.append(_enriched)
                             _annot_facts.append({**_enriched, "_source_agent": _target_id})
                             _f_flag = _f.get("flag")

@@ -237,6 +237,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send_json(200, {"id": cid})
             except Exception as exc:
                 return self._send_json(500, {"error": str(exc)})
+        elif path == "/api/step-chat":
+            return self._serve_step_chat(body)
         else:
             return self._send_json(404, {"error": "not found"})
 
@@ -281,6 +283,26 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as exc:
                 return self._send_json(500, {"error": str(exc)})
         return self._send_json(404, {"error": "not found"})
+
+    # --------------------------------------------------- scoped side-chat
+    def _serve_step_chat(self, body: dict) -> None:
+        """POST /api/step-chat → {answer}. Body: {question, facts: [...], agent_id}.
+
+        A plain request/response JSON call (not SSE) — one quick scoped model call.
+        ``answer_scoped`` (sapphire-orchestrator/scoped_chat.py) is the ONLY thing
+        that sees ``facts``; this handler does not widen scope beyond what the
+        client sent (it's the client's job — the Info tab — to have already
+        narrowed `facts` to the selected step's contributed-facts list). Honest
+        degrade: a hard failure returns a clear error string, never a 500/crash."""
+        question = (body.get("question") or "").strip()
+        raw_facts = body.get("facts")
+        facts = raw_facts if isinstance(raw_facts, list) else []
+        try:
+            import scoped_chat as _scoped_chat_mod
+            answer = _scoped_chat_mod.answer_scoped(question, facts)
+        except Exception as exc:  # last-resort net — answer_scoped itself never raises
+            answer = f"Could not answer — {type(exc).__name__}: {exc}"
+        return self._send_json(200, {"answer": answer})
 
     # ------------------------------------------------------- SSE streaming
     def _serve_plan(self, query: str, profile: str, model: str = "") -> None:

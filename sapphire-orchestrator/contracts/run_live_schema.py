@@ -19,6 +19,11 @@ from . import jsonschema_min
 # A3 (additive): `plane` is stamped by live_engine from contracts.provenance.plane_for(provenance).
 # Values: "internal" (moat-real) or "external" (all other sources). Always present in run_live
 # output; absent only in very old canned scenarios (treat missing plane as "external").
+# WO-8 Phase 3 (additive): `agent_id` is stamped unconditionally by live_engine on every fact
+# appended to `all_dossier_facts` (per-agent loop, corpus facts, rescue-mechanism, redispatch) —
+# the stable id of the Bucket-1 agent that contributed the fact, so the Info tab can show the
+# complete contributed-facts list for a clicked step. Optional (not required) so older captured
+# scenarios without it still validate.
 _FACT = {
     "type": "object",
     "required": ["value", "source", "tier", "provenance"],
@@ -31,6 +36,7 @@ _FACT = {
         "field": {"type": "string"},
         "confidence": {"type": "string"},
         "flag": {"type": "string", "enum": ["VETO", "DIVERGENCE", "KNOWN_UNKNOWN"]},
+        "agent_id": {"type": "string"},
     },
 }
 
