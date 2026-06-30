@@ -345,7 +345,7 @@ export function PlanReview() {
             onClick={cancel}
             className="text-[12px] text-[var(--color-fg-subtle)] hover:text-[var(--color-accent)]"
           >
-            or tell me to rethink a step
+            Cancel / start over
           </button>
           <span className="ml-auto text-[11px] text-[var(--color-fg-faint)]">
             Approve to convene exactly the selected agents.

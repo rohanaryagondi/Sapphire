@@ -676,25 +676,32 @@ def run_live(
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
             # Build the narrative — prefer the LLM-produced one (it's query-specific);
-            # fall back to the deterministic builder when absent/malformed.
-            from plan_narrative import build_deterministic_narrative as _build_narr
+            # fall back to the deterministic builder when absent/malformed or when
+            # the data-boundary scrub fires (defense-in-depth: the prompt says
+            # "public identifiers only" but we also check mechanically).
+            from plan_narrative import (build_deterministic_narrative as _build_narr,
+                                        FORBIDDEN_NARRATIVE_TERMS as _FORBIDDEN,
+                                        _scrub_narrative_text as _scrub_text)
             _raw_narrative = _sp_result.get("narrative") or None
             _narrative_is_llm = (
                 isinstance(_raw_narrative, dict)
                 and bool(_raw_narrative.get("framing"))
                 and isinstance(_raw_narrative.get("steps"), list)
                 and len(_raw_narrative["steps"]) > 0
+                # Data-boundary scrub: reject any narrative that contains a forbidden
+                # internal-score term (case-insensitive scan of all text fields).
+                and not _scrub_text(_raw_narrative)
             )
             if _narrative_is_llm:
                 # Stamp source="llm" so the card knows this prose is LLM-authored.
                 _llm_narrative = dict(_raw_narrative)
                 _llm_narrative["source"] = "llm"
             else:
-                # LLM did not produce a narrative — synthesise deterministically.
+                # LLM did not produce a narrative (or it was scrubbed) — synthesise
+                # deterministically. builder already stamps source="deterministic".
                 _selected_ids_for_narr = [
                     a["id"] for a in _sp_result.get("selected_agents", []) if a.get("id")
                 ] or list(_BUCKET1_AGENTS)
-                # builder already stamps source="deterministic"
                 _llm_narrative = _build_narr(query, public_plan, _selected_ids_for_narr,
                                              panel=panel)
             trace.close_engagement(eid, {"note": "plan_pending_approval", "plan_source": "llm"})

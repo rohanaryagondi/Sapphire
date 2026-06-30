@@ -16,6 +16,17 @@ Internal moat scores NEVER appear here.
 """
 from __future__ import annotations
 
+# Internal-score field names that must never appear in a public-facing narrative.
+# Used by live_engine to scrub LLM narrative output (defense-in-depth data-boundary
+# check) and by test_plan_narrative to guard the deterministic builder.
+FORBIDDEN_NARRATIVE_TERMS: tuple[str, ...] = (
+    "cosine",
+    "ep_score",
+    "cnsdp",
+    "dfp_score",
+    "reversal_strength",
+)
+
 # Veto agents — locked, non-deselectable
 _VETO_AGENTS = frozenset(["fda-institutional-memory", "patent-ip"])
 
@@ -48,6 +59,35 @@ _AGENT_LABEL: dict[str, str] = {
     "geneset-enrichment": "g:Profiler enrichment",
     "robyn-scs": "robyn_scs connectivity",
 }
+
+
+def _scrub_narrative_text(narrative: dict) -> bool:
+    """Return True if the narrative contains any forbidden internal-score term.
+
+    Collects all string text fields from the narrative dict (framing + every
+    step's title/prose/expect/skipping/badges/sub items) and scans them
+    case-insensitively against FORBIDDEN_NARRATIVE_TERMS.
+
+    Called by live_engine before accepting an LLM-produced narrative —
+    defense-in-depth data-boundary check. Returning True causes the caller to
+    fall back to the deterministic builder (source="deterministic").
+    """
+    parts: list[str] = []
+    framing = narrative.get("framing")
+    if framing:
+        parts.append(str(framing))
+    for step in narrative.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        for field in ("title", "prose", "expect", "skipping"):
+            val = step.get(field)
+            if val:
+                parts.append(str(val))
+        for lst_field in ("badges", "sub"):
+            for item in (step.get(lst_field) or []):
+                parts.append(str(item))
+    blob = " ".join(parts).lower()
+    return any(term in blob for term in FORBIDDEN_NARRATIVE_TERMS)
 
 
 def _label(agent_id: str) -> str:

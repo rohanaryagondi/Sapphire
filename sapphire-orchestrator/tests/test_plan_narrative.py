@@ -18,7 +18,9 @@ _PKG = os.path.dirname(_HERE)
 if _PKG not in sys.path:
     sys.path.insert(0, _PKG)
 
-from plan_narrative import build_deterministic_narrative
+from plan_narrative import (build_deterministic_narrative,
+                            FORBIDDEN_NARRATIVE_TERMS,
+                            _scrub_narrative_text)
 from live_engine import _BUCKET1_AGENTS
 
 _CANONICAL_KEYS = {"moat", "external", "veto", "roundtable", "synth"}
@@ -170,18 +172,14 @@ class TestDeterministicNarrative(unittest.TestCase):
     # ── test 8: no internal scores (values) in output ────────────────────────
     def test_no_internal_score_values_in_output(self):
         """Data boundary: no actual internal score *values* or model-specific field names
-        should appear in the narrative. (Prose describing that scores stay inside the
-        boundary is fine — we check for actual data-field names, not honesty statements.)"""
-        # These are the actual field/column names from the internal moat schema.
-        # They must never appear verbatim in a public-facing narrative.
-        _FORBIDDEN = ["cosine", "ep_score", "cnsdp", "dfp_score", "reversal_strength"]
+        should appear in the narrative. Uses the shared FORBIDDEN_NARRATIVE_TERMS list."""
         result = build_deterministic_narrative(
             "Is TSC2 viable?",
             self._plan(),
             list(_BUCKET1_AGENTS),
         )
         blob = str(result).lower()
-        for word in _FORBIDDEN:
+        for word in FORBIDDEN_NARRATIVE_TERMS:
             self.assertNotIn(word, blob,
                              f"Forbidden internal-score field name {word!r} found in narrative")
 
@@ -278,6 +276,131 @@ class TestDeterministicNarrative(unittest.TestCase):
                 f"narrative.source must be 'deterministic' on llm+approve fallback; "
                 f"got {narrative.get('source')!r}"
             )
+        finally:
+            os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+            os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+            os.environ.pop("SAPPHIRE_SIMULATE_MODELS", None)
+
+
+    # ── test 13: _scrub_narrative_text detects forbidden terms ───────────────
+    def test_scrub_detects_forbidden_term_in_framing(self):
+        """_scrub_narrative_text must return True when framing contains a forbidden term."""
+        dirty = {
+            "framing": "Lead with the cosine reversal score from the moat.",
+            "steps": [{"key": "moat", "title": "Moat signal", "prose": "Normal prose."}],
+        }
+        self.assertTrue(_scrub_narrative_text(dirty),
+                        "scrub must return True (reject) when 'cosine' appears in framing")
+
+    def test_scrub_detects_forbidden_term_in_step_prose(self):
+        """_scrub_narrative_text must return True when a step's prose contains a forbidden term."""
+        dirty = {
+            "framing": "A clean framing sentence.",
+            "steps": [
+                {"key": "moat", "title": "Signal", "prose": "The ep_score ranking drives this."},
+            ],
+        }
+        self.assertTrue(_scrub_narrative_text(dirty),
+                        "scrub must return True when 'ep_score' appears in step prose")
+
+    def test_scrub_accepts_clean_narrative(self):
+        """_scrub_narrative_text must return False (accept) for a narrative with no forbidden terms."""
+        clean = {
+            "framing": "A rescue-ranking question on TSC2-KO.",
+            "steps": [
+                {"key": "moat", "title": "Internal signal",
+                 "prose": "Pull Quiver CNS_DFP signal. Public gene symbols only."},
+                {"key": "external", "title": "External dossier",
+                 "prose": "Corroborate with cited evidence."},
+            ],
+        }
+        self.assertFalse(_scrub_narrative_text(clean),
+                         "scrub must return False (accept) for a clean narrative")
+
+    def test_scrub_checks_all_text_fields(self):
+        """_scrub_narrative_text must catch forbidden terms in badges, sub, expect, skipping."""
+        for field, value in [
+            ("badges", ["reversal_strength badge"]),
+            ("sub", ["uses dfp_score internally"]),
+            ("expect", "expect cnsdp output"),
+            ("skipping", "skipping because of ep_score"),
+        ]:
+            with self.subTest(field=field):
+                step: dict = {"key": "moat", "title": "T", "prose": "P"}
+                step[field] = value
+                dirty = {"framing": "clean", "steps": [step]}
+                self.assertTrue(_scrub_narrative_text(dirty),
+                                f"scrub must detect forbidden term in step.{field}")
+
+    # ── test 14: live_engine scrubs tainted LLM narrative → deterministic ────
+    def test_live_engine_scrubs_tainted_llm_narrative(self):
+        """When smart_plan returns a narrative containing a forbidden term (e.g. 'cosine'),
+        live_engine must reject it and fall back to the deterministic builder
+        (narrative.source='deterministic'), even though plan_source='llm'."""
+        import os
+        import sys
+        import json
+        import types
+        import tempfile
+        from unittest import mock
+
+        _PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        if _PKG_DIR not in sys.path:
+            sys.path.insert(0, _PKG_DIR)
+
+        from live_engine import run_live, _BUCKET1_AGENTS as _B1
+        from harness.contracts import load_registry
+        from tests.test_live_engine import _build_ctx
+
+        registry = load_registry()
+        known_ids = {a["id"] for a in registry.get("agents", [])}
+        universe = [aid for aid in _B1 if aid in known_ids]
+
+        # Build a synthetic smart_plan result with a tainted narrative.
+        tainted_narrative = {
+            "framing": "The cosine reversal score drives the ranking.",  # FORBIDDEN
+            "steps": [
+                {"key": "moat", "title": "Internal signal", "prose": "Clean prose."},
+                {"key": "external", "title": "External", "prose": "Cited evidence."},
+                {"key": "veto", "title": "Veto gates", "prose": "FDA + IP gates."},
+                {"key": "roundtable", "title": "Roundtable", "prose": "Partners deliberate."},
+                {"key": "synth", "title": "Synthesis", "prose": "Flag unknowns."},
+            ],
+        }
+        sp_result = {
+            "selected_agents": [{"id": universe[0], "why": "primary"}] if universe else [],
+            "dropped_agents": [],
+            "panel_rationale": "test",
+            "notes": "tainted narrative test",
+            "narrative": tainted_narrative,
+        }
+
+        eng_dir = tempfile.mkdtemp()
+        mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = mem_dir
+        os.environ["SAPPHIRE_SIMULATE_MODELS"] = "1"
+        try:
+            with mock.patch("smart_plan.smart_plan", return_value=sp_result):
+                result = run_live(
+                    "Is TSC2 viable in tuberous sclerosis?",
+                    plan_mode="llm+approve",
+                    ctx=_build_ctx(),
+                )
+            # plan_source is still "llm" (agent selection succeeded)
+            self.assertEqual(result.get("plan_source"), "llm")
+            # But narrative.source must be "deterministic" (tainted narrative was scrubbed)
+            narrative = result.get("narrative")
+            self.assertIsNotNone(narrative, "envelope must carry a narrative")
+            self.assertEqual(
+                narrative.get("source"), "deterministic",
+                f"tainted LLM narrative must be scrubbed → source='deterministic'; "
+                f"got {narrative.get('source')!r}"
+            )
+            # And 'cosine' must NOT appear anywhere in the narrative
+            narrative_blob = str(narrative).lower()
+            self.assertNotIn("cosine", narrative_blob,
+                             "scrubbed narrative must not contain the forbidden term 'cosine'")
         finally:
             os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
             os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
