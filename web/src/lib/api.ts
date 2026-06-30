@@ -10,6 +10,7 @@
 import type {
   Conversation,
   ConversationDetail,
+  Fact,
   ModelChoice,
   OpenEvent,
   PlanEnvelope,
@@ -163,6 +164,28 @@ function parseFrame(frame: string): ParsedFrame {
     }
   }
   return { event, data };
+}
+
+/** POST /api/step-chat — a scoped side-chat question over ONLY the facts of
+ *  one selected step (never the whole dossier). Returns the model's grounded
+ *  answer, or an honest fallback string on a backend failure (never throws). */
+export async function askScoped(
+  question: string,
+  facts: Fact[],
+  agentId?: string,
+): Promise<string> {
+  try {
+    const resp = await fetch("/api/step-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, facts, agent_id: agentId }),
+    });
+    if (!resp.ok) return "Could not reach the side-chat — try again.";
+    const data = (await safeJSON(resp)) as { answer?: string } | null;
+    return data?.answer || "No answer returned.";
+  } catch {
+    return "Could not reach the side-chat — try again.";
+  }
 }
 
 /* ============================================================================

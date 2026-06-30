@@ -4,7 +4,7 @@ import { Activity } from "lucide-react";
 import { useFirm } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Monitor } from "./monitor";
-import { DossierTab } from "./dossier-tab";
+import { InfoTab } from "./info-tab";
 
 export function Inspector() {
   const turns = useFirm((s) => s.turns);
@@ -86,18 +86,25 @@ export function Inspector() {
         {running && <div className="streamline h-px" />}
       </div>
 
-      {/* body — single scroll surface; Monitor's virtualizer binds to this ref */}
-      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
-        {tab === "trace" ? (
+      {/* body — single scroll surface; Monitor's virtualizer binds to this ref.
+          Info owns its own internal scroll + the bottom-pinned side-chat, so it
+          renders OUTSIDE the trace's single-scroll-surface ref (it manages its
+          own layout: scrollable detail above, a fixed chat bar below). */}
+      {tab === "trace" ? (
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
           <Monitor turn={activeTurn} outerScrollRef={scrollRef} />
-        ) : (
-          <DossierTab turn={activeTurn} />
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="min-h-0 flex-1">
+          <InfoTab turn={activeTurn} />
+        </div>
+      )}
 
       {/* hintbar */}
       <div className="shrink-0 border-t border-[var(--color-border)] px-3 py-2 text-[11px] text-[var(--color-fg-faint)]">
-        ↳ click any row to expand · ⤢ widen the panel
+        {tab === "trace"
+          ? "↳ click any row → Info · ⤢ widen the panel"
+          : "↳ Info — full detail · ask it anything below"}
       </div>
     </div>
   );

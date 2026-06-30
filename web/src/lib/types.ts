@@ -17,6 +17,10 @@ export interface Fact {
   field?: string;
   confidence?: string;
   flag?: FlagKind;
+  /** the Bucket-1 agent id that contributed this fact (WO-8 Phase 3, stamped
+   *  unconditionally by live_engine on every dossier fact); absent on very old
+   *  captured scenarios. */
+  agent_id?: string;
 }
 
 export interface AgentStatus {

@@ -27,6 +27,18 @@ import type {
 
 export type TurnStatus = "running" | "complete" | "error";
 
+// ── Phase 5 types ──────────────────────────────────────────────────────────
+export type NotificationKind = "info" | "running" | "complete" | "error";
+
+export interface Notification {
+  id: string;
+  kind: NotificationKind;
+  title: string;
+  body?: string;
+  /** auto-dismiss after ms (0 = manual only) */
+  ttl?: number;
+}
+
 export interface Turn {
   id: string;
   query: string;
@@ -42,6 +54,18 @@ export interface Turn {
 
 export type InspectorTab = "monitor" | "investigate";
 export type PanelTab = "trace" | "dossier";
+
+/** WO-8 Phase 3: a pinned step (a Bucket-1 agent or Bucket-2 partner, on one
+ *  turn) from the Info tab's pin affordance. NOTE: distinct from Phase 5's
+ *  `pinned: string[]` (whole-conversation pins on `rohan/web-ui-chrome`, not
+ *  yet merged when this landed) — this is a per-STEP pin, in-memory only
+ *  (Phase 5 owns persistence). Reconcile the two when both land on main. */
+export interface PinnedStep {
+  turnId: string;
+  /** the agentId (Bucket-1) or persona (Bucket-2) this pin refers to */
+  key: string;
+  label: string;
+}
 
 export type InspectorSelection =
   | { kind: "none" }
@@ -113,10 +137,27 @@ interface FirmState {
   starConversation: (id: string, starred: boolean) => Promise<void>;
   removeConversation: (id: string) => Promise<void>;
 
+  // ── Phase 5: pinned conversations ─────────────────────────────────────────
+  // IDs of pinned conversations; persisted in localStorage (degrades honestly if
+  // unavailable — SSR / private-browsing environments).
+  pinned: string[];
+  pinConversation: (id: string) => void;
+  unpinConversation: (id: string) => void;
+
+  // ── Phase 5: run notifications (toasts) ───────────────────────────────────
+  notifications: Notification[];
+  addNotification: (n: Omit<Notification, "id">) => void;
+  dismissNotification: (id: string) => void;
+
   // run
   submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
   /** Abort the current in-flight run (safe to call when nothing is running). */
   abortRun: () => void;
+
+  // WO-8 Phase 3: per-step pin (Info tab) — see PinnedStep doc comment above.
+  pinnedSteps: PinnedStep[];
+  togglePinStep: (step: PinnedStep) => void;
+  isStepPinned: (turnId: string, key: string) => boolean;
 }
 
 let _seq = 0;
@@ -147,14 +188,12 @@ export const useFirm = create<FirmState>((set, get) => ({
       panelOpen: true,
       // Legacy: kept for backward compat with command-palette / investigate.tsx
       inspectorTab: selection.kind === "none" ? get().inspectorTab : "investigate",
-      // New panel deep-link: agent/verdict selections open the Trace tab and
-      // focus the matching row; fact selections open the Dossier tab.
-      panelTab:
-        selection.kind === "none"
-          ? get().panelTab
-          : selection.kind === "fact"
-            ? "dossier"
-            : "trace",
+      // WO-8 Phase 3: "click a trace row → Info". agent/verdict/fact selections all
+      // open the Info view (panelTab "dossier") for that step/fact — NOT the Trace
+      // tab — per the locked design (no separate "Dossier" tab; the cited facts +
+      // full detail live inside each step's Info). Only `kind:"none"` leaves the
+      // current tab alone.
+      panelTab: selection.kind === "none" ? get().panelTab : "dossier",
       focusRowId:
         selection.kind === "agent"
           ? selection.agentId
@@ -326,6 +365,43 @@ export const useFirm = create<FirmState>((set, get) => ({
     if (ac) ac.abort();
   },
 
+  // ── Phase 5: pinned conversations ─────────────────────────────────────────
+  pinned: (() => {
+    try {
+      const raw = typeof localStorage !== "undefined" ? localStorage.getItem("sapphire:pinned") : null;
+      return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+      return [];
+    }
+  })(),
+  pinConversation: (id) =>
+    set((s) => {
+      if (s.pinned.includes(id)) return {};
+      const next = [id, ...s.pinned];
+      try { localStorage.setItem("sapphire:pinned", JSON.stringify(next)); } catch { /* noop */ }
+      return { pinned: next };
+    }),
+  unpinConversation: (id) =>
+    set((s) => {
+      const next = s.pinned.filter((p) => p !== id);
+      try { localStorage.setItem("sapphire:pinned", JSON.stringify(next)); } catch { /* noop */ }
+      return { pinned: next };
+    }),
+
+  // ── Phase 5: run notifications ─────────────────────────────────────────────
+  notifications: [],
+  addNotification: (n) => {
+    const id = uid("notif");
+    set((s) => ({ notifications: [...s.notifications, { ...n, id }] }));
+    if (n.ttl && n.ttl > 0) {
+      setTimeout(() => {
+        set((s) => ({ notifications: s.notifications.filter((x) => x.id !== id) }));
+      }, n.ttl);
+    }
+  },
+  dismissNotification: (id) =>
+    set((s) => ({ notifications: s.notifications.filter((n) => n.id !== id) })),
+
   // Tracks the AbortController for the in-flight run so we can cancel it on
   // new-query or unmount. Stored outside Zustand state (closure var) — it's an
   // imperative handle, not view state.
@@ -372,6 +448,15 @@ export const useFirm = create<FirmState>((set, get) => ({
       panelOpen: true,
       monitorTurnId: null, // a new turn returns the Monitor to "follow latest"
     }));
+
+    // Phase 5: fire "Running…" toast on convene (survives navigation away)
+    get().addNotification({
+      kind: "running",
+      title: "Running…",
+      body: (q || "replay").slice(0, 60),
+      ttl: 0, // manual dismiss; replaced by "complete" toast on finish
+    });
+    void turn.id; // Phase 5: runId captured above; used via turn.id closure in patchTurn
 
     const patchTurn = (patch: Partial<Turn>) =>
       set((s) => ({
@@ -426,11 +511,35 @@ export const useFirm = create<FirmState>((set, get) => ({
           onResult: (result) => {
             finalResult = result;
             patchTurn({ result, status: "complete" });
+            // Phase 5: replace "Running…" with "Run complete" toast
+            const title = (result.query || q || "Run").slice(0, 55);
+            // dismiss any running notification for this turn
+            set((s) => ({
+              notifications: s.notifications.filter(
+                (n) => !(n.kind === "running" && n.body?.startsWith((q || "replay").slice(0, 20))),
+              ),
+            }));
+            get().addNotification({
+              kind: "complete",
+              title: "Run complete",
+              body: title,
+              ttl: 6000,
+            });
           },
           onError: (message) => {
             // Swallow AbortError — the user/component deliberately cancelled.
             if (ac.signal.aborted) return;
             patchTurn({ error: message, status: "error" });
+            // Phase 5: fire error toast
+            set((s) => ({
+              notifications: s.notifications.filter((n) => n.kind !== "running"),
+            }));
+            get().addNotification({
+              kind: "error",
+              title: "Run failed",
+              body: message.slice(0, 80),
+              ttl: 8000,
+            });
           },
           onDone: () => {
             // if a result never arrived and no error was set, mark complete-ish
@@ -466,4 +575,21 @@ export const useFirm = create<FirmState>((set, get) => ({
       }
     }
   },
+
+  // WO-8 Phase 3: per-step pin (Info tab). In-memory only — Phase 5 owns
+  // cross-reload persistence for the rail's Pinned section (see PinnedStep doc).
+  pinnedSteps: [],
+  togglePinStep: (step) =>
+    set((s) => {
+      const exists = s.pinnedSteps.some(
+        (p) => p.turnId === step.turnId && p.key === step.key,
+      );
+      return {
+        pinnedSteps: exists
+          ? s.pinnedSteps.filter((p) => !(p.turnId === step.turnId && p.key === step.key))
+          : [step, ...s.pinnedSteps],
+      };
+    }),
+  isStepPinned: (turnId, key) =>
+    get().pinnedSteps.some((p) => p.turnId === turnId && p.key === key),
 }));

@@ -54,6 +54,7 @@ function AgentRow({
   const [open, setOpen] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
   const ev = row.ev;
+  const select = useFirm((s) => s.select);
 
   // Register this row with the Monitor so the focusRowId effect can open+scroll it.
   useEffect(() => {
@@ -102,7 +103,6 @@ function AgentRow({
     return all.find((v) => v.persona === row.agentId) ?? null;
   }, [isRT, turn, row.agentId]);
 
-  const setTab = useFirm((s) => s.setPanelTab);
   const select = useFirm((s) => s.select);
 
   return (
@@ -112,12 +112,18 @@ function AgentRow({
       className="mx-0.5 my-1 overflow-hidden rounded-[8px] border border-[var(--color-border)] bg-[var(--color-panel)] transition-colors hover:border-[var(--color-border-strong)]"
       style={open ? { borderColor: "var(--color-border-strong)" } : {}}
     >
-      {/* clickable header */}
+      {/* clickable header — click a trace row → Info (WO-8 Phase 3 locked design).
+          Still toggles the inline quick-preview below, but the primary action is
+          opening the full per-step Info view (only once the row has landed). */}
       <button
         onClick={() => {
           setOpen((o) => !o);
-          setTab("dossier");
-          select({ kind: "agent", agentId: row.agentId, turnId: turn?.id ?? "" });
+          if (!turn || !row.done) return;
+          select(
+            isRT
+              ? { kind: "verdict", persona: row.agentId, turnId: turn.id }
+              : { kind: "agent", agentId: row.agentId, turnId: turn.id },
+          );
         }}
         className="flex w-full items-center gap-2 px-2.5 py-2 text-left"
       >
