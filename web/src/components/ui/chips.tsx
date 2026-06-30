@@ -1,17 +1,23 @@
 "use client";
 import * as React from "react";
-import { FlaskConical, Globe, Lock, ShieldAlert } from "lucide-react";
-import { cn, provKind, provMarker, tierClass, type MockLabel, type ProvKind } from "@/lib/utils";
+import { Activity, FlaskConical, Globe, Lock, ShieldAlert } from "lucide-react";
+import { cn, provKind, tierClass, type MockLabel, type ProvKind } from "@/lib/utils";
 import type { FlagKind, Plane } from "@/lib/types";
 
 const base =
   "inline-flex items-center gap-1 rounded-[5px] border px-1.5 h-[18px] text-[10.5px] font-medium leading-none tracking-tight whitespace-nowrap font-mono";
 
-/* ── provenance chip (honesty marker — REAL / sim / cap) ── */
+/* ── provenance chip (honesty marker — icon + label) ── */
 const provStyle: Record<ProvKind, string> = {
   real: "border-[rgba(63,185,80,0.30)] bg-[rgba(63,185,80,0.08)] text-[#7ee787]",
   sim: "border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.08)] text-[#e3b341]",
   cap: "border-[rgba(86,182,255,0.28)] bg-[rgba(86,182,255,0.08)] text-[#79c0ff]",
+};
+
+const provIcon: Record<ProvKind, React.ReactNode> = {
+  real: <Activity className="size-2.5 shrink-0" />,
+  sim: <FlaskConical className="size-2.5 shrink-0" />,
+  cap: <Activity className="size-2.5 shrink-0 opacity-60" />,
 };
 
 export function ProvChip({ prov, via }: { prov?: string; via?: string }) {
@@ -19,7 +25,7 @@ export function ProvChip({ prov, via }: { prov?: string; via?: string }) {
   const kind = provKind(prov, via);
   return (
     <span className={cn(base, provStyle[kind])} title={`provenance: ${prov}`}>
-      <span className="text-[8px] leading-none">{provMarker(kind)}</span>
+      {provIcon[kind]}
       {prov}
     </span>
   );
