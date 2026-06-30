@@ -13,7 +13,7 @@ on why a trial design will fail, carries forward-looking signal that doesn't exi
 ## Procedure — corpus-first, then harvest the gap live
 1. Identify the field's KOLs and high-signal analyst voices for this target/class.
 2. **Query the local corpus FIRST.** Search
-   [`sapphire-orchestrator/corpus/kol-social-signal/`](../../../sapphire-orchestrator/corpus/kol-social-signal/)
+   [`sapphire-orchestrator/corpus/kol-social/`](../../../sapphire-orchestrator/corpus/kol-social/)
    — `index.jsonl` (one card per line: who · venue · claim · target_drug · position · attribution · date ·
    source · url · quote · tier) and the themed `notes/`. This holds **durable named-expert-on-record
    positions** (journal editorials/viewpoints, society voices) already attributed + dated, with the
@@ -36,7 +36,7 @@ KNOWN UNKNOWNS: low-coverage subfields
 ```
 
 ## Sources / tools
-**Local corpus (first):** [`sapphire-orchestrator/corpus/kol-social-signal/`](../../../sapphire-orchestrator/corpus/kol-social-signal/)
+**Local corpus (first):** [`sapphire-orchestrator/corpus/kol-social/`](../../../sapphire-orchestrator/corpus/kol-social/)
 — pre-ingested, attributed named-KOL on-record positions (`index.jsonl` + themed `notes/`, each card with
 who/venue/date/url/quote/tier). Hit this before any live harvest.
 

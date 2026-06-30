@@ -1649,6 +1649,17 @@ class TestBatchBucket1(unittest.TestCase):
         os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
 
     def test_batched_agents_land_facts_and_are_stamped(self):
+        # Monkeypatch live_engine.has_corpus → False so all agents are treated as
+        # corpus-less for this test.  Phase 0 grounded all 13 semantic agents, which
+        # correctly makes _batch_bucket1 skip every agent (corpus agents skip the batch
+        # path by design).  But the TEST must exercise the batch mechanism regardless of
+        # production grounding state, so we decouple them here.  The patch is scoped to
+        # this test via addCleanup and cannot leak into other tests.
+        import live_engine as _le
+        _orig_has_corpus = _le.has_corpus
+        _le.has_corpus = lambda *a, **k: False
+        self.addCleanup(setattr, _le, "has_corpus", _orig_has_corpus)
+
         ctx = _build_ctx()
         ctx["runner"] = _batch_aware_runner
         ctx["batch_buckets"] = True

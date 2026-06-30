@@ -1,7 +1,7 @@
 # Manifest — Financial & Investor Intelligence corpus
 
 **Agent:** Financial & Investor Intelligence Analyst (Bucket 1, semantic) · dossier field **E2** (competitive pipeline / deals).
-**Built:** `gavin/corpus-financial-investor` (2nd of Gavin's 6 semantic corpora; per the locked `fda-institutional-memory/METHOD.md`).
+**Built:** `gavin/corpus-financial-investor` (2nd of Gavin's 6 semantic corpora; per the locked `fda-institutional-memory/METHOD.md`). **Corpus dir:** `corpus/financial/` (renamed from `corpus/financial-investor/` — Phase 0 ID fix, WO-6).
 **Retrieval window:** 2026-06-24.
 **Cards:** **6** in `index.jsonl` (5 financial/deal events + 1 EMET deal-thesis grounding) · **Notes:** 2 themed files in `notes/`.
 **Tier split:** **3 T1 / 3 T2** — T1 = SEC primary filings (`sec.gov` 8-Ks); T2 = company/IR press + the EMET card.

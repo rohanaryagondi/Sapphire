@@ -1,7 +1,7 @@
 # Manifest — KOL & Social Signal corpus
 
 **Agent:** KOL & Social Signal Monitor (Bucket 1, semantic) · dossier field **F2** (KOL / expert sentiment).
-**Built:** `gavin/corpus-kol-social-signal` (4th of Gavin's 6 semantic corpora; per `fda-institutional-memory/METHOD.md`).
+**Built:** `gavin/corpus-kol-social-signal` (4th of Gavin's 6 semantic corpora; per `fda-institutional-memory/METHOD.md`). **Corpus dir:** `corpus/kol-social/` (renamed from `corpus/kol-social-signal/` — Phase 0 ID fix, WO-6).
 **Retrieval window:** 2026-06-25.
 **Cards:** **6** in `index.jsonl` (5 named-KOL on-record positions + 1 EMET validation) · **Notes:** 1 themed file in `notes/`.
 **Tier split:** **0 T1 / 6 T2** — by design: this agent's signal is *expert opinion*, which is inherently secondary. The spec's 4-tier scheme (T3 named-expert / T4 anonymous) maps onto the corpus's T1/T2 gate as **T2**; **T4 anonymous/social is excluded from pre-ingestion** (live-harvest only — see scope note).
