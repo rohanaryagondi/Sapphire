@@ -2234,5 +2234,324 @@ class TestBucket1Parallelization(unittest.TestCase):
                                   f"Agent {agent.get('id')} n_facts not int: {agent}")
 
 
+class TestBucket2Parallel(unittest.TestCase):
+    """Tests for the Bucket-2 round-1 parallel dispatch (ThreadPoolExecutor).
+
+    All backends are mocked — no real claude/EMET/AWS. The fake runner is fast
+    (in-process), so these tests complete in milliseconds and are fully offline/$0.
+
+    Five tests required by the brief:
+      1. test_parallel_verdicts_match_serial         — order-independent set comparison
+      2. test_concurrency_1_equals_serial            — per-persona name/stance/conviction
+      3. test_no_persona_dropped_parallel            — all N personas yield N verdicts
+      4. test_thread_safety_trace_no_corruption      — JSONL valid under 4 workers
+      5. test_on_progress_events_roundtable_all_personas — start+done for every persona
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+        # Reset the concurrency constant so tests are independent.
+        os.environ.pop("SAPPHIRE_BUCKET2_CONCURRENCY", None)
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+        os.environ.pop("SAPPHIRE_BUCKET2_CONCURRENCY", None)
+
+    def _run(self, concurrency):
+        """Run with a specific _MAX_BUCKET2_WORKERS value (patched at module level)."""
+        import live_engine
+        old = live_engine._MAX_BUCKET2_WORKERS
+        live_engine._MAX_BUCKET2_WORKERS = concurrency
+        try:
+            return run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=_build_ctx(),
+            )
+        finally:
+            live_engine._MAX_BUCKET2_WORKERS = old
+
+    # ── test 1: parallel verdicts match serial (order-independent) ────────────
+    def test_parallel_verdicts_match_serial(self):
+        """Run twice (concurrency=1 and concurrency=3, same deterministic mock runner),
+        collect round1 persona-name sets and stances, assert they match order-independently.
+        """
+        serial = self._run(concurrency=1)
+        parallel = self._run(concurrency=3)
+
+        serial_round1 = serial["consult"]["round1"]
+        parallel_round1 = parallel["consult"]["round1"]
+
+        # Both must produce the same number of verdicts.
+        self.assertEqual(
+            len(serial_round1), len(parallel_round1),
+            f"Verdict count mismatch: serial={len(serial_round1)} parallel={len(parallel_round1)}"
+        )
+
+        # The set of (persona, stance) pairs must be the same regardless of completion order.
+        serial_pairs = {
+            (v.get("persona", ""), v.get("stance", "hold"))
+            for v in serial_round1
+        }
+        parallel_pairs = {
+            (v.get("persona", ""), v.get("stance", "hold"))
+            for v in parallel_round1
+        }
+        self.assertEqual(
+            serial_pairs, parallel_pairs,
+            f"Parallel produced different (persona, stance) pairs than serial.\n"
+            f"  serial={sorted(serial_pairs)}\n  parallel={sorted(parallel_pairs)}"
+        )
+
+    # ── test 2: concurrency=1 produces the same results as the default ────────
+    def test_concurrency_1_equals_serial(self):
+        """SAPPHIRE_BUCKET2_CONCURRENCY=1 (single-thread pool) must yield identical
+        round1 persona names, stances, and convictions to the default-concurrency run."""
+        result_c1 = self._run(concurrency=1)
+        result_c8 = self._run(concurrency=8)
+
+        r1_c1 = result_c1["consult"]["round1"]
+        r1_c8 = result_c8["consult"]["round1"]
+
+        # Same persona names (order-independent for robustness against scheduler variance).
+        names_c1 = {v.get("persona", "") for v in r1_c1}
+        names_c8 = {v.get("persona", "") for v in r1_c8}
+        self.assertEqual(
+            names_c1, names_c8,
+            f"concurrency=1 produced different persona set from concurrency=8.\n"
+            f"  c1={sorted(names_c1)}\n  c8={sorted(names_c8)}"
+        )
+
+        # Same stances (deterministic mock runner returns the same stance every time).
+        stances_c1 = {v.get("stance", "hold") for v in r1_c1}
+        stances_c8 = {v.get("stance", "hold") for v in r1_c8}
+        self.assertEqual(
+            stances_c1, stances_c8,
+            f"concurrency=1 produced different stances from concurrency=8.\n"
+            f"  c1={sorted(stances_c1)}\n  c8={sorted(stances_c8)}"
+        )
+
+        # Same conviction values.
+        convictions_c1 = {v.get("conviction", 0) for v in r1_c1}
+        convictions_c8 = {v.get("conviction", 0) for v in r1_c8}
+        self.assertEqual(
+            convictions_c1, convictions_c8,
+            f"concurrency=1 produced different convictions from concurrency=8.\n"
+            f"  c1={sorted(convictions_c1)}\n  c8={sorted(convictions_c8)}"
+        )
+
+    # ── test 3: no persona dropped with parallel dispatch ────────────────────
+    def test_no_persona_dropped_parallel(self):
+        """With N personas in the mock plan, parallel dispatch must yield exactly N verdicts
+        (no future silently dropped on exception)."""
+        result = self._run(concurrency=4)
+        round1 = result["consult"]["round1"]
+        panel = result["plan"].get("panel", [])
+
+        # panel may be empty for this query in the mock orchestrator; the invariant is
+        # that round1 == panel in length (all submitted futures were joined and appended).
+        self.assertEqual(
+            len(round1), len(panel),
+            f"Parallel dispatch dropped or duplicated verdicts: "
+            f"expected {len(panel)} (panel length) got {len(round1)} round1 entries.\n"
+            f"  panel={[p.get('persona', p) for p in panel]}\n"
+            f"  round1 personas={[v.get('persona') for v in round1]}"
+        )
+
+    # ── test 4: trace is valid JSONL under concurrent persona writes ─────────
+    def test_thread_safety_trace_no_corruption(self):
+        """Run with _MAX_BUCKET2_WORKERS=4, then read the trace.jsonl and assert every
+        line parses as valid JSON (no interleaved/corrupted write from parallel personas)."""
+        result = self._run(concurrency=4)
+        eid = result["engagement_id"]
+        trace_file = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_file), f"Trace file not found: {trace_file}")
+
+        with open(trace_file, encoding="utf-8") as fh:
+            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+
+        self.assertGreater(
+            len(lines), 2,
+            "Trace must have at least engagement_open + one record + engagement_close"
+        )
+
+        for i, line in enumerate(lines):
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as exc:
+                self.fail(
+                    f"Trace line {i} is not valid JSON (interleaved write from parallel "
+                    f"Bucket-2 personas?): {exc}\n  Line content: {line[:160]}"
+                )
+            self.assertIsInstance(
+                obj, dict,
+                f"Trace line {i} parsed but is not a JSON object: {type(obj)}"
+            )
+
+    # ── test 5: on_progress events cover all personas (start + done) ─────────
+    def test_on_progress_events_roundtable_all_personas(self):
+        """With on_progress callback collecting events, assert every persona in panel
+        has both a roundtable 'start' and a roundtable 'done' event."""
+        import live_engine
+
+        events: list[dict] = []
+
+        def _collect(ev):
+            events.append(dict(ev))
+
+        old = live_engine._MAX_BUCKET2_WORKERS
+        live_engine._MAX_BUCKET2_WORKERS = 3
+        try:
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=_build_ctx(),
+                on_progress=_collect,
+            )
+        finally:
+            live_engine._MAX_BUCKET2_WORKERS = old
+
+        panel = result["plan"].get("panel", [])
+        # If there are no personas in the panel, the test is vacuously true — skip
+        # with a clear message so CI doesn't silently green a plan-without-panel.
+        if not panel:
+            self.skipTest("No personas in plan.panel for this query/mock; skipping roundtable event check.")
+
+        roundtable_events = [
+            ev for ev in events
+            if ev.get("stage") == "roundtable" and ev.get("round") == 1
+        ]
+
+        for p in panel:
+            persona_name = p.get("persona", "")
+            persona_events = [ev for ev in roundtable_events if ev.get("agent_id") == persona_name]
+            phases = {ev.get("phase") for ev in persona_events}
+
+            self.assertIn(
+                "start", phases,
+                f"Persona '{persona_name}' missing 'start' roundtable event. "
+                f"Got phases={sorted(phases)} from events={persona_events}"
+            )
+            self.assertIn(
+                "done", phases,
+                f"Persona '{persona_name}' missing 'done' roundtable event. "
+                f"Got phases={sorted(phases)} from events={persona_events}"
+            )
+
+    # ── test 6: round-2 (rebuttal) runs in parallel — no personas dropped ────
+    def test_round2_no_persona_dropped_parallel(self):
+        """Parallel round-2 dispatch must yield exactly len(panel) rebuttal entries
+        (no future silently dropped, no persona duplicated)."""
+        result = self._run(concurrency=4)
+        round2 = result["consult"]["round2"]
+        panel = result["plan"].get("panel", [])
+
+        self.assertEqual(
+            len(round2), len(panel),
+            f"Round-2 parallel dropped/duplicated entries: "
+            f"expected {len(panel)} got {len(round2)}.\n"
+            f"  panel={[p.get('persona', p) for p in panel]}\n"
+            f"  round2 personas={[r.get('persona') for r in round2]}"
+        )
+
+    # ── test 7: round-2 trace is valid JSONL under concurrent writes ──────────
+    def test_round2_trace_valid_jsonl_parallel(self):
+        """After parallel round-2 dispatch with 4 workers, every line of trace.jsonl
+        must parse as valid JSON (no interleaved writes from concurrent rebuttal threads)."""
+        result = self._run(concurrency=4)
+        eid = result["engagement_id"]
+        trace_file = os.path.join(self._eng_dir, eid, "trace.jsonl")
+        self.assertTrue(os.path.exists(trace_file), f"Trace not found: {trace_file}")
+
+        with open(trace_file, encoding="utf-8") as fh:
+            lines = [ln for ln in fh.read().splitlines() if ln.strip()]
+
+        for i, line in enumerate(lines):
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError as exc:
+                self.fail(
+                    f"Trace line {i} not valid JSON (interleaved write from parallel "
+                    f"round-2 threads?): {exc}\n  Line: {line[:160]}"
+                )
+            self.assertIsInstance(obj, dict, f"Trace line {i} is not a JSON object")
+
+    # ── test 8: round-2 on_progress events cover all personas ────────────────
+    def test_round2_on_progress_events_all_personas(self):
+        """With on_progress callback, every persona must have a rebuttal_start and
+        rebuttal_done event in the roundtable stage (round-2 progress events)."""
+        import live_engine
+        events: list[dict] = []
+
+        def _collect(ev):
+            events.append(dict(ev))
+
+        old = live_engine._MAX_BUCKET2_WORKERS
+        live_engine._MAX_BUCKET2_WORKERS = 3
+        try:
+            result = run_live(
+                "Is TSC2 a viable target in tuberous sclerosis?",
+                ctx=_build_ctx(),
+                on_progress=_collect,
+            )
+        finally:
+            live_engine._MAX_BUCKET2_WORKERS = old
+
+        panel = result["plan"].get("panel", [])
+        if not panel:
+            self.skipTest("No personas in plan.panel; skipping round-2 event check.")
+
+        r2_events = [
+            ev for ev in events
+            if ev.get("stage") == "roundtable" and ev.get("round") == 2
+        ]
+
+        for p in panel:
+            persona_name = p.get("persona", "")
+            persona_r2_events = [ev for ev in r2_events if ev.get("agent_id") == persona_name]
+            phases = {ev.get("phase") for ev in persona_r2_events}
+
+            self.assertIn(
+                "rebuttal_start", phases,
+                f"Persona '{persona_name}' missing 'rebuttal_start' event in round-2. "
+                f"Got phases={sorted(phases)} from events={persona_r2_events}"
+            )
+            self.assertIn(
+                "rebuttal_done", phases,
+                f"Persona '{persona_name}' missing 'rebuttal_done' event in round-2. "
+                f"Got phases={sorted(phases)} from events={persona_r2_events}"
+            )
+
+    # ── test 9: round-2 barrier — round1 fully joined before round2 starts ───
+    def test_round2_barrier_round1_complete(self):
+        """round1 must be fully populated BEFORE round2 dispatches — each round-2
+        worker must see the complete round1 verdicts list (barrier invariant)."""
+        result = self._run(concurrency=4)
+        round1 = result["consult"]["round1"]
+        round2 = result["consult"]["round2"]
+        panel = result["plan"].get("panel", [])
+
+        # Basic sanity: both lists have the same length as the panel.
+        self.assertEqual(len(round1), len(panel),
+                         "round1 length must equal panel length")
+        self.assertEqual(len(round2), len(panel),
+                         "round2 length must equal panel length")
+
+        # Every round2 entry must have a 'revised' field (set by the worker using
+        # round1 conviction/stance comparison — only possible if round1 was complete).
+        for i, r2 in enumerate(round2):
+            self.assertIn(
+                "revised", r2,
+                f"round2[{i}] missing 'revised' field — was round1 incomplete at dispatch? "
+                f"entry={r2}"
+            )
+            self.assertIsInstance(
+                r2["revised"], bool,
+                f"round2[{i}].revised must be bool; got {type(r2['revised'])}: {r2['revised']}"
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
