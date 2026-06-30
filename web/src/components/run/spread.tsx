@@ -6,14 +6,55 @@ import { finalVerdicts, isRebuttalRound } from "@/lib/verdicts";
 import { Chip, ProvChip } from "@/components/ui/chips";
 import { useFirm } from "@/lib/store";
 
-const stanceStyle: Record<string, { bar: string; text: string }> = {
-  advance: { bar: "bg-[var(--color-ok)]", text: "text-[var(--color-ok)]" },
-  caution: { bar: "bg-[var(--color-warn)]", text: "text-[var(--color-warn)]" },
-  block: { bar: "bg-[var(--color-danger)]", text: "text-[var(--color-danger)]" },
-  neutral: { bar: "bg-[var(--color-fg-subtle)]", text: "text-[var(--color-fg-muted)]" },
+const stanceStyle: Record<string, { bar: string; text: string; fill: string }> = {
+  advance: {
+    bar: "bg-[var(--color-ok)]",
+    text: "text-[var(--color-ok)]",
+    fill: "bg-[var(--color-ok)]",
+  },
+  caution: {
+    bar: "bg-[var(--color-warn)]",
+    text: "text-[var(--color-warn)]",
+    fill: "bg-[var(--color-warn)]",
+  },
+  block: {
+    bar: "bg-[var(--color-danger)]",
+    text: "text-[var(--color-danger)]",
+    fill: "bg-[var(--color-danger)]",
+  },
+  neutral: {
+    bar: "bg-[var(--color-fg-subtle)]",
+    text: "text-[var(--color-fg-muted)]",
+    fill: "bg-[var(--color-fg-subtle)]",
+  },
 };
 
-function VerdictCard({ v, turnId, via }: { v: Verdict; turnId: string; via?: string }) {
+function ConvictionBar({ conviction, fill }: { conviction: number; fill: string }) {
+  const pct = Math.max(0, Math.min(10, conviction)) / 10;
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="h-[3px] w-[60px] overflow-hidden rounded-full bg-[var(--color-border)]">
+        <div
+          className={cn("h-full rounded-full transition-all", fill)}
+          style={{ width: `${pct * 100}%` }}
+        />
+      </div>
+      <span className="text-[10.5px] text-[var(--color-fg-subtle)]">{conviction}/10</span>
+    </div>
+  );
+}
+
+function VerdictCard({
+  v,
+  turnId,
+  via,
+  compact,
+}: {
+  v: Verdict;
+  turnId: string;
+  via?: string;
+  compact?: boolean;
+}) {
   const select = useFirm((s) => s.select);
   const selection = useFirm((s) => s.selection);
   const ok = v.status === "ok";
@@ -47,8 +88,20 @@ function VerdictCard({ v, turnId, via }: { v: Verdict; turnId: string; via?: str
           <span className="text-[11px] text-[var(--color-fg-subtle)]">abstained</span>
         )}
       </div>
+
+      {v.conviction != null && (
+        <div className="mb-1.5">
+          <ConvictionBar conviction={v.conviction} fill={st.fill} />
+        </div>
+      )}
+
       {v.rationale && (
-        <p className="line-clamp-3 text-[12px] leading-snug text-[var(--color-fg-muted)]">
+        <p
+          className={cn(
+            "text-[12px] leading-snug text-[var(--color-fg-muted)]",
+            compact ? "line-clamp-2" : "",
+          )}
+        >
           {v.rationale}
         </p>
       )}
@@ -63,6 +116,7 @@ function VerdictCard({ v, turnId, via }: { v: Verdict; turnId: string; via?: str
 
 export function Spread({ result, turnId }: { result: RunResult; turnId: string }) {
   const round = finalVerdicts(result);
+  const panelOpen = useFirm((s) => s.panelOpen);
   const label = isRebuttalRound(result)
     ? "round 2 · rebuttal"
     : "round 1 · independent verdicts";
@@ -82,7 +136,13 @@ export function Spread({ result, turnId }: { result: RunResult; turnId: string }
       </div>
       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
         {round.map((v, i) => (
-          <VerdictCard key={`${v.persona}_${i}`} v={v} turnId={turnId} via={via} />
+          <VerdictCard
+            key={`${v.persona}_${i}`}
+            v={v}
+            turnId={turnId}
+            via={via}
+            compact={panelOpen}
+          />
         ))}
       </div>
     </div>
