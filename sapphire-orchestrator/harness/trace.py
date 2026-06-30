@@ -1,12 +1,20 @@
 """Append-only per-engagement trace (spec §A.6). Reuses the launcher.py ledger idiom:
 one JSON object per line, each stamped with an ISO-8601 ts. The audit surface AND the
-self-improvement loop's input. Dir override via SAPPHIRE_ENGAGEMENTS_DIR (tests)."""
+self-improvement loop's input. Dir override via SAPPHIRE_ENGAGEMENTS_DIR (tests).
+
+Thread-safety: _append acquires _APPEND_LOCK so concurrent Bucket-1 threads (ThreadPoolExecutor)
+never interleave partial JSON lines in the trace file. All callers (harness.run, _emit, corpus)
+go through this module, so one lock covers the whole trace surface."""
 from __future__ import annotations
 
 import datetime
 import json
 import os
+import threading
 from pathlib import Path
+
+# One lock for all trace writes — serialises concurrent appends from parallel Bucket-1 threads.
+_APPEND_LOCK = threading.Lock()
 
 _DEFAULT_DIR = Path(__file__).resolve().parents[2] / "RohanOnly" / "engagements"
 
@@ -26,8 +34,9 @@ def trace_path(engagement_id: str) -> Path:
 
 
 def _append(engagement_id: str, event: dict) -> None:
-    with open(trace_path(engagement_id), "a", encoding="utf-8") as f:
-        f.write(json.dumps({"ts": _now(), **event}) + "\n")
+    with _APPEND_LOCK:
+        with open(trace_path(engagement_id), "a", encoding="utf-8") as f:
+            f.write(json.dumps({"ts": _now(), **event}) + "\n")
 
 
 def open_engagement(engagement_id: str, plan: dict) -> None:

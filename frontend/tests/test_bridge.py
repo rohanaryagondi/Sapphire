@@ -39,6 +39,15 @@ class TestBridge(unittest.TestCase):
         self.assertEqual(r["_via"], "harness-live")
 
     def test_simulate_models_labels_personas_keeps_facts_real(self):
+        import sys, os as _os
+        _orch = _os.path.join(_os.path.dirname(__file__), '..', '..', 'sapphire-orchestrator')
+        if _orch not in sys.path:
+            sys.path.insert(0, _orch)
+        from moat.client import MoatClient
+        from moat.facts import moat_facts as _moat_facts
+        # Skip if the moat DB is unavailable or has no TSC2 hits.
+        if not MoatClient().available() or not _moat_facts("TSC2", k=1):
+            self.skipTest("moat DB unavailable or no TSC2 hits — skipping moat-real provenance assertion")
         r = bridge.run("Is TSC2 a viable target in tuberous sclerosis?", mock=True, simulate=True)
         self.assertEqual(validate_run_live(r), [])           # still a valid run
         self.assertTrue(r["_simulated"])
