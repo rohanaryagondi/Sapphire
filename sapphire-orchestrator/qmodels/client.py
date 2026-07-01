@@ -28,6 +28,10 @@ HERE = Path(__file__).resolve().parent
 REGISTRY_PATH = HERE / "registry.json"
 DEFAULT_LOCAL_URL = os.environ.get("QMODELS_LOCAL_URL", "http://127.0.0.1:8000")
 GPU_ENABLED = os.environ.get("QMODELS_GPU", "on").lower() not in ("off", "0", "false")
+# WO-9 Phase 4: gate REAL AWS launches behind SAPPHIRE_QMODELS_LIVE=1 (default OFF = dry-run).
+# When OFF, GPU-tier tools return a clearly-labeled dry-run result (provenance=gpu-dry-run).
+# When ON, the launcher is invoked for real (provenance=gpu-live on completion, gpu-stub on error).
+QMODELS_LIVE = os.environ.get("SAPPHIRE_QMODELS_LIVE", "0").strip() in ("1", "true", "yes")
 
 
 def load_registry(path: Path = REGISTRY_PATH) -> dict:
@@ -110,21 +114,88 @@ class QModelsClient:
         return row
 
     def _submit_gpu(self, tool: dict, inputs: dict) -> dict:
+        """Route a GPU-tier tool call.
+
+        Default (SAPPHIRE_QMODELS_LIVE not set): dry-run only — render the launch plan,
+        record the tool_id/label/inputs, return provenance=gpu-dry-run. Zero AWS calls.
+
+        Live opt-in (SAPPHIRE_QMODELS_LIVE=1): delegate to the launcher lifecycle —
+        auto-launch a tagged Sapphire EC2, attach EBS, run *_eval.py, retrieve result.json,
+        teardown by ledgered id. Provenance=gpu-live on success, gpu-stub on error.
+        All AWS safety guards are in launcher.py (profile Rohan-Sapphire, account-gate,
+        create-only ledger, teardown-only-by-ledgered-id, budget cap).
+        """
         if not GPU_ENABLED:
             return {"ok": False, "tool_id": tool["id"], "provenance": "gpu-disabled",
                     "model": tool.get("label") or tool.get("name"),
                     "note": "GPU tools disabled (QMODELS_GPU=off). Set QMODELS_GPU=on to enable the launcher.",
                     "out": "(gpu disabled)"}
         try:
-            from . import launcher  # lazy: launcher may run real AWS — only imported on a GPU call
+            from . import launcher  # lazy: only imported on a GPU call (may touch AWS in live mode)
         except Exception as e:
-            return {"ok": False, "tool_id": tool["id"], "provenance": "gpu-async",
+            return {"ok": False, "tool_id": tool["id"], "provenance": "gpu-stub",
                     "note": f"launcher unavailable: {e}", "out": "(launcher missing)"}
-        job = launcher.submit_job(tool, inputs)
-        return {"ok": True, "tool_id": tool["id"], "provenance": "gpu-async",
-                "model": tool.get("label") or tool.get("name"),
-                "job_id": job.get("job_id"), "status": job.get("status", "submitted"),
-                "out": f"GPU job {job.get('status', 'submitted')} ({job.get('job_id')}) — poll for result"}
+
+        tool_id = tool["id"]
+        tool_label = tool.get("label") or tool.get("name") or tool_id
+
+        if not QMODELS_LIVE:
+            # DRY-RUN: render the launch plan + validate the recipe; no AWS call.
+            # submit_job(mode="dry-run") is pure-local (validates userdata, writes a job file).
+            job = launcher.submit_job(tool, inputs, mode="dry-run")
+            return {
+                "ok": True,
+                "tool_id": tool_id,
+                "provenance": "gpu-dry-run",
+                "model": tool_label,
+                "job_id": job.get("job_id"),
+                "status": "dry-run",
+                "note": (job.get("note") or
+                         "Dry-run: set SAPPHIRE_QMODELS_LIVE=1 to launch a real Sapphire EC2."),
+                "out": (f"GPU tool {tool_id!r} selected; would launch tagged Sapphire EC2 (dry-run). "
+                        f"Label: {tool_label}. "
+                        f"Input recorded. Set SAPPHIRE_QMODELS_LIVE=1 for a real run."),
+            }
+
+        # LIVE PATH (SAPPHIRE_QMODELS_LIVE=1): every safety guard enforced inside launcher.
+        try:
+            job = launcher.submit_job(tool, inputs, mode="live")
+        except Exception as e:
+            return {"ok": False, "tool_id": tool_id, "provenance": "gpu-stub",
+                    "model": tool_label,
+                    "note": f"launcher submit failed: {e}", "out": "(gpu launch failed)"}
+
+        if job.get("status") in ("refused-budget", "dry-run-validated"):
+            return {"ok": False, "tool_id": tool_id, "provenance": "gpu-stub",
+                    "model": tool_label,
+                    "note": job.get("note", "launch refused"), "out": "(launch refused)"}
+
+        # Job launched — wait for completion + result retrieval.
+        try:
+            job = launcher.wait_for(job["job_id"])
+        except Exception as e:
+            return {"ok": False, "tool_id": tool_id, "provenance": "gpu-stub",
+                    "model": tool_label,
+                    "note": f"wait_for failed: {e}", "out": "(wait failed)"}
+
+        if job.get("status") == "done" and job.get("result"):
+            return {
+                "ok": True,
+                "tool_id": tool_id,
+                "provenance": "gpu-live",
+                "model": tool_label,
+                "job_id": job.get("job_id"),
+                "instance_id": job.get("instance_id"),
+                "status": "done",
+                "result": job["result"],
+                "out": str(job["result"]),
+            }
+        # done-no-result / timeout-torn-down / other terminal states
+        return {"ok": False, "tool_id": tool_id, "provenance": "gpu-stub",
+                "model": tool_label,
+                "job_id": job.get("job_id"),
+                "note": job.get("note", f"job ended with status={job.get('status')}"),
+                "out": "(gpu run ended without a retrievable result)"}
 
     def poll(self, job_id: str) -> dict:
         try:
