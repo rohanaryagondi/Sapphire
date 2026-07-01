@@ -2592,5 +2592,269 @@ class TestBucket2Parallel(unittest.TestCase):
             )
 
 
+class TestRoundtableHaikuRetry(unittest.TestCase):
+    """Tests for the Haiku-reliability retry in _run_persona_round1 (WO-9).
+
+    When a partner dispatch returns `abstained (guardrail-violation)` on the FIRST call,
+    live_engine must retry it ONCE before accepting the abstain.  If the retry succeeds,
+    the verdict is accepted.  If the retry also fails (genuine abstain), the abstain is
+    kept.  A partner that passes on the FIRST call must NOT trigger a second dispatch.
+
+    All tests are hermetic: harness.run is monkeypatched; no real claude / EMET / AWS.
+    """
+
+    def setUp(self):
+        self._eng_dir = tempfile.mkdtemp()
+        self._mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = self._eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = self._mem_dir
+
+    def tearDown(self):
+        os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+        os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+    def _make_persona_panel(self, persona_name="Test VP"):
+        """Return a minimal persona panel dict (one persona)."""
+        return {"persona": persona_name, "lens": "scientific"}
+
+    def _make_dossier_facts(self):
+        """Return a minimal dossier with one fact (so dossier_fields is non-empty)."""
+        return [{"value": "TSC2 loss activates mTOR signalling", "source": "PMID:1",
+                 "tier": "T2", "provenance": "semantic-web"}]
+
+    def _make_abstain_result(self, agent_id="company-partner"):
+        """AgentResult that represents a guardrail-violation abstain."""
+        from harness.contracts import AgentResult
+        from harness.errors import abstain_envelope
+        return AgentResult(
+            agent_id=agent_id,
+            ok=False,
+            output=abstain_envelope("guardrail-violation", "at least one cited fact_claim"),
+            provenance="persona-judgment",
+            status="abstained",
+            error="guardrail-violation",
+            meta={"inputs_hash": "sha256:aaa", "latency_ms": 10, "repairs": 2,
+                  "guardrails_run": ["must_cite_dossier"]},
+        )
+
+    def _make_ok_result(self, persona_name="Test VP", agent_id="company-partner"):
+        """AgentResult that represents a successful persona verdict."""
+        from harness.contracts import AgentResult
+        output = {
+            "persona": persona_name,
+            "stance": "conditional",
+            "conviction": 3,
+            "rationale": "Grounded in dossier evidence.",
+            "fact_claims": [{"claim": "TSC2 loss activates mTOR",
+                             "cite": "TSC2 loss activates mTOR signalling"}],
+            "provenance": "persona-judgment",
+        }
+        return AgentResult(
+            agent_id=agent_id,
+            ok=True,
+            output=output,
+            provenance="persona-judgment",
+            status="ok",
+            error=None,
+            meta={"inputs_hash": "sha256:bbb", "latency_ms": 20, "repairs": 0,
+                  "guardrails_run": ["must_cite_dossier"]},
+        )
+
+    def _run_one_persona(self, persona_name, side_effects, dossier_facts=None):
+        """Run _run_persona_round1 with harness.run replaced by a side_effect iterator.
+
+        Returns (persona_name, verdict_dict, call_count).
+        """
+        from live_engine import _run_persona_round1
+        from harness.contracts import load_registry
+
+        if dossier_facts is None:
+            dossier_facts = self._make_dossier_facts()
+
+        registry = load_registry()
+        ctx = _build_ctx()
+        import tempfile, hashlib
+        eid = "eng_" + hashlib.sha256(persona_name.encode()).hexdigest()[:8]
+
+        call_count = [0]
+        effect_iter = iter(side_effects)
+
+        def _fake_harness_run(agent_id, inputs, *, engagement_id, ctx, registry):
+            call_count[0] += 1
+            return next(effect_iter)
+
+        with mock.patch("live_engine.harness.run", side_effect=_fake_harness_run):
+            result = _run_persona_round1(
+                p={"persona": persona_name, "lens": "scientific"},
+                all_dossier_facts=dossier_facts,
+                eid=eid,
+                ctx=ctx,
+                registry=registry,
+                on_progress=None,
+                known_ids={"company-partner"},
+                veto_flags=[],
+            )
+
+        persona_out, verdict = result
+        return persona_out, verdict, call_count[0]
+
+    # ── test A: first abstains on guardrail-violation, retry succeeds ──────────
+    def test_retry_fires_when_first_call_guardrail_violation(self):
+        """When the first dispatch abstains on guardrail-violation, retry ONCE and
+        accept the retry result when it succeeds.  The verdict must carry status='ok'
+        and a real stance — not the abstained verdict."""
+        abstain = self._make_abstain_result()
+        ok = self._make_ok_result()
+
+        _name, verdict, calls = self._run_one_persona(
+            "Test VP",
+            side_effects=[abstain, ok],
+        )
+
+        # The retry must have fired (2 total calls).
+        self.assertEqual(calls, 2,
+                         f"Expected exactly 2 harness.run calls (first=abstain, retry=ok); "
+                         f"got {calls}")
+        # The final verdict must be the successful one.
+        self.assertEqual(verdict.get("status"), "ok",
+                         f"Expected status 'ok' from retry; got verdict={verdict}")
+        self.assertEqual(verdict.get("stance"), "conditional",
+                         f"Expected stance from retry; got {verdict.get('stance')}")
+        self.assertTrue(
+            len(verdict.get("fact_claims", [])) >= 1,
+            f"Expected fact_claims from retry verdict; got {verdict.get('fact_claims')}"
+        )
+
+    # ── test B: first call succeeds — NO retry fired ──────────────────────────
+    def test_no_retry_when_first_call_succeeds(self):
+        """When the first dispatch succeeds, the retry must NOT fire.  Total harness.run
+        calls must be exactly 1."""
+        ok = self._make_ok_result()
+
+        _name, verdict, calls = self._run_one_persona(
+            "Test VP",
+            side_effects=[ok],
+        )
+
+        self.assertEqual(calls, 1,
+                         f"Expected exactly 1 harness.run call (no retry on success); "
+                         f"got {calls}")
+        self.assertEqual(verdict.get("status"), "ok",
+                         f"Expected ok from first call; got verdict={verdict}")
+
+    # ── test C: both first and retry abstain (genuine abstain) ────────────────
+    def test_retry_then_genuine_abstain_accepted(self):
+        """When both the first call AND the retry abstain on guardrail-violation,
+        the final verdict must be the abstained one (honest), NOT crash.  Total
+        harness.run calls must be exactly 2."""
+        abstain1 = self._make_abstain_result()
+        abstain2 = self._make_abstain_result()
+
+        _name, verdict, calls = self._run_one_persona(
+            "Test VP",
+            side_effects=[abstain1, abstain2],
+        )
+
+        self.assertEqual(calls, 2,
+                         f"Expected exactly 2 calls (both abstain); got {calls}")
+        self.assertIn(
+            "guardrail-violation", verdict.get("rationale", ""),
+            f"Genuine-abstain verdict must say guardrail-violation; got {verdict}"
+        )
+
+    # ── test D: non-guardrail error NOT retried ───────────────────────────────
+    def test_non_guardrail_error_not_retried(self):
+        """A partner that abstains on a non-guardrail-violation error (e.g. timeout) must
+        NOT be retried — the retry is specific to guardrail-violation only."""
+        from harness.contracts import AgentResult
+        from harness.errors import abstain_envelope
+        timeout_result = AgentResult(
+            agent_id="company-partner",
+            ok=False,
+            output=abstain_envelope("timeout", "a working backend"),
+            provenance="persona-judgment",
+            status="abstained",
+            error="timeout",
+            meta={"inputs_hash": "sha256:ccc", "latency_ms": 5000, "repairs": 0,
+                  "guardrails_run": []},
+        )
+
+        _name, verdict, calls = self._run_one_persona(
+            "Test VP",
+            side_effects=[timeout_result],
+        )
+
+        # Only 1 call — no retry for non-guardrail errors.
+        self.assertEqual(calls, 1,
+                         f"Expected exactly 1 call for timeout error (no retry); got {calls}")
+        self.assertIn("timeout", verdict.get("rationale", ""),
+                      f"Expected timeout in rationale; got {verdict}")
+
+    # ── test E: end-to-end run_live retry — full pipeline smoke test ──────────
+    def test_run_live_retry_end_to_end(self):
+        """End-to-end: run_live with a runner that fails the first persona dispatch
+        (returns empty fact_claims → guardrail-violation) and succeeds on retry.
+        At least one verdict in round1 must have status='ok'.
+
+        The runner-side mechanism: the fake runner alternates between returning an
+        empty fact_claims (→ the harness will fail must_cite_dossier if dossier_fields
+        is non-empty; we simulate this at the engine level by patching harness.run for
+        company-partner only, using a call counter)."""
+        import tempfile
+
+        eng_dir = tempfile.mkdtemp()
+        mem_dir = tempfile.mkdtemp()
+        os.environ["SAPPHIRE_ENGAGEMENTS_DIR"] = eng_dir
+        os.environ["SAPPHIRE_MEMORY_DIR"] = mem_dir
+
+        try:
+            # State: first call to company-partner returns an abstain; subsequent calls return ok.
+            call_counts = {"company-partner": 0}
+
+            _abstain = self._make_abstain_result()
+            _ok_verdict = {
+                "persona": "Mock Persona",
+                "stance": "conditional",
+                "conviction": 3,
+                "rationale": "Grounded in dossier.",
+                "fact_claims": [{"claim": "TSC2 activates mTOR",
+                                 "cite": "mock"}],
+                "provenance": "persona-judgment",
+            }
+
+            import harness as _harness
+            _real_run = _harness.run
+
+            def _patched_run(agent_id, inputs, *, engagement_id, ctx, registry, dispatch_fn=None):
+                if agent_id == "company-partner":
+                    call_counts["company-partner"] += 1
+                    if call_counts["company-partner"] == 1:
+                        return _abstain
+                    # Second call (retry) — return a real result via the fake claude runner.
+                    # We delegate to the real harness with our fake runner in ctx.
+                    return _real_run(agent_id, inputs, engagement_id=engagement_id,
+                                     ctx=ctx, registry=registry, dispatch_fn=dispatch_fn)
+                return _real_run(agent_id, inputs, engagement_id=engagement_id,
+                                 ctx=ctx, registry=registry, dispatch_fn=dispatch_fn)
+
+            with mock.patch("live_engine.harness.run", side_effect=_patched_run):
+                result = run_live(
+                    "Is TSC2 a viable target in tuberous sclerosis?",
+                    ctx=_build_ctx(),
+                )
+
+            round1 = result["consult"]["round1"]
+            self.assertTrue(len(round1) > 0, "round1 must be non-empty")
+            ok_verdicts = [v for v in round1 if v.get("status") == "ok"]
+            self.assertTrue(
+                len(ok_verdicts) >= 1,
+                f"Expected >=1 ok verdict after retry; got statuses="
+                f"{[v.get('status') for v in round1]}"
+            )
+        finally:
+            os.environ.pop("SAPPHIRE_ENGAGEMENTS_DIR", None)
+            os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

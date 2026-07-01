@@ -538,5 +538,123 @@ class TestAgentTimeoutCap(unittest.TestCase):
         self.assertEqual(D._agent_timeout(300), 300)      # bad → contract value
 
 
+class TestPersonaMustCitePrompt(unittest.TestCase):
+    """Unit tests for the explicit must-cite prompt injection (WO-9: Haiku deliberation fix).
+
+    Verifies:
+      1. _is_persona_schema returns True for verdict-schema contracts (fact_claims + stance).
+      2. _is_persona_schema returns False for fact-agent contracts (no fact_claims / stance).
+      3. _persona_must_cite_block includes the CITATION REQUIREMENT header, the dossier
+         fields, a JSON example of the expected fact_claims shape, and the rejection warning.
+      4. build_prompt for a persona contract contains the must-cite block.
+      5. build_prompt for a fact-agent contract does NOT contain the must-cite block.
+      6. The example cite in the block matches the first dossier_field in inputs.
+      7. When dossier_fields is empty the block still contains the no-dossier fallback.
+    """
+
+    _PERSONA_CONTRACT = Contract(
+        id="company-partner", role="", kind="claude-subagent",
+        output_schema={
+            "type": "object",
+            "properties": {
+                "persona": {"type": "string"},
+                "stance": {"type": "string"},
+                "conviction": {"type": "integer"},
+                "rationale": {"type": "string"},
+                "fact_claims": {"type": "array", "items": {"type": "object"}},
+            },
+        },
+    )
+    _FACT_CONTRACT = Contract(
+        id="some-fact-agent", role="", kind="claude-subagent",
+        output_schema={
+            "type": "object",
+            "properties": {
+                "candidate": {"type": "string"},
+                "facts": {"type": "array"},
+            },
+        },
+    )
+
+    def test_is_persona_schema_true_for_verdict(self):
+        """fact_claims + stance present → persona schema detected."""
+        self.assertTrue(D._is_persona_schema(self._PERSONA_CONTRACT))
+
+    def test_is_persona_schema_false_for_fact_agent(self):
+        """fact-agent schema (candidate/facts) is NOT a persona schema."""
+        self.assertFalse(D._is_persona_schema(self._FACT_CONTRACT))
+
+    def test_is_persona_schema_false_no_output_schema(self):
+        """A contract with no output_schema must not be detected as persona."""
+        c = Contract(id="x", role="", kind="claude-subagent")
+        self.assertFalse(D._is_persona_schema(c))
+
+    def test_persona_must_cite_block_contains_header(self):
+        """The CITATION REQUIREMENT header must be in the block."""
+        block = D._persona_must_cite_block({"dossier_fields": ["fact A", "fact B"]})
+        self.assertIn("CITATION REQUIREMENT", block)
+
+    def test_persona_must_cite_block_contains_dossier_fields(self):
+        """The block must embed the exact dossier field strings."""
+        block = D._persona_must_cite_block({"dossier_fields": ["Nav1.8 expressed in DRG", "mTOR pathway activated"]})
+        self.assertIn("Nav1.8 expressed in DRG", block)
+        self.assertIn("mTOR pathway activated", block)
+
+    def test_persona_must_cite_block_contains_example_with_first_field(self):
+        """The JSON example in the block must use the first dossier_field as the cite."""
+        fields = ["TSC2 loss activates mTOR signalling", "Rapamycin rescues phenotype"]
+        block = D._persona_must_cite_block({"dossier_fields": fields})
+        # The example must contain the first field as the cite value.
+        self.assertIn(fields[0], block)
+        # Must also contain the fact_claims / claim / cite keys in the example JSON.
+        self.assertIn('"claim"', block)
+        self.assertIn('"cite"', block)
+
+    def test_persona_must_cite_block_contains_rejection_warning(self):
+        """The block must include the must-not-return-empty warning."""
+        block = D._persona_must_cite_block({"dossier_fields": ["some fact"]})
+        self.assertIn("DO NOT return an empty fact_claims list", block)
+
+    def test_persona_must_cite_block_empty_dossier_fallback(self):
+        """When dossier_fields is empty the block should contain the no-dossier fallback text."""
+        block = D._persona_must_cite_block({})
+        self.assertIn("CITATION REQUIREMENT", block)
+        # Should contain the fallback message for empty dossier.
+        self.assertIn("no dossier facts available", block)
+
+    def test_build_prompt_persona_contains_must_cite_block(self):
+        """build_prompt for a persona-verdict contract must include the must-cite block."""
+        inputs = {
+            "persona": "Test Persona",
+            "lens": "scientific",
+            "dossier_fields": ["TSC2 is haploinsufficient in ~50% of TSC patients"],
+        }
+        p = D.build_prompt(self._PERSONA_CONTRACT, inputs)
+        self.assertIn("CITATION REQUIREMENT", p)
+        self.assertIn("TSC2 is haploinsufficient in ~50% of TSC patients", p)
+        self.assertIn("DO NOT return an empty fact_claims list", p)
+
+    def test_build_prompt_fact_agent_no_must_cite_block(self):
+        """build_prompt for a fact-agent contract must NOT include the must-cite block."""
+        p = D.build_prompt(self._FACT_CONTRACT, {"candidate": "TSC2", "disease": "TSC"})
+        self.assertNotIn("CITATION REQUIREMENT", p)
+        self.assertNotIn("DO NOT return an empty fact_claims list", p)
+
+    def test_build_prompt_still_starts_with_shared_preamble(self):
+        """build_prompt must still start with SHARED_PREAMBLE for persona contracts."""
+        inputs = {"persona": "P", "lens": "L", "dossier_fields": ["some fact"]}
+        p = D.build_prompt(self._PERSONA_CONTRACT, inputs)
+        self.assertTrue(p.startswith(D.SHARED_PREAMBLE),
+                        "build_prompt must start with SHARED_PREAMBLE (cache key)")
+
+    def test_build_prompt_inputs_still_present(self):
+        """Inputs must still appear in the prompt after the persona block is injected."""
+        inputs = {"persona": "Cardiology VP", "lens": "commercial",
+                  "dossier_fields": ["Nav1.8 selective expression in nociceptors"]}
+        p = D.build_prompt(self._PERSONA_CONTRACT, inputs)
+        self.assertIn("Cardiology VP", p)
+        self.assertIn("commercial", p)
+
+
 if __name__ == "__main__":
     unittest.main()
