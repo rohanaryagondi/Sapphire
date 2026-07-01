@@ -29,6 +29,9 @@ class Contract:
     # personas/semantic agents while the science still runs for real. Tests still inject a mock
     # runner via ctx so an exempt agent never shells a real `claude -p` in CI.
     simulate_exempt: bool = False
+    # Per-agent preferred model (from agents.json "model" field). Env CLAUDE_MODEL/SAPPHIRE_MODEL
+    # overrides this at call time (see dispatch._resolve_model). None → no --model flag added.
+    model: str | None = None
 
 
 @dataclass
@@ -94,4 +97,5 @@ def resolve(agent_id: str, registry=None) -> Contract:
         veto_class=entry.get("veto_class", False),
         param=entry.get("param"),
         simulate_exempt=entry.get("simulate_exempt", False),
+        model=entry.get("model"),
     )
