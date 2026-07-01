@@ -1860,14 +1860,19 @@ class TestLiveProgress(unittest.TestCase):
         self._run(on_progress=events.append)
         self.assertTrue(events)
         self.assertEqual(events[0]["stage"], "plan")
-        self.assertEqual(events[-1], {"stage": "synthesis", "phase": "done",
-                                      "recommendation": events[-1]["recommendation"],
-                                      "confidence": events[-1]["confidence"]})
+        # WO-9 Phase 2: a "report" stage now always fires last (a terminal "done" event,
+        # after any streamed "chunk" events) -- the report synthesizer runs after synthesis.
+        self.assertEqual(events[-1], {"stage": "report", "phase": "done"})
+        synthesis_done = [e for e in events if e["stage"] == "synthesis" and e["phase"] == "done"]
+        self.assertEqual(len(synthesis_done), 1)
+        self.assertIn("recommendation", synthesis_done[0])
+        self.assertIn("confidence", synthesis_done[0])
         stages = [e["stage"] for e in events]
-        # bucket1 (and its flags) precede roundtable precede synthesis
+        # bucket1 (and its flags) precede roundtable precede synthesis precede report
         self.assertLess(stages.index("bucket1"), stages.index("roundtable"))
         self.assertLess(stages.index("flags"), stages.index("roundtable"))
         self.assertLess(stages.index("roundtable"), stages.index("synthesis"))
+        self.assertLess(stages.index("synthesis"), stages.index("report"))
 
     def test_bucket1_done_events_carry_real_result(self):
         events = []

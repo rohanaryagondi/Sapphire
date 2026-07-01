@@ -104,8 +104,8 @@ export interface RunResult {
 }
 
 /* ── SSE progress event (the live trace) — forwarded verbatim from the engine ── */
-export type TraceStage = "plan" | "bucket1" | "flags" | "roundtable" | "synthesis" | "redispatch";
-export type TracePhase = "start" | "done" | "rebuttal_start" | "rebuttal_done";
+export type TraceStage = "plan" | "bucket1" | "flags" | "roundtable" | "synthesis" | "redispatch" | "report";
+export type TracePhase = "start" | "done" | "rebuttal_start" | "rebuttal_done" | "chunk";
 
 export interface ProgressEvent {
   stage: TraceStage | string;
@@ -141,6 +141,8 @@ export interface ProgressEvent {
   model?: string;
   /** Concise public-identifier scoped target the agent operated on */
   agent_query?: string;
+  /** report streaming (stage:"report", phase:"chunk") — one accumulated text delta */
+  text?: string;
   [k: string]: unknown;
 }
 

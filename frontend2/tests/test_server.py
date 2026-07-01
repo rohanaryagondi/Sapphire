@@ -124,9 +124,10 @@ class TestServer(unittest.TestCase):
         self.assertIn("result", kinds)
         progresses = [d for e, d in events if e == "progress"]
         self.assertTrue(progresses, "must stream at least one progress event")
-        # The progress events cover the firm's stages.
+        # The progress events cover the firm's stages. WO-9 Phase 2: "report" is now always
+        # emitted (a terminal "done", plus "chunk" events when the synthesizer streamed text).
         stages = {p["stage"] for p in progresses}
-        self.assertEqual(stages, {"plan", "bucket1", "flags", "roundtable", "synthesis"})
+        self.assertEqual(stages, {"plan", "bucket1", "flags", "roundtable", "synthesis", "report"})
 
     def test_result_is_a_valid_run_live_dossier(self):
         from contracts.run_live_schema import validate_run_live
