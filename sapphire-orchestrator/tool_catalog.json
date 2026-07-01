@@ -1,0 +1,61 @@
+{
+  "_comment": "Sapphire scientific tool catalog — used by the orchestrator's Claude-driven tool-selection step in the PLAN stage. Each entry describes one selectable scientific tool. ALWAYS-ON core agents (moat, EMET, internal-science-lead, all semantic fact agents, scientific-reasoning, rescue-mechanism) are NOT listed here — they run unconditionally. Only the 8 scientific specialty tools below go through the Claude selection step.",
+  "tools": [
+    {
+      "id": "aso-tox",
+      "name": "ASO Acute-Tox Screener",
+      "purpose": "Predict acute toxicity risk for antisense oligonucleotide (ASO) candidate sequences using a validated GBR model.",
+      "required_inputs": ["ASO nucleotide sequences (pure uppercase A/T/G/C, ≥15 nt)"],
+      "when_to_use": "SELECT when the query involves ASO therapy, oligonucleotide design, or when explicit ASO sequences are present in the query or context. SKIP for standard gene-target or small-molecule queries with no ASO sequences."
+    },
+    {
+      "id": "boltz",
+      "name": "Boltz-2 Structure + Binding Affinity",
+      "purpose": "Predict protein 3D structure and ligand binding affinity (pKd/pIC50) using Boltz-2 via the hosted Boltz Compute API.",
+      "required_inputs": ["Target protein sequence (≥25 uppercase amino-acid letters) and/or ligand SMILES or CCD code"],
+      "when_to_use": "SELECT when the query asks about protein structure, binding affinity, molecular docking, or when a protein sequence or SMILES ligand is present. SKIP for standard gene-level epidemiology or regulatory queries where no structural/binding input is available."
+    },
+    {
+      "id": "q-models-runner",
+      "name": "Q-Models Runner (ESM-2 / DTI / Variant)",
+      "purpose": "Run Quiver's quantitative prediction models: ESM-2 protein family classification, drug-target interaction (DTI) prediction, and variant effect scoring.",
+      "required_inputs": ["For ESM-2/variant: gene symbol or protein sequence. For DTI: SMILES string and target gene symbol."],
+      "when_to_use": "SELECT when the query involves protein function prediction, drug-target binding prediction, or variant effect scoring. Most useful for gene-target queries (ESM-2 family) or small-molecule/repurposing queries (DTI). SKIP for non-gene/non-SMILES regulatory or epidemiology queries."
+    },
+    {
+      "id": "gnomad-constraint",
+      "name": "gnomAD Gene Constraint",
+      "purpose": "Fetch quantitative gene constraint metrics from gnomAD: pLI (loss-of-function intolerance), LOEUF, and missense Z-score.",
+      "required_inputs": ["Gene symbol (e.g. TSC2, SCN2A)"],
+      "when_to_use": "SELECT when the query involves a named gene target and the question bears on genetic constraint, haploinsufficiency, or population-level variation tolerance. SKIP for SMILES-only, ASO-only, or non-gene queries."
+    },
+    {
+      "id": "gtex-expression",
+      "name": "GTEx Tissue Expression",
+      "purpose": "Retrieve median TPM expression values and CNS-selectivity scores for a gene across GTEx tissues.",
+      "required_inputs": ["Gene symbol (e.g. TSC2, SCN2A)"],
+      "when_to_use": "SELECT when the query involves a named gene target and tissue-specific expression, CNS expression patterns, or target selectivity are relevant. SKIP for SMILES-only, ASO-only, or non-gene queries."
+    },
+    {
+      "id": "interpro-domains",
+      "name": "InterPro Protein Domain Annotations",
+      "purpose": "Retrieve InterPro domain, family, and active-site annotations (IPR accessions) for a gene/protein.",
+      "required_inputs": ["Gene symbol (e.g. TSC2, SCN2A)"],
+      "when_to_use": "SELECT when the query involves a named gene target and protein domain architecture, druggable pocket identification, or functional family classification are relevant. SKIP for SMILES-only, ASO-only, or non-gene queries."
+    },
+    {
+      "id": "geneset-enrichment",
+      "name": "Gene Set Enrichment (g:Profiler)",
+      "purpose": "Run functional enrichment analysis over a gene set using g:Profiler: top GO biological process, molecular function, and KEGG/Reactome pathway terms.",
+      "required_inputs": ["One or more gene symbols (a gene set or target + co-expressed genes)"],
+      "when_to_use": "SELECT when the query involves multiple genes, pathway analysis, biological process enrichment, or when understanding the functional theme of a gene set adds value. Also useful for single-gene queries where pathway context matters. SKIP for SMILES-only or ASO-only queries."
+    },
+    {
+      "id": "robyn-scs",
+      "name": "Robyn SCS Neuronal Connectivity",
+      "purpose": "Compute internal imaging-derived SCS/STA neuronal-connectivity scores from Quiver's robyn_scs model (requires v17_traces imaging plate data).",
+      "required_inputs": ["Imaging data path (v17_traces plate directory) — must be supplied explicitly in the run context"],
+      "when_to_use": "SELECT only when imaging plate data (v17_traces) is explicitly present in the run context. SKIP for all standard text-query engagements with no imaging input — this tool has no useful output without the plate data."
+    }
+  ]
+}

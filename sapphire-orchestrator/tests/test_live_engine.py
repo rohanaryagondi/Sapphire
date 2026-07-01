@@ -451,8 +451,10 @@ class TestAsoSequenceWiring(unittest.TestCase):
     # ── test 9: no sequences → aso-tox dispatches but returns facts=[] ───────
     def test_no_sequences_aso_tox_honest_empty(self):
         """
-        A normal target query (no sequences supplied) must still dispatch aso-tox
-        and contribute facts=[] with no error — the honest-empty behavior.
+        WO-9: A normal target query with no sequences → aso-tox is NOT selected by the
+        orchestrator's tool-selection step (no ASO inputs detected), so it must NOT
+        appear in discover.agents at all. The old "dispatch + honest-empty" behavior is
+        replaced by "don't dispatch" — the agent produces no trace noise.
         """
         result = run_live(
             "Is TSC2 a viable target in tuberous sclerosis?",
@@ -462,19 +464,15 @@ class TestAsoSequenceWiring(unittest.TestCase):
         dossier = result["discover"]["dossier"]
         agents = result["discover"]["agents"]
 
-        # aso-tox agent must appear in the dispatch list (status ok or known).
+        # WO-9: aso-tox must NOT appear in agents (not selected for a no-sequence query).
         aso_agent = next((a for a in agents if a["id"] == "aso-tox"), None)
-        self.assertIsNotNone(aso_agent, "aso-tox not found in discover.agents")
-
-        # Status must be 'ok' — the honest-empty output (facts=[], invalid_sequences=[])
-        # must pass harness schema validation, NOT abstain. Distinguishes a genuine
-        # honest-empty run from a schema-rejection that also yields 0 dossier facts.
-        self.assertEqual(
-            aso_agent["status"], "ok",
-            f"Expected aso-tox status 'ok' for honest-empty path; got {aso_agent}"
+        self.assertIsNone(
+            aso_agent,
+            "aso-tox must NOT appear in discover.agents for a query with no sequences "
+            "(WO-9: skipped tools produce no trace noise)"
         )
 
-        # No aso-tox facts should be present (honest empty path).
+        # No aso-tox facts should be present.
         tox_facts = [f for f in dossier if f.get("provenance") == "aso-tox"]
         self.assertEqual(
             len(tox_facts), 0,
@@ -809,18 +807,21 @@ class TestGnomadConstraintWiring(unittest.TestCase):
         self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
 
     def test_no_gene_query_honest_empty_no_network(self):
-        """A query with no extractable gene → the seam must NOT call the network,
-        gnomad-constraint dispatches honest-empty (status 'ok'), 0 gnomad facts."""
+        """A query with no extractable gene → gnomad-constraint is not selected by the
+        tool-selection step (WO-9 design: skip tools with no relevant inputs) and must NOT
+        appear in discover.agents. The _fetch method must not be called (no network)."""
         with mock.patch.object(gnomad_constraint_seam, "_fetch") as fetch_mock:
             result = run_live(
                 "Outline a general CNS target-validation strategy.",
                 ctx=self._ctx_with_real_gnomad(),
             )
             fetch_mock.assert_not_called()
+        # WO-9: gnomad-constraint is not selected for a non-gene query — must NOT appear.
         agent = next((a for a in result["discover"]["agents"]
                       if a["id"] == "gnomad-constraint"), None)
-        self.assertIsNotNone(agent, "gnomad-constraint not in discover.agents")
-        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertIsNone(agent,
+                          "gnomad-constraint must NOT be in discover.agents for a non-gene query "
+                          "(WO-9: skipped tools produce no trace noise)")
         gnomad_facts = [f for f in result["discover"]["dossier"]
                         if f.get("provenance") == "gnomad"]
         self.assertEqual(len(gnomad_facts), 0, f"expected 0 gnomad facts; got {gnomad_facts}")
@@ -967,11 +968,12 @@ class TestBoltzWiring(unittest.TestCase):
         vals = " ".join(f["value"] for f in boltz_facts)
         self.assertIn("structure_confidence", vals, vals)
 
-    # ── (b) Boltz stays DORMANT when no structure/affinity input is in scope ────
+    # ── (b) Boltz NOT selected when no structure/affinity input is in scope ────
     def test_no_structure_input_dormant_no_network(self):
-        """A normal gene query (no sequence, no ligand) → boltz must NOT call the network,
-        dispatches honest-empty (status 'ok'), and contributes 0 boltz facts. This mirrors
-        how aso-tox stays silent without ASO sequences."""
+        """WO-9: A normal gene query (no sequence, no ligand) → boltz is NOT selected by
+        the orchestrator's tool-selection step (no structure/affinity inputs detected).
+        Boltz must NOT appear in discover.agents and the _http method must NOT be called.
+        The old 'dispatch + honest-empty' behavior is replaced by 'don't dispatch'."""
         with mock.patch.object(boltz_seam, "_resolve_key", lambda: "DUMMY"), \
              mock.patch.object(boltz_seam, "_http") as http_mock, \
              mock.patch.object(boltz_seam, "_sleep", lambda s: None):
@@ -980,9 +982,11 @@ class TestBoltzWiring(unittest.TestCase):
                 ctx=self._ctx(),
             )
             http_mock.assert_not_called()
+        # WO-9: boltz must NOT appear in agents (not selected for a no-structure query).
         agent = next((a for a in result["discover"]["agents"] if a["id"] == "boltz"), None)
-        self.assertIsNotNone(agent, "boltz not in discover.agents")
-        self.assertEqual(agent["status"], "ok", f"expected ok (dormant/honest-empty); got {agent}")
+        self.assertIsNone(agent,
+                          "boltz must NOT appear in discover.agents for a no-structure query "
+                          "(WO-9: skipped tools produce no trace noise)")
         boltz_facts = [f for f in result["discover"]["dossier"]
                        if f.get("provenance") == "boltz"]
         self.assertEqual(len(boltz_facts), 0, f"expected 0 boltz facts; got {boltz_facts}")
@@ -1126,16 +1130,19 @@ class TestGtexExpressionWiring(unittest.TestCase):
         self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
 
     def test_no_gene_query_honest_empty_no_network(self):
+        """WO-9: Non-gene query → gtex-expression not selected, must NOT appear in agents.
+        _fetch must not be called."""
         with mock.patch.object(gtex_expression_seam, "_fetch") as fetch_mock:
             result = run_live(
                 "Outline a general CNS target-validation strategy.",
                 ctx=self._ctx_with_real_gtex(),
             )
             fetch_mock.assert_not_called()
+        # WO-9: gtex-expression must NOT appear in agents for a non-gene query.
         agent = next((a for a in result["discover"]["agents"]
                       if a["id"] == "gtex-expression"), None)
-        self.assertIsNotNone(agent)
-        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertIsNone(agent,
+                          "gtex-expression must NOT be in discover.agents for a non-gene query")
         self.assertEqual(
             [f for f in result["discover"]["dossier"] if f.get("provenance") == "gtex"], [])
 
@@ -1233,16 +1240,18 @@ class TestInterproDomainsWiring(unittest.TestCase):
         self.assertEqual(agent["status"], "ok", f"expected ok; got {agent}")
 
     def test_no_gene_query_honest_empty_no_network(self):
+        """WO-9: Non-gene query → interpro-domains not selected, must NOT appear in agents."""
         with mock.patch.object(interpro_domains_seam, "_fetch") as fetch_mock:
             result = run_live(
                 "Outline a general CNS target-validation strategy.",
                 ctx=self._ctx_with_real_interpro(),
             )
             fetch_mock.assert_not_called()
+        # WO-9: interpro-domains must NOT appear in agents for a non-gene query.
         agent = next((a for a in result["discover"]["agents"]
                       if a["id"] == "interpro-domains"), None)
-        self.assertIsNotNone(agent)
-        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertIsNone(agent,
+                          "interpro-domains must NOT be in discover.agents for a non-gene query")
         self.assertEqual(
             [f for f in result["discover"]["dossier"] if f.get("provenance") == "interpro"], [])
 
@@ -1350,16 +1359,18 @@ class TestGenesetEnrichmentWiring(unittest.TestCase):
         self.assertIn("TSC2", captured.get("genes", []))
 
     def test_no_gene_query_honest_empty_no_network(self):
+        """WO-9: Non-gene query → geneset-enrichment not selected, must NOT appear in agents."""
         with mock.patch.object(geneset_enrichment_seam, "_fetch") as fetch_mock:
             result = run_live(
                 "Outline a general CNS target-validation strategy.",
                 ctx=self._ctx_with_real_geneset(),
             )
             fetch_mock.assert_not_called()
+        # WO-9: geneset-enrichment must NOT appear in agents for a non-gene query.
         agent = next((a for a in result["discover"]["agents"]
                       if a["id"] == "geneset-enrichment"), None)
-        self.assertIsNotNone(agent)
-        self.assertEqual(agent["status"], "ok", f"expected ok (honest-empty); got {agent}")
+        self.assertIsNone(agent,
+                          "geneset-enrichment must NOT be in discover.agents for a non-gene query")
         self.assertEqual(
             [f for f in result["discover"]["dossier"] if f.get("provenance") == "gprofiler"], [])
 
