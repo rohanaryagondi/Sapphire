@@ -357,8 +357,17 @@ def _wire_emet_handler(ctx: dict) -> None:
     `dev/HELP.md` (EMET-MCP vs shared persistent profile vs in-session orchestration).
     """
     if "emet_handler" not in ctx:
-        from emet.handler import make_emet_handler
-        ctx["emet_handler"] = make_emet_handler()
+        # WO-9 FILE-BRIDGE mode ($SAPPHIRE_EMET_BRIDGE=1): live EMET is answered by a SEPARATE
+        # Claude-in-Chrome session via the shared file queue (RohanOnly/emet_bridge/) — no
+        # Playwright, no auto-login. Additive + swappable: default OFF keeps the existing
+        # Playwright-runner path unchanged; a caller-supplied ctx["emet_handler"] still wins
+        # (setdefault semantics preserved via the "not in ctx" guard above).
+        if (os.environ.get("SAPPHIRE_EMET_BRIDGE") or "").strip() in ("1", "true", "True", "yes"):
+            from emet.bridge_handler import make_emet_bridge_handler
+            ctx["emet_handler"] = make_emet_bridge_handler()
+        else:
+            from emet.handler import make_emet_handler
+            ctx["emet_handler"] = make_emet_handler()
 
 
 def _batch_bucket1(known_ids, bucket1_inputs, ctx, registry) -> dict:

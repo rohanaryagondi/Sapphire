@@ -33,6 +33,10 @@ from __future__ import annotations
 PROVENANCE = frozenset({
     # Phase 5 additions
     "emet-live", "emet-mcp", "memory-recall", "persona-judgment", "synthesis",
+    # WO-9: live EMET via a shared-file bridge answered by a separate Claude-in-Chrome
+    # session (no Playwright / no auto-login). Cited T2 facts from the user's own
+    # authenticated BenchSci session; EXTERNAL plane (public identifiers only).
+    "emet-live-bridge",
     # existing
     "live-local", "gpu-async", "gpu-disabled", "stub", "unavailable", "mock",
     # WO-9 Phase 4: GPU Q-Models on AWS (dry-run default vs live opt-in)
@@ -87,6 +91,7 @@ _PLANE_MAP: dict[str, str] = {
 
     # --- external plane ---
     "emet-live":        "external",
+    "emet-live-bridge": "external",   # WO-9 file-bridge EMET; public identifiers only
     "emet-mcp":         "external",
     "memory-recall":    "external",   # derived from public prior engagements
     "persona-judgment": "external",   # opinion citing the dossier, no internal data
