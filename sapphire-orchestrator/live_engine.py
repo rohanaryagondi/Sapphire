@@ -25,6 +25,7 @@ if _HERE not in sys.path:
 
 from orchestrator import Orchestrator
 from engagement import extract_entities, _eid, _GENE_RE
+from planner import classify_query
 from moat.facts import moat_facts, rescue_genes
 from memory import recall
 from harness import trace
@@ -921,8 +922,28 @@ def run_live(
     # -----------------------------------------------------------------------
     # 2. Entity extraction + engagement id + priors
     # -----------------------------------------------------------------------
-    ents = extract_entities(query)
-    target = ents["genes"][0] if ents["genes"] else ""
+    # Robust entity extraction via planner.classify_query (WO-9 Phase 6 Track C).
+    # classify_query handles: single-gene, multi-gene, comparison, ranking,
+    # SMILES, ASO sequences, and non-gene/disease queries without crashing.
+    # The returned QueryScope is backward-compatible: .candidate = legacy target,
+    # .genes = legacy ents["genes"], .smiles/.sequences/.diseases also populated.
+    _scope = classify_query(query)
+    # Bridge to legacy ents dict shape (used by recall + adaptive salient-entity scan).
+    ents = {
+        "genes": _scope.genes,
+        "smiles": _scope.smiles,
+        "diseases": _scope.diseases,
+        "drugs": [],
+    }
+    target = _scope.candidate  # first gene or "" — drop-in for legacy `target`
+
+    # WO-9 Phase 6: fold planner-extracted SMILES into the structure/affinity channel
+    # when the caller did NOT supply an explicit structure= dict AND no protein sequence
+    # was found in the query text.  This ensures a "compare SMILES X vs SMILES Y" or
+    # "run DTI on CC(=O)Oc1ccccc1" query actually routes to the boltz/structure agents.
+    # Data-boundary safe: SMILES are PUBLIC identifiers (from the query text itself).
+    if structure is None and _scope.smiles and not resolved_structure.get("target_sequence"):
+        resolved_structure["ligand_smiles"] = _scope.smiles[0]  # primary ligand
     eid = _eid(query)
     priors = recall(ents)
 
@@ -1077,6 +1098,11 @@ def run_live(
         # genes[0]). Threaded for the geneset-enrichment agent, which operates on a SET;
         # a single-gene query yields a one-element set. Other agents ignore this key.
         "genes": ents["genes"],
+        # WO-9 Phase 6: structured planner output threaded for agents that benefit from
+        # knowing the query type (comparison/ranking/multi-gene/non-gene).
+        "query_type": _scope.query_type,
+        "candidates": _scope.candidates,
+        "table_expected": _scope.table_expected,
         # sequences: ASO candidates threaded through to the aso-tox agent.
         # Populated from the explicit sequences= param (preferred) or the
         # query-text extractor.  Empty list when no sequences are present —
