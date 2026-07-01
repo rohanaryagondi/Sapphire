@@ -173,12 +173,15 @@ describe("Synthesis component", () => {
     expect(el.className).toContain("font-medium");
   });
 
-  // 4. Synthesis shows Export button
-  it("shows an Export button", async () => {
+  // 4. Synthesis shows Copy button (clipboard) and Export button (PDF)
+  it("shows a Copy button for clipboard and an Export button for PDF", async () => {
     const { Synthesis } = await import("@/components/run/synthesis");
     const result = makeResult();
     render(<Synthesis result={result} />);
-    expect(screen.getByRole("button", { name: /export/i })).toBeInTheDocument();
+    // Copy button: copies Markdown to clipboard
+    expect(screen.getByRole("button", { name: /^copy$/i })).toBeInTheDocument();
+    // Export button: triggers PDF print
+    expect(screen.getByRole("button", { name: /^export$/i })).toBeInTheDocument();
   });
 });
 

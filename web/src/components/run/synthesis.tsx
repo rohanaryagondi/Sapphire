@@ -35,36 +35,51 @@ export function Synthesis({ result, turnId }: { result: RunResult; turnId?: stri
   const s = result.synthesize;
   const [copied, setCopied] = React.useState(false);
 
-  const handleExport = React.useCallback(() => {
+  const handleCopy = React.useCallback(() => {
     exportSynthesis(result).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
   }, [result]);
 
+  const handleExportPdf = React.useCallback(() => {
+    window.print();
+  }, []);
+
   if (!s) return null;
 
   const report = s.report;
 
+  const buttonClass = cn(
+    "text-[11px] transition-colors",
+    "text-[var(--color-fg-faint)] hover:text-[var(--color-fg-muted)]",
+  );
+
   return (
     <div className="space-y-5">
-      {/* Export button -- de-emphasized, top-right */}
-      <div className="flex justify-end">
+      {/* Action buttons -- de-emphasized, top-right */}
+      <div className="flex justify-end gap-3">
         <button
-          onClick={handleExport}
-          className={cn(
-            "text-[11px] transition-colors",
-            "text-[var(--color-fg-faint)] hover:text-[var(--color-fg-muted)]",
-          )}
+          onClick={handleCopy}
+          className={buttonClass}
           title="Copy full report to clipboard as Markdown"
         >
-          {copied ? "Copied!" : "Export"}
+          {copied ? "Copied!" : "Copy"}
+        </button>
+        <button
+          onClick={handleExportPdf}
+          className={buttonClass}
+          title="Export report as PDF via browser print"
+        >
+          Export
         </button>
       </div>
 
       {isProseReport(report) ? (
         /* Full Claude-synthesized narrative report */
-        <MarkdownDoc text={report!} turnId={turnId} />
+        <div data-print-report>
+          <MarkdownDoc text={report!} turnId={turnId} />
+        </div>
       ) : (
         /* Terse fallback for old cached runs */
         <div className="space-y-3">
