@@ -86,7 +86,7 @@ class TestFollowupInEvidence(unittest.TestCase):
 
     def test_in_evidence_answer_and_citations(self):
         payload = {
-            "answer": "TSC2 loss activates mTORC1 signaling. [[EMET]]",
+            "answer": "TSC2 loss activates mTORC1 signaling. [[EMET]] Internal EP distance data agrees. [[Quiver data]]",
             "needs_new_data": False,
             "missing_agent": None,
         }
@@ -98,7 +98,9 @@ class TestFollowupInEvidence(unittest.TestCase):
         self.assertIn("mTORC1", out["answer"])
         self.assertFalse(out["needs_new_data"])
         self.assertIsNone(out["missing_agent"])
-        self.assertTrue(out["citations"], "citations must be non-empty when dossier has facts")
+        # citations reflect only the [[tokens]] actually present in the answer —
+        # this payload cites both, so both should appear.
+        self.assertTrue(out["citations"], "citations must be non-empty when the answer cites evidence")
         self.assertIn("EMET", out["citations"])
         self.assertIn("Quiver data", out["citations"])
 
@@ -141,11 +143,94 @@ class TestFollowupMalformedJSON(unittest.TestCase):
         self.assertEqual(out["answer"], raw)
         self.assertFalse(out["needs_new_data"])
 
-    def test_missing_answer_field_falls_back(self):
-        """Valid JSON object but missing/empty 'answer' key falls back to raw text."""
+    def test_missing_answer_field_never_dumps_raw_json(self):
+        """Valid JSON object but missing/empty 'answer' key must NEVER dump the raw
+        JSON braces to the user — degrade to a generic honest message instead."""
         raw = json.dumps({"needs_new_data": False, "missing_agent": None})
         out = answer_followup("Any question", _RESULT, runner=_raw_text_runner(raw))
+        self.assertNotEqual(out["answer"], raw)
+        self.assertNotIn("{", out["answer"])
+        self.assertTrue(out["answer"].strip())
+
+
+class TestFollowupRealStyleOutput(unittest.TestCase):
+    """Real Claude output is rarely clean JSON — fenced blocks, a preamble, trailing
+    prose, or an unescaped char are all common. These regressions guard the exact bug
+    Gate-5 caught on a live /api/followup call: the strict json.loads path threw and
+    the except branch dumped the raw JSON string to the UI instead of prose."""
+
+    def test_fenced_json_parses_cleanly(self):
+        """```json fences``` around an otherwise-valid object must not break parsing,
+        and the fence markers must never leak into the rendered answer."""
+        payload = {
+            "answer": "TSC2 loss drives mTORC1 hyperactivation. [[EMET]]",
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        raw = "```json\n" + json.dumps(payload) + "\n```"
+        out = answer_followup("What about TSC2 and mTORC1?", _RESULT, runner=_raw_text_runner(raw))
+        self.assertEqual(out["answer"], payload["answer"])
+        self.assertNotIn("```", out["answer"])
+        self.assertFalse(out["needs_new_data"])
+
+    def test_json_with_preamble_and_trailing_prose_parses(self):
+        """A short preamble before the object and trailing prose after it (both common
+        in real model output despite an explicit 'no preamble' instruction) must not
+        break extraction — the balanced-object scan finds the object regardless."""
+        payload = {
+            "answer": "Internal EP distance data supports this target. [[Quiver data]]",
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        raw = (
+            "Here's the answer based on the evidence:\n\n"
+            + json.dumps(payload)
+            + "\n\nLet me know if you need more detail."
+        )
+        out = answer_followup("Any internal support?", _RESULT, runner=_raw_text_runner(raw))
+        self.assertEqual(out["answer"], payload["answer"])
+        self.assertNotIn("Here's the answer", out["answer"])
+        self.assertNotIn("Let me know", out["answer"])
+
+    def test_bare_prose_with_no_json_structure_renders_as_answer(self):
+        """A model that ignores the JSON instruction entirely and just answers in
+        plain prose is still a valid, honest answer — render it as-is."""
+        raw = "Based on the dossier, TSC2 loss activates mTORC1 signaling."
+        out = answer_followup("What about TSC2?", _RESULT, runner=_raw_text_runner(raw))
         self.assertEqual(out["answer"], raw)
+        self.assertFalse(out["needs_new_data"])
+        self.assertIsNone(out["missing_agent"])
+
+    def test_unescaped_control_char_still_recovers_full_object(self):
+        """A raw (unescaped) newline inside the answer string breaks strict()
+        json.loads (JSON strings must escape control characters) but must still
+        recover the full answer/needs_new_data/missing_agent object — never fall
+        back to dumping the raw broken-JSON blob."""
+        raw = '{"answer": "Line one.\nLine two.", "needs_new_data": false, "missing_agent": null}'
+        out = answer_followup("Any question", _RESULT, runner=_raw_text_runner(raw))
+        self.assertIn("Line one", out["answer"])
+        self.assertNotIn('"needs_new_data"', out["answer"])
+        self.assertFalse(out["needs_new_data"])
+        self.assertIsNone(out["missing_agent"])
+
+    def test_citations_reflect_only_tokens_actually_used_in_answer(self):
+        """citations must reflect the [[tokens]] actually present in the final answer,
+        not every label that was available as context in the dossier."""
+        payload = {
+            # Dossier has both EMET and Quiver-data facts (see _RESULT), but this
+            # answer only cites Quiver data.
+            "answer": "Internal EP distance data supports this target. [[Quiver data]]",
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        out = answer_followup("Any internal support?", _RESULT, runner=_ok_runner(payload))
+        self.assertIn("Quiver data", out["citations"])
+        self.assertNotIn("EMET", out["citations"], "must not claim a citation the answer never used")
+
+    def test_citations_empty_when_answer_cites_nothing(self):
+        payload = {"answer": "No relevant evidence in this run.", "needs_new_data": False, "missing_agent": None}
+        out = answer_followup("Anything on X?", _RESULT, runner=_ok_runner(payload))
+        self.assertEqual(out["citations"], [])
 
 
 class TestFollowupClaudeUnavailable(unittest.TestCase):
