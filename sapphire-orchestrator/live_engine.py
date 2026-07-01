@@ -695,6 +695,26 @@ def _run_persona_round1(
         registry=registry,
     )
 
+    # Haiku-retry: when the first dispatch abstains on a guardrail-violation (most commonly
+    # empty or mis-cited fact_claims), retry ONCE with a fresh cache before accepting the
+    # abstain.  Haiku often succeeds on the second attempt now that the prompt includes the
+    # explicit must-cite instruction + dossier field examples.  We do NOT retry any other
+    # error code (timeout, tool-failure, unknown-agent) — only guardrail-violation, which is
+    # the specific Haiku failure mode this fix addresses.
+    # The genuine-abstain path is preserved: if the retry ALSO guardrail-fails, we accept
+    # the abstain (the partner truly had no relevant evidence or the model is broken).
+    if not res.ok and res.error == "guardrail-violation":
+        _retry_ctx = {**ctx, "_cache": {}, "dossier_fields": dossier_fields}
+        _retry_res = harness.run(
+            "company-partner",
+            persona_inputs,
+            engagement_id=eid,
+            ctx=_retry_ctx,
+            registry=registry,
+        )
+        if _retry_res.ok:
+            res = _retry_res
+
     _elapsed = round(time.monotonic() - _t0, 2)
     if res.ok and res.output:
         verdict = dict(res.output)

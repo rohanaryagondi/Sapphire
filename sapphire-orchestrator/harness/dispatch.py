@@ -47,11 +47,57 @@ def _read_spec(spec) -> str:
     return p.read_text(encoding="utf-8") if p.exists() else ""
 
 
+def _is_persona_schema(contract) -> bool:
+    """True when this contract uses the persona-verdict schema (has fact_claims + stance).
+
+    Used to inject the explicit must-cite instruction into the prompt so that Haiku-class
+    models reliably emit at least one cited fact_claim instead of returning an empty list
+    (which the must_cite_dossier guardrail rejects as a guardrail-violation)."""
+    props = (contract.output_schema or {}).get("properties") or {}
+    return "fact_claims" in props and "stance" in props
+
+
+def _persona_must_cite_block(inputs) -> str:
+    """Build the explicit must-cite instruction block for persona-verdict prompts.
+
+    Injects:
+      1. The EXACT dossier field strings the model must choose from for its cite values.
+      2. A JSON example of the expected fact_claims shape.
+      3. A hard rejection warning: empty fact_claims will be rejected.
+
+    This is the primary prompt-side fix for Haiku's tendency to return fact_claims: []
+    or to cite dossier facts with paraphrased text that doesn't match any dossier_fields
+    entry (which triggers must_cite_dossier guardrail violations)."""
+    dossier_fields = inputs.get("dossier_fields") or []
+    fields_block = (
+        json.dumps(dossier_fields, indent=2, ensure_ascii=False)
+        if dossier_fields
+        else '["(no dossier facts available — use an empty fact_claims list and set stance to hold)"]'
+    )
+    example_cite = dossier_fields[0] if dossier_fields else "<first dossier field text>"
+    example = json.dumps([
+        {"claim": "Your one-sentence factual claim grounded in the dossier.",
+         "cite": example_cite},
+    ], ensure_ascii=False)
+    return (
+        "\n\n## CITATION REQUIREMENT (MANDATORY — empty fact_claims will be REJECTED)\n"
+        "Your `fact_claims` list MUST contain 1-3 items. Each item MUST cite one of the EXACT "
+        "strings from the DOSSIER FIELDS list below — copy the cite text character-for-character.\n\n"
+        f"DOSSIER FIELDS (choose cite values from this list):\n{fields_block}\n\n"
+        f"REQUIRED fact_claims shape example:\n{example}\n\n"
+        "If you genuinely have no relevant claim, still return ONE item that notes your uncertainty "
+        "and cites the most relevant dossier field.\n"
+        "DO NOT return an empty fact_claims list — it will be rejected."
+    )
+
+
 def build_prompt(contract, inputs) -> str:
+    persona_block = _persona_must_cite_block(inputs) if _is_persona_schema(contract) else ""
     return (
         f"{SHARED_PREAMBLE}\n\n"
         f"{_read_spec(contract.spec)}\n\n"
-        f"## INPUTS\n{json.dumps(inputs, indent=2)}\n\n"
+        f"## INPUTS\n{json.dumps(inputs, indent=2)}\n"
+        f"{persona_block}\n\n"
         "Return ONLY the structured object (the JSON schema is enforced). Do not add commentary."
     )
 
