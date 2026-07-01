@@ -510,34 +510,28 @@ def answer_followup(question: str, result: "dict | None", runner=None,
                 # Same 300s used by report.py — a comparable full-context synthesis call.
                 return subprocess.run(cmd, capture_output=True, text=True, timeout=300)
 
-        proc = runner(cmd)
-
-        rc = getattr(proc, "returncode", 0)
-        if rc != 0:
+        # Retry the model call up to 3 times on a TRANSIENT failure — a non-zero
+        # exit, empty stdout, or an unparseable "looked like JSON but no answer"
+        # response. Transient empties happen under momentary resource pressure
+        # (the claude subprocess gets starved / OOM-nudged); a couple of retries
+        # reliably resolve them. Only fall back to the deterministic answer after
+        # EVERY attempt fails — a single empty response must not surface as
+        # "could not answer" when a retry would succeed.
+        parsed = None
+        for _attempt in range(3):
+            proc = runner(cmd)
+            rc = getattr(proc, "returncode", 0)
+            text = (getattr(proc, "stdout", "") or "").strip()
+            if rc != 0 or not text:
+                continue  # transient empty / non-zero exit — retry
+            candidate = _parse_model_response(text)
+            if not candidate.get("_parse_failed"):
+                parsed = candidate
+                break
+            parsed = candidate  # best-effort; keep in case all attempts parse-fail
+        if parsed is None:
+            # every attempt returned empty or non-zero — genuinely unreachable model
             return _fallback_answer(dossier, round1)
-
-        text = (getattr(proc, "stdout", "") or "").strip()
-        if not text:
-            return _fallback_answer(dossier, round1)
-
-        parsed = _parse_model_response(text)
-
-        # RETRY ONCE when _parse_model_response could not salvage a usable answer
-        # (e.g. the model returned a JSON object missing the "answer" key — a
-        # transient flake that a single retry reliably resolves). The sentinel
-        # `_parse_failed` is set by _parse_model_response on the
-        # looked_like_json-but-no-answer degraded path.
-        if parsed.get("_parse_failed"):
-            try:
-                proc2 = runner(cmd)
-                rc2 = getattr(proc2, "returncode", 0)
-                text2 = (getattr(proc2, "stdout", "") or "").strip()
-                if rc2 == 0 and text2:
-                    parsed2 = _parse_model_response(text2)
-                    if not parsed2.get("_parse_failed"):
-                        parsed = parsed2
-            except Exception:
-                pass  # retry failure is non-fatal; use original parsed result
         answer = parsed["answer"]
         # citations reflect only the [[Label]] tokens actually present in the final
         # answer text, not every label that WAS available as context — an answer
