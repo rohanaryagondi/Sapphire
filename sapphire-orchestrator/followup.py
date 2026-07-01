@@ -268,6 +268,7 @@ def _parse_model_response(text: str) -> dict:
             ),
             "needs_new_data": False,
             "missing_agent": None,
+            "_parse_failed": True,  # sentinel for retry logic; stripped before return
         }
 
     # No JSON structure recognizable at all — the model answered in bare prose.
@@ -301,6 +302,56 @@ def _safe_verdict(v: dict) -> dict:
     }
 
 
+def _build_synthesis_blocks(synthesize: dict) -> str:
+    """Render the synthesize block as clearly-labelled evidence sections.
+
+    Included only when the run HAS a synthesize block with real content — older/
+    simulated runs that lack it are silently skipped (returns empty string).
+    ranked_genes (the structured ranking) is rendered compactly as numbered lines.
+    report (the final synthesis markdown) is included up to 4000 chars with a note
+    if truncated, so ranking/recommendation/report questions can be answered from the
+    actual output rather than being incorrectly marked needs_new_data.
+    """
+    if not synthesize:
+        return ""
+
+    parts: list[str] = []
+
+    ranked_genes = synthesize.get("ranked_genes")
+    if ranked_genes and isinstance(ranked_genes, list):
+        lines: list[str] = []
+        for i, entry in enumerate(ranked_genes, 1):
+            if isinstance(entry, dict):
+                gene = entry.get("gene") or entry.get("name") or entry.get("id") or str(entry)
+                score = entry.get("score") or entry.get("rank_score") or entry.get("union_rank")
+                note = entry.get("rationale") or entry.get("note") or ""
+                line = f"{i}. {gene}"
+                if score is not None:
+                    line += f" (score: {score})"
+                if note:
+                    line += f" — {str(note)[:120]}"
+                lines.append(line)
+            else:
+                lines.append(f"{i}. {entry}")
+        if lines:
+            parts.append("FINAL RANKING (ranked_genes from synthesize):\n" + "\n".join(lines))
+
+    report = synthesize.get("report")
+    if report and isinstance(report, str):
+        report = report.strip()
+        if report:
+            _MAX_REPORT = 4000
+            if len(report) > _MAX_REPORT:
+                truncated = report[:_MAX_REPORT]
+                suffix = f"\n[... report truncated at {_MAX_REPORT} chars ...]"
+            else:
+                truncated = report
+                suffix = ""
+            parts.append("FINAL REPORT (synthesized):\n" + truncated + suffix)
+
+    return ("\n\n" + "\n\n".join(parts)) if parts else ""
+
+
 def _build_prompt(question: str, result: dict, citation_labels: list[str],
                    valid_targets: "list | None" = None) -> str:
     """Build the follow-up prompt with the honesty guard and citation instruction."""
@@ -325,6 +376,9 @@ def _build_prompt(question: str, result: dict, citation_labels: list[str],
     round1_block = json.dumps(safe_round1, indent=2)
     round2_block = json.dumps(safe_round2, indent=2) if safe_round2 else "(none)"
     ku_block = "\n".join(f"- {ku}" for ku in known_unknowns) if known_unknowns else "(none)"
+
+    # Synthesis evidence (ranked_genes + report) — present only when the run has it.
+    synthesis_block = _build_synthesis_blocks(synthesize)
 
     if citation_labels:
         label_list_str = ", ".join(f"[[{lbl}]]" for lbl in citation_labels)
@@ -379,7 +433,7 @@ ROUNDTABLE — ROUND 2 REBUTTALS (capped at 10):
 {round2_block}
 
 KNOWN UNKNOWNS:
-{ku_block}
+{ku_block}{synthesis_block}
 
 Return your response as a SINGLE JSON object on stdout, and nothing else — no markdown fences, no
 preamble. The object must have exactly these keys:
@@ -467,6 +521,23 @@ def answer_followup(question: str, result: "dict | None", runner=None,
             return _fallback_answer(dossier, round1)
 
         parsed = _parse_model_response(text)
+
+        # RETRY ONCE when _parse_model_response could not salvage a usable answer
+        # (e.g. the model returned a JSON object missing the "answer" key — a
+        # transient flake that a single retry reliably resolves). The sentinel
+        # `_parse_failed` is set by _parse_model_response on the
+        # looked_like_json-but-no-answer degraded path.
+        if parsed.get("_parse_failed"):
+            try:
+                proc2 = runner(cmd)
+                rc2 = getattr(proc2, "returncode", 0)
+                text2 = (getattr(proc2, "stdout", "") or "").strip()
+                if rc2 == 0 and text2:
+                    parsed2 = _parse_model_response(text2)
+                    if not parsed2.get("_parse_failed"):
+                        parsed = parsed2
+            except Exception:
+                pass  # retry failure is non-fatal; use original parsed result
         answer = parsed["answer"]
         # citations reflect only the [[Label]] tokens actually present in the final
         # answer text, not every label that WAS available as context — an answer
