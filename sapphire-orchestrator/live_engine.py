@@ -419,6 +419,177 @@ def _emit(on_progress, eid, event: dict) -> None:
             pass
 
 
+def _build_rescue_synthesis(
+    target: str,
+    rescue_ranked: list[dict],
+    gene_mechanisms: list[dict],
+    all_dossier_facts: list[dict],
+    queried_genes: list[str],
+) -> tuple:
+    """Build the rescue-ranking synthesis deliverable.
+
+    Called when `rescue_ranked` is non-empty (a rescue-ranking query with a correctly
+    identified perturbation target). Returns:
+
+        (ranked_genes, discovery_candidates, recommendation, confidence, proposed_experiment)
+
+    - ranked_genes: list[dict] — the USER'S QUERIED genes ordered by Quiver union_rank
+      (rescue_candidate entries first, sorted asc; absent/similar genes last, labeled).
+    - discovery_candidates: list[dict] — Quiver's global top rescue hits NOT in the queried set
+      (the discovery alpha: strong internal signal, not in the external prediction panel).
+    - recommendation: str — summary using the queried candidates.
+    - confidence: str — high/medium/low from citation groundedness.
+    - proposed_experiment: str — next-step suggestion.
+
+    DATA BOUNDARY: `queried_genes` are public gene symbols only. The cosine/euclidean
+    scores remain internal; `cosine` is present in the output as a ranking basis (it
+    is Quiver's EP-signature reversal strength, already in the dossier facts) but raw
+    internal EP embeddings never cross to external agents.
+
+    HONESTY: only asserts ranks present in the dossier's per-gene facts (parsed from
+    `field == "moat rescue (queried gene)"` facts). Never invents a rank.
+    """
+    mech_by_gene = {gm.get("gene", "").upper(): gm for gm in gene_mechanisms}
+
+    # ── Step 1: build per-gene rank/cosine map from the dossier's per-gene facts ──
+    # The dossier contains per-gene facts emitted by the moat agent for every gene the user
+    # queried (per-gene moat fix). The harness schema strips the "field" key, so we detect
+    # these facts purely by their value string pattern:
+    #   "Queried rescue candidate: GENE opposes TARGET KO EP-signature (union_rank N, cos X)"
+    # This is the canonical format emitted by moat_facts(queried_genes=...).
+    # HONESTY: only assert ranks whose value string is present in the dossier.
+    per_gene_rank: dict = {}   # GENE_UPPER → {"union_rank": int, "cosine": float}
+    _PER_GENE_FACT_RE = re.compile(
+        r"Queried rescue candidate:\s+(\S+)\s+opposes.*union_rank\s+(\d+),\s+cos\s+([\-\d\.]+)",
+        re.I,
+    )
+    for _f in all_dossier_facts:
+        _val = _f.get("value", "")
+        _m = _PER_GENE_FACT_RE.search(_val)
+        if _m:
+            per_gene_rank[_m.group(1).upper()] = {
+                "union_rank": int(_m.group(2)),
+                "cosine": float(_m.group(3)),
+            }
+
+    # ── Step 2: look up "similar" effect for absent-from-rescue queried genes ──
+    # Genes absent from rescue (opposite) may be in the "similar" set (controls).
+    queried_upper = [g.upper() for g in queried_genes]
+    absent_from_rescue = [
+        g for g in queried_upper
+        if g not in per_gene_rank and g != target.upper()
+    ]
+    similar_set: set[str] = set()
+    if absent_from_rescue:
+        try:
+            from moat.client import MoatClient as _MC
+            _mc = _MC()
+            if _mc.available():
+                _sim_rows = _mc.ranks_for_refs(target, absent_from_rescue, effect="similar")
+                similar_set = {r["ref"] for r in _sim_rows if r.get("found")}
+        except Exception:
+            pass
+
+    # ── Step 3: assign role for each queried gene ──
+    def _role(gene_upper: str) -> str:
+        if gene_upper in per_gene_rank:
+            return "rescue_candidate"
+        if gene_upper in similar_set:
+            return "control"
+        return "not_in_quiver"
+
+    # ── Step 4: build ranked_genes from the QUERIED genes ──
+    queried_with_rank: list[tuple] = []   # (union_rank, gene_upper)
+    queried_absent: list[str] = []
+    for _g in queried_upper:
+        if _g == target.upper():
+            continue  # skip the perturbation itself
+        if _g in per_gene_rank:
+            queried_with_rank.append((per_gene_rank[_g]["union_rank"], _g))
+        else:
+            queried_absent.append(_g)
+    queried_with_rank.sort(key=lambda x: x[0])
+
+    ranked_genes: list[dict] = []
+    for _rank_val, _gene_up in queried_with_rank:
+        _gm = mech_by_gene.get(_gene_up, {})
+        ranked_genes.append({
+            "rank": _rank_val,
+            "gene": _gene_up,
+            "cosine": per_gene_rank[_gene_up]["cosine"],
+            "role": "rescue_candidate",
+            "mechanism": _gm.get("mechanism", ""),
+            "citations": _gm.get("citations", []) or [],
+            "confidence": _gm.get("confidence", "low"),
+            "source": "Quiver CNS_DFP (moat-real)",
+        })
+    for _gene_up in queried_absent:
+        _r = _role(_gene_up)
+        _gm = mech_by_gene.get(_gene_up, {})
+        ranked_genes.append({
+            "rank": None,
+            "gene": _gene_up,
+            "cosine": None,
+            "role": _r,
+            "note": (
+                f"Not in Quiver's {target.upper()} rescue neighbor set"
+                if _r == "not_in_quiver"
+                else f"Present in Quiver's {target.upper()} similar (same-direction) set — not a rescue candidate"
+            ),
+            "mechanism": _gm.get("mechanism", ""),
+            "citations": _gm.get("citations", []) or [],
+            "confidence": _gm.get("confidence", "low"),
+            "source": "Quiver CNS_DFP (moat-real)",
+        })
+
+    # ── Step 5: discovery_candidates = global top hits NOT in the queried set ──
+    queried_set_upper = set(queried_upper)
+    discovery_candidates: list[dict] = []
+    for r in rescue_ranked:
+        if r["gene"].upper() in queried_set_upper:
+            continue
+        _gm = mech_by_gene.get(r["gene"].upper(), {})
+        discovery_candidates.append({
+            "rank": r["rank"],
+            "gene": r["gene"],
+            "cosine": r["cosine"],
+            "role": "discovery_alpha",
+            "note": (
+                f"Strong internal signal (Quiver CNS_DFP union_rank {r['rank']}) — "
+                "not in the external prediction panel; discovery alpha."
+            ),
+            "mechanism": _gm.get("mechanism", ""),
+            "citations": _gm.get("citations", []) or [],
+            "confidence": _gm.get("confidence", "low"),
+            "source": "Quiver CNS_DFP (moat-real)",
+        })
+
+    # ── Step 6: recommendation + confidence use the QUERIED candidates ──
+    queried_rescue = [g for g in ranked_genes if g["role"] == "rescue_candidate"]
+    grounded = [g for g in queried_rescue if g["citations"]]
+    # If no queried rescue candidates, fall back to discovery_candidates for the top-str
+    # so the recommendation is never silently empty.
+    top = queried_rescue[:5] or discovery_candidates[:5]
+    top_str = "; ".join(
+        f"{g['rank']}. {g['gene']}"
+        if g["rank"] is not None
+        else f"({g['gene']}, not in Quiver rescue set)"
+        for g in top
+    )
+    recommendation = (
+        f"Queried rescue-gene candidates for {target.upper()}-KO, ranked by Quiver EP-signature reversal "
+        f"with literature-grounded mechanism: {top_str}."
+    )
+    confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
+    proposed_experiment = (
+        f"Validate the top queried rescue-gene candidate(s) "
+        f"({', '.join(g['gene'] for g in queried_rescue[:3]) or 'see discovery_candidates'}) "
+        f"against the {target.upper()}-KO phenotype in a disease-relevant CNS model."
+    )
+
+    return ranked_genes, discovery_candidates, recommendation, confidence, proposed_experiment
+
+
 def _build_moat_agent():
     """Return the real moat backend closure.
 
@@ -1883,34 +2054,31 @@ def run_live(
     )
 
     # Rescue-ranking deliverable: when the query asked to RANK genes that rescue the KO, the
-    # synthesis IS a ranked gene table — merge the moat rank/cosine (internal, shown as the
-    # evidence basis) with each gene's cited mechanism. This OVERRIDES the IND-style recommendation
-    # computed above. Empty rescue_ranked (any non-rescue query) ⇒ this block is skipped entirely.
+    # synthesis IS a ranked gene table — the USER'S QUERIED genes ordered by their Quiver
+    # EP-scores (not Quiver's global top rescue hits). Global top hits go into a separate
+    # `discovery_candidates` field (the discovery alpha: strong internal signal, not in the
+    # external prediction panel). Empty rescue_ranked (any non-rescue query) ⇒ this block
+    # is skipped entirely.
     ranked_genes: list[dict] = []
+    discovery_candidates: list[dict] = []
     if rescue_ranked:
-        mech_by_gene = {gm.get("gene", "").upper(): gm for gm in gene_mechanisms}
-        for r in rescue_ranked:
-            gm = mech_by_gene.get(r["gene"].upper(), {})
-            ranked_genes.append({
-                "rank": r["rank"],
-                "gene": r["gene"],
-                "cosine": r["cosine"],            # Quiver EP-signature reversal strength (internal)
-                "mechanism": gm.get("mechanism", ""),
-                "citations": gm.get("citations", []) or [],
-                "confidence": gm.get("confidence", "low"),
-                "source": r.get("source", ""),
-            })
-        grounded = [g for g in ranked_genes if g["citations"]]
-        top = ranked_genes[:5]
-        top_str = "; ".join(f"{g['rank']}. {g['gene']}" for g in top)
-        recommendation = (
-            f"Top rescue-gene candidates for {target}-KO, ranked by Quiver EP-signature reversal "
-            f"with literature-grounded mechanism: {top_str}."
-        )
-        confidence = "high" if len(grounded) >= 3 else ("medium" if grounded else "low")
-        proposed_experiment = (
-            f"Validate the top rescue-gene candidate(s) ({', '.join(g['gene'] for g in top[:3])}) "
-            f"against the {target}-KO phenotype in a disease-relevant CNS model."
+        # The queried genes = every gene named in the query (from bucket1_inputs["genes"]).
+        # ctx["queried_genes"] can override this for testing / callers that know the candidate
+        # list explicitly (e.g. reinvoke or a follow-up that carries forward a prior gene list).
+        # The perturbation (target) is excluded from the ranking — it's the KO itself.
+        _queried_genes = list(ctx.get("queried_genes") or bucket1_inputs.get("genes") or [])
+        (
+            ranked_genes,
+            discovery_candidates,
+            recommendation,
+            confidence,
+            proposed_experiment,
+        ) = _build_rescue_synthesis(
+            target=target,
+            rescue_ranked=rescue_ranked,
+            gene_mechanisms=gene_mechanisms,
+            all_dossier_facts=all_dossier_facts,
+            queried_genes=_queried_genes,
         )
 
     syn = {
@@ -1921,6 +2089,8 @@ def run_live(
     }
     if ranked_genes:
         syn["ranked_genes"] = ranked_genes
+    if discovery_candidates:
+        syn["discovery_candidates"] = discovery_candidates
 
     # Live progress: synthesis done — the recommendation + confidence.
     _emit(on_progress, eid, {
