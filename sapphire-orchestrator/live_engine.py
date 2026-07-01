@@ -35,15 +35,29 @@ from tools import aso_tox_seam, gnomad_constraint_seam, gtex_expression_seam, in
 from corpus.reader import read_corpus, has_corpus
 from contracts.provenance import plane_for
 from summarizer import summarize_step
+from tool_selector import select_tools, SCIENTIFIC_TOOLS
 
 # ---------------------------------------------------------------------------
-# Bucket-1 agent IDs — the representative span the spec requests.
-# Agents are skipped if not present in the registry.
+# Bucket-1 agent IDs — split into two groups:
+#
+#   _BUCKET1_CORE_AGENTS  — always-on: run unconditionally on every engagement.
+#                           Includes moat wrapper, EMET, and all 13 semantic
+#                           fact agents. NOT subject to Claude tool selection.
+#
+#   _BUCKET1_SCIENTIFIC_TOOLS — the 8 specialty scientific tools that the
+#                           orchestrator's Claude-driven tool-selection step
+#                           decides whether to run. Only selected tools dispatch;
+#                           skipped tools produce zero facts + zero trace noise.
+#
+#   _BUCKET1_AGENTS       — union of both groups (backward-compat for smart_plan
+#                           and any callers that enumerate the full list).
+#
+# Agents are skipped (silently) if not present in the registry.
 # ---------------------------------------------------------------------------
-_BUCKET1_AGENTS = [
+
+_BUCKET1_CORE_AGENTS: list[str] = [
     "internal-science-lead",
     "emet-runner",
-    "q-models-runner",
     "fda-institutional-memory",
     "patent-ip",
     "global-regulatory-divergence",
@@ -63,30 +77,14 @@ _BUCKET1_AGENTS = [
     # Reputational risk screen — press, litigation, and ESG signal.
     "reputational",
     "financial",
-    # ASO acute-tox screen — contributes facts only when sequences are present in inputs;
-    # returns facts=[] (honest empty) for standard target-level queries with no ASO sequences.
-    "aso-tox",
-    # Boltz-2 structure + binding-affinity (hosted Boltz Compute API). Contributes facts only
-    # when a target protein sequence and/or a candidate ligand (SMILES/CCD) is present in inputs
-    # (the structure channel — fed by the upstream ASO Design / small-molecule tools); returns
-    # facts=[] (honest empty) for standard target-level queries with no structure/affinity input.
-    "boltz",
-    # gnomAD gene constraint (pLI / LOEUF / missense Z) — quantitative fact source.
-    # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
-    "gnomad-constraint",
-    # GTEx tissue expression (median TPM + CNS selectivity) — quantitative fact source.
-    # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
-    "gtex-expression",
-    # InterPro protein domain/family annotations (IPR accessions) — structured fact source.
-    # Fires when a target gene symbol is present in inputs; honest-empty otherwise.
-    "interpro-domains",
-    # g:Profiler functional enrichment (top GO / pathway terms) over the gene set —
-    # quantitative fact source. Fires when a gene set / target is present; honest-empty otherwise.
-    "geneset-enrichment",
-    # robyn_scs SCS/STA neuronal-connectivity (internal, imaging-derived). Fires only when
-    # imaging data (a v17_traces plate dir) is present in inputs; honest-empty otherwise.
-    "robyn-scs",
 ]
+
+# The 8 selectable scientific specialty tools (order mirrors tool_catalog.json).
+# These go through the Claude tool-selection step in the PLAN stage.
+_BUCKET1_SCIENTIFIC_TOOLS: list[str] = list(SCIENTIFIC_TOOLS)
+
+# Full Bucket-1 list (core + scientific) — backward-compat for smart_plan + callers.
+_BUCKET1_AGENTS: list[str] = _BUCKET1_CORE_AGENTS + _BUCKET1_SCIENTIFIC_TOOLS
 
 # Fast membership test for approved_plan filtering (WO 1.2).
 _BUCKET1_AGENTS_SET: frozenset = frozenset(_BUCKET1_AGENTS)
@@ -1077,6 +1075,7 @@ def run_live(
     plan_mode: str = "off",
     approved_plan: list[str] | None = None,
     adaptive: bool = False,
+    tools_override: list[str] | None = None,
 ) -> dict:
     """
     Run a full Sapphire engagement with every agent dispatched through the harness.
@@ -1123,12 +1122,34 @@ def run_live(
                     _MAX_ADAPTIVE_ROUNDS rounds or _MAX_ADAPTIVE_DISPATCHES total
                     follow-up calls.  Default False (OPT-IN, Gate-5 validated).
                     MUST reproduce today's output byte-for-byte when False.
+    tools_override: when not None, REPLACES the Claude tool-selection result for the
+                    scientific tools (SCIENTIFIC_TOOLS subset only). The core agents
+                    (_BUCKET1_CORE_AGENTS) always run regardless of this override.
+                    This is the handoff point for plan-mode tool-list edits: the UI
+                    sends the user's edited tool list here after the plan step, and
+                    the engine runs only those scientific tools. Invalid / unknown ids
+                    are silently filtered. An empty list [] is honoured (no scientific
+                    tools run; core agents still run).
+                    Also threads through /api/run so a caller can pass an edited list.
 
     Returns
     -------
     A structured dict with keys:
         query, plan, priors, discover, consult, synthesize, engagement_id,
         reflection, _via, plan_source.
+
+    Plan output contract (WO-9 orchestrator-tool-selection)
+    -------------------------------------------------------
+    The ``plan`` key in the result includes these additional fields populated by
+    the Claude tool-selection step (or its deterministic fallback):
+        tools_selected   : list[str]  — scientific tool ids that will/did run.
+        tool_rationale   : dict[str, str] — {tool_id: one-line reason why included
+                           or skipped} for every scientific tool in the catalog.
+        tools_available  : list[{id, name, purpose}] — full selectable tool list
+                           (for the frontend toggle panel — shows all 8 tools with
+                           their purpose so the UI can render enable/disable toggles).
+    tools_override feeds back into a re-run: pass the user's edited tool list as
+    ``tools_override=[...]`` and the engine runs core + only those tools.
 
     For plan_mode="llm+approve" returns early with:
         query, plan, plan_pending_approval, smart_plan (or absent on fallback),
@@ -1173,8 +1194,9 @@ def run_live(
     plan = engine.plan(query)
     panel = plan.get("panel", [])
 
-    # Bucket-1 selection defaults — overridden below by plan_mode or approved_plan.
-    selected_ids: list[str] = list(_BUCKET1_AGENTS)  # default: full deterministic list
+    # Bucket-1 selection defaults — set after step 2c (tool selection) below.
+    # plan_source and smart_plan_rationale are set here; selected_ids is set
+    # after _selected_scientific is computed (step 2c).
     plan_source: str = "deterministic"
     smart_plan_rationale: dict | None = None
 
@@ -1206,8 +1228,65 @@ def run_live(
     eid = _eid(query)
     priors = recall(ents)
 
+    # -----------------------------------------------------------------------
+    # 2c. Claude-driven scientific tool selection (WO-9 orchestrator-tool-selection)
+    #
+    # The orchestrator reads the tool catalog + detected inputs and decides which of
+    # the 8 scientific specialty tools to run. Only selected tools are dispatched;
+    # skipped tools produce zero facts and zero trace noise.
+    #
+    # Precedence (highest to lowest):
+    #   1. tools_override param — caller supplies an explicit tool list (UI edits).
+    #   2. Claude selection via select_tools() — reasoning over the catalog.
+    #   3. Deterministic fallback inside select_tools() — fires on any Claude failure.
+    #
+    # The always-on core agents (_BUCKET1_CORE_AGENTS) are NEVER touched by this
+    # selection — they run unconditionally. Only _BUCKET1_SCIENTIFIC_TOOLS are subject
+    # to selection.
+    # -----------------------------------------------------------------------
+    _scientific_tool_ids_set = frozenset(_BUCKET1_SCIENTIFIC_TOOLS)
+
+    if tools_override is not None:
+        # Explicit override from the caller (UI plan-edit or API param).
+        # Filter to valid scientific tool ids only; silently drop unknown ones.
+        _selected_scientific = [t for t in tools_override if t in _scientific_tool_ids_set]
+        _tool_rationale: dict[str, str] = {
+            t: ("override: caller-selected" if t in _selected_scientific else "override: caller-skipped")
+            for t in _BUCKET1_SCIENTIFIC_TOOLS
+        }
+        _tool_selection_source = "override"
+        import tool_selector as _ts_mod
+        _tools_available = [
+            {"id": t["id"], "name": t["name"], "purpose": t["purpose"]}
+            for t in _ts_mod._TOOL_CATALOG
+        ]
+    else:
+        # Claude-driven selection (degrades safely to deterministic fallback).
+        # Pass resolved_sequences + resolved_structure so the selector sees
+        # explicit ASO/structure inputs (passed via sequences=/structure= params)
+        # even when they are not extractable from the query text alone.
+        _sel_result = select_tools(
+            query, _scope, ctx=ctx,
+            resolved_sequences=resolved_sequences,
+            resolved_structure=resolved_structure,
+        )
+        _selected_scientific = _sel_result.get("tools_selected", [])
+        # Re-filter for safety (select_tools already validates, but belt+suspenders).
+        _selected_scientific = [t for t in _selected_scientific if t in _scientific_tool_ids_set]
+        _tool_rationale = _sel_result.get("tool_rationale", {})
+        _tool_selection_source = _sel_result.get("selection_source", "deterministic-fallback")
+        _tools_available = _sel_result.get("tools_available", [])
+
+    # Set selected_ids default now that _selected_scientific is available.
+    # Default: core agents + Claude-selected scientific tools (not all scientific tools).
+    selected_ids: list[str] = _BUCKET1_CORE_AGENTS + _selected_scientific
+
     # Open the engagement trace (plan dict minus internal _ keys).
     public_plan = {k: v for k, v in plan.items() if not k.startswith("_")}
+    # Stamp the tool-selection output onto the plan (WO-9 plan output contract).
+    public_plan["tools_selected"] = _selected_scientific
+    public_plan["tool_rationale"] = _tool_rationale
+    public_plan["tools_available"] = _tools_available
     trace.open_engagement(eid, public_plan)
 
     # Live progress: the plan is ready (fires immediately after triage, before any agent runs).
@@ -1234,11 +1313,11 @@ def run_live(
                         if i in known_ids and i in _BUCKET1_AGENTS_SET]
         if not selected_ids:
             # All client-supplied ids were unknown/out-of-bucket — running zero
-            # fact agents silently yields a fact-free dossier. Mirror the llm
-            # empty-selection guard: fall back to the full deterministic list.
+            # fact agents silently yields a fact-free dossier. Fall back to the
+            # core + Claude-selected scientific tools (the computed default).
             trace.record(eid, {"type": "plan_fallback",
                                "reason": "approved_plan all-filtered (no valid bucket-1 ids)"})
-            selected_ids = list(_BUCKET1_AGENTS)
+            selected_ids = _BUCKET1_CORE_AGENTS + _selected_scientific
             plan_source = "deterministic"
         else:
             plan_source = "approved"
@@ -1278,21 +1357,25 @@ def run_live(
         try:
             from smart_plan import smart_plan as _sp
             _sp_result = _sp(query, plan, registry, ctx)
-            selected_ids = [a["id"] for a in _sp_result.get("selected_agents", [])]
-            if not selected_ids:
+            _sp_ids = [a["id"] for a in _sp_result.get("selected_agents", [])]
+            if not _sp_ids:
                 # An empty LLM selection is not an exception, but running zero
                 # Bucket-1 agents yields no facts — fall back to deterministic.
                 trace.record(eid, {"type": "plan_fallback",
                                    "reason": "smart_plan returned empty selection"})
-                selected_ids = list(_BUCKET1_AGENTS)
+                selected_ids = _BUCKET1_CORE_AGENTS + _selected_scientific
                 plan_source = "deterministic"
             else:
+                # Always include core agents; add any LLM-selected agents on top.
+                _core_set = frozenset(_BUCKET1_CORE_AGENTS)
+                _sp_extra = [i for i in _sp_ids if i not in _core_set]
+                selected_ids = _BUCKET1_CORE_AGENTS + _sp_extra
                 plan_source = "llm"
                 smart_plan_rationale = _sp_result
         except Exception as _e:
             trace.record(eid, {"type": "plan_fallback", "reason": str(_e)})
-            # selected_ids and plan_source stay at their deterministic defaults.
-    # else: plan_mode "off" or any unrecognised value — keep deterministic defaults.
+            # selected_ids stays at the core + Claude-selected scientific default.
+    # else: plan_mode "off" or any unrecognised value — keep computed defaults.
 
     # -----------------------------------------------------------------------
     # 3. Wire the REAL moat backend + every Bucket-1 seam + live EMET (only if
@@ -1358,12 +1441,16 @@ def run_live(
     )
 
     # Emit a plan trace event so the run is auditable: which plan_source drove
-    # Bucket-1 and what the LLM rationale was (None for deterministic/approved).
+    # Bucket-1, what the LLM rationale was, and which scientific tools were selected.
     trace.record(eid, {
         "type": "plan",
         "plan_source": plan_source,
         "selected_ids": selected_ids,
         "rationale": smart_plan_rationale,
+        # WO-9 tool-selection audit fields.
+        "tools_selected": _selected_scientific,
+        "tool_rationale": _tool_rationale,
+        "tool_selection_source": _tool_selection_source,
     })
 
     # ── Parallel Bucket-1 dispatch ───────────────────────────────────────────

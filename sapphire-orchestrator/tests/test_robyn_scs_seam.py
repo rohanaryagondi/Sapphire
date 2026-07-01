@@ -100,13 +100,17 @@ class TestRobynScsThroughRunLive(unittest.TestCase):
         os.environ.pop("SAPPHIRE_MEMORY_DIR", None)
 
     def test_agent_registered_and_honest_empty(self):
+        """WO-9: robyn-scs is NOT selected for a standard gene query (no imaging data).
+        It must NOT appear in discover.agents. No robyn-scs facts in the dossier."""
         from test_live_engine import _build_ctx
         from live_engine import run_live
         result = run_live("Is TSC2 a viable target in tuberous sclerosis?", ctx=_build_ctx())
         agents = {a["id"]: a["status"] for a in result["discover"]["agents"]}
-        self.assertIn("robyn-scs", agents)              # wired into Bucket-1
-        self.assertEqual(agents["robyn-scs"], "ok")     # fired (honest-empty), not abstained
-        # honest-empty: no robyn-scs facts in the dossier for a no-imaging query
+        # WO-9: robyn-scs must NOT appear in agents for a no-imaging query.
+        self.assertNotIn("robyn-scs", agents,
+                         "robyn-scs must NOT be in discover.agents for a query with no imaging data "
+                         "(WO-9: skipped tools produce no trace noise)")
+        # No robyn-scs facts in the dossier.
         rs = [f for f in result["discover"]["dossier"] if f.get("provenance") == "robyn-scs"]
         self.assertEqual(rs, [])
 
