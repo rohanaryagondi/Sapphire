@@ -409,19 +409,41 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
 
   // ── ALL hooks must fire unconditionally, before any early return (Rules of Hooks) ──
 
+  // For follow-up turns: find the source run turn so we can display its trace.
+  // A follow-up has no agent trace of its own; it draws on a prior run's evidence.
+  const allTurns = useFirm((s) => s.turns);
+  const isFollowup = turn?.kind === "followup";
+  const sourceRunTurn = useMemo((): Turn | undefined => {
+    if (!isFollowup || !turn) return undefined;
+    const sourceId = turn.followup?.sourceRunId;
+    // Prefer the explicitly named source run; fall back to the most recent non-followup turn.
+    if (sourceId) {
+      const found = allTurns.find((t) => t.id === sourceId && t.kind !== "followup");
+      if (found) return found;
+    }
+    return [...allTurns].reverse().find((t) => t.id !== turn.id && t.kind !== "followup");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFollowup, turn?.id, turn?.followup?.sourceRunId, allTurns.length]);
+
+  // The effective turn for trace rendering:
+  //   - for a "run" turn → use the turn itself (keeps live streaming working)
+  //   - for a "followup" turn → redirect to the source run's trace
+  const traceTurn = isFollowup ? sourceRunTurn : turn;
+
   // Memoize buildTrace -- it iterates the full trace on every call; during a live run
   // the store pushes a new ProgressEvent on every SSE frame, which would re-render Monitor.
   // Null-safe: when turn is undefined we pass [] and get a well-typed empty TraceModel.
   // Keyed to trace.length so we recompute only when a new event arrives.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const m = useMemo(() => buildTrace(turn?.trace ?? []), [turn?.trace?.length]);
+  const m = useMemo(() => buildTrace(traceTurn?.trace ?? []), [traceTurn?.trace?.length]);
 
   // Once the run has a result, the roundtable rows are derived from the SAME
   // normalised verdicts the spread renders -- so Monitor can never contradict it.
   // While still streaming (no result yet), fall back to the live trace rows.
-  const verdicts = finalVerdicts(turn?.result);
+  // For follow-up turns we use the source run's result (traceTurn) for roundtable derivation.
+  const verdicts = finalVerdicts(traceTurn?.result);
   const roundtable: TraceRow[] =
-    turn?.result && verdicts.length
+    traceTurn?.result && verdicts.length
       ? verdicts.map((v) => ({
           agentId: v.persona,
           started: true,
@@ -458,6 +480,32 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
   return (
     <div className="space-y-1 p-3">
       <TurnSwitcher turn={turn} />
+
+      {/* Follow-up turn note: show which run's trace is being displayed, or a
+          tidy message when no source run is available. No agents were convened
+          for a follow-up — the answer was synthesized from stored evidence. */}
+      {isFollowup && (
+        sourceRunTurn ? (
+          <p
+            data-testid="followup-trace-note"
+            className="mb-1 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] px-2.5 py-1.5 text-[11px] leading-snug text-[var(--color-fg-subtle)]"
+          >
+            Trace of the run this answer draws on -- no new agents were convened for a follow-up.
+          </p>
+        ) : (
+          <div
+            data-testid="followup-no-source-note"
+            className="flex h-full flex-col items-center justify-center px-6 py-8 text-center"
+          >
+            <p className="text-[12.5px] text-[var(--color-fg-subtle)]">
+              This answer was synthesized from the run&apos;s stored evidence -- no agents were run.
+            </p>
+          </div>
+        )
+      )}
+
+      {(!isFollowup || sourceRunTurn) && (
+        <>
       <TopStep
         node={m.plan}
         icon={<span className="inline-block h-2 w-2 rounded-full bg-[var(--color-accent)]" />}
@@ -480,8 +528,8 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
           />
           {!b1Collapsed && (
             <>
-              <AgentList rows={m.bucket1} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
-              {turn.status === "running" && m.b1Done < m.bucket1.length && <WorkingRow />}
+              <AgentList rows={m.bucket1} turn={traceTurn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+              {traceTurn?.status === "running" && m.b1Done < m.bucket1.length && <WorkingRow />}
             </>
           )}
         </div>
@@ -515,8 +563,8 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
           />
           {!b2Collapsed && (
             <>
-              <AgentList rows={roundtable} turn={turn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
-              {turn.status === "running" && rtDone < roundtable.length && <WorkingRow />}
+              <AgentList rows={roundtable} turn={traceTurn} registerRow={registerRow} outerScrollRef={outerScrollRef} />
+              {traceTurn?.status === "running" && rtDone < roundtable.length && <WorkingRow />}
             </>
           )}
         </div>
@@ -532,6 +580,8 @@ export function Monitor({ turn, outerScrollRef }: { turn?: Turn; outerScrollRef?
             : null
         }
       />
+        </>
+      )}
     </div>
   );
 }

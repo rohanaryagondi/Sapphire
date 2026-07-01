@@ -23,7 +23,7 @@ export default function Home() {
   }, [abortRun]);
 
   // Compute grid-template-columns
-  const railCol = railOpen ? "236px" : "0px";
+  const railCol = railOpen ? "272px" : "0px";
   const panelCol = !panelOpen ? "0px" : panelWide ? "600px" : "400px";
   const cols = `${railCol} 1fr ${panelCol}`;
 
