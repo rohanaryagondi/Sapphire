@@ -7,10 +7,10 @@ import { useFirm } from "@/lib/store";
 import type { ModelChoice, Profile } from "@/lib/types";
 
 const PROFILE_OPTS: SelectOption[] = [
-  { value: "demo", label: "Demo", hint: "offline mock backends · $0 · deterministic", dot: "bg-[var(--color-fg-subtle)]" },
   { value: "simulate", label: "Simulate", hint: "real Quiver data/EMET/seams · sim reasoning", dot: "bg-[var(--color-warn)]" },
   { value: "live", label: "Live", hint: "real backends · claude subagents", dot: "bg-[var(--color-ok)]" },
   { value: "replay", label: "Replay", hint: "frozen real capture · $0", dot: "bg-[var(--color-external)]" },
+  { value: "demo", label: "Demo (no report)", hint: "offline mock backends · no report generated", dot: "bg-[var(--color-fg-subtle)]" },
 ];
 
 const MODEL_OPTS: SelectOption[] = [

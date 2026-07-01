@@ -17,6 +17,7 @@ import {
   runFirm,
 } from "./api";
 import { traceFromResult } from "./restore";
+import { exportSynthesis } from "./export-synthesis";
 import type {
   Conversation,
   ModelChoice,
@@ -154,6 +155,10 @@ interface FirmState {
   renameConversation: (id: string, title: string) => Promise<void>;
   starConversation: (id: string, starred: boolean) => Promise<void>;
   removeConversation: (id: string) => Promise<void>;
+  /** Delete ALL conversations (batch — fires one DELETE per conversation). */
+  clearAllConversations: () => Promise<void>;
+  /** Export a conversation's latest run to Markdown (download). Fetches from server if not active. */
+  exportConversation: (id: string) => Promise<void>;
 
   // ── Phase 5: pinned conversations ─────────────────────────────────────────
   // IDs of pinned conversations; persisted in localStorage (degrades honestly if
@@ -195,7 +200,7 @@ let _seq = 0;
 const uid = (p: string) => `${p}_${Date.now().toString(36)}_${(_seq++).toString(36)}`;
 
 export const useFirm = create<FirmState>((set, get) => ({
-  profile: "live",
+  profile: "simulate",
   model: "haiku",
   setProfile: (profile) => set({ profile }),
   setModel: (model) => set({ model }),
@@ -424,6 +429,29 @@ export const useFirm = create<FirmState>((set, get) => ({
       turns: s.activeConversationId === id ? [] : s.turns,
     }));
     await deleteConversation(id);
+  },
+
+  clearAllConversations: async () => {
+    const ids = get().conversations.map((c) => c.id);
+    // Optimistic: clear immediately
+    set({ conversations: [], activeConversationId: null, turns: [] });
+    // Fire deletes in parallel (best-effort; backend failures are non-fatal)
+    await Promise.allSettled(ids.map((id) => deleteConversation(id)));
+  },
+
+  exportConversation: async (id) => {
+    // First try the in-store turns (fast path when conversation is active)
+    const { activeConversationId, turns } = get();
+    if (activeConversationId === id) {
+      const result = turns.slice().reverse().find((t) => t.status === "complete" && !!t.result)?.result;
+      if (result) { await exportSynthesis(result, { download: true }); return; }
+    }
+    // Fallback: fetch from server
+    const detail = await getConversation(id);
+    const runs = detail?.runs ?? [];
+    const latestResult = runs.slice().reverse().find((r) => !!r.result)?.result;
+    if (latestResult) { await exportSynthesis(latestResult, { download: true }); return; }
+    // Nothing to export — silent no-op (no report exists yet for this conversation)
   },
 
   abortRun: () => {
