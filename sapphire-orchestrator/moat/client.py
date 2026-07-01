@@ -160,6 +160,96 @@ class MoatClient:
         except Exception:
             return []
 
+    def ranks_for_refs(
+        self,
+        perturbation: str,
+        refs: list[str],
+        effect: str = "rescue",
+    ) -> list[dict]:
+        """
+        Return the union_rank + cosine for SPECIFIC ref genes against `perturbation`.
+
+        Unlike `neighbors()` (which returns global top-N), this queries by ref name so
+        EVERY requested gene is looked up regardless of its rank.
+
+        Args:
+            perturbation: gene symbol or compound name (matched UPPERCASE).
+            refs: list of ref gene symbols to look up (matched UPPERCASE).
+            effect: "rescue" | "opposite" | "similar". "rescue" is an alias for
+                    "opposite" (connectivity-map convention: opposite EP-signature =
+                    rescue). Both strings are accepted; "rescue" is normalised to
+                    "opposite" before the SQL query.
+
+        Returns:
+            List of dicts, one per requested ref gene, in the same order as `refs`:
+                {ref, union_rank, cosine, found: bool, perturbation, effect, provenance}
+            When a gene is absent from the neighbor set, `found=False` and
+            `union_rank`/`cosine` are None.
+            Returns [] on any error — never raises.
+        """
+        if not refs:
+            return []
+        # "rescue" is an alias for "opposite" (CMap convention).
+        normalised_effect = "opposite" if effect == "rescue" else effect
+        try:
+            con = self._connect()
+            if con is None:
+                return []
+            if not self._has_neighbors_table(con):
+                con.close()
+                return []
+
+            query_upper = perturbation.upper()
+            # Build an in-clause for the refs (matched UPPERCASE).
+            refs_upper = [r.upper() for r in refs]
+            placeholders = ",".join("?" * len(refs_upper))
+            sql = f"""
+                SELECT ref, union_rank, cosine
+                FROM neighbors
+                WHERE query = ? AND effect = ? AND ref IN ({placeholders})
+            """
+            params = (query_upper, normalised_effect, *refs_upper)
+            cur = con.execute(sql, params)
+            rows = cur.fetchall()
+            con.close()
+
+            # Build a lookup: ref_upper → {union_rank, cosine}.
+            found_map: dict = {}
+            for row in rows:
+                found_map[row["ref"].upper()] = {
+                    "union_rank": row["union_rank"],
+                    "cosine": round(float(row["cosine"]), 3),
+                }
+
+            # Return one entry per requested ref, preserving the input order.
+            result = []
+            for ref in refs:
+                ref_upper = ref.upper()
+                if ref_upper in found_map:
+                    result.append({
+                        "ref":         ref_upper,
+                        "union_rank":  found_map[ref_upper]["union_rank"],
+                        "cosine":      found_map[ref_upper]["cosine"],
+                        "found":       True,
+                        "perturbation": query_upper,
+                        "effect":      normalised_effect,
+                        "provenance":  PROVENANCE,
+                    })
+                else:
+                    result.append({
+                        "ref":         ref_upper,
+                        "union_rank":  None,
+                        "cosine":      None,
+                        "found":       False,
+                        "perturbation": query_upper,
+                        "effect":      normalised_effect,
+                        "provenance":  PROVENANCE,
+                    })
+            return result
+
+        except Exception:
+            return []
+
     def health(self) -> dict:
         """
         Return a health dict:

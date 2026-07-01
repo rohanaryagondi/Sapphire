@@ -422,12 +422,24 @@ def _emit(on_progress, eid, event: dict) -> None:
 
 
 def _build_moat_agent():
-    """Return the real moat backend closure."""
+    """Return the real moat backend closure.
+
+    Passes `queried_genes` from the bucket-1 inputs so moat_facts emits a
+    per-gene rescue-rank fact for EVERY gene the user named in their query —
+    not just the global top-N rescue hits (which can miss lower-ranked candidates
+    like BCL2, VPS54, KMT2D, etc. that the user specifically asked about).
+    Data-boundary: moat-real facts are internal-plane; the harness guardrail
+    keeps them from ever being forwarded to external agents (EMET/web/Q-Models).
+    """
     def _moat_agent(inputs: dict) -> dict:
         tgt = inputs.get("candidate") or inputs.get("target") or ""
-        rows = moat_facts(tgt, k=4) if tgt else []
+        # Pull the full gene list from bucket1_inputs ("genes" key) so every
+        # gene named in the query gets its moat rescue rank, not just top-N.
+        queried = inputs.get("genes") or inputs.get("candidates") or []
+        rows = moat_facts(tgt, k=4, queried_genes=queried if queried else None) if tgt else []
         facts = [
-            {"value": r["value"], "source": r["source"], "tier": r["tier"]}
+            {"value": r["value"], "source": r["source"], "tier": r["tier"],
+             "provenance": r.get("provenance", "moat-real")}
             for r in rows
         ]
         return {"candidate": tgt, "facts": facts, "provenance": "moat-real"}
