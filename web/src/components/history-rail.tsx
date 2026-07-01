@@ -13,7 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useFirm } from "@/lib/store";
-import { cn, relTime } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import type { Conversation } from "@/lib/types";
 
@@ -216,20 +216,13 @@ function HistoryItem({
           className="flex w-full items-start gap-2 px-2.5 py-1.5 text-left"
         >
           <div className="min-w-0 flex-1">
-            <div className="flex items-baseline justify-between gap-1">
-              <div className="flex min-w-0 items-center gap-1">
-                {conv.starred && (
-                  <Star className="size-2.5 shrink-0 fill-[var(--color-warn)] text-[var(--color-warn)]" />
-                )}
-                <span className="truncate text-[13.5px] font-medium leading-snug text-[var(--color-fg)]">
-                  {conv.title || "Untitled"}
-                </span>
-              </div>
-              {conv.updated_at && (
-                <span className="shrink-0 text-[10.5px] text-[var(--color-fg-faint)]">
-                  {relTime(conv.updated_at)}
-                </span>
+            <div className="flex min-w-0 items-center gap-1">
+              {conv.starred && (
+                <Star className="size-2.5 shrink-0 fill-[var(--color-warn)] text-[var(--color-warn)]" />
               )}
+              <span className="truncate text-[13.5px] font-medium leading-snug text-[var(--color-fg)]">
+                {conv.title || "Untitled"}
+              </span>
             </div>
             {showPreview && (
               <p className="mt-0.5 truncate text-[11.5px] leading-snug text-[var(--color-fg-subtle)]">

@@ -6,12 +6,29 @@ import { exportSynthesis } from "@/lib/export-synthesis";
 import { MarkdownDoc } from "./markdown";
 
 /**
+ * Returns true only when `r` is a genuine prose narrative that should be
+ * rendered by MarkdownDoc.  Falls back to false when:
+ *   - r is empty / undefined
+ *   - r starts with "{" or "[" (raw JSON object/array)
+ *   - r contains "structured_output" (a demo/mock JSON blob leaked in)
+ * This prevents raw JSON from being dumped into the report panel.
+ */
+export function isProseReport(r?: string): boolean {
+  if (!r) return false;
+  const trimmed = r.trim();
+  if (!trimmed) return false;
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) return false;
+  if (trimmed.includes('"structured_output"')) return false;
+  return true;
+}
+
+/**
  * Synthesis -- the full narrative firm report.
  *
- * When result.synthesize.report is present (live run with report.py):
+ * When result.synthesize.report is a genuine prose narrative:
  *   Renders the Claude-synthesized Markdown report via MarkdownDoc.
  *
- * When report is absent (old cached run):
+ * When report is absent OR is raw JSON (old cached / demo run):
  *   Renders a terse fallback: recommendation + confidence + a note.
  */
 export function Synthesis({ result, turnId }: { result: RunResult; turnId?: string }) {
@@ -45,9 +62,9 @@ export function Synthesis({ result, turnId }: { result: RunResult; turnId?: stri
         </button>
       </div>
 
-      {report ? (
+      {isProseReport(report) ? (
         /* Full Claude-synthesized narrative report */
-        <MarkdownDoc text={report} turnId={turnId} />
+        <MarkdownDoc text={report!} turnId={turnId} />
       ) : (
         /* Terse fallback for old cached runs */
         <div className="space-y-3">
