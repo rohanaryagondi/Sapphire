@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import React from "react";
 import type { RunResult } from "@/lib/types";
 import { buildSynthesisMarkdown } from "@/lib/export-synthesis";
@@ -332,5 +332,111 @@ describe("TurnView trace pill", () => {
     };
     render(<TurnView turn={turn} />);
     expect(screen.getByText("trace")).toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 9. Flags — collapsible VETO / DIVERGENCE dropdowns
+// ---------------------------------------------------------------------------
+describe("Flags component — collapsible dropdowns", () => {
+  it("renders the DIVERGENCE header with count but not the item body by default", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    render(
+      <Flags
+        flags={{
+          VETO: [],
+          DIVERGENCE: ["Nav1.8 expression diverges", "TSC2 loss differs by isoform"],
+          KNOWN_UNKNOWNS: [],
+        }}
+      />,
+    );
+    // Header with count must be visible
+    expect(screen.getByTestId("flags-toggle-divergence")).toBeInTheDocument();
+    // Body must be hidden by default
+    expect(screen.queryByTestId("flags-body-divergence")).not.toBeInTheDocument();
+    // Item text must not be visible before expanding
+    expect(screen.queryByText("Nav1.8 expression diverges")).not.toBeInTheDocument();
+  });
+
+  it("expands DIVERGENCE body on click and shows items", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    render(
+      <Flags
+        flags={{
+          VETO: [],
+          DIVERGENCE: ["Nav1.8 expression diverges", "TSC2 loss differs by isoform"],
+          KNOWN_UNKNOWNS: [],
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("flags-toggle-divergence"));
+    expect(screen.getByTestId("flags-body-divergence")).toBeInTheDocument();
+    expect(screen.getByText("Nav1.8 expression diverges")).toBeInTheDocument();
+    expect(screen.getByText("TSC2 loss differs by isoform")).toBeInTheDocument();
+  });
+
+  it("renders the VETO header with count and keeps body collapsed by default", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    render(
+      <Flags
+        flags={{
+          VETO: ["IP conflict on SCN10A inhibitor scaffold", "FDA hold precedent"],
+          DIVERGENCE: [],
+          KNOWN_UNKNOWNS: [],
+        }}
+      />,
+    );
+    expect(screen.getByTestId("flags-toggle-veto")).toBeInTheDocument();
+    expect(screen.queryByTestId("flags-body-veto")).not.toBeInTheDocument();
+    expect(screen.queryByText("IP conflict on SCN10A inhibitor scaffold")).not.toBeInTheDocument();
+  });
+
+  it("expands VETO body on click and shows items", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    render(
+      <Flags
+        flags={{
+          VETO: ["IP conflict on SCN10A inhibitor scaffold", "FDA hold precedent"],
+          DIVERGENCE: [],
+          KNOWN_UNKNOWNS: [],
+        }}
+      />,
+    );
+    fireEvent.click(screen.getByTestId("flags-toggle-veto"));
+    expect(screen.getByTestId("flags-body-veto")).toBeInTheDocument();
+    expect(screen.getByText("IP conflict on SCN10A inhibitor scaffold")).toBeInTheDocument();
+    expect(screen.getByText("FDA hold precedent")).toBeInTheDocument();
+  });
+
+  it("collapses again after second click (toggle off)", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    render(
+      <Flags
+        flags={{
+          VETO: [],
+          DIVERGENCE: ["Single divergence"],
+          KNOWN_UNKNOWNS: [],
+        }}
+      />,
+    );
+    const toggle = screen.getByTestId("flags-toggle-divergence");
+    fireEvent.click(toggle);
+    expect(screen.getByTestId("flags-body-divergence")).toBeInTheDocument();
+    fireEvent.click(toggle);
+    expect(screen.queryByTestId("flags-body-divergence")).not.toBeInTheDocument();
+  });
+
+  it("does not render when flags are all empty", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    const { container } = render(
+      <Flags flags={{ VETO: [], DIVERGENCE: [], KNOWN_UNKNOWNS: [] }} />,
+    );
+    expect(container.firstChild).toBeNull();
+  });
+
+  it("does not render when flags prop is undefined", async () => {
+    const { Flags } = await import("@/components/run/flags");
+    const { container } = render(<Flags />);
+    expect(container.firstChild).toBeNull();
   });
 });
