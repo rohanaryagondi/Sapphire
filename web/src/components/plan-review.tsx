@@ -1,9 +1,62 @@
 "use client";
 import * as React from "react";
-import { Check, ClipboardList, Play, ShieldAlert, X } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, ClipboardList, Play, ShieldAlert, Wrench, X } from "lucide-react";
 import { useFirm } from "@/lib/store";
 import { agentLabel, cn, isVetoAgent } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
+/* A single scientific tool row in the tool-editing panel. */
+function ToolRow({
+  id,
+  name,
+  purpose,
+  rationale,
+  checked,
+  onToggle,
+}: {
+  id: string;
+  name: string;
+  purpose: string;
+  rationale?: string;
+  checked: boolean;
+  onToggle: () => void;
+}) {
+  return (
+    <button
+      onClick={onToggle}
+      aria-pressed={checked}
+      data-tool-id={id}
+      title={rationale || purpose}
+      className={cn(
+        "flex w-full items-start gap-2.5 rounded-[var(--radius-sm)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--color-elevated)]",
+        !checked && "opacity-45",
+      )}
+    >
+      <span
+        className={cn(
+          "mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-[4px] border",
+          checked
+            ? "border-[var(--color-accent)] bg-[var(--color-accent)] text-white"
+            : "border-[var(--color-border-strong)] bg-transparent",
+        )}
+      >
+        {checked && <Check className="size-3" strokeWidth={3} />}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[12px] font-medium text-[var(--color-fg)]">{name}</span>
+        {rationale ? (
+          <span className="mt-0.5 block text-[11px] leading-snug text-[var(--color-fg-subtle)]">
+            {rationale}
+          </span>
+        ) : (
+          <span className="mt-0.5 block truncate text-[11px] leading-snug text-[var(--color-fg-faint)]">
+            {purpose}
+          </span>
+        )}
+      </span>
+    </button>
+  );
+}
 
 /* The plan-review step (Plan-mode). When the user submits with "Plan first" ON, we fetch
    the proposed Bucket-1 plan (zero agents run) and render it here for review: every selected
@@ -17,6 +70,11 @@ export function PlanReview() {
   const setAll = useFirm((s) => s.setAllPlanAgents);
   const cancel = useFirm((s) => s.cancelPlan);
   const approve = useFirm((s) => s.approvePlan);
+  const toggleTool = useFirm((s) => s.togglePlanTool);
+  const toolsOverride = useFirm((s) => s.toolsOverride);
+
+  // Tool section collapsed state (collapsed by default to keep the card compact).
+  const [toolsOpen, setToolsOpen] = React.useState(false);
 
   // #8 — veto-class agents (FDA Institutional Memory, Patent/IP) gate the
   // roundtable. Warn (dismissibly) whenever one is currently deselected.
@@ -64,6 +122,14 @@ export function PlanReview() {
 
   const selectedCount = plan.agents.filter((a) => a.selected).length;
   const source = plan.plan_source || "deterministic";
+
+  // Compute effective tool selection for rendering: user edits win; else backend's list.
+  const effectiveToolIds: string[] = toolsOverride ?? plan.tools_selected ?? [];
+  const toolsAvailable = plan.tools_available ?? [];
+  // Split tools into selected vs available-to-add groups.
+  const toolsSelected = toolsAvailable.filter((t) => effectiveToolIds.includes(t.id));
+  const toolsDeselected = toolsAvailable.filter((t) => !effectiveToolIds.includes(t.id));
+  const hasTools = toolsAvailable.length > 0;
   const sourceLabel =
     source === "llm"
       ? "LLM-pruned plan"
@@ -167,6 +233,73 @@ export function PlanReview() {
             ))}
           </div>
         </div>
+
+        {/* Scientific tools section — collapsible; only shown when backend emits tools_available */}
+        {hasTools && (
+          <div className="border-t border-[var(--color-border)]">
+            <button
+              onClick={() => setToolsOpen((v) => !v)}
+              className="flex w-full items-center gap-2 px-4 py-2 text-left hover:bg-[var(--color-elevated)]"
+              aria-expanded={toolsOpen}
+            >
+              {toolsOpen ? (
+                <ChevronDown className="size-3 shrink-0 text-[var(--color-fg-subtle)]" />
+              ) : (
+                <ChevronRight className="size-3 shrink-0 text-[var(--color-fg-subtle)]" />
+              )}
+              <Wrench className="size-3 shrink-0 text-[var(--color-fg-subtle)]" />
+              <span className="text-[11px] font-medium text-[var(--color-fg-muted)]">
+                Scientific tools
+              </span>
+              <span className="ml-1 text-[10.5px] text-[var(--color-fg-faint)]">
+                {toolsSelected.length}/{toolsAvailable.length} selected
+              </span>
+              {toolsOverride !== null && (
+                <span className="ml-auto text-[10px] text-[var(--color-accent)]">edited</span>
+              )}
+            </button>
+            {toolsOpen && (
+              <div className="max-h-[28vh] overflow-y-auto px-2.5 pb-2">
+                {toolsSelected.length > 0 && (
+                  <div className="mb-1 px-1.5 pt-1">
+                    <span className="text-[10px] uppercase tracking-[0.07em] text-[var(--color-fg-faint)]">
+                      Selected
+                    </span>
+                  </div>
+                )}
+                {toolsSelected.map((t) => (
+                  <ToolRow
+                    key={t.id}
+                    id={t.id}
+                    name={t.name}
+                    purpose={t.purpose}
+                    rationale={plan.tool_rationale?.[t.id]}
+                    checked={true}
+                    onToggle={() => toggleTool(t.id)}
+                  />
+                ))}
+                {toolsDeselected.length > 0 && (
+                  <div className="mb-1 px-1.5 pt-2">
+                    <span className="text-[10px] uppercase tracking-[0.07em] text-[var(--color-fg-faint)]">
+                      Available to add
+                    </span>
+                  </div>
+                )}
+                {toolsDeselected.map((t) => (
+                  <ToolRow
+                    key={t.id}
+                    id={t.id}
+                    name={t.name}
+                    purpose={t.purpose}
+                    rationale={plan.tool_rationale?.[t.id]}
+                    checked={false}
+                    onToggle={() => toggleTool(t.id)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* #8 — veto-class deselection warning (dismissible) */}
         {deselectedVeto.length > 0 && !vetoDismissed && (

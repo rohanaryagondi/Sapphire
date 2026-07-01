@@ -205,6 +205,14 @@ export interface PlanAgent {
   selected: boolean;
 }
 
+/** A selectable scientific tool entry (from tool_catalog.json), as returned by
+ *  the backend's tool-selection step. */
+export interface ToolEntry {
+  id: string;
+  name: string;
+  purpose: string;
+}
+
 export interface PlanEnvelope {
   query: string;
   plan?: Plan;
@@ -214,6 +222,13 @@ export interface PlanEnvelope {
   engagement_id?: string;
   _via?: string;
   _bridge_error?: string;
+  /** Tool-selection output (from tool_selector.py). Present when the backend ran
+   *  the Claude/deterministic tool-selection step in the PLAN stage. */
+  tools_selected?: string[];
+  /** Per-tool rationale: tool_id → one-line reason (include or skip). */
+  tool_rationale?: Record<string, string>;
+  /** Full selectable tool list ({id, name, purpose} for every catalog entry). */
+  tools_available?: ToolEntry[];
 }
 
 /* ── top-bar selectors ──────────────────────────────────────────────────────── */

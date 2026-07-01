@@ -162,6 +162,12 @@ interface FirmState {
   setAllPlanAgents: (selected: boolean) => void;
   cancelPlan: () => void;
   approvePlan: () => Promise<void>;
+  /** Toggle a scientific tool on/off in the plan tool-editing panel.
+   *  Operates on the mutable toolsOverride set (seeded from plan.tools_selected). */
+  togglePlanTool: (toolId: string) => void;
+  /** The user's edited tool selection — overrides the orchestrator's selection.
+   *  null = user made no edits (send tools_selected as-is or omit). */
+  toolsOverride: string[] | null;
 
   // history
   conversations: Conversation[];
@@ -192,7 +198,7 @@ interface FirmState {
   dismissNotification: (id: string) => void;
 
   // run
-  submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
+  submit: (query: string, opts?: { approvedPlan?: string[]; toolsOverride?: string[] }) => Promise<void>;
   /** Abort the current in-flight run (safe to call when nothing is running). */
   abortRun: () => void;
 
@@ -320,14 +326,31 @@ export const useFirm = create<FirmState>((set, get) => ({
       };
     }),
 
-  cancelPlan: () => set({ pendingPlan: null, planError: null }),
+  cancelPlan: () => set({ pendingPlan: null, planError: null, toolsOverride: null }),
+
+  toolsOverride: null,
+
+  togglePlanTool: (toolId) =>
+    set((s) => {
+      const plan = s.pendingPlan;
+      if (!plan) return {};
+      // Seed toolsOverride from plan.tools_selected on first toggle.
+      const current: string[] = s.toolsOverride ?? (plan.tools_selected ? [...plan.tools_selected] : []);
+      const next = current.includes(toolId)
+        ? current.filter((id) => id !== toolId)
+        : [...current, toolId];
+      return { toolsOverride: next };
+    }),
 
   approvePlan: async () => {
-    const plan = get().pendingPlan;
-    if (!plan) return;
-    const approvedPlan = plan.agents.filter((a) => a.selected).map((a) => a.id);
-    set({ pendingPlan: null, planError: null });
-    await get().submit(plan.query, { approvedPlan });
+    const { pendingPlan, toolsOverride } = get();
+    if (!pendingPlan) return;
+    const approvedPlan = pendingPlan.agents.filter((a) => a.selected).map((a) => a.id);
+    // Compute the effective tools_override: use the user's edits if they touched
+    // anything; otherwise fall back to the plan's selected list (or omit).
+    const effectiveToolsOverride: string[] | undefined = toolsOverride ?? pendingPlan.tools_selected ?? undefined;
+    set({ pendingPlan: null, planError: null, toolsOverride: null });
+    await get().submit(pendingPlan.query, { approvedPlan, toolsOverride: effectiveToolsOverride });
   },
 
   conversations: [],
@@ -548,6 +571,7 @@ export const useFirm = create<FirmState>((set, get) => ({
     }
 
     const approvedPlan = opts?.approvedPlan;
+    const toolsOverrideOpt = opts?.toolsOverride;
     const ac = new AbortController();
     // Store the AbortController so unmount/new-query can cancel.
     (get() as unknown as { _runAbort: AbortController | null })._runAbort = ac;
@@ -627,6 +651,7 @@ export const useFirm = create<FirmState>((set, get) => ({
           model: get().model,
           conversation_id: convId ?? undefined,
           approved_plan: approvedPlan,
+          tools_override: toolsOverrideOpt,
         },
         {
           onOpen: (ev) => patchTurn({ via: ev.via }),
