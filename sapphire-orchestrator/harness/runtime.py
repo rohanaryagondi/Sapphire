@@ -82,6 +82,8 @@ def _finish(contract, result, engagement_id, t0, repairs, guardrails_run, ihash,
             meta["qmodels_tool_label"] = transport_meta["_qmodels_tool_label"]
         if transport_meta.get("_qmodels_input") is not None:
             meta["qmodels_input"] = transport_meta["_qmodels_input"]
+        if transport_meta.get("_qmodels_health") is not None:
+            meta["qmodels_health"] = transport_meta["_qmodels_health"]
     result.meta = meta
     T.record(engagement_id, {"agent_id": contract.id, "kind": contract.kind,
                              "inputs_hash": ihash, "status": result.status,
@@ -161,7 +163,7 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
         # findings schema rejects them. We extract them here (into _transport_meta) and
         # strip them from the output BEFORE the schema check, so validation passes.
         if isinstance(out, dict):
-            _TRANSPORT_KEYS = ("_qmodels_tool_id", "_qmodels_tool_label", "_qmodels_input")
+            _TRANSPORT_KEYS = ("_qmodels_tool_id", "_qmodels_tool_label", "_qmodels_input", "_qmodels_health")
             has_transport = any(k in out for k in _TRANSPORT_KEYS)
             if has_transport:
                 for tk in _TRANSPORT_KEYS:

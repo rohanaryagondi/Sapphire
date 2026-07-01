@@ -56,6 +56,37 @@ function KV({ k, v }: { k: string; v: React.ReactNode }) {
   );
 }
 
+/* Keys already rendered elsewhere in AgentInfo (facts via FactList, provenance/candidate
+   via KV) — skipped here so "Full detail" only surfaces the genuinely new drill-down
+   fields (e.g. qmodels_tool_id/label/input/health for q-models-runner). */
+const DETAIL_SKIP_KEYS = new Set(["facts", "candidate", "provenance"]);
+
+/** Full per-agent output (WO-9 Phase 3) — a public-safe key/value drill-down of
+ *  whatever the agent's raw output carried beyond the fields already rendered above.
+ *  Renders nothing when there's no detail, or nothing left after skipping the
+ *  already-shown keys (e.g. an agent whose only output was facts/candidate/provenance). */
+function DetailBlock({ detail }: { detail: Record<string, unknown> }) {
+  const entries = Object.entries(detail).filter(([k]) => !DETAIL_SKIP_KEYS.has(k));
+  if (!entries.length) return null;
+  return (
+    <div className="mt-3">
+      <div className="mb-1.5 px-0.5 text-[10.5px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
+        Full detail
+      </div>
+      <div className="rounded-[8px] border border-[var(--color-border)] bg-[var(--color-panel)] p-2.5">
+        {entries.map(([k, v]) => (
+          <div key={k} className="flex gap-3 border-b border-[var(--color-border)] py-1.5 last:border-0">
+            <span className="w-28 shrink-0 font-mono text-[11px] text-[var(--color-fg-subtle)]">{k}</span>
+            <span className="min-w-0 flex-1 whitespace-pre-wrap break-words font-mono text-[11.5px] text-[var(--color-fg-muted)]">
+              {typeof v === "string" ? v : JSON.stringify(v, null, 2)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PinButton({ turnId, stepKey, label }: { turnId: string; stepKey: string; label: string }) {
   const pinned = useFirm((s) => s.isStepPinned(turnId, stepKey));
   const toggle = useFirm((s) => s.togglePinStep);
@@ -162,6 +193,8 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
           )}
         </div>
 
+        {agentStatus?.detail && <DetailBlock detail={agentStatus.detail} />}
+
         <div className="mt-3 rounded-[8px] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] p-2.5 text-[11.5px] leading-relaxed text-[var(--color-fg-muted)]">
           <b className="text-[var(--color-fg)]">How this fed the run: </b>
           {facts.length > 0
@@ -174,6 +207,7 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
         scopeLabel={agentLabel(agentId)}
         facts={facts}
         agentId={agentId}
+        detail={agentStatus?.detail}
         prefill={prefill}
         onPrefillConsumed={() => setPrefill("")}
       />

@@ -198,6 +198,69 @@ describe("InfoTab", () => {
     expect(screen.getByText("SCN10A · neuropathic pain")).toBeInTheDocument();
   });
 
+  // ── WO-9 Phase 3: full detail drill-down ────────────────────────────────
+  it("renders agent.detail's extra keys when present (e.g. qmodels tool id/label)", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { InfoTab } = await import("@/components/inspector/info-tab");
+    const turn = makeTurn();
+    const withDetail: RunResult = {
+      ...RESULT,
+      discover: {
+        ...RESULT.discover,
+        agents: [
+          {
+            id: "emet-runner",
+            status: "ok",
+            provenance: "emet-live",
+            n_facts: 1,
+            model: "EMET / BenchSci",
+            agent_query: "SCN10A · neuropathic pain",
+            detail: {
+              candidate: "SCN10A",
+              facts: [],
+              provenance: "emet-live",
+              qmodels_tool_id: "dti",
+              qmodels_tool_label: "DTI / Binder Triage",
+            },
+          },
+        ],
+      },
+    };
+    const detailTurn = { ...turn, result: withDetail };
+    act(() => {
+      useFirm.setState({
+        turns: [detailTurn],
+        selection: { kind: "agent", agentId: "emet-runner", turnId: turn.id },
+      });
+    });
+
+    render(<InfoTab turn={detailTurn} />);
+
+    expect(screen.getByText("Full detail")).toBeInTheDocument();
+    expect(screen.getByText("qmodels_tool_id")).toBeInTheDocument();
+    expect(screen.getByText("dti")).toBeInTheDocument();
+    expect(screen.getByText("qmodels_tool_label")).toBeInTheDocument();
+    expect(screen.getByText("DTI / Binder Triage")).toBeInTheDocument();
+    // Keys already rendered elsewhere (facts/candidate/provenance) are skipped here.
+    expect(screen.queryByText("candidate")).not.toBeInTheDocument();
+  });
+
+  it("renders nothing extra when agent.detail is absent/null (regression-safe)", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { InfoTab } = await import("@/components/inspector/info-tab");
+    const turn = makeTurn();
+    act(() => {
+      useFirm.setState({
+        turns: [turn],
+        selection: { kind: "agent", agentId: "emet-runner", turnId: turn.id },
+      });
+    });
+
+    render(<InfoTab turn={turn} />);
+
+    expect(screen.queryByText("Full detail")).not.toBeInTheDocument();
+  });
+
   it("the Pin button toggles pinnedSteps in the store", async () => {
     const { useFirm } = await import("@/lib/store");
     const { InfoTab } = await import("@/components/inspector/info-tab");

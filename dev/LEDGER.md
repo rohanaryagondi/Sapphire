@@ -11,6 +11,52 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-30 — WO-9 Phase 3 (Track A): real local Q-Models execution + inspectable outputs  (`rohan/local-tools-phase3`)
+- Built-By: `rohan` (PR pending Head Claude gate + merge). Two sub-goals + one investigated-and-documented
+  finding, per the assigned Phase 3 brief.
+  **Finding, not fabricated — local-cpu Q-Models tools are mechanically real but have no model artifacts.**
+  Started the vendored Explorer backend myself (`bash sapphire-orchestrator/qmodels/serve_local.sh 8000`) —
+  it builds its isolated venv and comes up cleanly; `curl /api/meta` confirms `reachable`, `live_tracks: []`.
+  A real end-to-end `QModelsClient.call("dti", …)` through the running server returns `provenance="stub"`
+  (not `"unavailable"` — the endpoint IS reachable, it just has no live joblibs). Confirmed `q-models/models/`
+  (the dir `serve_local.sh` gates `EXPLORER_LOCAL_MODELS=1` on) does not exist in this repo. This is the
+  correct, honest current behavior — logged as an `[OPEN]` `dev/HELP.md` request (external artifact,
+  Rohan/Quiver-owned, same pattern as the ED-2 `.xlsx` template), not guessed or faked. Server stopped
+  cleanly after verification (no orphaned process).
+  **Info panel "full detail" + follow-up chat wiring.** The backend `agent.detail` seam (live_engine.py
+  building a public-safe per-agent output snapshot) and its scoped_chat.py `detail` param were already built
+  and tested (`tests/test_qmodels_tool_selection.py`) — only the frontend was missing the wiring. Added
+  `detail?: Record<string, unknown> | null` to `AgentStatus` (`web/src/lib/types.ts`); `info-tab.tsx` now
+  renders a "Full detail" key/value block for a selected Bucket-1 agent (skips keys already shown elsewhere —
+  facts/candidate/provenance — and renders nothing when detail is null/absent); `lib/api.ts`'s `askScoped()`
+  gained an optional `detail` param forwarded in the POST body; `side-chat.tsx` now accepts a `detail` prop
+  and passes it through, wired from `info-tab.tsx`'s `agentStatus?.detail`. Also closed a real gap found while
+  reading the plumbing: `harness/runtime.py` strips `_qmodels_*` transport keys from `res.output` (schema is
+  `additionalProperties:false`) and re-surfaces them only in `res.meta` — so `live_engine.py`'s `_detail`
+  build (which reads `res.output`) never actually carried the qmodels tool id/label/input even though they're
+  public-safe identifiers exactly suited to drill-down. Fixed by folding `res.meta`'s `qmodels_tool_id/
+  _label/_input` back into `_detail` in `live_engine.py`. Also added a small, scoped health surfacing (brief's
+  "modest" option): `dispatch_qmodels` now checks `client.health()` once for local-cpu tools (reused for
+  routing, not a second HTTP call), stamps a public-safe `_qmodels_health` (`{reachable, live_tracks}`) that
+  flows through the same transport-key mechanism into `detail.qmodels_health` — so a user drilling into
+  `q-models-runner` can see AT A GLANCE whether the local Explorer endpoint is even up, instead of only
+  inferring it from one fact's "unavailable" note. Did NOT build an auto-start-the-server mechanism (out of
+  scope per the brief — port conflicts / orphaned processes / venv-build latency).
+  **Semantic-agent kind check.** Grepped `harness/agents.json` for all 13 registered semantic (Bucket-1)
+  agents against `architecture/bucket1/semantic/*.md` — every one is `kind: "claude-subagent"` (the real-
+  dispatch path). No anomalies; nothing to flag or fix.
+- Gates: `CLAUDE_BIN=/usr/bin/false bash dev/run-tests.sh` → **Gate 1 GREEN — 1132 tests** (contracts 52 ·
+  harness 109 · emet 76 · memory 14 · selfimprove 20 · moat 95 · corpus 12 · `sapphire-orchestrator` top-level
+  tests 486 · frontend 67 · frontend2 48 · web/react 153). `cd web && npm run build` clean (zero type errors).
+  `npx vitest run` → 153/153 green (14 files) incl. 2 new `info-tab.test.tsx` cases (renders `detail` when
+  present, renders nothing extra when absent/null) and 2 new `side-chat.test.tsx` cases (forwards `detail` to
+  `askScoped` when present, omits it — `undefined`, not `null` — when absent).
+- Gaps/Follow-ups: `q-models/models/` joblib artifacts (external, flagged in `dev/HELP.md`, `[OPEN]`).
+  Secondary, non-blocking observation (same investigation, not fixed): registry `models` entries `chemberta2`/
+  `maplight`/`molformer`/`morgan-fp` have no `invoke.local_track`, so they 404 against the real Explorer
+  endpoints instead of reaching the honest-stub path that `tracks` entries (`dti`/`bbbp`/`toxicity`) do —
+  flagged in the same HELP.md entry, not touched (out of scope). Phases 4–7 of WO-9 remain queued/parallel.
+
 ## 2026-06-30 — WO-9 Phase 2: Live run — real, reliable, streamed  (`rohan/live-run-hardening`)
 - Built-By: `rohan` (PR pending Head Claude gate + merge). Sub-goals A and B of the assigned Phase 2 brief,
   built end-to-end. **Sub-goal C (the demo-profile-default fix) was NOT implemented on this branch** — while

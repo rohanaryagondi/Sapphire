@@ -1176,6 +1176,19 @@ def run_live(
         _detail: "dict | None" = None
         if res.ok and res.output:
             _detail = {k: v for k, v in res.output.items() if not k.startswith("_")}
+            # WO-9 Phase 3: for qmodels-delegate, the harness strips the `_qmodels_*`
+            # transport keys from res.output BEFORE schema validation (the findings
+            # schema is additionalProperties:false) and re-surfaces them in res.meta
+            # instead (harness/runtime.py). Fold them back into detail here — tool id/
+            # label/input are public identifiers (tool name, gene symbol / SMILES),
+            # not internal scores, and are exactly the "which tool, on what input"
+            # drill-down the Info panel needs. qmodels_health (reachable + live_tracks)
+            # lets a user see AT A GLANCE whether the local Explorer endpoint is even
+            # up, instead of only inferring it from a single fact's "unavailable" note.
+            if res.meta:
+                for _mk in ("qmodels_tool_id", "qmodels_tool_label", "qmodels_input", "qmodels_health"):
+                    if res.meta.get(_mk) is not None:
+                        _detail[_mk] = res.meta[_mk]
 
         agent_statuses.append({
             "id": agent_id,

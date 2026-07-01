@@ -28,6 +28,7 @@ export function SideChat({
   scopeLabel,
   facts,
   agentId,
+  detail,
   prefill,
   onPrefillConsumed,
 }: {
@@ -36,6 +37,10 @@ export function SideChat({
    *  widens this; it forwards exactly this list to askScoped(). */
   facts: Fact[];
   agentId?: string;
+  /** WO-9 Phase 3: the selected agent's full public-safe detail (AgentStatus.detail),
+   *  when the caller has one open (e.g. AgentInfo passes agentStatus.detail) — forwarded
+   *  to askScoped() as supplementary evidence beyond the flattened fact list. */
+  detail?: Record<string, unknown> | null;
   /** set by a FactCard's "ask" button (via the parent Info view) to pre-fill
    *  the input scoped to that one fact. */
   prefill?: string;
@@ -58,7 +63,7 @@ export function SideChat({
     if (!q) return;
     setInput("");
     setMessages((m) => [...m, { q, a: "…", pending: true }]);
-    const answer = await askScoped(q, facts, agentId);
+    const answer = await askScoped(q, facts, agentId, detail);
     setMessages((m) => {
       const next = [...m];
       const last = next[next.length - 1];

@@ -33,6 +33,12 @@ export interface AgentStatus {
   model?: string;
   /** concise public-identifier scoped target the agent operated on (e.g. "SCN10A · neuropathic pain") */
   agent_query?: string;
+  /** full public-safe per-agent output (WO-9 Phase 3) — the engine's live_engine.py
+   *  builds this from the agent's raw output minus any "_"-prefixed internal transport
+   *  keys (e.g. for q-models-runner: candidate, facts, provenance, qmodels_tool_id,
+   *  qmodels_tool_label, qmodels_input, qmodels_health). null/absent when the agent
+   *  abstained (no evidence to surface) — that's honest, not a bug. */
+  detail?: Record<string, unknown> | null;
 }
 
 export interface Verdict {

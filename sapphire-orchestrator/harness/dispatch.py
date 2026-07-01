@@ -332,7 +332,27 @@ def dispatch_qmodels(contract, inputs, client=None) -> dict:
     else:
         payload = inputs.get("inputs", inputs)
 
-    raw = client.call(chosen_id, payload)
+    # WO-9 Phase 3: for local-cpu tools, check server reachability once up front — reused
+    # both to route the call (avoids a second HTTP round-trip inside client.call) and to
+    # stamp an honest at-a-glance health summary on the output (see _qmodels_health below),
+    # so a user can tell the local Explorer endpoint is unreachable/stub-only WITHOUT having
+    # to infer it from a single fact's "unavailable" note. GPU-tier tools are untouched —
+    # this is scoped to the local-cpu investigation only. Guarded so callers whose fake
+    # `client` has no `.health()` (unit tests) are unaffected — registry_tools stays None
+    # and health is simply skipped.
+    health = None
+    if registry_tools:
+        tool_meta = next((t for t in registry_tools if t.get("id") == chosen_id), None)
+        if tool_meta and tool_meta.get("tier") == "local-cpu":
+            try:
+                health = client.health()
+            except Exception:
+                health = None
+
+    if health is not None:
+        raw = client.call(chosen_id, payload, live_tracks=health.get("live_tracks"))
+    else:
+        raw = client.call(chosen_id, payload)
 
     # If the client returned the raw {model, out, provenance} shape, wrap into findings.
     if "facts" not in raw:
@@ -368,6 +388,12 @@ def dispatch_qmodels(contract, inputs, client=None) -> dict:
     raw["_qmodels_tool_id"] = chosen_id
     raw["_qmodels_tool_label"] = chosen_label
     raw["_qmodels_input"] = chosen_input
+    if health is not None:
+        # Public-safe reachability summary only (bool + track-id list) — never internal scores.
+        raw["_qmodels_health"] = {
+            "reachable": bool(health.get("reachable")),
+            "live_tracks": list(health.get("live_tracks") or []),
+        }
     return raw
 
 
