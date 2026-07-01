@@ -35,6 +35,11 @@ PROVENANCE = frozenset({
     "emet-live", "emet-mcp", "memory-recall", "persona-judgment", "synthesis",
     # existing
     "live-local", "gpu-async", "gpu-disabled", "stub", "unavailable", "mock",
+    # WO-9 Phase 4: GPU Q-Models on AWS (dry-run default vs live opt-in)
+    # gpu-dry-run: SAPPHIRE_QMODELS_LIVE not set; plan rendered, no instance launched.
+    # gpu-live:    SAPPHIRE_QMODELS_LIVE=1; real instance launched + result retrieved.
+    # gpu-stub:    GPU tool unavailable / misconfigured (honest degradation).
+    "gpu-dry-run", "gpu-live", "gpu-stub",
     # real Quiver CNS_DFP moat
     "moat-real",
     # corpus-first retrieval: a claim-card from a Bucket-1 agent's pre-ingested
@@ -89,6 +94,9 @@ _PLANE_MAP: dict[str, str] = {
     "live-local":       "external",   # Q-Models CPU; public-identifier inputs
     "gpu-async":        "external",   # Q-Models GPU async; public-identifier inputs
     "gpu-disabled":     "external",   # Q-Models GPU stub
+    "gpu-dry-run":      "external",   # WO-9 P4: GPU plan rendered, no instance launched (default)
+    "gpu-live":         "external",   # WO-9 P4: GPU instance launched + result retrieved (opt-in)
+    "gpu-stub":         "external",   # WO-9 P4: GPU tool unavailable / misconfigured
     "stub":             "external",
     "unavailable":      "external",
     "mock":             "external",

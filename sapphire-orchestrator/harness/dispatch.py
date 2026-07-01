@@ -339,8 +339,16 @@ def dispatch_qmodels(contract, inputs, client=None) -> dict:
         summary = str(raw.get("out", ""))
         # Honest: if the tool is unavailable/simulated, mark the fact explicitly.
         prov = raw.get("provenance", "qmodels")
+        # not_called: tool selected but not executed (includes legacy gpu-async + new gpu-dry-run)
         not_called = prov in ("unavailable", "stub", "gpu-disabled", "gpu-async", "error", "unknown")
-        if not_called:
+        # gpu-dry-run: tool selected, launch plan validated, AWS not touched; label clearly
+        gpu_dry_run = prov == "gpu-dry-run"
+        # gpu-stub: GPU tool unavailable / misconfigured (honest degradation)
+        gpu_stub = prov == "gpu-stub"
+        if gpu_dry_run:
+            # Use the deterministic out string (already labeled "GPU tool … selected; would launch …")
+            fact_value = summary
+        elif not_called or gpu_stub:
             # Use the provenance string as the status descriptor, NOT the raw out string,
             # so the fact value is deterministic (the gpu-async out includes a random job id).
             fact_value = (
