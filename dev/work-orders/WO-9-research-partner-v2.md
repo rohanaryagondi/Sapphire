@@ -69,6 +69,29 @@ Main-chat follow-ups answer from the run's stored evidence, honesty-guarded, cit
 - Rename / organize / delete conversations, working search, **sidebar cleanup** (prune old test runs), export,
   and wire the streaming-report UX from Phase 2 through.
 
+## PARALLELIZATION — 3 concurrent tracks (for speed)
+Run the phases as THREE parallel tracks, one per contributor. Rule of the road: **own your track's files,
+rebase on `main` before every PR, keep each change function-scoped in shared files, one PR per phase.** Head
+Claude gates every PR (functional-verifies) and resolves any cross-track conflict at merge.
+
+- **Track A — Real & Streamed — `rohan`:** Phase 2 (live real + stream the report) → Phase 3 (real local
+  tools) → **Phase 5 (targeted re-invocation, starts once Track B's Phase 4 has merged)**. Owns:
+  `sapphire-orchestrator/live_engine.py` (run/dispatch flow), `report.py`, `frontend2/server.py` (SSE +
+  `/api/followup`), `harness/dispatch.py` (claude-agent path), `web/src/components/run/*`, `synthesis.tsx`.
+- **Track B — AWS Tools — `hayes`:** Phase 4 (GPU Q-Models on AWS via the already-proven async launcher +
+  the `sapphire-aws-runner` agent). Owns: `sapphire-orchestrator/qmodels/*` (client/launcher/adapters/
+  registry), the q-models branch of `harness/dispatch.py`, `RohanOnly/qmodels_run/*` (ledger). ALL AWS safety
+  guards (Rohan-Sapphire profile · account-gate · create-only + ledger · teardown-only-by-ledgered-id ·
+  dry-run default + explicit live opt-in + spend cap). This is INTEGRATION of proven plumbing, not from-scratch.
+- **Track C — Breadth & Polish — `gavin`:** Phase 6 (robust planner for the full query range) + Phase 7
+  (workspace: rename/delete, working search, export, sidebar cleanup, demo-profile footgun fix). Owns: the
+  planner/scoping + entity-extraction (extract a `planner.py` module if it aids isolation),
+  `web/src/components/history-rail.tsx`, `web/src/lib/store.ts` (workspace slices), search/export.
+
+**Only dependency:** Track A's Phase 5 waits for Track B's Phase 4 to merge (re-invocation needs real tool
+execution to invoke). Everything else runs concurrently. Shared files (`live_engine.py`, `store.ts`,
+`dispatch.py`) are split by function-level ownership above — touch only your functions and rebase often.
+
 ## OUT OF SCOPE (for now, per the user)
 Public hosting, auth, and external front-door deployment. Localhost is fine — do NOT spend effort there yet.
 
