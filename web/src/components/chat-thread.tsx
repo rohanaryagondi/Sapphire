@@ -1,14 +1,13 @@
 "use client";
 import * as React from "react";
-import { AlertCircle, FlaskConical } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { useFirm, type Turn } from "@/lib/store";
-import { agentLabel, fmtElapsed } from "@/lib/utils";
+import { agentLabel, fmtElapsed, stripEmoji } from "@/lib/utils";
 import type { ProgressEvent } from "@/lib/types";
 import { EmptyState } from "@/components/empty-state";
 import { Synthesis } from "@/components/run/synthesis";
 import { Flags } from "@/components/run/flags";
 import { Dossier } from "@/components/run/dossier";
-import { Spread } from "@/components/run/spread";
 
 function liveLabel(ev?: ProgressEvent): string {
   if (!ev) return "convening the firm…";
@@ -60,9 +59,6 @@ function Banner({
       className={`flex items-start gap-2 rounded-[var(--radius)] border px-3 py-2 text-[12px] leading-snug ${style}`}
     >
       {tone === "error" && <AlertCircle className="mt-0.5 size-3.5 shrink-0" />}
-      {(tone === "sim" || tone === "mock") && (
-        <FlaskConical className="mt-0.5 size-3.5 shrink-0" />
-      )}
       <span>{children}</span>
     </div>
   );
@@ -173,7 +169,7 @@ export function TurnView({ turn }: { turn: Turn }) {
         <button
           onClick={openTrace}
           title="Show this turn's trace in the Monitor"
-          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[13.5px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
+          className="max-w-[80%] rounded-[var(--radius-lg)] rounded-br-[4px] border border-[var(--color-border)] bg-[var(--color-elevated)] px-3.5 py-2 text-left text-[15px] leading-relaxed text-[var(--color-fg)] transition-colors hover:border-[var(--color-border-focus)]"
         >
           {turn.query}
         </button>
@@ -220,13 +216,13 @@ export function TurnView({ turn }: { turn: Turn }) {
           <Banner tone="mock">
             <b>Illustrative mock output.</b> This is canned/Demo-profile data, not a
             real analysis -- facts may be placeholders. Switch to the{" "}
-            <b>Simulate</b> profile for real moat / EMET / seam data.
+            <b>Simulate</b> profile for real Quiver data / EMET / seam data.
           </Banner>
         )}
 
         {result?._simulated && (
           <Banner tone="sim">
-            <b>Simulated-models run.</b> Real moat, EMET PMIDs, seams and Q-Models -- but the
+            <b>Simulated-models run.</b> Real Quiver data, EMET PMIDs, seams and External Models -- but the
             roundtable verdicts and any claude fact-agent reasoning are{" "}
             <b>simulated</b> (labeled <code className="font-mono">simulated</code>), not real
             model output.
@@ -242,10 +238,9 @@ export function TurnView({ turn }: { turn: Turn }) {
 
         {result && (
           <>
-            <Synthesis result={result} />
+            <Synthesis result={result} turnId={turn.id} />
             <Flags flags={result.discover?.flags} />
             <Dossier result={result} turnId={turn.id} />
-            <Spread result={result} turnId={turn.id} />
           </>
         )}
 

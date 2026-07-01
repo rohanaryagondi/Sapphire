@@ -297,9 +297,16 @@ class Handler(BaseHTTPRequestHandler):
         question = (body.get("question") or "").strip()
         raw_facts = body.get("facts")
         facts = raw_facts if isinstance(raw_facts, list) else []
+        # Optional per-agent detail dict (public-safe; sent by the client when
+        # the user has an agent step open in the Info panel). Strip internal keys
+        # defensively before passing to answer_scoped.
+        raw_detail = body.get("detail")
+        detail: "dict | None" = None
+        if isinstance(raw_detail, dict):
+            detail = {k: v for k, v in raw_detail.items() if not k.startswith("_")}
         try:
             import scoped_chat as _scoped_chat_mod
-            answer = _scoped_chat_mod.answer_scoped(question, facts)
+            answer = _scoped_chat_mod.answer_scoped(question, facts, detail=detail)
         except Exception as exc:  # last-resort net — answer_scoped itself never raises
             answer = f"Could not answer — {type(exc).__name__}: {exc}"
         return self._send_json(200, {"answer": answer})

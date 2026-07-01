@@ -14,11 +14,11 @@ import { useMemo, useState } from "react";
 import { MousePointerClick, Pin, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent } from "@/lib/utils";
+import { agentLabel, backendLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import { FactList } from "./dossier-tab";
-import { Chip, PlaneChip, ProvChip, StatusDot, TierChip } from "@/components/ui/chips";
+import { Chip, StatusDot } from "@/components/ui/chips";
 import type { Fact } from "@/lib/types";
 import { SideChat } from "./side-chat";
 
@@ -97,20 +97,14 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
     ? byAgentId
     : dossier.filter((f) => prov && f.provenance === prov);
 
-  // tier: the predominant tier among this step's facts (derived, not asserted —
-  // mixed-tier steps show the most common tier; never fabricated when no facts).
-  const tier = useMemo(() => {
-    if (!facts.length) return undefined;
-    const counts = new Map<string, number>();
-    for (const f of facts) if (f.tier) counts.set(f.tier, (counts.get(f.tier) ?? 0) + 1);
-    let best: string | undefined;
-    let bestN = 0;
-    for (const [t, n] of counts) if (n > bestN) { best = t; bestN = n; }
-    return best;
-  }, [facts]);
-
   const via = result?._via === "replay" || result?._replay ? "replay" : undefined;
   const takeaway = typeof ev?.summary === "string" ? ev.summary : undefined;
+
+  // Model: prefer the recorded value from agent_statuses (persisted in the run result),
+  // fall back to the trace done event, then derive from provenance.
+  const agentModel: string = agentStatus?.model ?? ev?.model ?? backendLabel(prov, turn.model);
+  // Agent query: prefer recorded value, fall back to the engagement query.
+  const agentQuery: string = agentStatus?.agent_query ?? ev?.agent_query ?? turn.query ?? "";
 
   const [prefill, setPrefill] = useState("");
 
@@ -146,18 +140,13 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
           />
           <KV
             k="provenance"
-            v={
-              <span className="flex flex-wrap items-center gap-1">
-                {prov && <ProvChip prov={prov} via={via} />}
-                {tier && <TierChip tier={tier} />}
-              </span>
-            }
+            v={prov ?? undefined}
           />
+          <KV k="model" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{agentModel}</span>} />
           <KV k="facts · time" v={`${facts.length} fact${facts.length === 1 ? "" : "s"} · ${fmtElapsed(ev?.elapsed_s)}`} />
-          {/* "query" per the design spec — the engagement query that drove this
-              run (we don't fabricate a per-agent reformulated sub-query the
-              engine doesn't expose). */}
-          <KV k="query" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{turn.query || "—"}</span>} />
+          {/* "query" — the scoped target the agent actually operated on (honest,
+              from the engine's agent record or the engagement query as fallback). */}
+          <KV k="query" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{agentQuery || "—"}</span>} />
         </div>
 
         <div className="mt-3">
@@ -249,7 +238,7 @@ function PartnerInfo({ turn, persona }: { turn: Turn; persona: string }) {
               )
             }
           />
-          <KV k="provenance" v={v.provenance && <ProvChip prov={v.provenance} via={via} />} />
+          <KV k="provenance" v={v.provenance ?? undefined} />
         </div>
 
         {(round1 || round2) && (

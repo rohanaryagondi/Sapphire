@@ -245,21 +245,121 @@ def dispatch_claude_batch(items, runner=None) -> dict:
     return {c.id: body[c.id] for c, _ in items}
 
 
+def _select_qmodels_tool(inputs: dict, registry_tools: "dict | None" = None) -> tuple:
+    """Select the most relevant Q-Models tool for the given inputs.
+
+    Simple deterministic heuristic (no ML) — avoids fabrication:
+      - SMILES present  → 'dti' (DTI/Binder Triage, live-local, headline tool)
+      - Gene + variant  → 'variant_effect' (funNCion, endpoint/live)
+      - Gene present    → 'kg_hypothesis' (PROTON, endpoint/live)
+      - Fallback        → 'kg_hypothesis'
+
+    Returns (tool_id, tool_label, input_used) — all public identifiers.
+    tool_label is the human-readable name from the registry, or a default.
+    """
+    # Infer entity type from inputs — only public identifiers are examined.
+    gene = (inputs.get("candidate") or "").strip()
+    smiles = (inputs.get("smiles") or "").strip()
+    variant = (inputs.get("variant") or "").strip()
+
+    # Mapping from tool_id → (label, input_used)
+    if smiles:
+        chosen_id = "dti"
+        chosen_input = smiles
+    elif gene and variant:
+        chosen_id = "variant_effect"
+        chosen_input = f"{gene} {variant}"
+    elif gene:
+        chosen_id = "kg_hypothesis"
+        chosen_input = gene
+    else:
+        chosen_id = "kg_hypothesis"
+        chosen_input = inputs.get("query", "")[:80]
+
+    # Look up the label from the registry (fall back to id if not found).
+    tool_label = chosen_id
+    if registry_tools:
+        for t in registry_tools:
+            if t.get("id") == chosen_id:
+                tool_label = t.get("label") or t.get("name") or chosen_id
+                break
+
+    return chosen_id, tool_label, chosen_input
+
+
 def dispatch_qmodels(contract, inputs, client=None) -> dict:
     if client is None:
         from qmodels.client import QModelsClient
         client = QModelsClient()
-    tool_id = inputs.get("tool_id", contract.id)
-    payload = inputs.get("inputs", inputs)
-    raw = client.call(tool_id, payload)
+
+    # --- tool selection: pick a specific, relevant tool from the registry ---
+    # If the caller explicitly pre-selected a tool_id via inputs["tool_id"], honour it.
+    # Otherwise, use the deterministic entity-type heuristic.
+    registry_tools = None
+    try:
+        registry_tools = list(client.tools())
+    except Exception:
+        pass
+
+    if inputs.get("tool_id"):
+        chosen_id = inputs["tool_id"]
+        chosen_input = inputs.get("inputs", inputs).get("candidate", "") or ""
+        # Look up label
+        chosen_label = chosen_id
+        if registry_tools:
+            for t in registry_tools:
+                if t.get("id") == chosen_id:
+                    chosen_label = t.get("label") or t.get("name") or chosen_id
+                    break
+    else:
+        chosen_id, chosen_label, chosen_input = _select_qmodels_tool(inputs, registry_tools)
+
+    # Build the tool-specific payload from public inputs only.
+    # Each tool declares its required inputs in the registry; we pass what we have
+    # and let the client/seam handle missing fields gracefully (stub/unavailable).
+    gene = (inputs.get("candidate") or "").strip()
+    smiles = (inputs.get("smiles") or "").strip()
+    variant = (inputs.get("variant") or "").strip()
+
+    if chosen_id == "dti":
+        payload = {"smiles": smiles or chosen_input}
+        if gene:
+            payload["uniprot_acc"] = gene  # best-effort; seam accepts partial
+    elif chosen_id == "variant_effect":
+        payload = {"gene": gene or chosen_input, "variant": variant or ""}
+    elif chosen_id == "kg_hypothesis":
+        payload = {"gene": gene or chosen_input, "known_drug": ""}
+    else:
+        payload = inputs.get("inputs", inputs)
+
+    raw = client.call(chosen_id, payload)
+
     # If the client returned the raw {model, out, provenance} shape, wrap into findings.
     if "facts" not in raw:
         summary = str(raw.get("out", ""))
+        # Honest: if the tool is unavailable/simulated, mark the fact explicitly.
+        prov = raw.get("provenance", "qmodels")
+        not_called = prov in ("unavailable", "stub", "gpu-disabled", "gpu-async", "error", "unknown")
+        if not_called:
+            # Use the provenance string as the status descriptor, NOT the raw out string,
+            # so the fact value is deterministic (the gpu-async out includes a random job id).
+            fact_value = (
+                f"(simulated / not called — {chosen_label} selected; "
+                f"input: {chosen_input!r}; status: {prov})"
+            )
+        else:
+            fact_value = summary if summary else f"({chosen_label} ran; no output)"
         raw = {
             "candidate": inputs.get("candidate", ""),
-            "facts": [{"value": summary, "source": "Q-Models", "tier": "T2"}],
-            "provenance": raw.get("provenance", "qmodels"),
+            "facts": [{"value": fact_value, "source": "Q-Models", "tier": "T2"}],
+            "provenance": prov,
         }
+
+    # Stamp the selected tool metadata on the output so the harness can surface it.
+    # Prefix _ means internal-to-output; the Info panel reads these from res.meta.
+    raw["_qmodels_tool_id"] = chosen_id
+    raw["_qmodels_tool_label"] = chosen_label
+    raw["_qmodels_input"] = chosen_input
     return raw
 
 

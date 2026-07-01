@@ -1,12 +1,17 @@
 "use client";
-import { Globe, Lock } from "lucide-react";
 import type { Turn } from "@/lib/store";
-import { cn, isPlaceholderCitation, mockLabel } from "@/lib/utils";
-import { FlagChip, MockBadge, PlaneChip, ProvChip, TierChip } from "@/components/ui/chips";
+import { cn, isPlaceholderCitation, mockLabel, stripEmoji } from "@/lib/utils";
+import { FlagChip, MockBadge } from "@/components/ui/chips";
 import { useRef } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Fact } from "@/lib/types";
 
+/**
+ * FactCard — a single fact row in the dossier.
+ * Tier/provenance/plane chips and DOIs are removed per the UI polish spec.
+ * For EMET facts a terse "EMET" label is shown; for all others nothing.
+ * The per-fact "ask" affordance is preserved when onAsk is provided.
+ */
 export function FactCard({
   fact,
   via,
@@ -20,8 +25,11 @@ export function FactCard({
    *  no side-chat. */
   onAsk?: (fact: Fact) => void;
 }) {
+  void via; // via kept in signature for backward compat; chip display removed
   const mock = mockLabel(fact.provenance, fact.value, fact.source);
   const placeholderSrc = isPlaceholderCitation(fact.source);
+  // EMET facts show "EMET" only — no DOI, no BenchSci, no chip row.
+  const sourceTerse = fact.provenance?.toLowerCase().includes("emet") ? "EMET" : null;
   return (
     <div
       className={cn(
@@ -33,7 +41,7 @@ export function FactCard({
     >
       <div className="flex items-start gap-2">
         <p className={cn("flex-1 text-[12px] leading-snug", mock ? "italic text-[var(--color-fg-muted)]" : "text-[var(--color-fg)]")}>
-          {fact.value}
+          {stripEmoji(fact.value)}
         </p>
         {onAsk && (
           <button
@@ -46,18 +54,18 @@ export function FactCard({
           </button>
         )}
       </div>
-      <div className="mt-1.5 flex flex-wrap items-center gap-1">
-        {mock && <MockBadge label={mock} />}
-        <TierChip tier={fact.tier} />
-        <ProvChip prov={fact.provenance} via={via} />
-        <PlaneChip plane={fact.plane === "internal" ? "internal" : "external"} />
-        {fact.flag && <FlagChip flag={fact.flag} />}
-        {fact.source && (
-          placeholderSrc
-            ? <span className="ml-0.5 truncate text-[10px] italic text-[var(--color-fg-faint)]">{fact.source} · placeholder</span>
-            : <span className="ml-0.5 truncate text-[10px] text-[var(--color-fg-subtle)]">{fact.source}</span>
-        )}
-      </div>
+      {(mock || fact.flag || sourceTerse || placeholderSrc) && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-1">
+          {mock && <MockBadge label={mock} />}
+          {fact.flag && <FlagChip flag={fact.flag} />}
+          {sourceTerse && (
+            <span className="ml-0.5 text-[10px] text-[var(--color-fg-subtle)]">{sourceTerse}</span>
+          )}
+          {placeholderSrc && (
+            <span className="ml-0.5 truncate text-[10px] italic text-[var(--color-fg-faint)]">placeholder</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -114,8 +122,8 @@ export function DossierTab({ turn }: { turn?: Turn }) {
 
   const dossier = turn.result.discover?.dossier ?? [];
   const via = turn.result._via === "replay" || turn.result._replay ? "replay" : undefined;
-  const internal = dossier.filter((f) => f.plane === "internal");
-  const external = dossier.filter((f) => f.plane !== "internal");
+  const internal = dossier.filter((f) => f.plane === "internal" || (f.provenance ?? "").toLowerCase().includes("moat"));
+  const external = dossier.filter((f) => !(f.plane === "internal" || (f.provenance ?? "").toLowerCase().includes("moat")));
 
   if (!dossier.length) {
     return (
@@ -129,20 +137,16 @@ export function DossierTab({ turn }: { turn?: Turn }) {
     <div className="p-2">
       {internal.length > 0 && (
         <>
-          <div className="mb-1 mt-2 flex items-center gap-2 px-1">
-            <Lock className="size-3 text-[var(--color-internal)]" />
-            <span className="text-[11px] font-medium text-[var(--color-internal)]">Quiver moat</span>
-            <span className="text-[10.5px] text-[var(--color-fg-faint)]">{internal.length} private</span>
+          <div className="mb-1 mt-2 px-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-fg-subtle)]">
+            Quiver data
           </div>
           <FactList facts={internal} via={via} />
         </>
       )}
       {external.length > 0 && (
         <>
-          <div className="mb-1 mt-3 flex items-center gap-2 px-1">
-            <Globe className="size-3 text-[var(--color-external)]" />
-            <span className="text-[11px] font-medium text-[var(--color-external)]">Public literature</span>
-            <span className="text-[10.5px] text-[var(--color-fg-faint)]">{external.length} public</span>
+          <div className="mb-1 mt-3 px-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-fg-subtle)]">
+            External evidence
           </div>
           <FactList facts={external} via={via} />
         </>

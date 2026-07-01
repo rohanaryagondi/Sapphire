@@ -487,6 +487,20 @@ def _run_one_bucket1_agent(
         _o = batched_outputs[agent_id]
         disp_fn = lambda contract, inputs, _ctx, _o=_o: _o  # noqa: E731
 
+    # Derive a concise, public-identifier-only scoped target for this agent.
+    # geneset-enrichment operates on a gene set; all others use candidate · disease.
+    _candidate = bucket1_inputs.get("candidate", "")
+    _disease = bucket1_inputs.get("disease", "")
+    _genes = bucket1_inputs.get("genes", [])
+    if agent_id == "geneset-enrichment" and _genes:
+        _agent_query = ", ".join(str(g) for g in _genes[:6])
+    elif _candidate and _disease:
+        _agent_query = f"{_candidate} · {_disease}"
+    elif _candidate:
+        _agent_query = _candidate
+    else:
+        _agent_query = query
+
     _emit(on_progress, eid, {"stage": "bucket1", "agent_id": agent_id, "phase": "start"})
     _t0 = time.monotonic()
 
@@ -514,6 +528,8 @@ def _run_one_bucket1_agent(
         "n_facts": _n_facts, "elapsed_s": _elapsed,
         "error": res.error if not res.ok else None,
         "summary": _summary,
+        "model": res.meta.get("model") if res.meta else None,
+        "agent_query": _agent_query,
     })
 
     # Collect _annot_facts locally (only populated when adaptive=True).
@@ -524,7 +540,7 @@ def _run_one_bucket1_agent(
             enriched.setdefault("provenance", res.output.get("provenance", res.provenance))
             _annot_facts_local.append({**enriched, "_source_agent": agent_id})
 
-    return (agent_id, res, corpus_cards, _n_facts, _annot_facts_local)
+    return (agent_id, res, corpus_cards, _n_facts, _annot_facts_local, _agent_query)
 
 
 def _run_persona_round1(
@@ -1140,7 +1156,26 @@ def run_live(
         result_tuple = _futures[agent_id].result()  # re-raises any worker exception
         if result_tuple is None:
             continue  # agent was absent from registry (skipped inside worker)
-        _, res, corpus_cards, _n_facts, _annot_facts_local = result_tuple
+        _, res, corpus_cards, _n_facts, _annot_facts_local, _agent_query = result_tuple
+
+        # For q-models-runner: override model + agent_query with the specific
+        # tool label and concrete input (gene/SMILES) stamped by dispatch_qmodels
+        # via res.meta.  Falls back to the generic label and entity query gracefully.
+        _model = res.meta.get("model") if res.meta else None
+        _aq = _agent_query
+        if agent_id == "q-models-runner" and res.meta:
+            if res.meta.get("qmodels_tool_label"):
+                _model = res.meta["qmodels_tool_label"]
+            if res.meta.get("qmodels_input"):
+                _aq = res.meta["qmodels_input"]
+
+        # Build a public-safe detail snapshot of the per-agent output.
+        # This is the FULL output minus any internal transport keys (those starting
+        # with '_'). No internal scores cross — only public evidence (facts, sources,
+        # provenance, tool labels, inputs). Absent when the agent abstained (None).
+        _detail: "dict | None" = None
+        if res.ok and res.output:
+            _detail = {k: v for k, v in res.output.items() if not k.startswith("_")}
 
         agent_statuses.append({
             "id": agent_id,
@@ -1150,6 +1185,12 @@ def run_live(
             # trace) can show each agent's REAL contribution instead of mis-attributing
             # by shared provenance. Mirrors the n_facts in the live progress event above.
             "n_facts": _n_facts,
+            # Recorded backend/model and scoped target for the Info panel.
+            "model": _model,
+            "agent_query": _aq,
+            # Full per-agent public output for follow-up side-chat context.
+            # None when the agent abstained (no evidence to surface).
+            "detail": _detail,
         })
 
         if res.ok and res.output:
@@ -1706,6 +1747,24 @@ def run_live(
         "stage": "synthesis", "phase": "done",
         "recommendation": recommendation, "confidence": confidence,
     })
+
+    # Synthesize written narrative report (best-effort, never blocks the run).
+    try:
+        from report import synthesize_report
+        _report_md = synthesize_report(
+            query=query,
+            dossier=all_dossier_facts,
+            round1=round1,
+            round2=round2,
+            recommendation=recommendation,
+            confidence=confidence,
+            known_unknowns=known_unknowns,
+            runner=ctx.get("runner"),
+        )
+        if _report_md:
+            syn["report"] = _report_md
+    except Exception:
+        pass  # report is best-effort; never blocks the engagement
 
     # Close the trace and run the self-improvement reflection loop.
     trace.close_engagement(eid, syn)

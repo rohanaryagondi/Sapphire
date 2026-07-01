@@ -46,7 +46,7 @@ const RESULT: RunResult = {
     ],
     flags: { VETO: [], DIVERGENCE: [], KNOWN_UNKNOWNS: [] },
     status: "complete",
-    agents: [{ id: "emet-runner", status: "ok", provenance: "emet-live", n_facts: 1 }],
+    agents: [{ id: "emet-runner", status: "ok", provenance: "emet-live", n_facts: 1, model: "EMET / BenchSci", agent_query: "SCN10A · neuropathic pain" }],
   },
   consult: {
     round1: [
@@ -177,6 +177,25 @@ describe("InfoTab", () => {
     expect(screen.getByText("R2")).toBeInTheDocument();
     // cited dossier fact (fact_claims)
     expect(screen.getByText("PMID:12345")).toBeInTheDocument();
+  });
+
+  it("shows model and agent_query KV rows for a Bucket-1 agent", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { InfoTab } = await import("@/components/inspector/info-tab");
+    const turn = makeTurn();
+    act(() => {
+      useFirm.setState({
+        turns: [turn],
+        selection: { kind: "agent", agentId: "emet-runner", turnId: turn.id },
+      });
+    });
+
+    render(<InfoTab turn={turn} />);
+
+    // model KV row should show the recorded model
+    expect(screen.getByText("EMET / BenchSci")).toBeInTheDocument();
+    // agent_query KV row should show the scoped target
+    expect(screen.getByText("SCN10A · neuropathic pain")).toBeInTheDocument();
   });
 
   it("the Pin button toggles pinnedSteps in the store", async () => {
