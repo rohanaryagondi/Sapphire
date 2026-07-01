@@ -99,21 +99,49 @@ class QModelsClient:
             return {"reachable": False, "endpoint": ep, "error": f"{type(e).__name__}: {e}"}
 
     # ---------- R-Sapphire routing ----------
+    # Gene-tool remapping: proton (kg_hypothesis) and funncion (variant_effect) are NOT
+    # provisioned on the R-Sapphire box. When the endpoint is set, remap these to
+    # family_clustering + esm2_650m (the gene-embedding tool that IS provisioned and live).
+    # Input: gene symbol → passed as "sequences" (the only accepted input key for esm2_650m).
+    _GENE_TOOL_REMAP = {
+        "kg_hypothesis": ("family_clustering", "esm2_650m"),
+        "variant_effect": ("family_clustering", "esm2_650m"),
+    }
+
     def _call_rsapphire(self, tool: dict, inputs: dict, adapters) -> dict | None:
         """POST to R-Sapphire /predict. Returns normalized result or None on unreachable/error.
 
-        Protocol: POST {"track": <id>, "model": <aws_model_key>, "inputs": <inputs>}
-        — same as the Explorer inference.py live path. On connection failure → returns None
-        (caller falls through to local/launcher). On HTTP error → returns an error dict
-        (endpoint is up but rejected the request; do NOT fall through to avoid double-charging).
+        Protocol: POST {"track": <track>, "model": <model>, "inputs": <inputs>}
+        — same as the Explorer inference.py live path.
+
+        Gene-tool remapping: kg_hypothesis (proton) and variant_effect (funncion) are not
+        provisioned on the R-Sapphire instance. These are remapped to family_clustering +
+        esm2_650m (the ESM-2 embedding tool that IS live on R-Sapphire): the gene symbol
+        is passed as "sequences" to get a real protein-family embedding prediction.
+
+        On connection failure → returns None (caller falls through to local/launcher).
+        On HTTP error → returns an error dict (endpoint is up but rejected the request;
+        do NOT fall through to avoid double-charging).
         """
         ep = _rsapphire_endpoint()
         if not ep:
             return None
         tool_id = tool.get("id", "")
-        # aws_model_key from the tool; fall back to tool_id for local tracks (dti/bbbp/toxicity)
-        model_key = tool.get("aws_model_key") or tool_id
-        body = json.dumps({"track": tool_id, "model": model_key, "inputs": inputs}).encode("utf-8")
+
+        # Gene-tool remapping: kg_hypothesis/variant_effect → family_clustering/esm2_650m.
+        # These track/model names are provisioned and return real ESM-2 embeddings.
+        remap = self._GENE_TOOL_REMAP.get(tool_id)
+        if remap:
+            track, model_key = remap
+            # Gene identifier → pass as "sequences" (the esm2_650m accepted input key).
+            gene = (inputs.get("gene") or inputs.get("candidate") or "").strip()
+            remapped_inputs = {"sequences": gene} if gene else inputs
+            body = json.dumps({"track": track, "model": model_key,
+                               "inputs": remapped_inputs}).encode("utf-8")
+        else:
+            # aws_model_key from the tool; fall back to tool_id for local tracks (dti/bbbp/toxicity)
+            model_key = tool.get("aws_model_key") or tool_id
+            body = json.dumps({"track": tool_id, "model": model_key, "inputs": inputs}).encode("utf-8")
         req = urllib.request.Request(
             ep, data=body,
             headers={"Content-Type": "application/json", "Accept": "application/json"},

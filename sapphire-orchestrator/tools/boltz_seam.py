@@ -64,6 +64,12 @@ _PROVENANCE = "boltz"
 _MODEL = "boltz-2.1"
 _SOURCE = "Boltz-2 structure/binding model (Boltz Compute API)"
 
+# R-Sapphire shortcut: when SAPPHIRE_QMODELS_GPU_ENDPOINT is set, route boltz through
+# R-Sapphire's boltz2 model via POST /predict rather than the hosted Boltz API
+# (which requires BOLTZ_API_KEY). Only falls back to the hosted API when the endpoint
+# env var is unset or the endpoint is unreachable.
+_RSAPPHIRE_ENV = "SAPPHIRE_QMODELS_GPU_ENDPOINT"
+
 # Network / polling budget. Kept tight: this is a fact seam inside an engine turn,
 # not a batch screen. A tiny fold returns in ~30s; we cap total wait so a slow or
 # stuck job degrades to an honest KNOWN_UNKNOWN rather than blocking the dossier.
@@ -334,6 +340,88 @@ def normalize(job: dict, requested_binding: bool) -> list[dict]:
 
 
 # ---------------------------------------------------------------------------
+# R-Sapphire routing (preferred when endpoint is set; no API key required)
+# ---------------------------------------------------------------------------
+def _rsapphire_endpoint() -> str | None:
+    """Return the R-Sapphire /predict URL if set, else None."""
+    ep = os.environ.get(_RSAPPHIRE_ENV, "").strip()
+    return ep if ep else None
+
+
+def _predict_via_rsapphire(entities: list[dict], binding: dict | None) -> dict | None:
+    """Attempt to run a boltz2 prediction via R-Sapphire's /predict endpoint.
+
+    Sends {"track": "boltz2", "model": "boltz2", "inputs": {"target_seq": ..., "smiles": ...}}.
+    Returns a parsed result dict on success, None on connection failure (caller falls through
+    to the hosted API), or a fact-bearing error dict on HTTP/server error.
+    """
+    ep = _rsapphire_endpoint()
+    if not ep:
+        return None
+
+    # Extract protein sequence and ligand SMILES from the Boltz entities list.
+    target_seq = ""
+    smiles = ""
+    for ent in entities:
+        if not isinstance(ent, dict):
+            continue
+        if ent.get("type") == "protein":
+            target_seq = ent.get("value", "")
+        elif ent.get("type") in ("ligand_smiles",):
+            smiles = ent.get("value", "")
+
+    if not target_seq and not smiles:
+        return None  # nothing to send; fall through
+
+    r_inputs: dict = {}
+    if target_seq:
+        r_inputs["target_seq"] = target_seq
+    if smiles:
+        r_inputs["smiles"] = smiles
+
+    body = json.dumps({"track": "boltz2", "model": "boltz2", "inputs": r_inputs}).encode("utf-8")
+    req = urllib.request.Request(
+        ep, data=body,
+        headers={"Content-Type": "application/json", "Accept": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=_HTTP_TIMEOUT) as resp:
+            pred = json.loads(resp.read())
+        # Normalise the R-Sapphire response into the same fact shape as the hosted path.
+        # R-Sapphire returns the raw model output dict; extract structure_confidence/binding_confidence.
+        sc = pred.get("structure_confidence") or pred.get("score")
+        bc = pred.get("binding_confidence")
+        facts: list[dict] = []
+        if sc is not None:
+            val = f"Boltz-2 (R-Sapphire) predicted complex: structure_confidence {float(sc):.2f}"
+            facts.append({"value": val, "source": "Boltz-2 via R-Sapphire endpoint", "tier": "T2"})
+        if bc is not None:
+            val = f"Boltz-2 (R-Sapphire) predicted binding: binding_confidence {float(bc):.2f}"
+            facts.append({"value": val, "source": "Boltz-2 via R-Sapphire endpoint", "tier": "T2"})
+        if not facts:
+            # Server responded but no recognised metric keys — emit what we got.
+            summary = json.dumps(pred)[:200]
+            facts.append({"value": f"Boltz-2 (R-Sapphire) response: {summary}",
+                          "source": "Boltz-2 via R-Sapphire endpoint", "tier": "T2"})
+        return {"facts": facts, "provenance": "boltz-rsapphire", "status": "succeeded"}
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")[:200] if hasattr(e, "read") else str(e)
+        return {
+            "facts": [_abstain_fact(f"R-Sapphire boltz2 HTTP {e.code}: {detail}")],
+            "provenance": "boltz-rsapphire",
+            "status": "rsapphire-error",
+            "error": f"R-Sapphire HTTP {e.code}",
+        }
+    except urllib.error.URLError:
+        # Endpoint unreachable → fall through to the hosted API path.
+        return None
+    except Exception:
+        # Any other unexpected error → fall through.
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 def predict(entities: list[dict], binding: dict | None = None,
@@ -369,6 +457,15 @@ def predict(entities: list[dict], binding: dict | None = None,
             "status": "boundary_block",
             "error": str(exc),
         }
+
+    # R-Sapphire shortcut: when SAPPHIRE_QMODELS_GPU_ENDPOINT is set, route boltz through
+    # the warm R-Sapphire box (no API key required) rather than the hosted Boltz API.
+    # Falls through to the hosted path only when the endpoint is unset or unreachable.
+    if _rsapphire_endpoint():
+        r_result = _predict_via_rsapphire(entities, binding)
+        if r_result is not None:
+            return r_result
+        # None means endpoint unreachable → fall through to hosted API below.
 
     api_key = _resolve_key()
     if not api_key:
