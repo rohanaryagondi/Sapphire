@@ -198,6 +198,8 @@ QUERY: {query}
 RECOMMENDATION: {recommendation}
 CONFIDENCE: {confidence}
 
+DISCOVERY MINDSET: Quiver is a discovery company — the alpha is in genes that carry strong internal (Quiver CNS_DFP / EP-signature / moat) evidence but have received only modest or emerging attention from the published literature. Weight internal evidence heavily as the PRIMARY signal; treat modest or emerging external attention as a POSITIVE (early external validation + a discovery opportunity, not a weakness). Do NOT penalise a target for thin literature coverage when the internal signal is strong — explicitly call out that low literature saturation on a strong-internal hit can itself be the discovery alpha (Quiver seeing what the field has not yet). Genes already saturated with published evidence are less novel; genes with strong internal signal and some external corroboration are the opportunity. Surface contradictions, risks, and DIVERGENCE honestly — this framing is a lens, not a filter.
+
 Write a report with EXACTLY this structure:
 
 A 2–3 sentence abstract (no heading) that states the conclusion (recommendation + core reason + one sentence on what the report covers).

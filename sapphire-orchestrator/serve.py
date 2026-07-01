@@ -207,6 +207,7 @@ Produce the four downstream stages, obeying these NON-NEGOTIABLE rules:
 - Personas in round1 each give a verdict (stance: champion|conditional|skeptic|veto; conviction 1-5).
   In round2, each is shown the others and revises or holds with a reason. No forced consensus.
 - If evidence is thin or contradictory, ABSTAIN in synthesis and propose the resolving experiment.
+- DISCOVERY MINDSET: weight strong internal (moat/EP-signature) evidence as the primary signal; treat modest external corroboration as a positive (early validation + discovery opportunity); do NOT penalise a target for thin literature — low coverage on a strong-internal hit can itself be the alpha. Surface contradictions and risks honestly.
 - HONESTY: you are NOT querying EMET or Q-Models live in this web run — the dossier facts are your own
   reconstruction from training. Do not claim a fact came from a live database hit; the UI labels these
   as Claude-reconstructed. Public identifiers only; never fabricate a PMID — cite a source TYPE

@@ -260,6 +260,55 @@ class TestReportLabels(unittest.TestCase):
                       "Prompt must reference 'Quiver data'")
 
 
+class TestReportDiscoveryFraming(unittest.TestCase):
+    """Synthesis prompt must carry the discovery-mindset framing (WO-9 synthesis retune)."""
+
+    def _prompt(self):
+        return _build_prompt(
+            query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+            recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+            known_unknowns=_KNOWN_UNKNOWNS,
+        )
+
+    def test_discovery_mindset_label_present(self):
+        """Prompt must include the DISCOVERY MINDSET heading."""
+        self.assertIn("DISCOVERY MINDSET", self._prompt())
+
+    def test_internal_evidence_primary_signal(self):
+        """Prompt must direct synthesis to weight internal evidence as the PRIMARY signal."""
+        self.assertIn("PRIMARY signal", self._prompt())
+
+    def test_thin_literature_not_penalised(self):
+        """Prompt must explicitly say thin literature does not penalise a strong-internal hit."""
+        prompt = self._prompt()
+        self.assertTrue(
+            "thin literature" in prompt or "low literature" in prompt or "thin" in prompt.lower(),
+            "Prompt must address thin-literature treatment positively for strong-internal hits.",
+        )
+
+    def test_emerging_external_positive(self):
+        """Prompt must frame modest/emerging external attention as a positive."""
+        prompt = self._prompt()
+        self.assertTrue(
+            "emerging" in prompt or "modest" in prompt,
+            "Prompt must mention emerging or modest external attention as a positive.",
+        )
+
+    def test_honesty_guard_preserved(self):
+        """HONESTY GUARD must still be present in the prompt (not removed by the retune)."""
+        self.assertIn("HONESTY GUARD", self._prompt())
+
+    def test_no_numeric_weight_introduced(self):
+        """Discovery framing must be prose only — no numeric weight/multiplier in the prompt."""
+        import re
+        prompt = self._prompt()
+        # Reject patterns like "weight 0.8", "multiplier 2", "score * 3" etc.
+        self.assertIsNone(
+            re.search(r"\bweight\s*[=:]\s*[\d.]+\b", prompt),
+            "Prompt must not introduce numeric weight assignments.",
+        )
+
+
 class TestReportCitationInstruction(unittest.TestCase):
     """Item 4: single-source paragraph gets ONE citation at the end."""
 
