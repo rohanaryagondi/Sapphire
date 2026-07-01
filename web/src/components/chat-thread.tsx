@@ -8,6 +8,8 @@ import { EmptyState } from "@/components/empty-state";
 import { Synthesis } from "@/components/run/synthesis";
 import { Flags } from "@/components/run/flags";
 import { Dossier } from "@/components/run/dossier";
+import { MarkdownDoc } from "@/components/run/markdown";
+import { Button } from "@/components/ui/button";
 
 function liveLabel(ev?: ProgressEvent): string {
   if (!ev) return "convening the firm…";
@@ -116,8 +118,12 @@ function FollowUpChips({ questions }: { questions: string[] }) {
   if (!questions.length) return null;
 
   const handleClick = (q: string) => {
+    // Seed the composer exactly like the empty-state suggestions do (same event
+    // + detail shape as components/empty-state.tsx's `fill()`) — this keeps
+    // follow-up chips on the SAME single routing path (composer -> `ask()`,
+    // WO-9 Phase 1) instead of a second, divergent submission code path.
     if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("sapphire:seed-composer", { detail: { text: q } }));
+      window.dispatchEvent(new CustomEvent<string>("sapphire:fill", { detail: q }));
     }
   };
 
@@ -132,6 +138,58 @@ function FollowUpChips({ questions }: { questions: string[] }) {
           {q}
         </button>
       ))}
+    </div>
+  );
+}
+
+/** WO-9 Phase 1: renders a follow-up turn — the answer synthesized from a prior
+ *  run's STORED evidence (no re-convened firm). Citation pills come free via
+ *  MarkdownDoc's existing [[Label]] parsing. When the model flagged a genuine
+ *  evidence gap (needsNewData), an explicit escalation affordance is shown —
+ *  the full firm is only ever convened on a deliberate user click, never
+ *  silently/automatically. */
+function FollowupAnswer({ turn }: { turn: Turn }) {
+  const submit = useFirm((s) => s.submit);
+  const f = turn.followup;
+
+  if (turn.status === "running") {
+    return <TypingIndicator trace={[]} />;
+  }
+
+  if (turn.status === "error" || !f) {
+    return (
+      <Banner tone="error">
+        {turn.error || "Could not answer from this run's evidence. No answer is fabricated."}
+      </Banner>
+    );
+  }
+
+  return (
+    <div className="space-y-3 fadeup">
+      <div className="rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3">
+        <MarkdownDoc text={f.answer} turnId={turn.id} />
+      </div>
+      {f.needsNewData && (
+        <div className="flex flex-col gap-2 rounded-[var(--radius)] border border-[rgba(210,153,34,0.30)] bg-[rgba(210,153,34,0.06)] px-3 py-2.5 text-[12px] text-[#e3b341]">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
+            <span>
+              This needs data not in this run
+              {f.missingAgent ? <> -- from: <b>{f.missingAgent}</b></> : null}.
+            </span>
+          </div>
+          <div>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => submit(turn.query)}
+            >
+              Run the full firm on this
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -175,7 +233,11 @@ export function TurnView({ turn }: { turn: Turn }) {
         </button>
       </div>
 
-      {/* firm response */}
+      {/* WO-9 Phase 1: a follow-up turn renders the stored-evidence answer, never
+          the full-firm response chrome (trace pill, dossier, roundtable, …). */}
+      {turn.kind === "followup" ? (
+        <FollowupAnswer turn={turn} />
+      ) : (
       <div className="space-y-3 fadeup">
         {turn.status === "running" && !result && <TypingIndicator trace={turn.trace} />}
 
@@ -249,6 +311,7 @@ export function TurnView({ turn }: { turn: Turn }) {
           <FollowUpChips questions={followUpQuestions} />
         )}
       </div>
+      )}
     </div>
   );
 }

@@ -9,7 +9,10 @@ export function Composer() {
   const taRef = React.useRef<HTMLTextAreaElement>(null);
   const running = useFirm((s) => s.running);
   const profile = useFirm((s) => s.profile);
-  const submit = useFirm((s) => s.submit);
+  // WO-9 Phase 1: `ask` auto-routes to a follow-up over stored evidence (when
+  // this conversation already has a completed full run) or a full firm
+  // convening via `submit` — see the single routing decision in lib/store.ts.
+  const ask = useFirm((s) => s.ask);
   const planMode = useFirm((s) => s.planMode);
   const setPlanMode = useFirm((s) => s.setPlanMode);
   const requestPlan = useFirm((s) => s.requestPlan);
@@ -36,7 +39,7 @@ export function Composer() {
     if (planMode && profile !== "replay" && q.trim()) {
       requestPlan(q);
     } else {
-      submit(q);
+      ask(q);
     }
   };
 

@@ -7,6 +7,7 @@
    ============================================================================ */
 import { create } from "zustand";
 import {
+  askFollowup as apiAskFollowup,
   createConversation,
   deleteConversation,
   fetchPlan,
@@ -39,6 +40,17 @@ export interface Notification {
   ttl?: number;
 }
 
+/** WO-9 Phase 1: a follow-up turn's payload — the answer synthesized from a
+ *  prior run's STORED evidence (no re-convened firm), plus whether the model
+ *  flagged a genuine evidence gap. */
+export interface FollowupTurnData {
+  answer: string;
+  citations: string[];
+  needsNewData: boolean;
+  missingAgent: string | null;
+  sourceRunId: string;
+}
+
 export interface Turn {
   id: string;
   query: string;
@@ -50,6 +62,12 @@ export interface Turn {
   error?: string;
   via?: string;
   startedAt: number;
+  /** "run" (default/absent, full firm convening) or "followup" (answered from
+   *  stored evidence, WO-9 Phase 1). Absent = "run" for backward compat with
+   *  every existing Turn-producing code path. */
+  kind?: "run" | "followup";
+  /** present only when kind === "followup". */
+  followup?: FollowupTurnData;
 }
 
 export type InspectorTab = "monitor" | "investigate";
@@ -153,6 +171,19 @@ interface FirmState {
   submit: (query: string, opts?: { approvedPlan?: string[] }) => Promise<void>;
   /** Abort the current in-flight run (safe to call when nothing is running). */
   abortRun: () => void;
+
+  // ── WO-9 Phase 1: main-chat follow-up over a run's stored evidence ────────
+  /** Answer `question` from the active conversation's last real run's stored
+   *  evidence — no re-convened firm. Requires activeConversationId to be set
+   *  (callers should route through `ask`, not call this directly, unless they
+   *  have already verified a completed run exists). */
+  askFollowup: (question: string) => Promise<void>;
+  /** Single routing decision point (per WO-9 Phase 1): auto-detects whether a
+   *  query should be answered as a follow-up over stored evidence (existing
+   *  conversation with at least one completed full run) or convene the full
+   *  firm via `submit`. All entry points (composer, follow-up chips) should
+   *  call this instead of `submit` directly. */
+  ask: (query: string) => Promise<void>;
 
   // WO-8 Phase 3: per-step pin (Info tab) — see PinnedStep doc comment above.
   pinnedSteps: PinnedStep[];
@@ -313,9 +344,44 @@ export const useFirm = create<FirmState>((set, get) => ({
     // Map each persisted RUN → a fully-rendered, complete Turn. The result dict the
     // server re-attached carries the dossier (both planes), roundtable spread, synthesis
     // and flags; we synthesise a static trace so the Monitor/Investigate render too.
+    //
+    // WO-9 Phase 1: a run persisted with via="followup" carries a minimal
+    // {_via:"followup", answer, citations, needs_new_data, missing_agent,
+    // source_run_id, ...} dict — NOT a real run_live result. Restoring it through
+    // traceFromResult/the full Turn shape would render nonsense/empty, so it gets
+    // the lightweight followup Turn variant instead. Real runs restore exactly as
+    // today (no behavior change there).
     const runs = detail.runs ?? [];
     const turns: Turn[] = runs.map((r, i) => {
-      const result = (r.result ?? undefined) as RunResult | undefined;
+      const raw = r.result ?? undefined;
+      if (raw && (raw as { _via?: string })._via === "followup") {
+        const f = raw as unknown as {
+          answer?: string;
+          citations?: string[];
+          needs_new_data?: boolean;
+          missing_agent?: string | null;
+          source_run_id?: string;
+        };
+        return {
+          id: `${id}_${r.id ?? i}`,
+          query: r.query,
+          profile: "demo" as Profile,
+          model: "default" as ModelChoice,
+          status: "complete" as TurnStatus,
+          trace: [],
+          kind: "followup" as const,
+          followup: {
+            answer: f.answer ?? "",
+            citations: f.citations ?? [],
+            needsNewData: !!f.needs_new_data,
+            missingAgent: f.missing_agent ?? null,
+            sourceRunId: f.source_run_id ?? "",
+          },
+          via: r.via,
+          startedAt: 0,
+        };
+      }
+      const result = raw as RunResult | undefined;
       return {
         id: `${id}_${r.id ?? i}`,
         query: r.query,
@@ -573,6 +639,78 @@ export const useFirm = create<FirmState>((set, get) => ({
           last_result: finalResult,
         } as Partial<Conversation>).then(() => get().refreshConversations());
       }
+    }
+  },
+
+  // ── WO-9 Phase 1: main-chat follow-up over a run's stored evidence ────────
+  askFollowup: async (question) => {
+    const q = question.trim();
+    const convId = get().activeConversationId;
+    if (!q || !convId) return;
+
+    const turn: Turn = {
+      id: uid("turn"),
+      query: q,
+      profile: get().profile,
+      model: get().model,
+      status: "running",
+      trace: [],
+      kind: "followup",
+      startedAt: Date.now(),
+    };
+    set((s) => ({ turns: [...s.turns, turn] }));
+
+    const result = await apiAskFollowup(convId, q);
+
+    if (!result) {
+      set((s) => ({
+        turns: s.turns.map((t) =>
+          t.id === turn.id
+            ? {
+                ...t,
+                status: "error" as TurnStatus,
+                error: "Could not answer from this run's evidence — try again.",
+              }
+            : t,
+        ),
+      }));
+      get().addNotification({
+        kind: "error",
+        title: "Follow-up failed",
+        body: q.slice(0, 80),
+        ttl: 8000,
+      });
+      return;
+    }
+
+    set((s) => ({
+      turns: s.turns.map((t) =>
+        t.id === turn.id
+          ? {
+              ...t,
+              status: "complete" as TurnStatus,
+              followup: {
+                answer: result.answer,
+                citations: result.citations ?? [],
+                needsNewData: !!result.needs_new_data,
+                missingAgent: result.missing_agent ?? null,
+                sourceRunId: result.source_run_id,
+              },
+            }
+          : t,
+      ),
+    }));
+  },
+
+  ask: async (query) => {
+    const q = query.trim();
+    if (!q && get().profile !== "replay") return;
+    const { activeConversationId, turns } = get();
+    const hasCompletedRun = turns.some((t) => t.status === "complete" && !!t.result);
+    if (activeConversationId && hasCompletedRun) {
+      await get().askFollowup(q);
+    } else {
+      await get().submit(q);
     }
   },
 

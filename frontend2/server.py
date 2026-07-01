@@ -24,6 +24,10 @@ ROUTES
   provenance, guardrails_run, repairs, output, elapsed_s. 404 honestly if absent.
 - ``GET /api/runs/<id>``          → the COMPLETE cached ``run_live`` result dict for engagement
   ``<id>`` (the same dict the ``result`` SSE frame carried), or 404 if not cached.
+- ``POST /api/followup``          → answer a follow-up question in an EXISTING conversation
+  from its last real run's STORED evidence (no re-convening the firm). Body JSON
+  ``{conversation_id, question}``. Plain JSON request/response (not SSE) — see
+  ``sapphire-orchestrator/followup.py`` for the honesty-guarded synthesis contract.
 
 FULL BACKEND ACCESS (for Demo Claudes — the hard requirement)
 -------------------------------------------------------------
@@ -239,6 +243,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._send_json(500, {"error": str(exc)})
         elif path == "/api/step-chat":
             return self._serve_step_chat(body)
+        elif path == "/api/followup":
+            return self._serve_followup(body)
         else:
             return self._send_json(404, {"error": "not found"})
 
@@ -310,6 +316,77 @@ class Handler(BaseHTTPRequestHandler):
         except Exception as exc:  # last-resort net — answer_scoped itself never raises
             answer = f"Could not answer — {type(exc).__name__}: {exc}"
         return self._send_json(200, {"answer": answer})
+
+    # ------------------------------------------------- main-chat follow-up
+    def _serve_followup(self, body: dict) -> None:
+        """POST /api/followup → answer a follow-up question in an EXISTING conversation
+        from its last real run's STORED evidence — no re-convening the firm.
+
+        Body: {conversation_id, question}. Plain JSON request/response (not SSE); a
+        follow-up is a comparable full-context synthesis call to /api/step-chat's
+        scoped call, but over the WHOLE run instead of one step. Honest degrade at
+        every step: missing conversation → 404, no real run yet → 400, a persistence
+        failure never blocks the answer reaching the client (mirrors `_stream_run`'s
+        non-fatal store-write pattern)."""
+        conversation_id = (body.get("conversation_id") or "").strip()
+        question = (body.get("question") or "").strip()
+        if not conversation_id or not question:
+            return self._send_json(400, {"error": "conversation_id and question are required"})
+
+        try:
+            import store as _store_mod
+        except Exception as exc:
+            return self._send_json(500, {"error": str(exc)})
+
+        conv = _store_mod.get_conversation(conversation_id)
+        if conv is None:
+            return self._send_json(404, {"error": "not found"})
+
+        # Pick the LAST run whose `via` is a real firm run (never a prior follow-up).
+        source_run = None
+        for run in conv.get("runs", []):
+            if run.get("via") != "followup":
+                source_run = run
+        if source_run is None:
+            return self._send_json(400, {
+                "error": "This conversation has no run yet — ask a question to start one."
+            })
+
+        full = _store_mod.get_run(source_run.get("id", ""))
+        result = (full or {}).get("result_json") if full else None
+
+        import followup as _followup_mod
+        answer_dict = _followup_mod.answer_followup(question, result)
+
+        # Persist the follow-up like a run (via="followup"), best-effort — a persistence
+        # failure must NOT prevent the answer from reaching the client.
+        try:
+            msg_id = _store_mod.add_message(conversation_id, "user", question)
+            _store_mod.add_message(conversation_id, "assistant", answer_dict.get("answer", ""))
+            followup_result = {
+                "_via": "followup",
+                "_followup": True,
+                "query": question,
+                "answer": answer_dict.get("answer", ""),
+                "citations": answer_dict.get("citations", []),
+                "needs_new_data": answer_dict.get("needs_new_data", False),
+                "missing_agent": answer_dict.get("missing_agent"),
+                "source_run_id": source_run.get("id", ""),
+                "source_query": source_run.get("query", ""),
+            }
+            _store_mod.save_run(conversation_id, msg_id, question, followup_result, "followup")
+        except Exception as _store_exc:
+            import sys as _sys
+            print(f"[store] followup save failed (non-fatal): {_store_exc}", file=_sys.stderr)
+
+        return self._send_json(200, {
+            "answer": answer_dict.get("answer", ""),
+            "citations": answer_dict.get("citations", []),
+            "needs_new_data": answer_dict.get("needs_new_data", False),
+            "missing_agent": answer_dict.get("missing_agent"),
+            "source_run_id": source_run.get("id", ""),
+            "conversation_id": conversation_id,
+        })
 
     # ------------------------------------------------------- SSE streaming
     def _serve_plan(self, query: str, profile: str, model: str = "") -> None:
