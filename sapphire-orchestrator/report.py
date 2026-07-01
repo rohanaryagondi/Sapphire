@@ -334,7 +334,10 @@ def synthesize_report(
                 )
 
             def runner(cmd: list[str]):  # type: ignore[misc]
-                return subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+                # 300s: a full sonnet synthesis of the dossier runs ~70-100s;
+                # 120s was too tight and silently fell back to the deterministic
+                # report under any variance/load. This cap only bounds a hang.
+                return subprocess.run(cmd, capture_output=True, text=True, timeout=300)
 
         proc = runner(cmd)
 
