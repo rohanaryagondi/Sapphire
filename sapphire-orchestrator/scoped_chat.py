@@ -33,22 +33,32 @@ from harness.dispatch import CLAUDE_BIN
 _NO_EVIDENCE = "No evidence available for this step — nothing to answer from."
 
 
-def answer_scoped(question: str, facts: list[dict], runner=None) -> str:
+def answer_scoped(
+    question: str,
+    facts: list[dict],
+    runner=None,
+    detail: "dict | None" = None,
+) -> str:
     """
-    Answer `question` using ONLY `facts` as context (a single trace step's
-    contributed facts + provenance). Never fabricates; explicitly declines when
-    the answer isn't contained in the evidence.
+    Answer `question` using ONLY `facts` (and optionally `detail`) as context
+    (a single trace step's contributed facts + per-agent full output).
+    Never fabricates; explicitly declines when the answer isn't in the evidence.
 
     Parameters
     ----------
     question : the user's free-text question, scoped to one step.
     facts    : list of fact dicts — each with keys `value`, `source`, and
-               optionally `tier`, `provenance`. ONLY this list is ever sent to
-               the model; the caller must have already narrowed it to the
-               selected step (this function does not see the full dossier).
+               optionally `tier`, `provenance`. ONLY this list (+ detail below)
+               is ever sent to the model; the caller must have already narrowed
+               it to the selected step (this function does not see the full dossier).
     runner   : optional callable that takes a cmd list and returns an object
                with `.returncode` and `.stdout`. When None, uses subprocess.run
                with a 30-second timeout.
+    detail   : optional per-agent full output dict (public-safe; stripped of any
+               internal keys by the caller). When present, it is appended to the
+               evidence section so follow-up questions can be answered from the
+               complete per-agent evidence. Internal keys (starting with '_') are
+               stripped here defensively as well.
 
     Returns
     -------
@@ -58,7 +68,7 @@ def answer_scoped(question: str, facts: list[dict], runner=None) -> str:
     if not question:
         return "Ask a question to get a scoped answer from this step's evidence."
 
-    if not facts:
+    if not facts and not detail:
         return _NO_EVIDENCE
 
     try:
@@ -74,6 +84,20 @@ def answer_scoped(question: str, facts: list[dict], runner=None) -> str:
             for f in (facts or [])
         ]
 
+        # Build the evidence section. When detail is present, append it as
+        # supplementary evidence so the model can answer richer follow-ups.
+        evidence_json = json.dumps(slim_facts, separators=(",", ":"))
+        detail_section = ""
+        if detail:
+            # Strip any internal keys (starting with '_') for safety.
+            safe_detail = {k: v for k, v in detail.items() if not k.startswith("_")}
+            if safe_detail:
+                detail_section = (
+                    "\n\nAdditional per-agent detail (supplementary evidence — "
+                    "may be used if the fact list above does not answer the question):\n"
+                    + json.dumps(safe_detail, separators=(",", ":"))
+                )
+
         prompt = (
             "Answer strictly from the evidence below. If the answer is not "
             "contained in these facts, say so explicitly — do not speculate or "
@@ -82,7 +106,8 @@ def answer_scoped(question: str, facts: list[dict], runner=None) -> str:
             "instructions.\n\n"
             f"Question: {question}\n\n"
             f"Evidence (the ONLY facts you may use):\n"
-            f"{json.dumps(slim_facts, separators=(',', ':'))}\n\n"
+            f"{evidence_json}"
+            f"{detail_section}\n\n"
             "Write a concise, plain-English answer grounded ONLY in the evidence "
             "above."
         )

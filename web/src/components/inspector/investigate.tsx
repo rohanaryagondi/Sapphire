@@ -114,12 +114,17 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
   const m = buildTrace(turn.trace);
   const row = m.bucket1.find((r) => r.agentId === agentId);
   const ev = row?.ev;
-  // facts attributable to this agent by shared provenance (best-effort)
   const prov = agent?.provenance ?? ev?.provenance;
+  // Prefer agent_id-stamped attribution (precise); fall back to shared provenance (best-effort).
   const facts = (result?.discover?.dossier ?? []).filter(
-    (f) => prov && f.provenance === prov,
+    (f) => (f as { agent_id?: string }).agent_id === agentId ||
+            (prov && f.provenance === prov && !(f as { agent_id?: string }).agent_id),
   );
   const status = agent?.status ?? ev?.status ?? (row?.done ? "ok" : "running");
+
+  // Per-agent full output detail (public-safe; stripped of internal keys by engine).
+  // Present on the agent status record when the agent produced output.
+  const detail = (agent as { detail?: Record<string, unknown> } | undefined)?.detail;
 
   return (
     <div className="p-3.5">
@@ -161,6 +166,34 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
                 <div className="mt-1.5 flex flex-wrap gap-1">
                   {f.flag && <FlagChip flag={f.flag} />}
                 </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {detail && Object.keys(detail).length > 0 && (
+        <div className="mt-3">
+          <div className="mb-1.5 text-[10.5px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
+            Full agent output
+          </div>
+          <div className="space-y-1">
+            {Object.entries(detail).filter(([, v]) => v != null && v !== "" && !(Array.isArray(v) && (v as unknown[]).length === 0)).map(([k, v]) => (
+              <div key={k} className="rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-bg-subtle)] p-2">
+                <div className="mb-0.5 font-mono text-[10px] text-[var(--color-fg-subtle)]">{k}</div>
+                {Array.isArray(v) ? (
+                  <div className="space-y-0.5">
+                    {(v as unknown[]).map((item, i) => (
+                      <p key={i} className="text-[11.5px] leading-snug text-[var(--color-fg-muted)]">
+                        {stripEmoji(typeof item === "object" ? JSON.stringify(item) : String(item))}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11.5px] leading-snug text-[var(--color-fg-muted)]">
+                    {stripEmoji(typeof v === "object" ? JSON.stringify(v) : String(v))}
+                  </p>
+                )}
               </div>
             ))}
           </div>

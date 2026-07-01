@@ -1158,6 +1158,25 @@ def run_live(
             continue  # agent was absent from registry (skipped inside worker)
         _, res, corpus_cards, _n_facts, _annot_facts_local, _agent_query = result_tuple
 
+        # For q-models-runner: override model + agent_query with the specific
+        # tool label and concrete input (gene/SMILES) stamped by dispatch_qmodels
+        # via res.meta.  Falls back to the generic label and entity query gracefully.
+        _model = res.meta.get("model") if res.meta else None
+        _aq = _agent_query
+        if agent_id == "q-models-runner" and res.meta:
+            if res.meta.get("qmodels_tool_label"):
+                _model = res.meta["qmodels_tool_label"]
+            if res.meta.get("qmodels_input"):
+                _aq = res.meta["qmodels_input"]
+
+        # Build a public-safe detail snapshot of the per-agent output.
+        # This is the FULL output minus any internal transport keys (those starting
+        # with '_'). No internal scores cross — only public evidence (facts, sources,
+        # provenance, tool labels, inputs). Absent when the agent abstained (None).
+        _detail: "dict | None" = None
+        if res.ok and res.output:
+            _detail = {k: v for k, v in res.output.items() if not k.startswith("_")}
+
         agent_statuses.append({
             "id": agent_id,
             "status": res.status,
@@ -1167,8 +1186,11 @@ def run_live(
             # by shared provenance. Mirrors the n_facts in the live progress event above.
             "n_facts": _n_facts,
             # Recorded backend/model and scoped target for the Info panel.
-            "model": res.meta.get("model") if res.meta else None,
-            "agent_query": _agent_query,
+            "model": _model,
+            "agent_query": _aq,
+            # Full per-agent public output for follow-up side-chat context.
+            # None when the agent abstained (no evidence to surface).
+            "detail": _detail,
         })
 
         if res.ok and res.output:

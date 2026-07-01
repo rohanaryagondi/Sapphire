@@ -33,11 +33,15 @@ def _validate_output(contract, out, ctx) -> tuple:
     return schema_errs, guard_errs
 
 
-def _model_for_contract(contract) -> str:
+def _model_for_contract(contract, transport_meta: "dict | None" = None) -> str:
     """Return an honest backend/model string for the contract's kind.
 
     Recorded in meta["model"] so the UI can show what actually ran.
     Never fabricates — falls back to kind-based label.
+
+    For qmodels-delegate, prefers the specific tool label from transport_meta
+    (extracted by the harness from dispatch_qmodels output before schema validation)
+    over the generic "Q-Models launchpad" fallback.
     """
     kind = contract.kind
     if kind == "emet-playwright":
@@ -45,6 +49,9 @@ def _model_for_contract(contract) -> str:
     if kind == "python":
         return "Quiver data (CNS_DFP)"
     if kind == "qmodels-delegate":
+        # Use the specific tool label if the dispatch recorded one.
+        if transport_meta and transport_meta.get("_qmodels_tool_label"):
+            return transport_meta["_qmodels_tool_label"]
         return "Q-Models launchpad"
     if kind == "claude-subagent":
         from . import dispatch as _d
@@ -55,10 +62,27 @@ def _model_for_contract(contract) -> str:
     return kind
 
 
-def _finish(contract, result, engagement_id, t0, repairs, guardrails_run, ihash, cache):
-    result.meta = {"inputs_hash": ihash, "latency_ms": int((time.time() - t0) * 1000),
-                   "repairs": repairs, "guardrails_run": guardrails_run,
-                   "model": _model_for_contract(contract)}
+def _finish(contract, result, engagement_id, t0, repairs, guardrails_run, ihash, cache,
+            transport_meta: "dict | None" = None):
+    out = result.output if result.ok else None
+    meta: dict = {
+        "inputs_hash": ihash,
+        "latency_ms": int((time.time() - t0) * 1000),
+        "repairs": repairs,
+        "guardrails_run": guardrails_run,
+        "model": _model_for_contract(contract, transport_meta or {}),
+    }
+    # For q-models-delegate: surface the specific tool + input in meta so live_engine
+    # can read them and set agent_query / model on the agent status entry.
+    # transport_meta carries the _qmodels_* keys extracted before schema validation.
+    if transport_meta and contract.kind == "qmodels-delegate":
+        if transport_meta.get("_qmodels_tool_id"):
+            meta["qmodels_tool_id"] = transport_meta["_qmodels_tool_id"]
+        if transport_meta.get("_qmodels_tool_label"):
+            meta["qmodels_tool_label"] = transport_meta["_qmodels_tool_label"]
+        if transport_meta.get("_qmodels_input") is not None:
+            meta["qmodels_input"] = transport_meta["_qmodels_input"]
+    result.meta = meta
     T.record(engagement_id, {"agent_id": contract.id, "kind": contract.kind,
                              "inputs_hash": ihash, "status": result.status,
                              "provenance": result.provenance, "error": result.error,
@@ -100,10 +124,18 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
 
     disp = dispatch_fn or _dispatch.dispatch
 
+    # Transport-only metadata extracted from dispatch output (before schema validation).
+    # For qmodels-delegate: dispatch_qmodels stamps _qmodels_* on the output dict so the
+    # harness can surface them in meta, but the schema rejects extra keys — so we extract
+    # and strip them here, before _validate_output runs, and carry them forward in a local
+    # dict that is folded into result.meta inside _finish. Cleared on each attempt.
+    _transport_meta: dict = {}
+
     # 2. dispatch + validate + repair loop
     out, errs = None, []
     for attempt in range(contract.max_repair + 1):
         call_inputs = inputs if attempt == 0 else {**inputs, "_repair": repair_prompt(out, errs)}
+        _transport_meta = {}  # reset each attempt
         try:
             out = disp(contract, call_inputs, ctx)
         except HarnessEscalation as ex:
@@ -122,6 +154,21 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
             res = AgentResult(contract.id, False, abstain_envelope(code, "a working backend"),
                               contract.provenance_label, status, code)
             return _finish(contract, res, engagement_id, t0, attempt, guardrails_run, ihash, cache)
+
+        # Strip transport-only keys from the dispatch output before schema validation.
+        # dispatch_qmodels stamps _qmodels_* keys on the output dict so the harness can
+        # surface tool-selection details in meta; but "additionalProperties: false" in the
+        # findings schema rejects them. We extract them here (into _transport_meta) and
+        # strip them from the output BEFORE the schema check, so validation passes.
+        if isinstance(out, dict):
+            _TRANSPORT_KEYS = ("_qmodels_tool_id", "_qmodels_tool_label", "_qmodels_input")
+            has_transport = any(k in out for k in _TRANSPORT_KEYS)
+            if has_transport:
+                for tk in _TRANSPORT_KEYS:
+                    if tk in out:
+                        _transport_meta[tk] = out[tk]
+                # Shallow-copy minus transport keys so we don't mutate the dispatch return.
+                out = {k: v for k, v in out.items() if k not in _TRANSPORT_KEYS}
 
         schema_errs, guard_errs = _validate_output(contract, out, ctx)
         errs = schema_errs + guard_errs
@@ -145,4 +192,5 @@ def run(agent_id, inputs, *, engagement_id, ctx=None, registry=None, dispatch_fn
         guardrails_run.append("stamp_provenance")
     provenance = out.get("provenance", contract.provenance_label)
     res = AgentResult(contract.id, True, out, provenance, "ok", None)
-    return _finish(contract, res, engagement_id, t0, repairs, guardrails_run, ihash, cache)
+    return _finish(contract, res, engagement_id, t0, repairs, guardrails_run, ihash, cache,
+                   transport_meta=_transport_meta)
