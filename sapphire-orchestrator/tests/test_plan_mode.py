@@ -19,7 +19,7 @@ _PKG = os.path.dirname(_HERE)
 if _PKG not in sys.path:
     sys.path.insert(0, _PKG)
 
-from live_engine import run_live, _BUCKET1_AGENTS
+from live_engine import run_live, _BUCKET1_AGENTS, _BUCKET1_CORE_AGENTS
 from smart_plan import SmartPlanError
 from harness.contracts import load_registry
 from tests.test_live_engine import _build_ctx
@@ -190,21 +190,24 @@ class TestPlanMode(unittest.TestCase):
                       "plan_mode='llm' must produce a full result with discover (agents ran)")
         self.assertEqual(result.get("plan_source"), "llm",
                          f"Expected plan_source='llm'; got {result.get('plan_source')}")
-        # The agents that ran must be drawn from the LLM selection.
+        # The agents that ran must be drawn from the LLM selection OR be core agents.
+        # Core agents always run regardless of the LLM selection (WO-9 design invariant).
         agent_ids = {a["id"] for a in result["discover"]["agents"]}
         selected_ids = {a["id"] for a in sp_result["selected_agents"]}
-        # Every ran agent must be in the LLM selection (or a non-Bucket-1 agent
-        # like rescue-mechanism for rescue queries — none for a standard query).
+        core_set = set(_BUCKET1_CORE_AGENTS)
+        # Every ran scientific (non-core) Bucket-1 agent must be in the LLM selection.
         for aid in agent_ids:
-            if aid in set(_BUCKET1_AGENTS):
+            if aid in set(_BUCKET1_AGENTS) and aid not in core_set:
                 self.assertIn(aid, selected_ids,
-                              f"agent {aid!r} ran but was not in LLM selection {selected_ids}")
+                              f"Non-core agent {aid!r} ran but was not in LLM selection {selected_ids}")
 
     # ── test 6: llm fallback uses deterministic when smart_plan raises ───────
     def test_llm_fallback_uses_deterministic(self):
         """When smart_plan raises SmartPlanError, run_live falls back to deterministic:
           - plan_source='deterministic' in result
-          - All known Bucket-1 agents appear in discover.agents (full panel ran)
+          - All known core agents appear in discover.agents (core always runs)
+          - Scientific tools run per the tool-selector deterministic fallback
+            (NOT necessarily all of them — e.g. boltz/aso-tox skip on a gene query)
         """
         with mock.patch("smart_plan.smart_plan",
                         side_effect=SmartPlanError("test fallback trigger")):
@@ -218,18 +221,18 @@ class TestPlanMode(unittest.TestCase):
         self.assertEqual(result.get("plan_source"), "deterministic",
                          f"Expected fallback plan_source='deterministic'; "
                          f"got {result.get('plan_source')}")
-        # The full deterministic panel must have run (no agents dropped).
+        # All known CORE agents must have run on fallback.
         agent_ids = {a["id"] for a in result["discover"]["agents"]}
         known_ids = {a["id"] for a in self._registry.get("agents", [])}
-        for aid in _BUCKET1_AGENTS:
+        for aid in _BUCKET1_CORE_AGENTS:
             if aid in known_ids:
                 self.assertIn(aid, agent_ids,
-                              f"Expected {aid!r} in discover.agents on deterministic fallback")
+                              f"Expected core agent {aid!r} in discover.agents on fallback")
 
     # ── test 7: empty LLM selection falls back to deterministic ─────────────
     def test_empty_llm_selection_falls_back_to_deterministic(self):
         """When smart_plan returns selected_agents=[], live_engine must NOT run
-        zero agents silently.  It must fall back to the full deterministic list
+        zero agents silently.  It must fall back to the core + tool-selector default
         and stamp plan_source='deterministic'.
 
         This guards against the degenerate case where the LLM legitimately
@@ -254,19 +257,19 @@ class TestPlanMode(unittest.TestCase):
         self.assertEqual(result.get("plan_source"), "deterministic",
                          f"Expected plan_source='deterministic' on empty LLM selection; "
                          f"got {result.get('plan_source')}")
-        # The full deterministic panel must have run.
+        # All known CORE agents must have run on the fallback.
         agent_ids = {a["id"] for a in result["discover"]["agents"]}
         known_ids = {a["id"] for a in self._registry.get("agents", [])}
-        for aid in _BUCKET1_AGENTS:
+        for aid in _BUCKET1_CORE_AGENTS:
             if aid in known_ids:
                 self.assertIn(aid, agent_ids,
-                              f"Expected {aid!r} in discover.agents on empty-selection fallback")
+                              f"Expected core agent {aid!r} in discover.agents on empty-selection fallback")
 
     # ── test 8: all-filtered approved_plan falls back to deterministic ────────
     def test_all_filtered_approved_plan_falls_back_to_deterministic(self):
         """When every id in approved_plan is unknown or out-of-bucket, the filtered
         list is empty.  live_engine must NOT silently run zero fact agents.
-        It must fall back to the full deterministic list and stamp
+        It must fall back to core + tool-selector default and stamp
         plan_source='deterministic'.
         """
         result = run_live(
@@ -280,13 +283,13 @@ class TestPlanMode(unittest.TestCase):
         self.assertEqual(result.get("plan_source"), "deterministic",
                          f"Expected plan_source='deterministic' for all-filtered approved_plan; "
                          f"got {result.get('plan_source')}")
-        # Full deterministic panel must have run.
+        # All known CORE agents must have run on the fallback.
         agent_ids = {a["id"] for a in result["discover"]["agents"]}
         known_ids = {a["id"] for a in self._registry.get("agents", [])}
-        for aid in _BUCKET1_AGENTS:
+        for aid in _BUCKET1_CORE_AGENTS:
             if aid in known_ids:
                 self.assertIn(aid, agent_ids,
-                              f"Expected {aid!r} in discover.agents on all-filtered fallback")
+                              f"Expected core agent {aid!r} in discover.agents on all-filtered fallback")
 
     # ── test 9: llm+approve + smart_plan fails → deterministic fallback envelope
     def test_llm_approve_smartplan_fails_returns_deterministic_envelope(self):
