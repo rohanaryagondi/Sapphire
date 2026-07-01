@@ -28,6 +28,10 @@ export interface RunRequest {
   conversation_id?: string;
   scenario?: string;
   approved_plan?: string[];
+  /** User-edited tool selection (tool ids) replacing the orchestrator's automatic
+   *  selection. When present, the backend's run_live() honours this list instead
+   *  of re-running tool_selector. Absent/undefined = use backend selection as-is. */
+  tools_override?: string[];
 }
 
 export interface RunCallbacks {
@@ -58,6 +62,7 @@ export async function runFirm(req: RunRequest, cb: RunCallbacks): Promise<void> 
       conversation_id: req.conversation_id,
       scenario: req.scenario,
       approved_plan: req.approved_plan,
+      ...(req.tools_override !== undefined ? { tools_override: req.tools_override } : {}),
     }),
     signal: cb.signal,
   });
