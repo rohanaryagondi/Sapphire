@@ -13,7 +13,7 @@ _ORCH_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ORCH_DIR not in sys.path:
     sys.path.insert(0, _ORCH_DIR)
 
-from followup import answer_followup, _build_prompt, _valid_targets
+from followup import answer_followup, _build_prompt, _build_synthesis_blocks, _valid_targets
 
 
 class _FakeQModelsClient:
@@ -452,6 +452,210 @@ class TestFollowupMissingAgentTargeting(unittest.TestCase):
         rather than presenting an empty-but-implied list."""
         prompt = _build_prompt("Any question?", _RESULT, citation_labels=[], valid_targets=[])
         self.assertIn("MUST be null", prompt)
+
+
+class TestFollowupSynthesisContext(unittest.TestCase):
+    """WO-9 — follow-up sees the final report + ranking.
+
+    (a) A result WITH synthesize.ranked_genes + report → the built prompt contains
+        the ranking + report text (so ranking/report questions are answerable).
+    (b) "Show me the full ranking" answerable from synthesis → NOT marked needs_new_data.
+    (c) Empty first response → retried once; the retry's good response is returned.
+    (d) Result without a synthesize block → no crash (backward-compatible).
+    """
+
+    _RANKED_GENES = [
+        {"gene": "TSC2", "score": 0.95, "rationale": "mTORC1 hyperactivation driver"},
+        {"gene": "MTOR", "score": 0.88, "rationale": "Direct downstream effector"},
+        {"gene": "RHEB", "score": 0.81},
+    ]
+    _REPORT_TEXT = (
+        "## Synthesis Report\n\n"
+        "TSC2 is ranked #1 with score 0.95. MTOR is #2. "
+        "The roundtable reached a conditional-pass for TSC2 based on mTORC1 evidence."
+    )
+
+    _RESULT_WITH_SYNTHESIS = {
+        "query": _QUERY,
+        "discover": {
+            "dossier": _DOSSIER,
+            "flags": {"KNOWN_UNKNOWNS": _KNOWN_UNKNOWNS},
+        },
+        "consult": {"round1": _ROUND1, "round2": _ROUND2},
+        "synthesize": {
+            "recommendation": "TSC2 is a high-confidence target.",
+            "confidence": "high",
+            "ranked_genes": _RANKED_GENES,
+            "report": _REPORT_TEXT,
+        },
+    }
+
+    def test_prompt_contains_ranking_and_report(self):
+        """(a) With synthesize.ranked_genes + report → prompt contains FINAL RANKING and
+        FINAL REPORT blocks with actual content, so the model can answer ranking questions."""
+        prompt = _build_prompt(
+            "Show me the full ranking",
+            self._RESULT_WITH_SYNTHESIS,
+            citation_labels=[],
+        )
+        self.assertIn("FINAL RANKING", prompt)
+        self.assertIn("TSC2", prompt)
+        self.assertIn("MTOR", prompt)
+        self.assertIn("FINAL REPORT", prompt)
+        self.assertIn("Synthesis Report", prompt)
+        self.assertIn("0.95", prompt)
+
+    def test_build_synthesis_blocks_ranked_genes_and_report(self):
+        """_build_synthesis_blocks renders ranked_genes compactly and includes report text."""
+        block = _build_synthesis_blocks(self._RESULT_WITH_SYNTHESIS["synthesize"])
+        self.assertIn("FINAL RANKING", block)
+        self.assertIn("1. TSC2", block)
+        self.assertIn("score: 0.95", block)
+        self.assertIn("mTORC1 hyperactivation driver", block)
+        self.assertIn("2. MTOR", block)
+        self.assertIn("FINAL REPORT", block)
+        self.assertIn("Synthesis Report", block)
+
+    def test_ranking_question_not_marked_needs_new_data(self):
+        """(b) A question answerable from synthesize.ranked_genes must NOT be marked
+        needs_new_data — the model sees the full ranking in the prompt."""
+        payload = {
+            "answer": (
+                "The full ranking is: 1. TSC2 (score 0.95), 2. MTOR (score 0.88), "
+                "3. RHEB (score 0.81)."
+            ),
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        out = answer_followup(
+            "Show me the full ranking",
+            self._RESULT_WITH_SYNTHESIS,
+            runner=_ok_runner(payload),
+        )
+        self.assertFalse(out["needs_new_data"])
+        self.assertIn("TSC2", out["answer"])
+        self.assertIsNone(out["missing_agent"])
+
+    def test_report_question_not_marked_needs_new_data(self):
+        """(b) A question about the final report is answerable → not needs_new_data."""
+        payload = {
+            "answer": "The final report concludes TSC2 is ranked #1.",
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        out = answer_followup(
+            "What did the synthesis report conclude?",
+            self._RESULT_WITH_SYNTHESIS,
+            runner=_ok_runner(payload),
+        )
+        self.assertFalse(out["needs_new_data"])
+
+    def test_empty_first_response_retried_once(self):
+        """(c) When the first model call returns a JSON object without an 'answer' key
+        (_parse_model_response sets _parse_failed=True), the runner is called a second
+        time and the retry's good response is returned to the caller."""
+        call_count = {"n": 0}
+
+        def _retry_runner(cmd):
+            call_count["n"] += 1
+            if call_count["n"] == 1:
+                # First call: JSON object missing "answer" — triggers _parse_failed
+                return _FakeProc(
+                    stdout=json.dumps({"needs_new_data": False, "missing_agent": None}),
+                    returncode=0,
+                )
+            # Second call (retry): well-formed response
+            return _FakeProc(
+                stdout=json.dumps({
+                    "answer": "TSC2 is ranked first.",
+                    "needs_new_data": False,
+                    "missing_agent": None,
+                }),
+                returncode=0,
+            )
+
+        out = answer_followup(
+            "What is the top-ranked gene?",
+            self._RESULT_WITH_SYNTHESIS,
+            runner=_retry_runner,
+        )
+        self.assertEqual(call_count["n"], 2, "runner must be called exactly twice (first + retry)")
+        self.assertIn("TSC2", out["answer"])
+        self.assertFalse(out["needs_new_data"])
+
+    def test_retry_not_triggered_on_good_first_response(self):
+        """Retry must NOT fire when the first response parses successfully — runner called once."""
+        call_count = {"n": 0}
+
+        def _counting_runner(cmd):
+            call_count["n"] += 1
+            return _FakeProc(
+                stdout=json.dumps({
+                    "answer": "TSC2 is the top target.",
+                    "needs_new_data": False,
+                    "missing_agent": None,
+                }),
+                returncode=0,
+            )
+
+        answer_followup(
+            "What is the top gene?",
+            self._RESULT_WITH_SYNTHESIS,
+            runner=_counting_runner,
+        )
+        self.assertEqual(call_count["n"], 1, "runner must be called exactly once on success")
+
+    def test_no_synthesize_block_no_crash(self):
+        """(d) Older/simulated results without a synthesize block must not crash and
+        must still produce a valid answer dict."""
+        result_no_synthesis = {
+            "query": _QUERY,
+            "discover": {"dossier": _DOSSIER, "flags": {}},
+            "consult": {"round1": _ROUND1, "round2": []},
+            # no 'synthesize' key at all
+        }
+        payload = {
+            "answer": "Based on dossier only.",
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+        out = answer_followup(
+            "Summarize the evidence",
+            result_no_synthesis,
+            runner=_ok_runner(payload),
+        )
+        self.assertIsInstance(out, dict)
+        self.assertIn("answer", out)
+        self.assertFalse(out["needs_new_data"])
+
+    def test_synthesize_block_no_ranked_genes_no_crash(self):
+        """A synthesize block with only recommendation/confidence (no ranked_genes/report)
+        is handled gracefully — backward-compatible with pre-ranking runs."""
+        result_partial = {
+            "query": _QUERY,
+            "discover": {"dossier": _DOSSIER, "flags": {}},
+            "consult": {"round1": _ROUND1, "round2": []},
+            "synthesize": {"recommendation": "Proceed.", "confidence": "moderate"},
+        }
+        prompt = _build_prompt("What is the recommendation?", result_partial, citation_labels=[])
+        # No FINAL RANKING or FINAL REPORT block (neither ranked_genes nor report present)
+        self.assertNotIn("FINAL RANKING", prompt)
+        self.assertNotIn("FINAL REPORT", prompt)
+        # But recommendation/confidence appear in the header
+        self.assertIn("Proceed.", prompt)
+
+    def test_report_truncated_when_long(self):
+        """A synthesize.report longer than 4000 chars is truncated with a note, not dropped."""
+        long_report = "X" * 5000
+        block = _build_synthesis_blocks({
+            "recommendation": "ok",
+            "confidence": "high",
+            "report": long_report,
+        })
+        self.assertIn("FINAL REPORT", block)
+        self.assertIn("truncated at 4000 chars", block)
+        # The block should not contain more than the first 4000 'X' chars + annotation
+        self.assertLess(block.count("X"), 4001)
 
 
 if __name__ == "__main__":
