@@ -3,6 +3,7 @@ import * as React from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
+  Download,
   MessageSquarePlus,
   MoreHorizontal,
   Pencil,
@@ -27,9 +28,12 @@ export function HistoryRail() {
   const refresh = useFirm((s) => s.refreshConversations);
   const newChat = useFirm((s) => s.newChat);
   const open = useFirm((s) => s.openConversation);
+  const clearAll = useFirm((s) => s.clearAllConversations);
   // Phase 5: pinned
   const pinned = useFirm((s) => s.pinned);
   const unpinConversation = useFirm((s) => s.unpinConversation);
+
+  const [clearConfirmOpen, setClearConfirmOpen] = React.useState(false);
 
   React.useEffect(() => {
     refresh();
@@ -54,17 +58,41 @@ export function HistoryRail() {
         <span className="text-[12px] font-medium uppercase tracking-[0.07em] text-[var(--color-fg-subtle)]">
           Workspace
         </span>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => newChat()}
-          disabled={running}
-          className="h-7"
-        >
-          <MessageSquarePlus className="size-3.5" />
-          New
-        </Button>
+        <div className="flex items-center gap-1.5">
+          {conversations.length > 0 && !running && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setClearConfirmOpen(true)}
+              className="h-7 text-[var(--color-fg-subtle)] hover:text-[var(--color-danger)]"
+              aria-label="Clear all conversations"
+            >
+              <Trash2 className="size-3.5" />
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => newChat()}
+            disabled={running}
+            className="h-7"
+          >
+            <MessageSquarePlus className="size-3.5" />
+            New
+          </Button>
+        </div>
       </div>
+
+      {/* clear-all confirm */}
+      <ClearAllConfirm
+        open={clearConfirmOpen}
+        count={conversations.length}
+        onOpenChange={setClearConfirmOpen}
+        onConfirm={() => {
+          setClearConfirmOpen(false);
+          void clearAll();
+        }}
+      />
 
       {/* search */}
       <div className="shrink-0 px-2.5 py-2">
@@ -144,6 +172,7 @@ function HistoryItem({
   const rename = useFirm((s) => s.renameConversation);
   const star = useFirm((s) => s.starConversation);
   const remove = useFirm((s) => s.removeConversation);
+  const exportConv = useFirm((s) => s.exportConversation);
   const pinConversation = useFirm((s) => s.pinConversation);
   const unpinConversation = useFirm((s) => s.unpinConversation);
   const pinned = useFirm((s) => s.pinned);
@@ -275,6 +304,11 @@ function HistoryItem({
                   label={isPinned ? "Unpin" : "Pin"}
                   onSelect={() => isPinned ? unpinConversation(conv.id) : pinConversation(conv.id)}
                 />
+                <MenuItem
+                  icon={<Download className="size-3.5" />}
+                  label="Export"
+                  onSelect={() => void exportConv(conv.id)}
+                />
                 <DropdownMenu.Separator className="my-1 h-px bg-[var(--color-border)]" />
                 <MenuItem
                   icon={<Trash2 className="size-3.5" />}
@@ -338,6 +372,50 @@ function DeleteConfirm({
             >
               <Trash2 className="size-3.5" />
               Delete
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+function ClearAllConfirm({
+  open,
+  count,
+  onOpenChange,
+  onConfirm,
+}: {
+  open: boolean;
+  count: number;
+  onOpenChange: (o: boolean) => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-[99] bg-black/55 backdrop-blur-sm fadein" />
+        <Dialog.Content className="fixed left-1/2 top-1/2 z-[100] w-[min(380px,92vw)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--radius-lg)] border border-[var(--color-border-strong)] bg-[var(--color-panel-raised)] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.65)] fadein">
+          <Dialog.Title className="text-[14px] font-semibold text-[var(--color-fg)]">
+            Clear all conversations?
+          </Dialog.Title>
+          <Dialog.Description className="mt-1.5 text-[12.5px] leading-relaxed text-[var(--color-fg-muted)]">
+            All {count} conversation{count !== 1 ? "s" : ""} will be permanently deleted. This can't be undone.
+          </Dialog.Description>
+          <div className="mt-4 flex justify-end gap-2">
+            <Dialog.Close asChild>
+              <Button variant="ghost" size="sm" className="h-7">
+                Cancel
+              </Button>
+            </Dialog.Close>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onConfirm}
+              className="h-7 bg-[var(--color-danger)] text-white hover:bg-[var(--color-danger)]/90"
+            >
+              <Trash2 className="size-3.5" />
+              Clear all
             </Button>
           </div>
         </Dialog.Content>
