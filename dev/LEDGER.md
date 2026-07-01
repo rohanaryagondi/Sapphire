@@ -11,6 +11,35 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-30 — WO-9 Phase 1 hardening: robust JSON parse in followup.py  (`rohan/followup-hardening`)
+- Built-By: `rohan` (PR pending Head Claude gate + merge). Gate-5 on a LIVE `/api/followup` call caught a bug the
+  merged Phase 1 (#158) tests missed (they only fed clean JSON): real Claude output is frequently NOT clean JSON
+  — a ` ```json ` fence, a preamble, trailing prose, or a raw unescaped control character all broke the previous
+  strict `json.loads(text)`, and the `except` branch fell back to the RAW model output as `answer` — dumping a
+  literal `{"answer":"...","needs_new_data":false,...}` string into the chat UI instead of prose. `followup.py`
+  now parses via `_parse_model_response`: strict parse (now `strict=False`, tolerating a raw control char inside
+  a string value) → fence-stripped parse → the first balanced `{...}` object extracted from the text
+  (string/escape-aware brace counting, tolerant of preamble/trailing prose) → a regex salvage of just the
+  `"answer": "..."` value (also `strict=False`, JSON-unescaped via `json.loads('"'+group+'"')` rather than
+  hand-rolled unescaping) → and ONLY when none of that finds any JSON-like structure at all does it fall back to
+  treating the whole text as bare prose (a model that ignored the JSON instruction entirely is still giving an
+  honest answer). Critically: when the text DOES look like an attempted JSON object but no usable `"answer"` can
+  be extracted from it, the fallback is now a generic honest message ("Could not parse a clear answer…") — NEVER
+  the raw JSON/braces — closing the exact case this fix targets. `citations` now reflect only the `[[Label]]`
+  tokens actually present in the final answer text (not every label that was available as dossier context) —
+  an answer that only drew on Quiver data shouldn't claim an EMET citation too. Confirmed `report.py` is NOT
+  similarly fragile — it returns `proc.stdout.strip()` directly as the Markdown report with zero `json.loads`
+  calls on model output, so no equivalent bug exists there. The honesty guard and the
+  `answer`/`citations`/`needs_new_data`/`missing_agent` contract are unchanged.
+- Gates: 6 new regression tests in `test_followup.py` feeding REAL-style output (fenced JSON, JSON with a
+  preamble + trailing prose, bare prose with no JSON structure, a raw unescaped control character, and the two
+  citation-scoping cases) + 1 existing test updated to assert the missing-answer-field case no longer dumps raw
+  JSON + 1 existing test updated for the new "cited tokens only" citation semantics. `CLAUDE_BIN=/usr/bin/false
+  bash dev/run-tests.sh` → **Gate 1 GREEN — 1084 tests**. `cd web && npm run build` clean (zero type errors).
+  `npx vitest run` → 127/127 green incl. emoji-lint (frontend/UI untouched by this fix; re-verified anyway).
+- Gaps/Follow-ups: none — this is a scoped hardening fix over Phase 1's `followup.py` only. Phases 2–5 of WO-9
+  remain queued.
+
 ## 2026-06-30 — WO-9 Phase 1: main-chat follow-up over stored evidence  (`rohan/followup-chat`)
 - Built-By: `rohan` (PR pending Head Claude gate + merge). A follow-up question in an EXISTING conversation now answers from that run's STORED evidence — no re-convening the 23-agent firm. New `sapphire-orchestrator/followup.py` (`answer_followup(question, result, runner=None) -> {"answer","citations","needs_new_data","missing_agent"}`) mirrors `report.py`'s exact pattern: same `CLAUDE_BIN` resolution, same honesty-guard-in-prompt style, same never-raises/deterministic-fallback contract, same stdlib-only footprint (imports only `os`/`json`/`shutil`/`subprocess`/`harness.dispatch.CLAUDE_BIN`); it reuses `report.py`'s `_derive_citation_labels` directly (no duplicated provenance→label map) so follow-up answers use the SAME `[[Label]]` citation convention the frontend already renders as pills. The model is asked to return `{"answer","needs_new_data","missing_agent"}` as JSON; a parse failure falls back to the raw stdout as `answer` rather than losing content. Backend: `POST /api/followup` in `frontend2/server.py` — `{conversation_id, question}` → `store.get_conversation` → picks the LAST run whose `via != "followup"` as the evidence source (400 honest error if none) → `followup.answer_followup` → persists onto the EXISTING `runs` table with `via="followup"` and a self-contained `result_dict` (`_via`, `answer`, `citations`, `needs_new_data`, `missing_agent`, `source_run_id`, `source_query`) — no schema change; a persistence failure never blocks the answer reaching the client (mirrors `_stream_run`'s non-fatal store-write pattern). Frontend: `askFollowup()` in `web/src/lib/api.ts` (same non-SSE JSON-POST/null-on-failure pattern as `fetchPlan`); `store.ts` gains `Turn.kind`/`Turn.followup` (backward-compat: absent = a normal full-run turn), an `askFollowup` action, and a single `ask()` routing helper (auto-detects: existing conversation + at least one completed full run → follow-up; else → `submit`) — both the composer and the follow-up chips (fixed a pre-existing event-name mismatch, `sapphire:seed-composer` → `sapphire:fill`, that meant clicking a chip did nothing) route through this ONE decision point. `chat-thread.tsx` renders a followup turn via `<MarkdownDoc>` (citation pills for free) plus an explicit "Run the full firm on this" button — shown only when the model itself flags `needsNewData`, naming `missingAgent` — that calls `submit(turn.query)` (never silent/automatic). `openConversation()` restores a persisted `via="followup"` run as the lightweight followup Turn variant (real runs restore unchanged).
 - Gates: **`dev/run-tests.sh` Gate 1 GREEN — 1078 tests** (contracts 52 · harness 109 · emet 76 · memory 14 · selfimprove 20 · moat 95 · corpus 12 · `sapphire-orchestrator` top-level tests 458 incl. 14 new `test_followup.py` · frontend 67 · frontend2 48 incl. 8 new `test_followup_api.py` over a real socket · web/react 127 incl. 6 new `followup-turn.test.tsx`). `cd web && npm run build` clean (zero type errors). `npx vitest run` 127/127 green incl. the emoji-lint test.

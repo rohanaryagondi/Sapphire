@@ -22,13 +22,21 @@ HONESTY GUARD (in the prompt)
   agent/tool would need to run — never invent an answer.
 
 STDLIB-ONLY
-  Imports: os, json, subprocess, shutil + harness.dispatch.CLAUDE_BIN.
+  Imports: os, json, re, subprocess, shutil + harness.dispatch.CLAUDE_BIN.
   No third-party deps.
+
+ROBUST PARSING (the model rarely returns clean JSON)
+  Real Claude output frequently wraps the JSON in a ```json fence```, adds a short
+  preamble, or trails off into extra prose. `_parse_model_response` degrades through
+  progressively looser extraction (strict parse → fence-stripped parse → first
+  balanced {...} object → regex-salvaged "answer" value → the whole text as bare
+  prose) so the UI never renders a literal JSON blob to the user.
 """
 from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 
@@ -38,6 +46,143 @@ except ImportError:
     CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 
 from report import _derive_citation_labels  # noqa: E402
+
+# Matches the "answer" string value in a (possibly malformed) JSON-ish blob,
+# tolerating escaped characters inside the string (\" \\ \n ...).
+_ANSWER_VALUE_RE = re.compile(r'"answer"\s*:\s*"((?:[^"\\]|\\.)*)"', re.DOTALL)
+_FENCE_RE = re.compile(r"^\s*```(?:json)?\s*\n?(.*?)\n?```\s*$", re.DOTALL)
+
+
+def _strip_fences(text: str) -> str:
+    """Strip a single wrapping ```json ... ``` (or ``` ... ```) code fence, if present."""
+    m = _FENCE_RE.match(text)
+    return m.group(1).strip() if m else text
+
+
+def _extract_balanced_object(text: str) -> "str | None":
+    """Return the first top-level {...} substring in ``text`` (string/escape aware),
+    or None if no balanced object is found. Tolerates a preamble and/or trailing prose
+    around the JSON object — real model output rarely returns bare JSON."""
+    start = text.find("{")
+    if start == -1:
+        return None
+    depth = 0
+    in_string = False
+    escape = False
+    for i in range(start, len(text)):
+        ch = text[i]
+        if in_string:
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == '"':
+                in_string = False
+            continue
+        if ch == '"':
+            in_string = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i + 1]
+    return None
+
+
+def _dict_with_answer(obj) -> "dict | None":
+    """Return obj if it's a dict with a non-empty 'answer' string, else None."""
+    if not isinstance(obj, dict):
+        return None
+    answer = str(obj.get("answer", "")).strip()
+    if not answer:
+        return None
+    needs_new_data = bool(obj.get("needs_new_data", False))
+    missing_agent = obj.get("missing_agent")
+    missing_agent = str(missing_agent).strip() if missing_agent else None
+    return {"answer": answer, "needs_new_data": needs_new_data, "missing_agent": missing_agent}
+
+
+def _salvage_answer_value(text: str) -> "str | None":
+    """Last-resort: regex out just the `"answer": "..."` string value and JSON-unescape
+    it, WITHOUT requiring the surrounding object to be valid JSON. Never dumps raw JSON."""
+    m = _ANSWER_VALUE_RE.search(text)
+    if not m:
+        return None
+    try:
+        # Wrapping the captured group back in quotes and parsing it AS a JSON string
+        # literal correctly resolves \n, \", \\, \uXXXX, … — safer than hand-rolling
+        # unescaping. strict=False additionally tolerates a raw (unescaped) control
+        # character the model left inside the string.
+        unescaped = json.loads('"' + m.group(1) + '"', strict=False)
+        unescaped = str(unescaped).strip()
+        return unescaped or None
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+
+def _parse_model_response(text: str) -> dict:
+    """Robustly parse the model's response into {"answer","needs_new_data","missing_agent"}.
+
+    Real Claude output is frequently NOT clean JSON — a ```json fence```, a short
+    preamble ("Here's the answer:"), trailing prose after the object, or a stray
+    unescaped character can all break a strict ``json.loads``. This never dumps the
+    raw (possibly JSON-looking) text to the user as a fallback; it degrades through
+    progressively looser extraction, and the last resort is treating the ENTIRE text
+    as plain-prose answer (a model that ignored the JSON instruction entirely and
+    just answered directly is still a valid, honest answer).
+    """
+    stripped = _strip_fences(text)
+    balanced = _extract_balanced_object(stripped)
+    # Tracks whether we ever saw something that LOOKS like a JSON object was
+    # attempted (a top-level dict, even if unusable) — used below to decide
+    # whether the ultimate fallback should be the raw text (bare prose, safe to
+    # show) or a generic honest message (a broken/incomplete JSON object, which
+    # must NEVER be dumped verbatim to the user).
+    looked_like_json = balanced is not None
+
+    candidates = [text, stripped]
+    if balanced:
+        candidates.append(balanced)
+
+    for candidate in candidates:
+        try:
+            # strict=False tolerates raw control characters (e.g. a literal,
+            # unescaped newline) inside string values — a common real-model slip
+            # that would otherwise sink an object that is OTHERWISE well-formed.
+            parsed = json.loads(candidate, strict=False)
+        except (json.JSONDecodeError, ValueError, TypeError):
+            continue
+        if isinstance(parsed, dict):
+            looked_like_json = True
+        result = _dict_with_answer(parsed)
+        if result is not None:
+            return result
+
+    # Still no valid {"answer": "..."} object — salvage just the answer string via
+    # regex (tolerates trailing garbage / an unescaped char elsewhere in the blob
+    # that broke strict parsing, without requiring the whole object to be valid).
+    salvaged = _salvage_answer_value(stripped)
+    if salvaged:
+        return {"answer": salvaged, "needs_new_data": False, "missing_agent": None}
+
+    if looked_like_json:
+        # The model attempted a structured JSON object but we could not extract
+        # a usable answer from it (e.g. the "answer" key itself is missing) —
+        # NEVER dump the raw JSON/braces to the user; degrade to an honest,
+        # generic message instead.
+        return {
+            "answer": (
+                "Could not parse a clear answer from the model's response — "
+                "try rephrasing the question."
+            ),
+            "needs_new_data": False,
+            "missing_agent": None,
+        }
+
+    # No JSON structure recognizable at all — the model answered in bare prose.
+    # That prose IS the answer; render it as-is rather than erroring.
+    return {"answer": text.strip(), "needs_new_data": False, "missing_agent": None}
 
 
 def _report_model() -> str:
@@ -203,30 +348,18 @@ def answer_followup(question: str, result: "dict | None", runner=None) -> dict:
         if not text:
             return _fallback_answer(dossier, round1)
 
-        try:
-            parsed = json.loads(text)
-            if not isinstance(parsed, dict):
-                raise ValueError("parsed JSON is not an object")
-            answer = str(parsed.get("answer", "")).strip()
-            if not answer:
-                raise ValueError("empty 'answer' field")
-            needs_new_data = bool(parsed.get("needs_new_data", False))
-            missing_agent = parsed.get("missing_agent")
-            missing_agent = str(missing_agent).strip() if missing_agent else None
-            return {
-                "answer": answer,
-                "citations": citation_labels,
-                "needs_new_data": needs_new_data,
-                "missing_agent": missing_agent,
-            }
-        except (json.JSONDecodeError, ValueError, TypeError):
-            # Never lose the model's output just because it wasn't perfect JSON.
-            return {
-                "answer": text,
-                "citations": citation_labels,
-                "needs_new_data": False,
-                "missing_agent": None,
-            }
+        parsed = _parse_model_response(text)
+        answer = parsed["answer"]
+        # citations reflect only the [[Label]] tokens actually present in the final
+        # answer text, not every label that WAS available as context — an answer
+        # that only drew on Quiver data shouldn't claim an EMET citation too.
+        used_citations = [lbl for lbl in citation_labels if f"[[{lbl}]]" in answer]
+        return {
+            "answer": answer,
+            "citations": used_citations,
+            "needs_new_data": parsed["needs_new_data"],
+            "missing_agent": parsed["missing_agent"],
+        }
 
     except Exception:
         return _fallback_answer(dossier, round1)
