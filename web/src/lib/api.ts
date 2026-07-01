@@ -11,6 +11,7 @@ import type {
   Conversation,
   ConversationDetail,
   Fact,
+  FollowupResult,
   ModelChoice,
   OpenEvent,
   PlanEnvelope,
@@ -185,6 +186,30 @@ export async function askScoped(
     return data?.answer || "No answer returned.";
   } catch {
     return "Could not reach the side-chat — try again.";
+  }
+}
+
+/** POST /api/followup — WO-9 Phase 1: answer a follow-up question in an EXISTING
+ *  conversation from its last real run's STORED evidence (no re-convening the
+ *  firm). Follows the exact non-SSE JSON-POST pattern fetchPlan() uses: never
+ *  throws to the caller — returns null on any network/HTTP failure so the store
+ *  can degrade to an honest error turn. */
+export async function askFollowup(
+  conversationId: string,
+  question: string,
+): Promise<FollowupResult | null> {
+  try {
+    const resp = await fetch("/api/followup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conversation_id: conversationId, question }),
+    });
+    if (!resp.ok) return null;
+    const data = (await safeJSON(resp)) as FollowupResult | null;
+    if (!data || typeof data.answer !== "string") return null;
+    return data;
+  } catch {
+    return null;
   }
 }
 

@@ -211,3 +211,15 @@ export interface PlanEnvelope {
 /* ── top-bar selectors ──────────────────────────────────────────────────────── */
 export type Profile = "demo" | "simulate" | "live" | "replay";
 export type ModelChoice = "default" | "sonnet" | "haiku";
+
+/* ── WO-9 Phase 1: main-chat follow-up over a run's stored evidence ─────────── */
+/* POST /api/followup response shape (sapphire-orchestrator/followup.py's contract,
+   plus the persistence ids the server attaches). */
+export interface FollowupResult {
+  answer: string;
+  citations: string[];
+  needs_new_data: boolean;
+  missing_agent: string | null;
+  source_run_id: string;
+  conversation_id: string;
+}
