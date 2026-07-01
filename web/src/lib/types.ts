@@ -228,6 +228,27 @@ export interface FollowupResult {
   citations: string[];
   needs_new_data: boolean;
   missing_agent: string | null;
+  /** WO-9 Phase 5: the missing_agent id's human-readable label, resolved
+   *  server-side (never model-generated). Additive — absent on pre-Phase-5 runs. */
+  missing_agent_label?: string | null;
   source_run_id: string;
   conversation_id: string;
+}
+
+/* ── WO-9 Phase 5: targeted re-invocation of ONE agent/tool ──────────────────── */
+/* POST /api/reinvoke response shape (frontend2/server.py's _serve_reinvoke). A
+   failed re-invocation carries only {ok:false, error, agent_id, source_run_id,
+   conversation_id} — never a fabricated answer/new_facts. */
+export interface ReinvokeResult {
+  ok: boolean;
+  answer?: string;
+  citations?: string[];
+  needs_new_data?: boolean;
+  missing_agent?: string | null;
+  missing_agent_label?: string | null;
+  new_facts?: Fact[];
+  agent_id?: string;
+  source_run_id?: string;
+  conversation_id?: string;
+  error?: string;
 }

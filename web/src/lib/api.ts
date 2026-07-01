@@ -17,6 +17,7 @@ import type {
   PlanEnvelope,
   Profile,
   ProgressEvent,
+  ReinvokeResult,
   RunResult,
 } from "./types";
 
@@ -218,6 +219,37 @@ export async function askFollowup(
     if (!resp.ok) return null;
     const data = (await safeJSON(resp)) as FollowupResult | null;
     if (!data || typeof data.answer !== "string") return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/** POST /api/reinvoke — WO-9 Phase 5: actually invoke ONE specific Bucket-1 agent
+ *  or Q-Models tool (never the full firm, never the roundtable), fold the new
+ *  evidence into the conversation, and re-answer `question` from the grown
+ *  evidence. Mirrors askFollowup()'s exact pattern: never throws — returns null
+ *  on any network/HTTP failure so the caller degrades to an honest error state. */
+export async function reinvokeAgent(
+  conversationId: string,
+  agentId: string,
+  question: string,
+  refinedQuery?: string,
+): Promise<ReinvokeResult | null> {
+  try {
+    const resp = await fetch("/api/reinvoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversation_id: conversationId,
+        agent_id: agentId,
+        question,
+        ...(refinedQuery ? { refined_query: refinedQuery } : {}),
+      }),
+    });
+    if (!resp.ok) return null;
+    const data = (await safeJSON(resp)) as ReinvokeResult | null;
+    if (!data || typeof data.ok !== "boolean") return null;
     return data;
   } catch {
     return null;

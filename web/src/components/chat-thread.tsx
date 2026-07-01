@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Play } from "lucide-react";
 import { useFirm, type Turn } from "@/lib/store";
 import { agentLabel, fmtElapsed, stripEmoji } from "@/lib/utils";
 import type { ProgressEvent } from "@/lib/types";
@@ -150,6 +150,7 @@ function FollowUpChips({ questions }: { questions: string[] }) {
  *  silently/automatically. */
 function FollowupAnswer({ turn }: { turn: Turn }) {
   const submit = useFirm((s) => s.submit);
+  const reinvokeOnTurn = useFirm((s) => s.reinvokeOnTurn);
   const f = turn.followup;
 
   if (turn.status === "running") {
@@ -164,8 +165,23 @@ function FollowupAnswer({ turn }: { turn: Turn }) {
     );
   }
 
+  // WO-9 Phase 5: only a real, invocable id (never free prose — followup.py
+  // constrains missingAgent to a validated id or null) shows the targeted button.
+  const targetedLabel = f.missingAgent ? (f.missingAgentLabel || agentLabel(f.missingAgent)) : null;
+
   return (
     <div className="space-y-3 fadeup">
+      {!!f.newFacts?.length && (
+        <div className="space-y-1.5 rounded-[var(--radius)] border border-[var(--color-accent-ring)] bg-[var(--color-accent-soft)] px-3 py-2.5 text-[12px]">
+          <div className="font-medium text-[var(--color-accent)]">New evidence</div>
+          {f.newFacts.map((nf, i) => (
+            <div key={i} className="text-[var(--color-fg-muted)]">
+              {stripEmoji(nf.value)}
+              {nf.source ? <span className="text-[var(--color-fg-subtle)]"> — {nf.source}</span> : null}
+            </div>
+          ))}
+        </div>
+      )}
       <div className="rounded-[var(--radius)] border border-[var(--color-border)] bg-[var(--color-panel)] px-4 py-3">
         <MarkdownDoc text={f.answer} turnId={turn.id} />
       </div>
@@ -175,10 +191,37 @@ function FollowupAnswer({ turn }: { turn: Turn }) {
             <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
             <span>
               This needs data not in this run
-              {f.missingAgent ? <> -- from: <b>{f.missingAgent}</b></> : null}.
+              {targetedLabel ? <> -- from: <b>{targetedLabel}</b></> : null}.
             </span>
           </div>
-          <div>
+          {f.reinvokeError && (
+            <div className="text-[11px] text-[#ff7b72]">{f.reinvokeError}</div>
+          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Targeted, cheap re-invocation — only shown when missingAgent maps to a
+                real, invocable id (WO-9 Phase 5). Alongside, never replacing, the
+                full-firm re-convene below, so the user chooses the cheap or full path. */}
+            {targetedLabel && (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={!!f.reinvoking}
+                onClick={() => reinvokeOnTurn(turn.id, f.missingAgent!, turn.query)}
+              >
+                {f.reinvoking ? (
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] live-dot" />
+                    Running {targetedLabel}…
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <Play className="size-3" />
+                    Run {targetedLabel}
+                  </span>
+                )}
+              </Button>
+            )}
             <Button
               type="button"
               variant="secondary"

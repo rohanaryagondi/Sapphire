@@ -10,10 +10,18 @@ never-raises/deterministic-fallback contract, same stdlib-only footprint.
 
 CONTRACT
 --------
-  answer_followup(question: str, result: dict, runner=None) -> dict
+  answer_followup(question: str, result: dict, runner=None,
+                   registry=None, qmodels_client=None) -> dict
 
   Returns {"answer": str, "citations": list[str], "needs_new_data": bool,
-           "missing_agent": str | None}. Never raises.
+           "missing_agent": str | None, "missing_agent_label": str | None}. Never raises.
+
+  WO-9 PHASE 5 — `missing_agent` is constrained to a REAL, invocable identifier (a
+  Bucket-1 agent id or a Q-Models tool id), never free prose: the prompt gives the
+  model a closed list of valid {id, label} targets, and the parsed response is
+  DEFENSIVELY re-validated against the same list after parsing — anything not on the
+  list (hallucinated id, leaked prose) is coerced to None. `missing_agent_label` is
+  the id's human-readable label, resolved server-side (never model-generated).
 
 HONESTY GUARD (in the prompt)
   Answer strictly from the evidence provided below. Do not invent facts,
@@ -46,6 +54,88 @@ except ImportError:
     CLAUDE_BIN = os.environ.get("CLAUDE_BIN", "claude")
 
 from report import _derive_citation_labels  # noqa: E402
+
+# ---------------------------------------------------------------------------
+# WO-9 Phase 5 — constrain `missing_agent` to a REAL, invocable identifier.
+#
+# Human-readable labels for the Bucket-1 roster, resolved SERVER-SIDE (never
+# model-generated) so the UI can show "Post-Market Safety" instead of a raw
+# id. Deliberately a small hand-authored map (the roster is small + stable) —
+# NOT derived from `role` (that field is a long spec description, not a UI
+# label) and not a generic id.title() (loses acronyms like FDA/DEA/KOL/CMC).
+# ---------------------------------------------------------------------------
+_BUCKET1_AGENT_LABELS: dict = {
+    "internal-science-lead": "Internal Science Lead",
+    "emet-runner": "EMET Runner",
+    "q-models-runner": "Q-Models Runner",
+    "fda-institutional-memory": "FDA Institutional Memory",
+    "patent-ip": "Patent / IP",
+    "global-regulatory-divergence": "Global Regulatory Divergence",
+    "clinical-trial-registry": "Clinical Trial Registry",
+    "post-market-safety": "Post-Market Safety",
+    "payer": "Payer",
+    "dea-scheduling": "DEA Scheduling",
+    "manufacturing-cmc": "Manufacturing / CMC",
+    "patient-advocacy": "Patient Advocacy",
+    "kol-social": "KOL / Social",
+    "policy-legislative": "Policy / Legislative",
+    "reputational": "Reputational",
+    "financial": "Financial",
+    "aso-tox": "ASO Toxicity",
+    "boltz": "Boltz-2 Structure / Binding",
+    "gnomad-constraint": "gnomAD Constraint",
+    "gtex-expression": "GTEx Expression",
+    "interpro-domains": "InterPro Domains",
+    "geneset-enrichment": "Geneset Enrichment",
+    "robyn-scs": "Robyn SCS Connectivity",
+}
+
+
+def _bucket1_targets(registry=None) -> list:
+    """Real Bucket-1 agent ids the orchestrator can actually re-invoke, sourced from
+    the SAME roster + registry live_engine.run_live() uses (never invented here).
+    Returns [] on any import/lookup failure (offline/degraded — honest empty)."""
+    try:
+        from harness.contracts import load_registry
+        from live_engine import _BUCKET1_AGENTS
+    except ImportError:
+        return []
+    try:
+        reg = registry if registry is not None else load_registry()
+        known_ids = {a.get("id") for a in reg.get("agents", [])}
+    except Exception:
+        return []
+    return [
+        {"id": aid, "label": _BUCKET1_AGENT_LABELS.get(aid, aid)}
+        for aid in _BUCKET1_AGENTS if aid in known_ids
+    ]
+
+
+def _qmodels_targets(client=None) -> list:
+    """Real Q-Models tool ids (dti, variant_effect, kg_hypothesis, ...) with their
+    registry label. Returns [] on any import/lookup failure (honest empty)."""
+    try:
+        from qmodels.client import QModelsClient
+    except ImportError:
+        return []
+    try:
+        tools = (client if client is not None else QModelsClient()).tools()
+    except Exception:
+        return []
+    out = []
+    for t in tools:
+        tid = t.get("id")
+        if not tid:
+            continue
+        out.append({"id": tid, "label": t.get("label") or t.get("name") or tid})
+    return out
+
+
+def _valid_targets(registry=None, qmodels_client=None) -> list:
+    """The full list of {"id","label"} the model may name as `missing_agent` — Bucket-1
+    agents + Q-Models tools. Concatenated (both rosters are small; no cap needed)."""
+    return _bucket1_targets(registry) + _qmodels_targets(qmodels_client)
+
 
 # Matches the "answer" string value in a (possibly malformed) JSON-ish blob,
 # tolerating escaped characters inside the string (\" \\ \n ...).
@@ -211,7 +301,8 @@ def _safe_verdict(v: dict) -> dict:
     }
 
 
-def _build_prompt(question: str, result: dict, citation_labels: list[str]) -> str:
+def _build_prompt(question: str, result: dict, citation_labels: list[str],
+                   valid_targets: "list | None" = None) -> str:
     """Build the follow-up prompt with the honesty guard and citation instruction."""
     discover = result.get("discover") or {}
     consult = result.get("consult") or {}
@@ -246,6 +337,22 @@ def _build_prompt(question: str, result: dict, citation_labels: list[str]) -> st
     else:
         citation_instruction = ""
 
+    valid_targets = valid_targets or []
+    if valid_targets:
+        targets_block = "\n".join(f'- "{t["id"]}" — {t["label"]}' for t in valid_targets)
+        missing_agent_instruction = f"""
+VALID missing_agent TARGETS (the ONLY ids you may return in "missing_agent"):
+{targets_block}
+
+"missing_agent" MUST be EITHER exactly one "id" from the list above, OR null — NEVER free
+prose, NEVER a description. Only name an id from the list above; if nothing in the list would
+answer this, return null even if you can describe in words what's missing — do not invent a
+plausible-sounding but fake id."""
+    else:
+        missing_agent_instruction = (
+            '\n"missing_agent" MUST be null (no real invocable targets are available to this run).'
+        )
+
     prompt = f"""You are a senior CNS drug-discovery analyst at Quiver Bioscience. Answer a follow-up
 question about a completed diligence run, using ONLY the run's stored evidence below.
 
@@ -258,9 +365,9 @@ FOLLOW-UP QUESTION: {question}
 HONESTY GUARD: Answer strictly from the evidence provided below. Do not invent facts, numbers,
 citations, or partner opinions. If the follow-up question needs data that is NOT present in this
 evidence (e.g. it asks about a gene/mechanism/comparison/tool result this run never covered), do
-NOT invent an answer — set needs_new_data=true and name, in plain terms, which kind of agent or
-tool would need to run to answer it (e.g. "the EMET literature agent" or "a Q-Models
-binding-affinity run") — infer this from context, never hallucinate a fake agent id.{citation_instruction}
+NOT invent an answer — set needs_new_data=true and name which real agent/tool would need to run
+to answer it, per the constraint below.{citation_instruction}
+{missing_agent_instruction}
 
 DOSSIER FACTS (public fields only, capped at 30):
 {dossier_block}
@@ -279,8 +386,8 @@ preamble. The object must have exactly these keys:
   "answer": a markdown string (use [[Label]] citation tokens per the instruction above) that
             answers the follow-up question grounded ONLY in the evidence above.
   "needs_new_data": true or false.
-  "missing_agent": a short plain-language description of what would need to run if
-                    needs_new_data is true, else null.
+  "missing_agent": one id from the VALID missing_agent TARGETS list above if needs_new_data is
+                    true AND a real target would answer it, else null.
 """
     return prompt
 
@@ -298,10 +405,12 @@ def _fallback_answer(dossier: list[dict], round1: list[dict]) -> dict:
         "citations": [],
         "needs_new_data": False,
         "missing_agent": None,
+        "missing_agent_label": None,
     }
 
 
-def answer_followup(question: str, result: "dict | None", runner=None) -> dict:
+def answer_followup(question: str, result: "dict | None", runner=None,
+                     registry=None, qmodels_client=None) -> dict:
     """Answer a follow-up question from a run's stored evidence. Never raises.
 
     Parameters
@@ -311,11 +420,19 @@ def answer_followup(question: str, result: "dict | None", runner=None) -> dict:
                (``{"discover": {...}, "consult": {...}, "synthesize": {...}}``).
     runner   : optional callable ``(cmd: list[str]) -> proc`` injected in tests.
                None → real ``claude -p`` subprocess.
+    registry : optional pre-loaded harness agents.json dict (injectable for hermetic
+               tests); None → ``harness.contracts.load_registry()``.
+    qmodels_client : optional pre-built ``QModelsClient`` (injectable for hermetic
+               tests); None → a real ``QModelsClient()``.
 
     Returns
     -------
     dict — ``{"answer": str, "citations": list[str], "needs_new_data": bool,
-    "missing_agent": str | None}``. Never raises.
+    "missing_agent": str | None, "missing_agent_label": str | None}``. ``missing_agent``
+    is EITHER a real, invocable agent/tool id (validated against the live Bucket-1
+    registry + Q-Models tool list — never trusted from the model unvalidated) or
+    ``None``; ``missing_agent_label`` is the id's human-readable label, resolved
+    server-side. Never raises.
     """
     result = result if isinstance(result, dict) else {}
     discover = result.get("discover") or {}
@@ -325,7 +442,8 @@ def answer_followup(question: str, result: "dict | None", runner=None) -> dict:
 
     try:
         citation_labels = _derive_citation_labels(dossier)
-        prompt = _build_prompt(question, result, citation_labels)
+        valid_targets = _valid_targets(registry, qmodels_client)
+        prompt = _build_prompt(question, result, citation_labels, valid_targets)
         model = _report_model()
 
         cmd = [CLAUDE_BIN, "-p", prompt, "--output-format", "text", "--model", model]
@@ -354,11 +472,22 @@ def answer_followup(question: str, result: "dict | None", runner=None) -> dict:
         # answer text, not every label that WAS available as context — an answer
         # that only drew on Quiver data shouldn't claim an EMET citation too.
         used_citations = [lbl for lbl in citation_labels if f"[[{lbl}]]" in answer]
+
+        # DEFENSIVE VALIDATION (correctness-critical, not optional): never trust the
+        # model's `missing_agent` as an invocation target unvalidated. Recompute the
+        # same known-id set and coerce anything not in it — free prose, a hallucinated
+        # id, a plausible-sounding fake — to None. Only a real id may reach the caller.
+        target_by_id = {t["id"]: t["label"] for t in valid_targets}
+        raw_missing_agent = parsed["missing_agent"]
+        missing_agent = raw_missing_agent if raw_missing_agent in target_by_id else None
+        missing_agent_label = target_by_id.get(missing_agent) if missing_agent else None
+
         return {
             "answer": answer,
             "citations": used_citations,
             "needs_new_data": parsed["needs_new_data"],
-            "missing_agent": parsed["missing_agent"],
+            "missing_agent": missing_agent,
+            "missing_agent_label": missing_agent_label,
         }
 
     except Exception:

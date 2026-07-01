@@ -225,6 +225,70 @@ def get_run(run_id: str) -> "dict | None":
         conn.close()
 
 
+def get_effective_evidence(conv_id: str) -> "dict | None":
+    """WO-9 Phase 5 — the EFFECTIVE dossier evidence for a conversation: the last REAL
+    firm run's full ``result_json``, with its ``discover.dossier`` extended by the
+    ``new_facts`` from every ``via="reinvoke"`` run chained to that same source run
+    (ordered oldest -> newest, so repeated re-invocations accumulate). This is what
+    "the dossier grows" means: the original run's stored ``result_json`` is NEVER
+    rewritten (append-only, matching the harness trace / memory store convention
+    elsewhere in this codebase) — the growth is computed here, on read.
+
+    A "real firm run" is any run whose ``via`` is NEITHER "followup" NOR "reinvoke" —
+    both of those are evidence-only / answer-only rows, never a source of evidence
+    themselves.
+
+    Returns ``{"result": <extended result dict>, "source_run_id": str}``, or ``None``
+    if the conversation has no real firm run yet (unknown conversation, or one with
+    only followup/reinvoke rows or no runs at all).
+    """
+    conv = get_conversation(conv_id)
+    if conv is None:
+        return None
+    runs = conv.get("runs", [])  # ORDER BY created_at ASC (oldest -> newest)
+
+    source_run_meta = None
+    for run in runs:
+        if run.get("via") not in ("followup", "reinvoke"):
+            source_run_meta = run  # keep overwriting -> the LAST real firm run wins
+    if source_run_meta is None:
+        return None
+
+    source_run_id = source_run_meta.get("id", "")
+    full = get_run(source_run_id)
+    if full is None:
+        return None
+    result = full.get("result_json")
+    if not isinstance(result, dict):
+        return None
+
+    # Chain every via="reinvoke" row whose persisted source_run_id matches this run,
+    # oldest -> newest (runs is already ASC-ordered).
+    accumulated_facts: list = []
+    for run in runs:
+        if run.get("via") != "reinvoke":
+            continue
+        rfull = get_run(run.get("id", ""))
+        if rfull is None:
+            continue
+        rresult = rfull.get("result_json")
+        if not isinstance(rresult, dict) or rresult.get("source_run_id") != source_run_id:
+            continue
+        new_facts = rresult.get("new_facts")
+        if isinstance(new_facts, list):
+            accumulated_facts.extend(new_facts)
+
+    if not accumulated_facts:
+        return {"result": result, "source_run_id": source_run_id}
+
+    import copy
+    extended = copy.deepcopy(result)
+    discover = extended.setdefault("discover", {})
+    dossier = discover.get("dossier")
+    discover["dossier"] = (dossier if isinstance(dossier, list) else []) + accumulated_facts
+    return {"result": extended, "source_run_id": source_run_id}
+
+
 def rename_conversation(conv_id: str, title: str) -> bool:
     """UPDATE title + bump updated_at. Returns True if a row was changed."""
     now = _now()

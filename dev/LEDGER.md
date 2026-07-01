@@ -11,6 +11,66 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-07-01 — WO-9 Phase 5 (Track A): targeted re-invocation (agentic follow-ups)  (`rohan/reinvoke-phase5`)
+- Built-By: `rohan` (PR pending Head Claude gate + merge). Rebased onto `origin/main` after Phase 3
+  (`#166`), Phase 6 (`#167`), and the Phase-3 HELP.md answer (`#168`) all merged during the build — clean
+  auto-merge, no conflicts, `_wire_bucket1_ctx` extraction verified intact against Phase 6's `live_engine.py`
+  changes.
+  **Step 1 — `missing_agent` constrained to a real, invocable id.** `followup.py`'s `_build_prompt` now
+  injects a closed `{id, label}` target list (Bucket-1 agent ids via the SAME `_BUCKET1_AGENTS` roster +
+  `harness.contracts.load_registry()` `live_engine.py` uses, concatenated with Q-Models tool ids via
+  `QModelsClient().tools()`) and instructs the model `missing_agent` must be one of those ids or `null` —
+  never free prose. **Defensive re-validation after parsing**: the parsed `missing_agent` is checked against
+  the SAME recomputed id set; anything not on it (hallucinated id, leaked prose) is coerced to `null` — never
+  trusted unvalidated. Added `missing_agent_label`, resolved server-side (a small hand-authored map for the
+  23-agent Bucket-1 roster — not derived from the registry's long `role` description, not a generic
+  `.title()` that would mangle acronyms like FDA/DEA/KOL/CMC). `answer_followup` gained injectable
+  `registry`/`qmodels_client` params for hermetic tests.
+  **Step 2 — the re-invocation seam (`sapphire-orchestrator/reinvoke.py`, new).** `reinvoke_agent(agent_id,
+  source_result, refined_query=None, ...)` routes to one of two REAL invocation paths: (a) a Bucket-1/
+  semantic agent, dispatched via `harness.run` using a minimal ctx built by a NEW extracted helper
+  `live_engine._wire_bucket1_ctx` (the exact python_fns-seam + live-EMET wiring `run_live` already does,
+  pulled out so this module doesn't duplicate it — `run_live` itself now calls the same helper, byte-for-byte
+  behavior preserved, 99 live_engine tests confirm); (b) a Q-Models tool, dispatched directly via
+  `harness.dispatch.dispatch_qmodels` (passing `tool_id` explicitly reuses its existing gene/smiles/variant
+  payload-building — no duplication). New facts get the same public-safe enrichment `live_engine.py` already
+  applies (`plane_for`-derived plane, `agent_id` stamped). Never raises; every failure path (unknown id,
+  dispatch exception, honest-empty abstain) degrades to `{"ok": False, "new_facts": [], "error": "..."}`.
+  **Deliberately out of scope**: roundtable/persona re-invocation — a materially larger, more expensive
+  multi-persona 2-round operation that deserves its own follow-up (per the WO's own framing).
+  **Step 3 — append-only evidence growth.** New `store.get_effective_evidence(conv_id)`: finds the last run
+  whose `via` is NEITHER `"followup"` NOR `"reinvoke"` (the real firm run — fixed a latent bug in the OLD
+  `/api/followup` selection logic, which would have wrongly picked up a `reinvoke` row as if it were a real
+  run), then extends its `discover.dossier` with every chained `via="reinvoke"` row's `new_facts`, oldest→
+  newest — the ORIGINAL run's stored `result_json` is never rewritten. New `POST /api/reinvoke` in
+  `frontend2/server.py`: resolve conversation → effective evidence → `reinvoke_agent` → persist a
+  `via="reinvoke"` row (best-effort, non-fatal on failure — the re-answer is folded in-memory so it reflects
+  the grown evidence even if the persist write fails) → re-answer via `followup.answer_followup` on the grown
+  evidence → `{ok, answer, citations, needs_new_data, missing_agent, missing_agent_label, new_facts,
+  agent_id, source_run_id}`. `/api/followup`'s existing handler now ALSO uses `get_effective_evidence` (a real
+  behavior fix: a follow-up asked after a re-invocation now sees the grown dossier).
+  **Step 4 — frontend.** `web/src/lib/api.ts` `reinvokeAgent()` mirrors `askFollowup()`'s exact
+  never-throws pattern. `store.ts` gained `reinvokeOnTurn` (mirrors `askFollowup`'s set() pattern) and a
+  restore-loop fix: `via="reinvoke"` rows are filtered out of a restored conversation's turns (they're
+  evidence-only, never a chat turn — restoring them through the real-run Turn shape would render garbage).
+  `chat-thread.tsx`'s followup-turn branch shows a targeted `"Run <label>"` button ALONGSIDE (never
+  replacing) the existing "Run the full firm on this" escalation, only when `missingAgent` is a real id (per
+  Step 1, it now only ever is one or `null`); a lightweight pulsing-dot in-flight indicator (NOT a full SSE
+  trace panel — a single targeted call is seconds, not minutes, so a full live-streaming panel would be
+  disproportionate); on success renders "New evidence: ..." distinctly above the updated answer. No emojis
+  (lucide `Play` icon + colored dots only).
+- Gates: `CLAUDE_BIN=/usr/bin/false bash dev/run-tests.sh` → **Gate 1 GREEN — 1216 tests** (contracts 52 ·
+  harness 109 · emet 76 · memory 14 · selfimprove 20 · moat 95 · corpus 12 · `sapphire-orchestrator`
+  top-level tests 556 · frontend 67 · frontend2 56 · web/react 159), including 27 followup.py tests (7 new
+  Phase-5 targeting cases), 13 new `reinvoke.py` tests, 8 new `/api/reinvoke` server tests, 9 new
+  `store.get_effective_evidence` tests, and 12 new/updated frontend component tests (6 new
+  `reinvoke-turn.test.tsx` + 2 updated `followup-turn.test.tsx` cases for the new real-id contract).
+  `cd web && npm run build` clean (zero type errors). `npx vitest run` → 155/155 → 159/159 green post-rebase,
+  emoji-lint included.
+- Gaps/Follow-ups: roundtable/persona re-invocation (deliberate scope exclusion, noted above). A `/api/run`
+  with `profile=live` end-to-end exercise of the real Bucket-1 dispatch path (not just the mocked-runner unit
+  tests) is left for the Gate-5 functional verifier.
+
 ## 2026-06-30 — WO-9 Phase 3 (Track A): real local Q-Models execution + inspectable outputs  (`rohan/local-tools-phase3`)
 - Built-By: `rohan` (PR pending Head Claude gate + merge). Two sub-goals + one investigated-and-documented
   finding, per the assigned Phase 3 brief.
