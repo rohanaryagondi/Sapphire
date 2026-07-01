@@ -140,7 +140,8 @@ function AgentDetail({ turn, agentId }: { turn: Turn; agentId: string }) {
       <KV k="agent id" v={<span className="font-mono text-[11.5px]">{agentId}</span>} />
       <KV k="status" v={status} />
       <KV k="provenance" v={prov ?? "—"} />
-      <KV k="model" v={backendLabel(prov, turn.model)} />
+      <KV k="model" v={agent?.model ?? backendLabel(prov, turn.model)} />
+      <KV k="query" v={agent?.agent_query ?? turn.query ?? "—"} />
       <KV k="facts" v={ev?.n_facts != null ? `${ev.n_facts}` : `${facts.length}`} />
       <KV k="elapsed" v={ev?.elapsed_s != null ? fmtElapsed(ev.elapsed_s) : undefined} />
       {ev?.error ? <KV k="note" v={String(ev.error)} /> : null}

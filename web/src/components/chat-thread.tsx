@@ -216,13 +216,13 @@ export function TurnView({ turn }: { turn: Turn }) {
           <Banner tone="mock">
             <b>Illustrative mock output.</b> This is canned/Demo-profile data, not a
             real analysis -- facts may be placeholders. Switch to the{" "}
-            <b>Simulate</b> profile for real moat / EMET / seam data.
+            <b>Simulate</b> profile for real Quiver data / EMET / seam data.
           </Banner>
         )}
 
         {result?._simulated && (
           <Banner tone="sim">
-            <b>Simulated-models run.</b> Real moat, EMET PMIDs, seams and External Models -- but the
+            <b>Simulated-models run.</b> Real Quiver data, EMET PMIDs, seams and External Models -- but the
             roundtable verdicts and any claude fact-agent reasoning are{" "}
             <b>simulated</b> (labeled <code className="font-mono">simulated</code>), not real
             model output.

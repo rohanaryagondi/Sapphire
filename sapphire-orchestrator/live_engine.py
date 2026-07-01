@@ -487,6 +487,20 @@ def _run_one_bucket1_agent(
         _o = batched_outputs[agent_id]
         disp_fn = lambda contract, inputs, _ctx, _o=_o: _o  # noqa: E731
 
+    # Derive a concise, public-identifier-only scoped target for this agent.
+    # geneset-enrichment operates on a gene set; all others use candidate · disease.
+    _candidate = bucket1_inputs.get("candidate", "")
+    _disease = bucket1_inputs.get("disease", "")
+    _genes = bucket1_inputs.get("genes", [])
+    if agent_id == "geneset-enrichment" and _genes:
+        _agent_query = ", ".join(str(g) for g in _genes[:6])
+    elif _candidate and _disease:
+        _agent_query = f"{_candidate} · {_disease}"
+    elif _candidate:
+        _agent_query = _candidate
+    else:
+        _agent_query = query
+
     _emit(on_progress, eid, {"stage": "bucket1", "agent_id": agent_id, "phase": "start"})
     _t0 = time.monotonic()
 
@@ -514,6 +528,8 @@ def _run_one_bucket1_agent(
         "n_facts": _n_facts, "elapsed_s": _elapsed,
         "error": res.error if not res.ok else None,
         "summary": _summary,
+        "model": res.meta.get("model") if res.meta else None,
+        "agent_query": _agent_query,
     })
 
     # Collect _annot_facts locally (only populated when adaptive=True).
@@ -524,7 +540,7 @@ def _run_one_bucket1_agent(
             enriched.setdefault("provenance", res.output.get("provenance", res.provenance))
             _annot_facts_local.append({**enriched, "_source_agent": agent_id})
 
-    return (agent_id, res, corpus_cards, _n_facts, _annot_facts_local)
+    return (agent_id, res, corpus_cards, _n_facts, _annot_facts_local, _agent_query)
 
 
 def _run_persona_round1(
@@ -1140,7 +1156,7 @@ def run_live(
         result_tuple = _futures[agent_id].result()  # re-raises any worker exception
         if result_tuple is None:
             continue  # agent was absent from registry (skipped inside worker)
-        _, res, corpus_cards, _n_facts, _annot_facts_local = result_tuple
+        _, res, corpus_cards, _n_facts, _annot_facts_local, _agent_query = result_tuple
 
         agent_statuses.append({
             "id": agent_id,
@@ -1150,6 +1166,9 @@ def run_live(
             # trace) can show each agent's REAL contribution instead of mis-attributing
             # by shared provenance. Mirrors the n_facts in the live progress event above.
             "n_facts": _n_facts,
+            # Recorded backend/model and scoped target for the Info panel.
+            "model": res.meta.get("model") if res.meta else None,
+            "agent_query": _agent_query,
         })
 
         if res.ok and res.output:

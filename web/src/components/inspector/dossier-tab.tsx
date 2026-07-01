@@ -138,7 +138,7 @@ export function DossierTab({ turn }: { turn?: Turn }) {
       {internal.length > 0 && (
         <>
           <div className="mb-1 mt-2 px-1 text-xs font-semibold uppercase tracking-wide text-[var(--color-fg-subtle)]">
-            Internal moat findings
+            Quiver data
           </div>
           <FactList facts={internal} via={via} />
         </>

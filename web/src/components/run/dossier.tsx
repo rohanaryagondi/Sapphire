@@ -21,7 +21,7 @@ function FactCard({
   const active =
     selection.kind === "fact" && selection.index === index && selection.turnId === turnId;
   // honesty: a mock/stub/simulated fact gets a muted card + an unmistakable badge,
-  // so it can never be mistaken for a real (moat-real / emet-live / corpus) fact.
+  // so it can never be mistaken for a real (Quiver data / emet-live / corpus) fact.
   const mock = mockLabel(fact.provenance, fact.value, fact.source);
   // EMET facts show "EMET" only; all others show nothing (chips removed).
   const sourceTerse = fact.provenance?.toLowerCase().includes("emet") ? "EMET" : null;
@@ -114,7 +114,7 @@ function externalGroupKey(fact: Fact): string {
   const p = String(fact.provenance ?? "").toLowerCase();
   if (p.startsWith("emet")) return "EMET";
   if (p === "qmodels" || p.startsWith("qmodels")) return "External Models";
-  if (p === "moat-real" || p.startsWith("moat")) return "Internal moat";
+  if (p === "moat-real" || p.startsWith("moat")) return "Quiver data";
   if (p === "corpus" || p === "gnomad" || p === "gtex" || p === "interpro" || p === "gprofiler")
     return "Curated datasets";
   // Semantic agents — named provenance values like "fda-institutional-memory" etc.
@@ -153,7 +153,7 @@ function SourceGroup({
   );
 }
 
-/** Collapsible L2 section for Internal moat or External evidence. Default collapsed. */
+/** Collapsible L2 section for Quiver data or External evidence. Default collapsed. */
 function Section({
   label,
   items,
@@ -215,7 +215,7 @@ function Section({
 /**
  * Single-column cited fact dossier.
  * LEVEL 1: "Cited fact dossier" toggle — default COLLAPSED.
- * LEVEL 2: "Internal moat findings" / "External evidence" — each collapsible, default collapsed.
+ * LEVEL 2: "Quiver data" / "External evidence" — each collapsible, default collapsed.
  * LEVEL 3 (External evidence only): grouped by source agent, each collapsible, default collapsed.
  */
 export function Dossier({ result, turnId }: { result: RunResult; turnId: string }) {
@@ -268,7 +268,7 @@ export function Dossier({ result, turnId }: { result: RunResult; turnId: string 
         <div className="mt-2" data-testid="dossier-body">
           {internal.length > 0 && (
             <Section
-              label="Internal moat findings"
+              label="Quiver data"
               items={internal}
               turnId={turnId}
               groupBySource={false}

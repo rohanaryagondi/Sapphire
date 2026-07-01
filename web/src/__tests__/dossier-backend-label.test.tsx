@@ -24,8 +24,8 @@ describe("backendLabel", () => {
     expect(backendLabel("emet-live")).toBe("EMET · BenchSci (live)");
   });
 
-  it("returns moat label for provenance starting with 'moat'", () => {
-    expect(backendLabel("moat-real")).toBe("Internal CNS_DFP (no LLM)");
+  it("returns Quiver data label for provenance starting with 'moat'", () => {
+    expect(backendLabel("moat-real")).toBe("Quiver data (CNS_DFP)");
   });
 
   it("returns Curated dataset label for gnomad", () => {

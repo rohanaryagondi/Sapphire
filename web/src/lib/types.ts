@@ -29,6 +29,10 @@ export interface AgentStatus {
   provenance: string;
   /** per-agent fact count, persisted by the engine (absent on older saved runs) */
   n_facts?: number;
+  /** actual backend/model that ran (e.g. "claude-haiku-4-5", "EMET / BenchSci", "simulated") */
+  model?: string;
+  /** concise public-identifier scoped target the agent operated on (e.g. "SCN10A · neuropathic pain") */
+  agent_query?: string;
 }
 
 export interface Verdict {
@@ -133,6 +137,10 @@ export interface ProgressEvent {
   round?: number;
   /** Per-step takeaway (<=18 words) stamped by the engine summarizer on done events */
   summary?: string;
+  /** Actual backend/model that ran for this agent (stamped on done events) */
+  model?: string;
+  /** Concise public-identifier scoped target the agent operated on */
+  agent_query?: string;
   [k: string]: unknown;
 }
 

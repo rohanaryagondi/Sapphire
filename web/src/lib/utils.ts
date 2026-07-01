@@ -38,7 +38,7 @@ export function stanceKind(stance?: string): "advance" | "caution" | "block" | "
 /* ── human labels for the ~22 fact agents + control nodes ─────────────────────
    Extends frontend2/app.js AGENT_LABEL with the broader semantic roster. */
 export const AGENT_LABEL: Record<string, string> = {
-  "internal-science-lead": "Internal moat — Quiver CNS_DFP",
+  "internal-science-lead": "Quiver data — CNS_DFP",
   "emet-runner": "EMET — live BenchSci",
   "emet-analyst": "EMET analyst",
   "q-models-runner": "External Models",
@@ -125,7 +125,7 @@ export function backendLabel(provenance?: string, runModel?: string): string {
   const p = String(provenance ?? "").trim().toLowerCase();
   if (p === "simulated") return "Simulated -- no real model called";
   if (p.startsWith("emet")) return "EMET · BenchSci (live)";
-  if (p.startsWith("moat")) return "Internal CNS_DFP (no LLM)";
+  if (p.startsWith("moat")) return "Quiver data (CNS_DFP)";
   if (p === "qmodels") return "Q-Models launchpad";
   if (p === "corpus" || p === "gnomad" || p === "gtex" || p === "interpro" || p === "gprofiler")
     return "Curated dataset";

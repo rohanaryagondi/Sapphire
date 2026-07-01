@@ -6,7 +6,7 @@ import { useFirm } from "@/lib/store";
 /** Label -> agent id map for citation pills. */
 const CITATION_TO_AGENT: Record<string, string> = {
   "EMET": "emet-runner",
-  "Internal moat": "internal-science-lead",
+  "Quiver data": "internal-science-lead",
   "External Models": "q-models-runner",
   "FDA memory": "fda-institutional-memory",
   "Patent/IP": "patent-ip",
@@ -192,6 +192,75 @@ export function MarkdownDoc({ text, turnId }: { text: string; turnId?: string })
       continue;
     }
 
+    // GFM table: header row | sep row | body rows
+    // Detect: current line has "|", next line is |---|---| separator
+    if (line.includes("|") && i + 1 < lines.length && /^\s*\|?[\s:]*-+[\s:]*(\|[\s:]*-+[\s:]*)*\|?\s*$/.test(lines[i + 1])) {
+      const parseRow = (r: string): string[] =>
+        r.replace(/^\s*\|/, "").replace(/\|\s*$/, "").split("|").map((c) => c.trim());
+
+      const headers = parseRow(line);
+      i += 2; // skip header + separator
+      const bodyRows: string[][] = [];
+      while (i < lines.length && lines[i].includes("|")) {
+        bodyRows.push(parseRow(lines[i]));
+        i++;
+      }
+      nodes.push(
+        <table
+          key={`tbl-${i}`}
+          style={{
+            borderCollapse: "collapse",
+            fontSize: "15px",
+            margin: "10px 0 18px 0",
+            width: "100%",
+            maxWidth: "70ch",
+          }}
+        >
+          <thead>
+            <tr>
+              {headers.map((h, hi) => (
+                <th
+                  key={hi}
+                  style={{
+                    background: "var(--color-q-soft, rgba(139,92,246,0.12))",
+                    color: "var(--color-accent)",
+                    fontWeight: 600,
+                    fontSize: "13px",
+                    padding: "6px 10px",
+                    textAlign: "left",
+                    border: "1px solid var(--color-border)",
+                  }}
+                >
+                  <InlineContent text={stripEmoji(h)} turnId={turnId} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {bodyRows.map((row, ri) => (
+              <tr key={ri} style={{ background: ri % 2 === 0 ? "transparent" : "var(--color-bg-subtle, rgba(255,255,255,0.03))" }}>
+                {row.map((cell, ci) => (
+                  <td
+                    key={ci}
+                    style={{
+                      padding: "5px 10px",
+                      border: "1px solid var(--color-border)",
+                      color: "var(--color-fg)",
+                      fontSize: "14px",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <InlineContent text={stripEmoji(cell)} turnId={turnId} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>,
+      );
+      continue;
+    }
+
     // Horizontal rule
     if (/^---+$/.test(line.trim())) {
       nodes.push(
@@ -280,7 +349,7 @@ export function MarkdownDoc({ text, turnId }: { text: string; turnId?: string })
       continue;
     }
 
-    // Paragraph -- collect consecutive non-blank, non-heading, non-list lines
+    // Paragraph -- collect consecutive non-blank, non-heading, non-list, non-table lines
     const paraLines: string[] = [];
     while (
       i < lines.length &&
@@ -288,7 +357,8 @@ export function MarkdownDoc({ text, turnId }: { text: string; turnId?: string })
       !/^#+\s/.test(lines[i]) &&
       !/^-\s/.test(lines[i]) &&
       !/^\d+\.\s/.test(lines[i]) &&
-      !/^---+$/.test(lines[i].trim())
+      !/^---+$/.test(lines[i].trim()) &&
+      !(lines[i].includes("|") && i + 1 < lines.length && /^\s*\|?[\s:]*-+[\s:]*(\|[\s:]*-+[\s:]*)*\|?\s*$/.test(lines[i + 1]))
     ) {
       paraLines.push(lines[i]);
       i++;

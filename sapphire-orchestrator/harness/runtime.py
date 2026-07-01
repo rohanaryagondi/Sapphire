@@ -2,6 +2,7 @@
 -> repair -> stamp -> trace -> AgentResult. Fail-safe; never fabricates (spec §A.3/§A.4)."""
 from __future__ import annotations
 
+import os
 import time
 
 from contracts.jsonschema_min import validate
@@ -32,9 +33,32 @@ def _validate_output(contract, out, ctx) -> tuple:
     return schema_errs, guard_errs
 
 
+def _model_for_contract(contract) -> str:
+    """Return an honest backend/model string for the contract's kind.
+
+    Recorded in meta["model"] so the UI can show what actually ran.
+    Never fabricates — falls back to kind-based label.
+    """
+    kind = contract.kind
+    if kind == "emet-playwright":
+        return "EMET / BenchSci"
+    if kind == "python":
+        return "Quiver data (CNS_DFP)"
+    if kind == "qmodels-delegate":
+        return "Q-Models launchpad"
+    if kind == "claude-subagent":
+        from . import dispatch as _d
+        if _d._simulate_models_on():
+            return "simulated"
+        model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+        return model if model else "claude (default)"
+    return kind
+
+
 def _finish(contract, result, engagement_id, t0, repairs, guardrails_run, ihash, cache):
     result.meta = {"inputs_hash": ihash, "latency_ms": int((time.time() - t0) * 1000),
-                   "repairs": repairs, "guardrails_run": guardrails_run}
+                   "repairs": repairs, "guardrails_run": guardrails_run,
+                   "model": _model_for_contract(contract)}
     T.record(engagement_id, {"agent_id": contract.id, "kind": contract.kind,
                              "inputs_hash": ihash, "status": result.status,
                              "provenance": result.provenance, "error": result.error,

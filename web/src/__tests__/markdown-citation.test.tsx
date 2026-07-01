@@ -66,17 +66,17 @@ describe("MarkdownDoc citation pills", () => {
     expect(pill).not.toHaveAttribute("role", "button");
   });
 
-  it("renders [[Internal moat]] pill that navigates to internal-science-lead", async () => {
+  it("renders [[Quiver data]] pill that navigates to internal-science-lead", async () => {
     mockSelect.mockClear();
     const { MarkdownDoc } = await import("@/components/run/markdown");
     render(
       <MarkdownDoc
-        text="Internal CNS_DFP data confirms target expression. [[Internal moat]]"
+        text="Internal CNS_DFP data confirms target expression. [[Quiver data]]"
         turnId="turn-test-4"
       />
     );
 
-    const pill = screen.getByText("Internal moat");
+    const pill = screen.getByText("Quiver data");
     fireEvent.click(pill);
 
     expect(mockSelect).toHaveBeenCalledWith({
@@ -136,5 +136,55 @@ describe("MarkdownDoc citation pills", () => {
     const para = screen.getByText("This is a prose paragraph with body text.");
     expect(para).toHaveStyle({ fontSize: "16px" });
     expect(para).toHaveStyle({ color: "var(--color-fg)" });
+  });
+
+  it("renders a GFM table with header and body rows", async () => {
+    const { MarkdownDoc } = await import("@/components/run/markdown");
+    render(
+      <MarkdownDoc
+        text={"| Gene | Score |\n|---|---|\n| SCN10A | 0.92 |\n| SCN9A | 0.87 |"}
+        turnId="turn-test-8"
+      />
+    );
+
+    // Table element exists
+    const table = document.querySelector("table");
+    expect(table).toBeInTheDocument();
+
+    // Header cells
+    expect(screen.getByText("Gene")).toBeInTheDocument();
+    expect(screen.getByText("Score")).toBeInTheDocument();
+
+    // Body cells
+    expect(screen.getByText("SCN10A")).toBeInTheDocument();
+    expect(screen.getByText("0.92")).toBeInTheDocument();
+    expect(screen.getByText("SCN9A")).toBeInTheDocument();
+    expect(screen.getByText("0.87")).toBeInTheDocument();
+  });
+
+  it("table header cells have violet accent color", async () => {
+    const { MarkdownDoc } = await import("@/components/run/markdown");
+    render(
+      <MarkdownDoc
+        text={"| Target | Status |\n|---|---|\n| Nav1.8 | viable |"}
+        turnId="turn-test-9"
+      />
+    );
+    const th = document.querySelector("th");
+    expect(th).toBeInTheDocument();
+    expect(th).toHaveStyle({ color: "var(--color-accent)" });
+  });
+
+  it("non-table text is unaffected when a table is present", async () => {
+    const { MarkdownDoc } = await import("@/components/run/markdown");
+    render(
+      <MarkdownDoc
+        text={"Intro paragraph.\n\n| A | B |\n|---|---|\n| 1 | 2 |\n\nOutro paragraph."}
+        turnId="turn-test-10"
+      />
+    );
+    expect(screen.getByText("Intro paragraph.")).toBeInTheDocument();
+    expect(screen.getByText("Outro paragraph.")).toBeInTheDocument();
+    expect(document.querySelector("table")).toBeInTheDocument();
   });
 });

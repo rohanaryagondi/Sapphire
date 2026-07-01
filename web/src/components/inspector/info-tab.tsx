@@ -14,7 +14,7 @@ import { useMemo, useState } from "react";
 import { MousePointerClick, Pin, ShieldAlert } from "lucide-react";
 import type { Turn } from "@/lib/store";
 import { useFirm } from "@/lib/store";
-import { agentLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, stripEmoji } from "@/lib/utils";
+import { agentLabel, backendLabel, cn, fmtElapsed, isPlaceholderCitation, isVetoAgent, stripEmoji } from "@/lib/utils";
 import { finalVerdicts } from "@/lib/verdicts";
 import { buildTrace } from "./trace-model";
 import { FactList } from "./dossier-tab";
@@ -100,6 +100,12 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
   const via = result?._via === "replay" || result?._replay ? "replay" : undefined;
   const takeaway = typeof ev?.summary === "string" ? ev.summary : undefined;
 
+  // Model: prefer the recorded value from agent_statuses (persisted in the run result),
+  // fall back to the trace done event, then derive from provenance.
+  const agentModel: string = agentStatus?.model ?? ev?.model ?? backendLabel(prov, turn.model);
+  // Agent query: prefer recorded value, fall back to the engagement query.
+  const agentQuery: string = agentStatus?.agent_query ?? ev?.agent_query ?? turn.query ?? "";
+
   const [prefill, setPrefill] = useState("");
 
   return (
@@ -136,11 +142,11 @@ function AgentInfo({ turn, agentId }: { turn: Turn; agentId: string }) {
             k="provenance"
             v={prov ?? undefined}
           />
+          <KV k="model" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{agentModel}</span>} />
           <KV k="facts · time" v={`${facts.length} fact${facts.length === 1 ? "" : "s"} · ${fmtElapsed(ev?.elapsed_s)}`} />
-          {/* "query" per the design spec — the engagement query that drove this
-              run (we don't fabricate a per-agent reformulated sub-query the
-              engine doesn't expose). */}
-          <KV k="query" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{turn.query || "—"}</span>} />
+          {/* "query" — the scoped target the agent actually operated on (honest,
+              from the engine's agent record or the engagement query as fallback). */}
+          <KV k="query" v={<span className="font-mono text-[11px] text-[var(--color-fg-muted)]">{agentQuery || "—"}</span>} />
         </div>
 
         <div className="mt-3">

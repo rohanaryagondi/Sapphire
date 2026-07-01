@@ -41,9 +41,9 @@ except ImportError:
 _PROV_TO_LABEL = {
     "emet-live": "EMET",
     "emet": "EMET",
-    "moat-real": "Internal moat",
-    "moat": "Internal moat",
-    "internal": "Internal moat",
+    "moat-real": "Quiver data",
+    "moat": "Quiver data",
+    "internal": "Quiver data",
     "qmodels": "External Models",
     "q-models": "External Models",
     "live-local": "External Models",
@@ -72,7 +72,7 @@ _PROV_TO_LABEL = {
 }
 
 _CITATION_LABEL_ORDER = [
-    "EMET", "Internal moat", "External Models", "FDA memory", "Patent/IP",
+    "EMET", "Quiver data", "External Models", "FDA memory", "Patent/IP",
     "Clinical-trial registry", "Post-market safety", "Payer", "Manufacturing/CMC",
     "Patient advocacy", "KOL/social", "Policy/legislative", "DEA", "Global regulatory",
 ]
@@ -140,7 +140,7 @@ def _build_prompt(
     if citation_labels:
         _label_descriptions = {
             "EMET": "published literature",
-            "Internal moat": "Quiver CNS_DFP",
+            "Quiver data": "Quiver CNS_DFP",
             "External Models": "predictive models",
             "FDA memory": "FDA institutional memory",
             "Patent/IP": "patent and IP landscape",
@@ -161,7 +161,8 @@ def _build_prompt(
         citation_instruction = (
             f"\nCITATION INSTRUCTION: Cite evidence inline using EXACT bracket tokens placed at the END of the sentence or clause the evidence supports. "
             f"Use ONLY these tokens (derived from the evidence below): {label_list_str}. "
-            f"Rules: cite ONCE per sentence; if a whole paragraph rests on one source, cite once at the paragraph end. "
+            f"Rules: if an ENTIRE paragraph draws on a SINGLE source, cite it ONCE at the end of that paragraph — do NOT repeat the same source token within the paragraph. "
+            f"Cite per-sentence only when a paragraph mixes multiple different sources. "
             f"Do NOT cite general reasoning — only evidence-derived claims. Never invent a source label not in this list."
         )
     else:
@@ -183,8 +184,8 @@ Then these ## headed sections:
 ## Target & mechanism
 Draw on the evidence to describe the biological target, mechanism, and disease relevance.
 
-## Internal evidence (Quiver moat)
-Synthesize internal (moat/CNS_DFP) dossier facts. If none are present in the dossier, state that no internal evidence was surfaced in this run.
+## Internal evidence (Quiver data)
+Synthesize internal (Quiver data/CNS_DFP) dossier facts. If none are present in the dossier, state that no internal evidence was surfaced in this run.
 
 ## External evidence & landscape
 Synthesize external facts (EMET, Q-Models, semantic agents) into prose. Weave facts into narrative — do NOT list them as bullets.
@@ -200,7 +201,7 @@ Restate the recommendation with confidence level. Enumerate the top 2–3 risks.
 
 ---
 
-HONESTY GUARD: Synthesize ONLY from the evidence provided below. Do not invent facts, numbers, citations, or partner opinions. Refer to sources by name (e.g. 'EMET', 'the internal moat', 'External Models') — never quote DOIs/PMIDs. If the partner verdicts are marked simulated/placeholder, state in ONE sentence that partner reasoning is pending a live run rather than inventing stances.{citation_instruction}
+HONESTY GUARD: Synthesize ONLY from the evidence provided below. Do not invent facts, numbers, citations, or partner opinions. Refer to sources by name (e.g. 'EMET', 'Quiver data', 'External Models') — never quote DOIs/PMIDs. If the partner verdicts are marked simulated/placeholder, state in ONE sentence that partner reasoning is pending a live run rather than inventing stances. When the answer is naturally tabular — e.g. ranking genes/candidates or comparing options — present it as a GitHub-flavored Markdown table.{citation_instruction}
 
 DOSSIER FACTS (public fields only, capped at 30):
 {dossier_block}
@@ -248,7 +249,7 @@ def _fallback_report(
     # Fact counts by provenance bucket
     lines.append("## Evidence summary")
     lines.append("")
-    lines.append(f"- Internal facts (Quiver moat): {len(internal_facts)}")
+    lines.append(f"- Internal facts (Quiver data): {len(internal_facts)}")
     lines.append(f"- External facts (EMET, Q-Models, semantic): {len(external_facts)}")
     lines.append(f"- Total dossier facts: {len(dossier)}")
     lines.append("")
