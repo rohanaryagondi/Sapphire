@@ -360,6 +360,115 @@ class TestBoltzProvenanceContract(unittest.TestCase):
         self.assertFalse(prov.is_boundary_violation("boltz", "external"))
 
 
+class _FakeUrlResponse:
+    """Minimal urllib response stub for R-Sapphire routing tests."""
+    def __init__(self, body: dict):
+        import io
+        self._data = json.dumps(body).encode()
+        self._bio = io.BytesIO(self._data)
+
+    def read(self):
+        return self._data
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        pass
+
+
+class TestBoltzRSapphireRouting(unittest.TestCase):
+    """When SAPPHIRE_QMODELS_GPU_ENDPOINT is set, predict() routes boltz through
+    R-Sapphire's boltz2 model — NOT the hosted Boltz API (which needs BOLTZ_API_KEY)."""
+
+    def _entities(self):
+        return [
+            {"type": "protein", "chain_ids": ["A"], "value": "MKTAYIAKQR"},
+            {"type": "ligand_smiles", "chain_ids": ["B"], "value": "CCO"},
+        ]
+
+    def test_routes_through_rsapphire_when_endpoint_set(self):
+        """With endpoint set: _predict_via_rsapphire is called; hosted _http is NOT called."""
+        hits = {"rsapphire": 0, "hosted": 0}
+
+        def _fake_urlopen(req, timeout=None):
+            url = req.full_url if hasattr(req, "full_url") else str(req)
+            if "boltz.bio" in url:
+                hits["hosted"] += 1
+            elif "54.164" in url or "rsapphire" in url or "8080" in url:
+                hits["rsapphire"] += 1
+            return _FakeUrlResponse({"structure_confidence": 0.82, "binding_confidence": 0.75})
+
+        with mock.patch.dict(os.environ, {"SAPPHIRE_QMODELS_GPU_ENDPOINT": "http://rsapphire:8080/predict"}), \
+             mock.patch("urllib.request.urlopen", side_effect=_fake_urlopen):
+            out = seam.predict(self._entities())
+
+        self.assertEqual(hits["hosted"], 0, "hosted Boltz API must NOT be called when endpoint set")
+        self.assertGreater(hits["rsapphire"], 0, "R-Sapphire endpoint must be called")
+        self.assertEqual(out["provenance"], "boltz-rsapphire")
+        self.assertGreater(len(out["facts"]), 0, "must return at least one fact")
+
+    def test_rsapphire_result_carries_structure_and_binding_facts(self):
+        """When R-Sapphire returns structure_confidence + binding_confidence, both appear."""
+        def _fake_urlopen(req, timeout=None):
+            return _FakeUrlResponse({"structure_confidence": 0.85, "binding_confidence": 0.72})
+
+        with mock.patch.dict(os.environ, {"SAPPHIRE_QMODELS_GPU_ENDPOINT": "http://rsapphire:8080/predict"}), \
+             mock.patch("urllib.request.urlopen", side_effect=_fake_urlopen):
+            out = seam.predict(self._entities())
+
+        vals = " || ".join(f["value"] for f in out["facts"])
+        self.assertIn("structure_confidence 0.85", vals, vals)
+        self.assertIn("binding_confidence 0.72", vals, vals)
+
+    def test_falls_through_to_hosted_api_when_endpoint_unreachable(self):
+        """URLError from R-Sapphire endpoint → falls through to hosted path → no_key degradation."""
+        import urllib.error as ue
+
+        call_count = {"rsapphire": 0}
+
+        def _fake_urlopen(req, timeout=None):
+            url = req.full_url if hasattr(req, "full_url") else str(req)
+            if "rsapphire" in url or "8080" in url:
+                call_count["rsapphire"] += 1
+                raise ue.URLError("connection refused")
+            raise ue.URLError("hosted also down")
+
+        with mock.patch.dict(os.environ, {"SAPPHIRE_QMODELS_GPU_ENDPOINT": "http://rsapphire:8080/predict"}), \
+             mock.patch("urllib.request.urlopen", side_effect=_fake_urlopen), \
+             mock.patch.object(seam, "_resolve_key", lambda: None):
+            out = seam.predict(self._entities())
+
+        # R-Sapphire was tried (then fell through); no_key since BOLTZ_API_KEY also absent.
+        self.assertGreater(call_count["rsapphire"], 0, "R-Sapphire must be attempted first")
+        self.assertEqual(out["status"], "no_key", f"expected no_key degrade, got {out}")
+
+    def test_no_rsapphire_call_when_endpoint_unset(self):
+        """When endpoint env is unset, skip R-Sapphire entirely → no_key (honest)."""
+        env = {k: v for k, v in os.environ.items() if k != "SAPPHIRE_QMODELS_GPU_ENDPOINT"}
+        with mock.patch.dict(os.environ, env, clear=True), \
+             mock.patch.object(seam, "_resolve_key", lambda: None):
+            out = seam.predict(self._entities())
+        self.assertEqual(out["status"], "no_key")
+        self.assertEqual(out["provenance"], "boltz")
+
+    def test_rsapphire_http_error_is_honest_degrade_not_raises(self):
+        """HTTP 500 from R-Sapphire endpoint → honest error fact, never raises."""
+        import urllib.error as ue
+        from io import BytesIO
+
+        http_err = ue.HTTPError("http://rsapphire:8080/predict", 500, "Internal Server Error",
+                                {}, BytesIO(b"Boltz-2 failed"))
+        with mock.patch.dict(os.environ, {"SAPPHIRE_QMODELS_GPU_ENDPOINT": "http://rsapphire:8080/predict"}), \
+             mock.patch("urllib.request.urlopen", side_effect=http_err):
+            try:
+                out = seam.predict(self._entities())
+            except Exception as exc:
+                self.fail(f"predict() raised instead of degrading: {exc!r}")
+        self.assertEqual(out["provenance"], "boltz-rsapphire")
+        self.assertIn("500", out.get("error", "") + " " + out["facts"][0]["value"])
+
+
 @unittest.skipUnless(
     os.environ.get("SAPPHIRE_LIVE_TESTS") == "1",
     "live Boltz API test (set SAPPHIRE_LIVE_TESTS=1; does a $0 cost-estimate, needs the key)",
