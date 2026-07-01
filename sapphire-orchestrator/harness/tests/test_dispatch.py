@@ -244,6 +244,202 @@ class TestDispatch(unittest.TestCase):
         self.assertNotIn("--model", captured[0])
 
 
+class TestPerAgentModelSelection(unittest.TestCase):
+    """Per-agent model selection (WO-9): Bucket-2 → haiku, Bucket-1/control → sonnet."""
+
+    def _no_env(self):
+        """Context manager that removes CLAUDE_MODEL and SAPPHIRE_MODEL from env."""
+        import contextlib
+
+        @contextlib.contextmanager
+        def _cm():
+            prev_c = os.environ.pop("CLAUDE_MODEL", None)
+            prev_s = os.environ.pop("SAPPHIRE_MODEL", None)
+            try:
+                yield
+            finally:
+                if prev_c is not None:
+                    os.environ["CLAUDE_MODEL"] = prev_c
+                if prev_s is not None:
+                    os.environ["SAPPHIRE_MODEL"] = prev_s
+
+        return _cm()
+
+    def _canned_env(self, stdout=None):
+        if stdout is None:
+            stdout = json.dumps({"structured_output": {"ok": True}})
+        return stdout
+
+    def _dispatch(self, contract):
+        """Run dispatch_claude with a capturing runner; return the argv list."""
+        captured = []
+        stdout = self._canned_env()
+        D.dispatch_claude(contract, {}, runner=capturing_runner(captured, stdout))
+        return captured[0]
+
+    # ── _resolve_model unit tests ─────────────────────────────────────────────
+
+    def test_resolve_model_contract_haiku(self):
+        """contract.model='claude-haiku-4-5' → haiku when env unset."""
+        c = Contract(id="company-partner", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5")
+        with self._no_env():
+            self.assertEqual(D._resolve_model(c), "claude-haiku-4-5")
+
+    def test_resolve_model_contract_sonnet(self):
+        """contract.model='claude-sonnet-4-6' → sonnet when env unset."""
+        c = Contract(id="fda-institutional-memory", role="", kind="claude-subagent",
+                     model="claude-sonnet-4-6")
+        with self._no_env():
+            self.assertEqual(D._resolve_model(c), "claude-sonnet-4-6")
+
+    def test_resolve_model_no_model_field(self):
+        """contract.model=None → empty string (no --model flag)."""
+        c = Contract(id="x", role="", kind="claude-subagent")
+        with self._no_env():
+            self.assertEqual(D._resolve_model(c), "")
+
+    def test_resolve_model_env_overrides_contract(self):
+        """CLAUDE_MODEL env wins over contract.model (tier 1 > tier 2)."""
+        c = Contract(id="company-partner", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5")
+        prev = os.environ.pop("CLAUDE_MODEL", None)
+        os.environ["CLAUDE_MODEL"] = "claude-sonnet-4-6"
+        try:
+            result = D._resolve_model(c)
+        finally:
+            os.environ.pop("CLAUDE_MODEL", None)
+            if prev is not None:
+                os.environ["CLAUDE_MODEL"] = prev
+        self.assertEqual(result, "claude-sonnet-4-6")
+
+    def test_resolve_model_sapphire_model_env_overrides_contract(self):
+        """SAPPHIRE_MODEL env also overrides contract.model."""
+        c = Contract(id="company-partner", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5")
+        prev_c = os.environ.pop("CLAUDE_MODEL", None)
+        prev_s = os.environ.pop("SAPPHIRE_MODEL", None)
+        os.environ["SAPPHIRE_MODEL"] = "claude-opus-4-5"
+        try:
+            result = D._resolve_model(c)
+        finally:
+            os.environ.pop("SAPPHIRE_MODEL", None)
+            if prev_c is not None:
+                os.environ["CLAUDE_MODEL"] = prev_c
+            if prev_s is not None:
+                os.environ["SAPPHIRE_MODEL"] = prev_s
+        self.assertEqual(result, "claude-opus-4-5")
+
+    def test_resolve_model_none_contract(self):
+        """_resolve_model(None) → empty string (safe for batch with no items)."""
+        with self._no_env():
+            self.assertEqual(D._resolve_model(None), "")
+
+    # ── dispatch_claude integration: --model flag in argv ────────────────────
+
+    def test_bucket2_partner_dispatches_haiku(self):
+        """Bucket-2 company-partner contract → --model claude-haiku-4-5 in argv."""
+        c = Contract(id="company-partner", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5",
+                     output_schema={"type": "object", "properties": {"ok": {"type": "boolean"}}})
+        with self._no_env():
+            argv = self._dispatch(c)
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
+
+    def test_bucket2_ex_fda_regulator_dispatches_haiku(self):
+        """ex-fda-regulator → haiku."""
+        c = Contract(id="ex-fda-regulator", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5",
+                     output_schema={"type": "object"})
+        with self._no_env():
+            argv = self._dispatch(c)
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-haiku-4-5")
+
+    def test_bucket1_fact_agent_dispatches_sonnet(self):
+        """Bucket-1 fact agent (fda-institutional-memory) → sonnet."""
+        c = Contract(id="fda-institutional-memory", role="", kind="claude-subagent",
+                     model="claude-sonnet-4-6",
+                     output_schema={"type": "object"})
+        with self._no_env():
+            argv = self._dispatch(c)
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-sonnet-4-6")
+
+    def test_rescue_mechanism_dispatches_sonnet(self):
+        """rescue-mechanism (Bucket-1 scientific) → sonnet."""
+        c = Contract(id="rescue-mechanism", role="", kind="claude-subagent",
+                     model="claude-sonnet-4-6",
+                     output_schema={"type": "object"})
+        with self._no_env():
+            argv = self._dispatch(c)
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-sonnet-4-6")
+
+    def test_env_override_beats_per_agent_model(self):
+        """CLAUDE_MODEL env wins even when contract.model says haiku."""
+        c = Contract(id="company-partner", role="", kind="claude-subagent",
+                     model="claude-haiku-4-5",
+                     output_schema={"type": "object"})
+        prev_c = os.environ.pop("CLAUDE_MODEL", None)
+        prev_s = os.environ.pop("SAPPHIRE_MODEL", None)
+        os.environ["CLAUDE_MODEL"] = "claude-sonnet-4-6"
+        try:
+            captured = []
+            stdout = self._canned_env()
+            D.dispatch_claude(c, {}, runner=capturing_runner(captured, stdout))
+            argv = captured[0]
+        finally:
+            os.environ.pop("CLAUDE_MODEL", None)
+            if prev_c is not None:
+                os.environ["CLAUDE_MODEL"] = prev_c
+            if prev_s is not None:
+                os.environ["SAPPHIRE_MODEL"] = prev_s
+        self.assertIn("--model", argv)
+        self.assertEqual(argv[argv.index("--model") + 1], "claude-sonnet-4-6")
+
+    # ── Registry-level: verify agents.json encodes the right models ──────────
+
+    def test_registry_bucket2_agents_have_haiku(self):
+        """All Bucket-2 verdict agents in agents.json declare model=claude-haiku-4-5."""
+        from harness.contracts import load_registry, resolve
+        reg = load_registry()
+        b2_ids = {"company-partner", "ex-fda-regulator", "adversarial-red-team",
+                  "payer-partner", "kol-partner"}
+        for entry in reg["agents"]:
+            if entry["id"] in b2_ids:
+                self.assertEqual(
+                    entry.get("model"), "claude-haiku-4-5",
+                    f"{entry['id']} should be claude-haiku-4-5",
+                )
+
+    def test_registry_bucket1_claude_subagent_fact_agents_have_sonnet(self):
+        """Bucket-1 semantic + rescue-mechanism agents in agents.json declare sonnet."""
+        from harness.contracts import load_registry
+        reg = load_registry()
+        b1_ids = {
+            "fda-institutional-memory", "patent-ip", "global-regulatory-divergence",
+            "dea-scheduling", "clinical-trial-registry", "post-market-safety",
+            "financial", "payer", "manufacturing-cmc", "patient-advocacy",
+            "kol-social", "policy-legislative", "reputational", "rescue-mechanism",
+        }
+        for entry in reg["agents"]:
+            if entry["id"] in b1_ids:
+                self.assertEqual(
+                    entry.get("model"), "claude-sonnet-4-6",
+                    f"{entry['id']} should be claude-sonnet-4-6",
+                )
+
+    def test_registry_resolve_loads_model_field(self):
+        """contracts.resolve() populates Contract.model from agents.json."""
+        from harness.contracts import resolve
+        c = resolve("company-partner")
+        self.assertEqual(c.model, "claude-haiku-4-5")
+        c2 = resolve("fda-institutional-memory")
+        self.assertEqual(c2.model, "claude-sonnet-4-6")
+
+
 class TestSimulateModels(unittest.TestCase):
     """SAPPHIRE_SIMULATE_MODELS=1 → labeled, schema-valid simulated output, NO claude call."""
 

@@ -128,6 +128,27 @@ def _simulate_claude(contract, inputs) -> dict:
     return out
 
 
+def _resolve_model(contract) -> str:
+    """Resolve the --model flag for a claude dispatch call (3-tier priority).
+
+    1. CLAUDE_MODEL or SAPPHIRE_MODEL env — operator override; wins unconditionally.
+       Keeps backward-compat (existing tests that set CLAUDE_MODEL still pass; serve.py
+       can force a single model for the whole run).
+    2. contract.model (agents.json "model" field) — per-agent default. Mapping:
+       - Bucket-2 roundtable/partner agents → claude-haiku-4-5  (cheap, fast deliberation)
+       - Control + Bucket-1 fact agents + synthesis → claude-sonnet-4-6  (nuanced reasoning)
+    3. Empty string → no --model flag (CLI default; backward-compatible fallback).
+    """
+    env_model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    if env_model:
+        return env_model
+    if contract is not None:
+        per_agent = getattr(contract, "model", None)
+        if per_agent:
+            return per_agent.strip()
+    return ""
+
+
 def dispatch_claude(contract, inputs, runner=None) -> dict:
     # simulate_exempt agents (the scientific-core reasoners whose output IS the deliverable, e.g.
     # rescue-mechanism) do REAL reasoning even under SAPPHIRE_SIMULATE_MODELS — so a fast demo can
@@ -145,7 +166,7 @@ def dispatch_claude(contract, inputs, runner=None) -> dict:
     # lever) so EITHER env works on this path — serve.py:_run_live reads SAPPHIRE_MODEL into its
     # local `CLAUDE_MODEL`, so accepting both keeps the two paths consistent. Additive +
     # backward-compatible — neither set → the CLI default.
-    model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    model = _resolve_model(contract)
     if model:
         cmd += ["--model", model]
     cmd += _context_flags()  # Opt-1: drop CLAUDE.md + cache-stable prefix
@@ -213,7 +234,9 @@ def dispatch_claude_batch(items, runner=None) -> dict:
         "--output-format", "json",
         "--json-schema", json.dumps(_batch_schema(items)),
     ]
-    model = (os.environ.get("CLAUDE_MODEL") or os.environ.get("SAPPHIRE_MODEL") or "").strip()
+    # Batch model: env override wins (same priority as per-agent); fall back to the first
+    # item's per-agent model (batch calls group same-bucket agents so they share a model).
+    model = _resolve_model(items[0][0] if items else None)
     if model:
         cmd += ["--model", model]
     cmd += _context_flags()
