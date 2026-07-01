@@ -5,9 +5,12 @@ import type { Fact } from "@/lib/types";
 
 // Mock the API seam — the component under test must forward the call exactly
 // as given, never widening scope. Capture every call's arguments.
-const askScopedMock = vi.fn(async (_q: string, _facts: Fact[], _agentId?: string) => "mock answer");
+const askScopedMock = vi.fn(
+  async (_q: string, _facts: Fact[], _agentId?: string, _detail?: Record<string, unknown> | null) => "mock answer",
+);
 vi.mock("@/lib/api", () => ({
-  askScoped: (...args: [string, Fact[], string | undefined]) => askScopedMock(...args),
+  askScoped: (...args: [string, Fact[], string | undefined, Record<string, unknown> | null | undefined]) =>
+    askScopedMock(...args),
 }));
 
 const originalError = console.error;
@@ -68,6 +71,35 @@ describe("SideChat", () => {
     expect(sentFacts).not.toEqual(WHOLE_DOSSIER);
     expect(sentFacts.length).toBe(1);
     expect(agentId).toBe("emet-runner");
+  });
+
+  // ── WO-9 Phase 3: detail forwarding (the follow-up chat should have access
+  // to full per-agent evidence, not just the flattened fact list) ──────────
+  it("forwards the agent's detail to askScoped when provided", async () => {
+    const { SideChat } = await import("@/components/inspector/side-chat");
+    const detail = { qmodels_tool_id: "dti", qmodels_tool_label: "DTI / Binder Triage" };
+    render(<SideChat scopeLabel="q-models-runner" facts={STEP_FACTS} agentId="q-models-runner" detail={detail} />);
+
+    const input = screen.getByPlaceholderText(/ask about/i);
+    fireEvent.change(input, { target: { value: "Which tool ran?" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => expect(askScopedMock).toHaveBeenCalledTimes(1));
+    const [, , , sentDetail] = askScopedMock.mock.calls[0];
+    expect(sentDetail).toEqual(detail);
+  });
+
+  it("omits detail (undefined) when the selected step has none — backward compatible", async () => {
+    const { SideChat } = await import("@/components/inspector/side-chat");
+    render(<SideChat scopeLabel="emet-runner" facts={STEP_FACTS} agentId="emet-runner" />);
+
+    const input = screen.getByPlaceholderText(/ask about/i);
+    fireEvent.change(input, { target: { value: "What does TSC2 do?" } });
+    fireEvent.keyDown(input, { key: "Enter" });
+
+    await waitFor(() => expect(askScopedMock).toHaveBeenCalledTimes(1));
+    const [, , , sentDetail] = askScopedMock.mock.calls[0];
+    expect(sentDetail).toBeUndefined();
   });
 
   it("clicking a suggested question sends it and shows the conversation view", async () => {

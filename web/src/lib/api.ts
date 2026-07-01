@@ -174,12 +174,23 @@ export async function askScoped(
   question: string,
   facts: Fact[],
   agentId?: string,
+  /** WO-9 Phase 3: the selected agent's full public-safe `detail` (AgentStatus.detail),
+   *  when available — supplementary per-agent evidence beyond the flattened fact list
+   *  (e.g. the specific Q-Models tool id/label/input it ran). The seam already supports
+   *  this end-to-end (sapphire-orchestrator/scoped_chat.py::answer_scoped, forwarded by
+   *  frontend2/server.py::_serve_step_chat); only sent when the caller has one. */
+  detail?: Record<string, unknown> | null,
 ): Promise<string> {
   try {
     const resp = await fetch("/api/step-chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, facts, agent_id: agentId }),
+      body: JSON.stringify({
+        question,
+        facts,
+        agent_id: agentId,
+        ...(detail ? { detail } : {}),
+      }),
     });
     if (!resp.ok) return "Could not reach the side-chat — try again.";
     const data = (await safeJSON(resp)) as { answer?: string } | null;
