@@ -211,3 +211,88 @@
 .synth-glow {
   box-shadow: 0 1px 0 rgba(255,255,255,.03), 0 14px 34px -28px rgba(139,92,246,.28);
 }
+
+/* ── print stylesheet — Export to PDF ────────────────────────────────────── */
+/* When the user triggers window.print() (from the Export button):
+   - Hide the entire app chrome (sidebar, header, trace panel, composer, buttons).
+   - Show only the [data-print-report] content in a readable light-on-white layout.
+*/
+@media print {
+  /* Reset to white page */
+  body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+
+  /* Hide everything by default */
+  body > * {
+    display: none !important;
+  }
+
+  /* Show only the print-report subtree */
+  [data-print-report],
+  [data-print-report] * {
+    display: revert !important;
+    color: #111 !important;
+    background: transparent !important;
+  }
+
+  /* Ensure the report wrapper itself is block-level */
+  [data-print-report] {
+    display: block !important;
+    width: 100% !important;
+    max-width: 760px !important;
+    margin: 0 auto !important;
+    padding: 2cm !important;
+    font-family: Georgia, "Times New Roman", serif !important;
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Headings */
+  [data-print-report] h1,
+  [data-print-report] h2,
+  [data-print-report] h3,
+  [data-print-report] h4 {
+    color: #000 !important;
+    page-break-after: avoid;
+    font-family: inherit !important;
+  }
+
+  /* Tables */
+  [data-print-report] table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  [data-print-report] th,
+  [data-print-report] td {
+    border: 1px solid #ccc !important;
+    padding: 4pt 6pt !important;
+    color: #111 !important;
+  }
+
+  /* Code blocks */
+  [data-print-report] pre,
+  [data-print-report] code {
+    background: #f5f5f5 !important;
+    border: 1px solid #ddd !important;
+    font-family: "Courier New", monospace !important;
+    font-size: 10pt !important;
+    color: #111 !important;
+    white-space: pre-wrap !important;
+    word-break: break-all !important;
+  }
+
+  /* Links — show URL in parens */
+  [data-print-report] a::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #444;
+  }
+
+  /* Avoid page breaks inside paragraphs */
+  [data-print-report] p {
+    orphans: 3;
+    widows: 3;
+  }
+}
