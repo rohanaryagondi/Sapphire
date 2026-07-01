@@ -281,12 +281,22 @@ def _report_model() -> str:
 
 
 def _safe_fact(f: dict) -> dict:
-    """Extract only public-safe fields from a dossier fact. Mirrors report.py."""
+    """Extract only public-safe fields from a dossier fact.
+
+    EMET facts carry the FULL per-gene literature evidence (frequently many KB —
+    the whole BenchSci sweep for the query). Give them a large budget so a
+    follow-up can actually reason over the retrieved citations/mechanism, instead
+    of the first 300 chars. Ordinary facts stay bounded to keep the prompt tractable
+    (there is at most one large EMET evidence fact per run; its per-citation facts
+    are short).
+    """
+    prov = str(f.get("provenance", ""))
+    cap = 6000 if "emet" in prov.lower() else 300
     return {
-        "value": str(f.get("value", ""))[:300],
+        "value": str(f.get("value", ""))[:cap],
         "source": str(f.get("source", "")),
         "tier": str(f.get("tier", "")),
-        "provenance": str(f.get("provenance", "")),
+        "provenance": prov,
     }
 
 
@@ -517,18 +527,24 @@ def answer_followup(question: str, result: "dict | None", runner=None,
         # reliably resolve them. Only fall back to the deterministic answer after
         # EVERY attempt fails — a single empty response must not surface as
         # "could not answer" when a retry would succeed.
+        import time as _time
         parsed = None
-        for _attempt in range(3):
+        _ATTEMPTS = 4
+        for _attempt in range(_ATTEMPTS):
             proc = runner(cmd)
             rc = getattr(proc, "returncode", 0)
             text = (getattr(proc, "stdout", "") or "").strip()
-            if rc != 0 or not text:
-                continue  # transient empty / non-zero exit — retry
-            candidate = _parse_model_response(text)
-            if not candidate.get("_parse_failed"):
-                parsed = candidate
-                break
-            parsed = candidate  # best-effort; keep in case all attempts parse-fail
+            if rc == 0 and text:
+                candidate = _parse_model_response(text)
+                if not candidate.get("_parse_failed"):
+                    parsed = candidate
+                    break
+                parsed = candidate  # best-effort; keep the parse-failed answer
+            # brief, growing backoff before the next attempt so a momentary
+            # resource spike (a starved / OOM-nudged claude subprocess on a loaded
+            # machine) can clear rather than being hit again immediately.
+            if _attempt < _ATTEMPTS - 1:
+                _time.sleep(1.5 * (_attempt + 1))
         if parsed is None:
             # every attempt returned empty or non-zero — genuinely unreachable model
             return _fallback_answer(dossier, round1)

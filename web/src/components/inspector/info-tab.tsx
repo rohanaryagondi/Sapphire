@@ -359,21 +359,41 @@ function dossierFactsForClaims(dossier: Fact[], claims: string[]): Fact[] {
 
 export function InfoTab({ turn }: { turn?: Turn }) {
   const selection = useFirm((s) => s.selection);
+  const allTurns = useFirm((s) => s.turns);
 
-  if (!turn || selection.kind === "none" || selection.turnId !== turn.id) {
+  // A follow-up turn carries no agent trace of its own — its per-step detail lives in
+  // the SOURCE run turn (the same redirect Monitor does for the trace). Resolve it so
+  // clicking a trace row after a follow-up opens the source agent's full detail instead
+  // of falling back to the empty placeholder.
+  const detailTurn = useMemo(() => {
+    if (!turn || turn.kind !== "followup") return turn;
+    const sourceId = turn.followup?.sourceRunId;
+    if (sourceId) {
+      const found = allTurns.find((t) => t.id === sourceId && t.kind !== "followup");
+      if (found) return found;
+    }
+    return [...allTurns].reverse().find((t) => t.id !== turn.id && t.kind !== "followup");
+  }, [turn, allTurns]);
+
+  // The selection.turnId may reference the display (follow-up) turn OR the source run
+  // turn depending on where the row was clicked — accept either so the detail opens.
+  const matches =
+    selection.kind !== "none" &&
+    (selection.turnId === turn?.id || selection.turnId === detailTurn?.id);
+  if (!turn || !detailTurn || !matches) {
     return <EmptyInfo />;
   }
 
   if (selection.kind === "agent") {
-    return <AgentInfo turn={turn} agentId={selection.agentId} />;
+    return <AgentInfo turn={detailTurn} agentId={selection.agentId} />;
   }
   if (selection.kind === "verdict") {
-    return <PartnerInfo turn={turn} persona={selection.persona} />;
+    return <PartnerInfo turn={detailTurn} persona={selection.persona} />;
   }
   if (selection.kind === "fact") {
-    const fact = turn.result?.discover?.dossier?.[selection.index];
+    const fact = detailTurn.result?.discover?.dossier?.[selection.index];
     if (!fact) return <EmptyInfo />;
-    const via = turn.result?._via === "replay" ? "replay" : undefined;
+    const via = detailTurn.result?._via === "replay" ? "replay" : undefined;
     return (
       <div className="flex h-full flex-col">
         <div className="min-h-0 flex-1 overflow-y-auto p-3">
