@@ -137,9 +137,6 @@ export function Composer() {
               <span className="kbd">⇧↵</span> newline
             </span>
           </div>
-          <span className="hidden md:inline">
-            Sapphire never fabricates — unknowns are flagged, not faked.
-          </span>
         </div>
       </div>
     </div>

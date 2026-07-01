@@ -490,3 +490,106 @@ describe("ToastContainer", () => {
     expect(notifications.map((n) => n.id)).toContain("n2");
   });
 });
+
+// ── 4. HistoryRail duplicate-preview suppression ───────────────────────────
+describe("HistoryRail duplicate-preview suppression", () => {
+  it("does not render the preview when it is identical to the title", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { HistoryRail } = await import("@/components/history-rail");
+
+    act(() => {
+      useFirm.setState({
+        conversations: [
+          {
+            id: "c1",
+            title: "Is TSC2 a viable CNS target?",
+            preview: "Is TSC2 a viable CNS target?",
+          },
+        ],
+        pinned: [],
+        persistenceAvailable: true,
+        historyQuery: "",
+      });
+    });
+
+    render(
+      <Providers>
+        <HistoryRail />
+      </Providers>,
+    );
+
+    // The title appears once; the preview (same text) must NOT appear a second time.
+    await waitFor(() => {
+      const hits = screen.getAllByText("Is TSC2 a viable CNS target?");
+      expect(hits).toHaveLength(1);
+    });
+  });
+
+  it("renders the preview when it is distinct from the title", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { HistoryRail } = await import("@/components/history-rail");
+
+    act(() => {
+      useFirm.setState({
+        conversations: [
+          {
+            id: "c2",
+            title: "Nav1.8 pain targets",
+            preview: "Full analysis of Nav1.8 as a pain target including safety profile",
+          },
+        ],
+        pinned: [],
+        persistenceAvailable: true,
+        historyQuery: "",
+      });
+    });
+
+    render(
+      <Providers>
+        <HistoryRail />
+      </Providers>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Nav1.8 pain targets")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          "Full analysis of Nav1.8 as a pain target including safety profile",
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("suppresses preview when it is a truncated prefix of the title", async () => {
+    const { useFirm } = await import("@/lib/store");
+    const { HistoryRail } = await import("@/components/history-rail");
+
+    act(() => {
+      useFirm.setState({
+        conversations: [
+          {
+            id: "c3",
+            title: "Is TSC2 a viable CNS target for rapamycin?",
+            preview: "Is TSC2 a viable CNS target",
+          },
+        ],
+        pinned: [],
+        persistenceAvailable: true,
+        historyQuery: "",
+      });
+    });
+
+    render(
+      <Providers>
+        <HistoryRail />
+      </Providers>,
+    );
+
+    await waitFor(() => {
+      // preview text must not appear independently
+      expect(
+        screen.queryByText("Is TSC2 a viable CNS target"),
+      ).toBeNull();
+    });
+  });
+});

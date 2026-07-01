@@ -102,7 +102,7 @@ export function HistoryRail() {
             </p>
           </div>
         ) : (
-          <div className="space-y-0.5">
+          <div className="space-y-px">
             {filtered.map((c) => (
               <HistoryItem
                 key={c.id}
@@ -116,6 +116,20 @@ export function HistoryRail() {
       </div>
     </div>
   );
+}
+
+/**
+ * Returns true when the preview is redundant — i.e. it is identical to, or
+ * a truncated prefix of, the title (case-insensitive, trimmed).  This avoids
+ * rendering "Is TSC2 a target?" as both the title AND the subtitle.
+ */
+function isDuplicatePreview(title: string | undefined, preview: string | undefined): boolean {
+  if (!preview || !title) return false;
+  const t = title.trim().toLowerCase();
+  const p = preview.trim().toLowerCase();
+  // exact match OR the title starts with the preview (title was truncated) OR
+  // the preview starts with the title (preview is the full query, title is truncated)
+  return t === p || t.startsWith(p) || p.startsWith(t);
 }
 
 function HistoryItem({
@@ -160,22 +174,25 @@ function HistoryItem({
     setDraft(conv.title ?? "");
   };
 
+  const showPreview =
+    !!conv.preview && !isDuplicatePreview(conv.title, conv.preview);
+
   return (
     <div
       className={cn(
-        "group relative rounded-[var(--radius-sm)] transition-colors",
+        "group relative rounded-[var(--radius-sm)] border-b border-[var(--color-border)]/40 transition-colors last:border-b-0",
         active ? "bg-[var(--color-elevated)]" : "hover:bg-[var(--color-bg-subtle)]",
       )}
     >
       {active && (
-        <span className="absolute inset-y-1.5 left-0 w-[2px] rounded-full bg-[var(--color-accent)]" />
+        <span className="absolute inset-y-2 left-0 w-[2px] rounded-full bg-[var(--color-accent)]" />
       )}
 
       {editing ? (
         /* the edit field is a SIBLING of the row button (never nested inside it),
            so Enter/blur/Escape behave predictably (#5). Enter commits, blur
            commits, Escape cancels. */
-        <div className="px-2.5 py-2">
+        <div className="px-2.5 py-1.5">
           <input
             autoFocus
             value={draft}
@@ -196,26 +213,28 @@ function HistoryItem({
       ) : (
         <button
           onClick={onOpen}
-          className="flex w-full items-start gap-2 px-2.5 py-2 text-left"
+          className="flex w-full items-start gap-2 px-2.5 py-1.5 text-left"
         >
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1">
-              {conv.starred && (
-                <Star className="size-2.5 shrink-0 fill-[var(--color-warn)] text-[var(--color-warn)]" />
+            <div className="flex items-baseline justify-between gap-1">
+              <div className="flex min-w-0 items-center gap-1">
+                {conv.starred && (
+                  <Star className="size-2.5 shrink-0 fill-[var(--color-warn)] text-[var(--color-warn)]" />
+                )}
+                <span className="truncate text-[13.5px] font-medium leading-snug text-[var(--color-fg)]">
+                  {conv.title || "Untitled"}
+                </span>
+              </div>
+              {conv.updated_at && (
+                <span className="shrink-0 text-[10.5px] text-[var(--color-fg-faint)]">
+                  {relTime(conv.updated_at)}
+                </span>
               )}
-              <span className="truncate text-[12.5px] font-medium text-[var(--color-fg)]">
-                {conv.title || "Untitled"}
-              </span>
             </div>
-            {conv.preview && (
-              <p className="mt-0.5 truncate text-[11px] text-[var(--color-fg-subtle)]">
+            {showPreview && (
+              <p className="mt-0.5 truncate text-[11.5px] leading-snug text-[var(--color-fg-subtle)]">
                 {conv.preview}
               </p>
-            )}
-            {conv.updated_at && (
-              <span className="text-[10px] text-[var(--color-fg-faint)]">
-                {relTime(conv.updated_at)}
-              </span>
             )}
           </div>
         </button>

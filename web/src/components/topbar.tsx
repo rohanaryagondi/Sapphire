@@ -58,17 +58,12 @@ export function TopBar() {
               <path d="M4 8h16M12 2v20" stroke="currentColor" strokeWidth="1" opacity="0.6" />
             </svg>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span
-              className="text-[14px] font-semibold tracking-tight"
-              style={{ background: "linear-gradient(90deg, #f4f5f6, #cdbcff)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}
-            >
-              Sapphire
-            </span>
-            <span className="hidden text-[11px] text-[var(--color-fg-subtle)] sm:inline">
-              CNS decision firm
-            </span>
-          </div>
+          <span
+            className="text-[14px] font-semibold tracking-tight"
+            style={{ background: "linear-gradient(90deg, #f4f5f6, #cdbcff)", WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}
+          >
+            Sapphire
+          </span>
         </div>
       </div>
 
