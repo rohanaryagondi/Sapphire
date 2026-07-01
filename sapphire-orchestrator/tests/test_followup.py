@@ -13,7 +13,17 @@ _ORCH_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _ORCH_DIR not in sys.path:
     sys.path.insert(0, _ORCH_DIR)
 
-from followup import answer_followup
+from followup import answer_followup, _build_prompt, _valid_targets
+
+
+class _FakeQModelsClient:
+    """Hermetic stand-in for qmodels.client.QModelsClient — no network/subprocess."""
+
+    def __init__(self, tools):
+        self._tools = tools
+
+    def tools(self):
+        return list(self._tools)
 
 
 # ── test helpers ─────────────────────────────────────────────────────────────
@@ -110,19 +120,24 @@ class TestFollowupOutOfEvidence(unittest.TestCase):
     and the answer does not fabricate specifics."""
 
     def test_out_of_evidence_flags_needs_new_data(self):
+        # WO-9 Phase 5: missing_agent must now be a REAL, invocable id — "dti" (a real
+        # Q-Models tool id) — never free prose. See TestFollowupMissingAgentTargeting
+        # below for the full valid-id / hallucinated-id / no-targets matrix.
         payload = {
             "answer": "This run's evidence does not cover binding affinity for this compound.",
             "needs_new_data": True,
-            "missing_agent": "a Q-Models binding-affinity run",
+            "missing_agent": "dti",
         }
         out = answer_followup(
             "What is the binding affinity of compound X to target Y?",
             _RESULT,
             runner=_ok_runner(payload),
+            qmodels_client=_FakeQModelsClient([{"id": "dti", "label": "DTI / Binder Triage"}]),
+            registry={"agents": []},
         )
         self.assertTrue(out["needs_new_data"])
-        self.assertIsNotNone(out["missing_agent"])
-        self.assertIn("Q-Models", out["missing_agent"])
+        self.assertEqual(out["missing_agent"], "dti")
+        self.assertEqual(out["missing_agent_label"], "DTI / Binder Triage")
         self.assertNotIn("nM", out["answer"], "must not fabricate a specific binding number")
 
 
@@ -324,8 +339,119 @@ class TestFollowupReturnShape(unittest.TestCase):
 
     def test_return_keys(self):
         out = answer_followup(_QUERY, _RESULT, runner=_false_runner)
-        for key in ("answer", "citations", "needs_new_data", "missing_agent"):
+        for key in ("answer", "citations", "needs_new_data", "missing_agent", "missing_agent_label"):
             self.assertIn(key, out)
+
+
+class TestFollowupMissingAgentTargeting(unittest.TestCase):
+    """WO-9 Phase 5 — `missing_agent` is constrained to a real, invocable id (never
+    free prose): a closed {id,label} list is built from the registry + Q-Models tool
+    list and injected into the prompt; the parsed response is re-validated against
+    the SAME list after parsing. All registry/qmodels lookups are mocked (hermetic)."""
+
+    _REGISTRY = {"agents": [
+        {"id": "post-market-safety"},
+        {"id": "emet-runner"},
+    ]}
+    _QMODELS = _FakeQModelsClient([
+        {"id": "dti", "label": "DTI / Binder Triage"},
+        {"id": "kg_hypothesis", "label": None},  # no label -> falls back to id
+    ])
+
+    def test_valid_id_response_passes_through(self):
+        payload = {
+            "answer": "This run has no post-market safety data for this class.",
+            "needs_new_data": True,
+            "missing_agent": "post-market-safety",
+        }
+        out = answer_followup(
+            "What does the FAERS record show for this class?",
+            _RESULT,
+            runner=_ok_runner(payload),
+            registry=self._REGISTRY,
+            qmodels_client=self._QMODELS,
+        )
+        self.assertEqual(out["missing_agent"], "post-market-safety")
+        self.assertEqual(out["missing_agent_label"], "Post-Market Safety")
+
+    def test_valid_qmodels_tool_id_with_no_registry_label_falls_back_to_id(self):
+        payload = {
+            "answer": "No KG hypothesis data in this run.",
+            "needs_new_data": True,
+            "missing_agent": "kg_hypothesis",
+        }
+        out = answer_followup(
+            "Any hypothesis generation on this target?",
+            _RESULT,
+            runner=_ok_runner(payload),
+            registry=self._REGISTRY,
+            qmodels_client=self._QMODELS,
+        )
+        self.assertEqual(out["missing_agent"], "kg_hypothesis")
+        self.assertEqual(out["missing_agent_label"], "kg_hypothesis")
+
+    def test_hallucinated_id_coerced_to_null(self):
+        """A plausible-sounding but FAKE id (not in the closed list) must never reach
+        the caller — this is the correctness-critical defensive guard."""
+        payload = {
+            "answer": "This run's evidence does not cover that.",
+            "needs_new_data": True,
+            "missing_agent": "toxicology-deep-dive-agent",  # not a real id anywhere
+        }
+        out = answer_followup(
+            "What about deep toxicology?",
+            _RESULT,
+            runner=_ok_runner(payload),
+            registry=self._REGISTRY,
+            qmodels_client=self._QMODELS,
+        )
+        self.assertIsNone(out["missing_agent"])
+        self.assertIsNone(out["missing_agent_label"])
+
+    def test_free_prose_missing_agent_coerced_to_null(self):
+        """The OLD free-prose contract ("a Q-Models binding-affinity run") must now
+        be rejected — it is not an id in the closed list."""
+        payload = {
+            "answer": "No binding data here.",
+            "needs_new_data": True,
+            "missing_agent": "a Q-Models binding-affinity run",
+        }
+        out = answer_followup(
+            "Binding affinity?",
+            _RESULT,
+            runner=_ok_runner(payload),
+            registry=self._REGISTRY,
+            qmodels_client=self._QMODELS,
+        )
+        self.assertIsNone(out["missing_agent"])
+
+    def test_null_missing_agent_stays_null(self):
+        payload = {"answer": "In evidence.", "needs_new_data": False, "missing_agent": None}
+        out = answer_followup(
+            "In-evidence question", _RESULT, runner=_ok_runner(payload),
+            registry=self._REGISTRY, qmodels_client=self._QMODELS,
+        )
+        self.assertIsNone(out["missing_agent"])
+        self.assertIsNone(out["missing_agent_label"])
+
+    def test_prompt_includes_the_id_list(self):
+        """The built prompt string actually contains the valid target ids/labels —
+        a unit test on _build_prompt directly, mocking registry/qmodels lookups."""
+        targets = _valid_targets(registry=self._REGISTRY, qmodels_client=self._QMODELS)
+        prompt = _build_prompt("Any question?", _RESULT, citation_labels=[], valid_targets=targets)
+        self.assertIn("post-market-safety", prompt)
+        self.assertIn("Post-Market Safety", prompt)
+        self.assertIn("emet-runner", prompt)
+        self.assertIn("dti", prompt)
+        self.assertIn("DTI / Binder Triage", prompt)
+        self.assertIn("NEVER free", prompt)
+
+    def test_no_valid_targets_instructs_always_null(self):
+        """When the registry/qmodels lookups both come back empty (offline/degraded),
+        the prompt honestly instructs the model that missing_agent must always be null
+        rather than presenting an empty-but-implied list."""
+        prompt = _build_prompt("Any question?", _RESULT, citation_labels=[], valid_targets=[])
+        self.assertIn("MUST be null", prompt)
 
 
 if __name__ == "__main__":

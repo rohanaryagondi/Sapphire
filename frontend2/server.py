@@ -28,6 +28,13 @@ ROUTES
   from its last real run's STORED evidence (no re-convening the firm). Body JSON
   ``{conversation_id, question}``. Plain JSON request/response (not SSE) — see
   ``sapphire-orchestrator/followup.py`` for the honesty-guarded synthesis contract.
+- ``POST /api/reinvoke``          → WO-9 Phase 5: actually invoke ONE specific Bucket-1
+  agent or Q-Models tool (never the full firm, never the roundtable), fold the new
+  evidence into the conversation (append-only — a new ``via="reinvoke"`` run row), and
+  re-answer a question from the grown evidence. Body JSON ``{conversation_id, agent_id,
+  question, refined_query?}``. Plain JSON request/response (not SSE) — see
+  ``sapphire-orchestrator/reinvoke.py`` for the two invocation paths + the deliberate
+  roundtable-re-invocation scope exclusion.
 
 FULL BACKEND ACCESS (for Demo Claudes — the hard requirement)
 -------------------------------------------------------------
@@ -245,6 +252,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._serve_step_chat(body)
         elif path == "/api/followup":
             return self._serve_followup(body)
+        elif path == "/api/reinvoke":
+            return self._serve_reinvoke(body)
         else:
             return self._send_json(404, {"error": "not found"})
 
@@ -327,7 +336,12 @@ class Handler(BaseHTTPRequestHandler):
         scoped call, but over the WHOLE run instead of one step. Honest degrade at
         every step: missing conversation → 404, no real run yet → 400, a persistence
         failure never blocks the answer reaching the client (mirrors `_stream_run`'s
-        non-fatal store-write pattern)."""
+        non-fatal store-write pattern).
+
+        WO-9 Phase 5: uses ``store.get_effective_evidence`` (shared with
+        ``/api/reinvoke``) so a follow-up asked AFTER a re-invocation sees the GROWN
+        dossier — every ``new_facts`` folded in from every chained ``via="reinvoke"``
+        run — not just the original run's stored facts."""
         conversation_id = (body.get("conversation_id") or "").strip()
         question = (body.get("question") or "").strip()
         if not conversation_id or not question:
@@ -342,21 +356,15 @@ class Handler(BaseHTTPRequestHandler):
         if conv is None:
             return self._send_json(404, {"error": "not found"})
 
-        # Pick the LAST run whose `via` is a real firm run (never a prior follow-up).
-        source_run = None
-        for run in conv.get("runs", []):
-            if run.get("via") != "followup":
-                source_run = run
-        if source_run is None:
+        evidence = _store_mod.get_effective_evidence(conversation_id)
+        if evidence is None:
             return self._send_json(400, {
                 "error": "This conversation has no run yet — ask a question to start one."
             })
-
-        full = _store_mod.get_run(source_run.get("id", ""))
-        result = (full or {}).get("result_json") if full else None
+        source_run_id = evidence["source_run_id"]
 
         import followup as _followup_mod
-        answer_dict = _followup_mod.answer_followup(question, result)
+        answer_dict = _followup_mod.answer_followup(question, evidence["result"])
 
         # Persist the follow-up like a run (via="followup"), best-effort — a persistence
         # failure must NOT prevent the answer from reaching the client.
@@ -371,8 +379,9 @@ class Handler(BaseHTTPRequestHandler):
                 "citations": answer_dict.get("citations", []),
                 "needs_new_data": answer_dict.get("needs_new_data", False),
                 "missing_agent": answer_dict.get("missing_agent"),
-                "source_run_id": source_run.get("id", ""),
-                "source_query": source_run.get("query", ""),
+                "missing_agent_label": answer_dict.get("missing_agent_label"),
+                "source_run_id": source_run_id,
+                "source_query": evidence["result"].get("query", ""),
             }
             _store_mod.save_run(conversation_id, msg_id, question, followup_result, "followup")
         except Exception as _store_exc:
@@ -384,7 +393,107 @@ class Handler(BaseHTTPRequestHandler):
             "citations": answer_dict.get("citations", []),
             "needs_new_data": answer_dict.get("needs_new_data", False),
             "missing_agent": answer_dict.get("missing_agent"),
-            "source_run_id": source_run.get("id", ""),
+            "missing_agent_label": answer_dict.get("missing_agent_label"),
+            "source_run_id": source_run_id,
+            "conversation_id": conversation_id,
+        })
+
+    # --------------------------------------------- targeted re-invocation
+    def _serve_reinvoke(self, body: dict) -> None:
+        """POST /api/reinvoke → WO-9 Phase 5: actually invoke ONE specific Bucket-1
+        agent or Q-Models tool (never the full firm, never the roundtable — see
+        ``reinvoke.py``'s docstring for the deliberate scope exclusion), fold the new
+        evidence into the conversation's evidence (append-only — a NEW ``via="reinvoke"``
+        run row, the original run's stored result_json is never rewritten), and
+        re-answer ``question`` from the now-grown evidence.
+
+        Body: {conversation_id, agent_id, question, refined_query?}. Plain JSON
+        request/response (not SSE — a single targeted agent call is fast, seconds not
+        minutes; a full live-streaming trace panel would be disproportionate here).
+        Honest degrade at every step: missing conversation → 404, no real run yet →
+        400, an unknown/failed re-invocation → 200 {"ok": false, "error": ...} (never
+        a fabricated success), a persistence failure never blocks the re-answer
+        reaching the client (mirrors `_serve_followup`'s non-fatal store-write
+        pattern) — the re-answer is computed from the new facts DIRECTLY (not by
+        re-reading the store), so it reflects the grown evidence even if the
+        persistence write itself failed."""
+        conversation_id = (body.get("conversation_id") or "").strip()
+        agent_id = (body.get("agent_id") or "").strip()
+        question = (body.get("question") or "").strip()
+        refined_query = (body.get("refined_query") or "").strip() or None
+        if not conversation_id or not agent_id or not question:
+            return self._send_json(400, {
+                "error": "conversation_id, agent_id and question are required"
+            })
+
+        try:
+            import store as _store_mod
+        except Exception as exc:
+            return self._send_json(500, {"error": str(exc)})
+
+        conv = _store_mod.get_conversation(conversation_id)
+        if conv is None:
+            return self._send_json(404, {"error": "not found"})
+
+        evidence = _store_mod.get_effective_evidence(conversation_id)
+        if evidence is None:
+            return self._send_json(400, {
+                "error": "This conversation has no run yet — ask a question to start one."
+            })
+        source_run_id = evidence["source_run_id"]
+
+        import reinvoke as _reinvoke_mod
+        reinvoke_result = _reinvoke_mod.reinvoke_agent(agent_id, evidence["result"], refined_query)
+
+        if not reinvoke_result.get("ok"):
+            return self._send_json(200, {
+                "ok": False,
+                "error": reinvoke_result.get("error") or "re-invocation failed",
+                "agent_id": agent_id,
+                "source_run_id": source_run_id,
+                "conversation_id": conversation_id,
+            })
+
+        new_facts = reinvoke_result.get("new_facts", [])
+
+        # Persist the via="reinvoke" evidence row, best-effort — a persistence failure
+        # must NOT prevent the re-answer from reaching the client (mirrors
+        # _serve_followup's non-fatal store-write pattern).
+        try:
+            reinvoke_row = {
+                "_via": "reinvoke",
+                "_reinvoke": True,
+                "agent_id": agent_id,
+                "new_facts": new_facts,
+                "source_run_id": source_run_id,
+                "triggered_by_question": question,
+            }
+            _store_mod.save_run(conversation_id, None, question, reinvoke_row, "reinvoke")
+        except Exception as _store_exc:
+            import sys as _sys
+            print(f"[store] reinvoke save failed (non-fatal): {_store_exc}", file=_sys.stderr)
+
+        # Re-answer from the grown evidence, folded IN-MEMORY (not re-read from the
+        # store) so the answer reflects the new facts even if the persist above failed.
+        import copy as _copy
+        updated_result = _copy.deepcopy(evidence["result"])
+        discover = updated_result.setdefault("discover", {})
+        dossier = discover.get("dossier")
+        discover["dossier"] = (dossier if isinstance(dossier, list) else []) + new_facts
+
+        import followup as _followup_mod
+        answer_dict = _followup_mod.answer_followup(question, updated_result)
+
+        return self._send_json(200, {
+            "ok": True,
+            "answer": answer_dict.get("answer", ""),
+            "citations": answer_dict.get("citations", []),
+            "needs_new_data": answer_dict.get("needs_new_data", False),
+            "missing_agent": answer_dict.get("missing_agent"),
+            "missing_agent_label": answer_dict.get("missing_agent_label"),
+            "new_facts": new_facts,
+            "agent_id": agent_id,
+            "source_run_id": source_run_id,
             "conversation_id": conversation_id,
         })
 

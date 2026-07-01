@@ -425,6 +425,53 @@ def _build_moat_agent():
     return _moat_agent
 
 
+def _wire_bucket1_ctx(ctx: dict) -> dict:
+    """Wire every Bucket-1 python_fns seam + the live EMET handler onto ``ctx``
+    (setdefault — never overrides a caller-supplied backend). Extracted from
+    ``run_live`` (WO-9 Phase 5) so a SINGLE-agent re-invocation
+    (``reinvoke.reinvoke_agent``) can build the exact same minimal ctx a full
+    ``run_live`` pass would, without duplicating this wiring. Returns ``ctx``
+    (mutated in place) for convenient chaining."""
+    ctx.setdefault("python_fns", {})
+    if "internal-science-lead" not in ctx["python_fns"]:
+        ctx["python_fns"]["internal-science-lead"] = _build_moat_agent()
+    # Wire the ASO acute-tox seam (stdlib-only orchestrator; sklearn lives in the subprocess).
+    # Passes sequences through inputs — fires only when ASO sequences are present.
+    if "aso-tox" not in ctx["python_fns"]:
+        ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings
+    # Wire the Boltz structure/binding seam (stdlib-only orchestrator; urllib lives in the seam;
+    # the BOLTZ_API_KEY is read by the seam from RohanOnly/boltz_api.env at call time, never here).
+    # Passes structural inputs through — fires only when a target sequence and/or ligand is present.
+    if "boltz" not in ctx["python_fns"]:
+        ctx["python_fns"]["boltz"] = boltz_seam.findings
+    # Wire the gnomAD constraint seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
+    if "gnomad-constraint" not in ctx["python_fns"]:
+        ctx["python_fns"]["gnomad-constraint"] = gnomad_constraint_seam.findings
+    # Wire the GTEx expression seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
+    if "gtex-expression" not in ctx["python_fns"]:
+        ctx["python_fns"]["gtex-expression"] = gtex_expression_seam.findings
+    # Wire the InterPro domains seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
+    if "interpro-domains" not in ctx["python_fns"]:
+        ctx["python_fns"]["interpro-domains"] = interpro_domains_seam.findings
+    # Wire the g:Profiler enrichment seam (stdlib-only orchestrator; urllib lives in the seam).
+    # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
+    if "geneset-enrichment" not in ctx["python_fns"]:
+        ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
+    # Wire the robyn_scs connectivity seam (stdlib orchestrator; numpy/scipy/pandas in the
+    # subprocess). Fires only when imaging data is present in inputs — honest-empty otherwise.
+    if "robyn-scs" not in ctx["python_fns"]:
+        ctx["python_fns"]["robyn-scs"] = robyn_scs_seam.findings
+
+    # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
+    # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
+    # _wire_emet_handler for the lazy import + the honest session-reuse caveat.
+    _wire_emet_handler(ctx)
+    return ctx
+
+
 def _run_one_bucket1_agent(
     agent_id: str,
     known_ids: set,
@@ -1036,45 +1083,11 @@ def run_live(
     # else: plan_mode "off" or any unrecognised value — keep deterministic defaults.
 
     # -----------------------------------------------------------------------
-    # 3. Wire the REAL moat backend (only if caller didn't supply one already)
+    # 3. Wire the REAL moat backend + every Bucket-1 seam + live EMET (only if
+    #    the caller didn't supply one already) — extracted to _wire_bucket1_ctx
+    #    (WO-9 Phase 5) so reinvoke.py's single-agent path reuses it verbatim.
     # -----------------------------------------------------------------------
-    ctx.setdefault("python_fns", {})
-    if "internal-science-lead" not in ctx["python_fns"]:
-        ctx["python_fns"]["internal-science-lead"] = _build_moat_agent()
-    # Wire the ASO acute-tox seam (stdlib-only orchestrator; sklearn lives in the subprocess).
-    # Passes sequences through inputs — fires only when ASO sequences are present.
-    if "aso-tox" not in ctx["python_fns"]:
-        ctx["python_fns"]["aso-tox"] = aso_tox_seam.predict_findings
-    # Wire the Boltz structure/binding seam (stdlib-only orchestrator; urllib lives in the seam;
-    # the BOLTZ_API_KEY is read by the seam from RohanOnly/boltz_api.env at call time, never here).
-    # Passes structural inputs through — fires only when a target sequence and/or ligand is present.
-    if "boltz" not in ctx["python_fns"]:
-        ctx["python_fns"]["boltz"] = boltz_seam.findings
-    # Wire the gnomAD constraint seam (stdlib-only orchestrator; urllib lives in the seam).
-    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
-    if "gnomad-constraint" not in ctx["python_fns"]:
-        ctx["python_fns"]["gnomad-constraint"] = gnomad_constraint_seam.findings
-    # Wire the GTEx expression seam (stdlib-only orchestrator; urllib lives in the seam).
-    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
-    if "gtex-expression" not in ctx["python_fns"]:
-        ctx["python_fns"]["gtex-expression"] = gtex_expression_seam.findings
-    # Wire the InterPro domains seam (stdlib-only orchestrator; urllib lives in the seam).
-    # Fires when a target gene symbol is present in inputs — honest-empty otherwise.
-    if "interpro-domains" not in ctx["python_fns"]:
-        ctx["python_fns"]["interpro-domains"] = interpro_domains_seam.findings
-    # Wire the g:Profiler enrichment seam (stdlib-only orchestrator; urllib lives in the seam).
-    # Fires when a gene set (or target) is present in inputs — honest-empty otherwise.
-    if "geneset-enrichment" not in ctx["python_fns"]:
-        ctx["python_fns"]["geneset-enrichment"] = geneset_enrichment_seam.findings
-    # Wire the robyn_scs connectivity seam (stdlib orchestrator; numpy/scipy/pandas in the
-    # subprocess). Fires only when imaging data is present in inputs — honest-empty otherwise.
-    if "robyn-scs" not in ctx["python_fns"]:
-        ctx["python_fns"]["robyn-scs"] = robyn_scs_seam.findings
-
-    # Wire the live EMET handler (external plane). Registered so emet-runner is no longer
-    # silently absent on ctx=None — a logged-in BenchSci session can actually be used. See
-    # _wire_emet_handler for the lazy import + the honest session-reuse caveat.
-    _wire_emet_handler(ctx)
+    _wire_bucket1_ctx(ctx)
 
     # -----------------------------------------------------------------------
     # 4. Bucket 1 — fact agents

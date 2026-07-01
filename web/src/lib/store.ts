@@ -14,12 +14,14 @@ import {
   getConversation,
   listConversations,
   patchConversation,
+  reinvokeAgent as apiReinvokeAgent,
   runFirm,
 } from "./api";
 import { traceFromResult } from "./restore";
 import { exportSynthesis } from "./export-synthesis";
 import type {
   Conversation,
+  Fact,
   ModelChoice,
   PlanEnvelope,
   ProgressEvent,
@@ -49,7 +51,19 @@ export interface FollowupTurnData {
   citations: string[];
   needsNewData: boolean;
   missingAgent: string | null;
+  /** WO-9 Phase 5: the missingAgent id's human-readable label, resolved server-side
+   *  (never model-generated). Additive — null on pre-Phase-5 responses. */
+  missingAgentLabel?: string | null;
   sourceRunId: string;
+  /** WO-9 Phase 5: facts surfaced by a targeted re-invocation of `missingAgent`,
+   *  rendered distinctly ("New evidence: ...") above the updated answer. */
+  newFacts?: Fact[];
+  /** WO-9 Phase 5: true while a targeted re-invocation is in flight (a lightweight
+   *  pulsing-dot indicator, NOT a full live-streaming trace — a single targeted
+   *  agent call is seconds, not minutes). */
+  reinvoking?: boolean;
+  /** WO-9 Phase 5: the last re-invocation's error, if any (cleared on retry/success). */
+  reinvokeError?: string;
 }
 
 export interface Turn {
@@ -188,6 +202,11 @@ interface FirmState {
    *  (callers should route through `ask`, not call this directly, unless they
    *  have already verified a completed run exists). */
   askFollowup: (question: string) => Promise<void>;
+  /** WO-9 Phase 5: actually invoke ONE specific Bucket-1 agent or Q-Models tool
+   *  named by a followup turn's `missingAgent`, fold the new evidence in, and
+   *  re-answer the SAME turn's question — updating that turn in place. A
+   *  targeted, cheap alternative to `submit(turn.query)` (the full re-convene). */
+  reinvokeOnTurn: (turnId: string, agentId: string, question: string, refinedQuery?: string) => Promise<void>;
   /** Single routing decision point (per WO-9 Phase 1): auto-detects whether a
    *  query should be answered as a follow-up over stored evidence (existing
    *  conversation with at least one completed full run) or convene the full
@@ -361,7 +380,12 @@ export const useFirm = create<FirmState>((set, get) => ({
     // traceFromResult/the full Turn shape would render nonsense/empty, so it gets
     // the lightweight followup Turn variant instead. Real runs restore exactly as
     // today (no behavior change there).
-    const runs = detail.runs ?? [];
+    //
+    // WO-9 Phase 5: a run persisted with via="reinvoke" is EVIDENCE-ONLY (see
+    // store.get_effective_evidence) — it is never itself a chat turn (its answer,
+    // if any, was already rendered in-memory on the followup turn that triggered
+    // it), so it is filtered out here entirely rather than mapped to a Turn.
+    const runs = (detail.runs ?? []).filter((r) => r.via !== "reinvoke");
     const turns: Turn[] = runs.map((r, i) => {
       const raw = r.result ?? undefined;
       if (raw && (raw as { _via?: string })._via === "followup") {
@@ -742,7 +766,63 @@ export const useFirm = create<FirmState>((set, get) => ({
                 citations: result.citations ?? [],
                 needsNewData: !!result.needs_new_data,
                 missingAgent: result.missing_agent ?? null,
+                missingAgentLabel: result.missing_agent_label ?? null,
                 sourceRunId: result.source_run_id,
+              },
+            }
+          : t,
+      ),
+    }));
+  },
+
+  // ── WO-9 Phase 5: targeted re-invocation of ONE agent/tool on a followup turn ──
+  reinvokeOnTurn: async (turnId, agentId, question, refinedQuery) => {
+    const convId = get().activeConversationId;
+    if (!convId) return;
+
+    set((s) => ({
+      turns: s.turns.map((t) =>
+        t.id === turnId && t.followup
+          ? { ...t, followup: { ...t.followup, reinvoking: true, reinvokeError: undefined } }
+          : t,
+      ),
+    }));
+
+    const result = await apiReinvokeAgent(convId, agentId, question, refinedQuery);
+
+    if (!result || !result.ok) {
+      const errMsg = result?.error || "Could not run this agent — try again.";
+      set((s) => ({
+        turns: s.turns.map((t) =>
+          t.id === turnId && t.followup
+            ? { ...t, followup: { ...t.followup, reinvoking: false, reinvokeError: errMsg } }
+            : t,
+        ),
+      }));
+      get().addNotification({
+        kind: "error",
+        title: "Re-invocation failed",
+        body: agentId,
+        ttl: 8000,
+      });
+      return;
+    }
+
+    set((s) => ({
+      turns: s.turns.map((t) =>
+        t.id === turnId && t.followup
+          ? {
+              ...t,
+              followup: {
+                answer: result.answer ?? t.followup.answer,
+                citations: result.citations ?? [],
+                needsNewData: !!result.needs_new_data,
+                missingAgent: result.missing_agent ?? null,
+                missingAgentLabel: result.missing_agent_label ?? null,
+                sourceRunId: result.source_run_id ?? t.followup.sourceRunId,
+                newFacts: result.new_facts ?? [],
+                reinvoking: false,
+                reinvokeError: undefined,
               },
             }
           : t,

@@ -244,5 +244,105 @@ class TestStore(unittest.TestCase):
                          "conv with most-recently-updated_at must be first")
 
 
+    # ---------------------------------------------------------------------- #
+    # get_effective_evidence (WO-9 Phase 5)                                    #
+    # ---------------------------------------------------------------------- #
+
+    def test_effective_evidence_no_runs_returns_none(self):
+        cid = store.create_conversation("Empty")
+        self.assertIsNone(store.get_effective_evidence(cid))
+
+    def test_effective_evidence_unknown_conversation_returns_none(self):
+        self.assertIsNone(store.get_effective_evidence("no-such-conv"))
+
+    def test_effective_evidence_single_real_run_returns_it_unmodified(self):
+        cid = store.create_conversation("Conv")
+        result = {"query": "q", "discover": {"dossier": [{"value": "a", "source": "s", "tier": "T1"}]}}
+        rid = store.save_run(cid, None, "q", result, "engine-demo")
+        ev = store.get_effective_evidence(cid)
+        self.assertIsNotNone(ev)
+        self.assertEqual(ev["source_run_id"], rid)
+        self.assertEqual(len(ev["result"]["discover"]["dossier"]), 1)
+
+    def test_effective_evidence_only_followup_or_reinvoke_rows_returns_none(self):
+        """A conversation with ONLY followup/reinvoke rows (no real firm run) has no
+        evidence to answer from — never fabricate a source."""
+        cid = store.create_conversation("Conv")
+        store.save_run(cid, None, "q1", {"_via": "followup", "answer": "x"}, "followup")
+        store.save_run(cid, None, "q2", {"_via": "reinvoke", "new_facts": []}, "reinvoke")
+        self.assertIsNone(store.get_effective_evidence(cid))
+
+    def test_effective_evidence_folds_in_chained_reinvoke_new_facts(self):
+        """A single reinvoke chained to the real run extends discover.dossier — the
+        ORIGINAL run's stored result_json is untouched (append-only)."""
+        cid = store.create_conversation("Conv")
+        original = {"query": "q", "discover": {"dossier": [{"value": "orig", "source": "s", "tier": "T1"}]}}
+        rid = store.save_run(cid, None, "q", original, "engine-demo")
+        new_fact = {"value": "new evidence", "source": "post-market-safety",
+                    "tier": "T2", "provenance": "semantic-web", "plane": "external",
+                    "agent_id": "post-market-safety"}
+        store.save_run(cid, None, "follow-up q", {
+            "_via": "reinvoke", "agent_id": "post-market-safety",
+            "new_facts": [new_fact], "source_run_id": rid,
+        }, "reinvoke")
+
+        ev = store.get_effective_evidence(cid)
+        self.assertEqual(ev["source_run_id"], rid)
+        values = [f["value"] for f in ev["result"]["discover"]["dossier"]]
+        self.assertEqual(values, ["orig", "new evidence"])
+
+        # The append-only guarantee: re-fetching the ORIGINAL run's stored result_json
+        # directly must show it untouched (no mutation of the stored row).
+        stored_original = store.get_run(rid)["result_json"]
+        self.assertEqual(len(stored_original["discover"]["dossier"]), 1)
+
+    def test_effective_evidence_accumulates_multiple_reinvokes_oldest_to_newest(self):
+        cid = store.create_conversation("Conv")
+        original = {"query": "q", "discover": {"dossier": [{"value": "orig", "source": "s", "tier": "T1"}]}}
+        rid = store.save_run(cid, None, "q", original, "engine-demo")
+
+        fact_a = {"value": "fact A", "source": "x", "tier": "T2"}
+        fact_b = {"value": "fact B", "source": "y", "tier": "T2"}
+        store.save_run(cid, None, "q2", {
+            "_via": "reinvoke", "new_facts": [fact_a], "source_run_id": rid,
+        }, "reinvoke")
+        time.sleep(0.01)
+        store.save_run(cid, None, "q3", {
+            "_via": "reinvoke", "new_facts": [fact_b], "source_run_id": rid,
+        }, "reinvoke")
+
+        ev = store.get_effective_evidence(cid)
+        values = [f["value"] for f in ev["result"]["discover"]["dossier"]]
+        self.assertEqual(values, ["orig", "fact A", "fact B"],
+                         "chained reinvoke facts must accumulate oldest -> newest")
+
+    def test_effective_evidence_uses_the_last_real_run_not_an_earlier_one(self):
+        """Two real firm runs in one conversation: the LAST one is the evidence source."""
+        cid = store.create_conversation("Conv")
+        store.save_run(cid, None, "q1", {"query": "q1", "discover": {"dossier": []}}, "engine-demo")
+        time.sleep(0.01)
+        r2 = {"query": "q2", "discover": {"dossier": [{"value": "second run fact",
+                                                        "source": "s", "tier": "T1"}]}}
+        rid2 = store.save_run(cid, None, "q2", r2, "engine-live")
+        ev = store.get_effective_evidence(cid)
+        self.assertEqual(ev["source_run_id"], rid2)
+        self.assertEqual(ev["result"]["query"], "q2")
+
+    def test_effective_evidence_ignores_reinvoke_chained_to_a_different_source_run(self):
+        """A reinvoke row's new_facts only fold in when its source_run_id matches the
+        CURRENT effective source run — never leak facts from an unrelated chain."""
+        cid = store.create_conversation("Conv")
+        original = {"query": "q", "discover": {"dossier": [{"value": "orig", "source": "s", "tier": "T1"}]}}
+        rid = store.save_run(cid, None, "q", original, "engine-demo")
+        store.save_run(cid, None, "q2", {
+            "_via": "reinvoke", "new_facts": [{"value": "unrelated", "source": "x", "tier": "T2"}],
+            "source_run_id": "some-other-run-id",
+        }, "reinvoke")
+        ev = store.get_effective_evidence(cid)
+        values = [f["value"] for f in ev["result"]["discover"]["dossier"]]
+        self.assertEqual(values, ["orig"])
+        self.assertEqual(ev["source_run_id"], rid)
+
+
 if __name__ == "__main__":
     unittest.main()

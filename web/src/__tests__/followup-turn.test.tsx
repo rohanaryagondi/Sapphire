@@ -10,6 +10,7 @@ const submitMock = vi.fn();
 const setPanelOpenMock = vi.fn();
 const setPanelTabMock = vi.fn();
 const selectMock = vi.fn();
+const reinvokeOnTurnMock = vi.fn();
 
 vi.mock("@/lib/store", async () => {
   const actual = await vi.importActual<typeof import("@/lib/store")>("@/lib/store");
@@ -21,6 +22,7 @@ vi.mock("@/lib/store", async () => {
         setPanelTab: setPanelTabMock,
         select: selectMock,
         submit: submitMock,
+        reinvokeOnTurn: reinvokeOnTurnMock,
       };
       return sel(store);
     },
@@ -32,6 +34,7 @@ beforeEach(() => {
   setPanelOpenMock.mockClear();
   setPanelTabMock.mockClear();
   selectMock.mockClear();
+  reinvokeOnTurnMock.mockClear();
 });
 
 const BASE_TURN: Turn = {
@@ -72,19 +75,23 @@ describe("Followup turn rendering (WO-9 Phase 1)", () => {
 
   it("shows the escalation affordance + names the missing agent when needsNewData is true", async () => {
     const { TurnView } = await import("@/components/chat-thread");
+    // WO-9 Phase 5: missingAgent is now a real, invocable id (never free prose) —
+    // dti (a real Q-Models tool id) here, with its server-resolved label.
     const turn: Turn = {
       ...BASE_TURN,
       followup: {
         answer: "This run's evidence does not cover binding affinity for this compound.",
         citations: [],
         needsNewData: true,
-        missingAgent: "a Q-Models binding-affinity run",
+        missingAgent: "dti",
+        missingAgentLabel: "DTI / Binder Triage",
         sourceRunId: "run-1",
       },
     };
     render(<TurnView turn={turn} />);
 
-    expect(screen.getByText(/a Q-Models binding-affinity run/)).toBeInTheDocument();
+    // Appears in the banner text AND the targeted button's own label — at least once.
+    expect(screen.getAllByText(/DTI \/ Binder Triage/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: /Run the full firm on this/i })).toBeInTheDocument();
   });
 
@@ -97,7 +104,8 @@ describe("Followup turn rendering (WO-9 Phase 1)", () => {
         answer: "Not covered by this run.",
         citations: [],
         needsNewData: true,
-        missingAgent: "a Q-Models binding-affinity run",
+        missingAgent: "dti",
+        missingAgentLabel: "DTI / Binder Triage",
         sourceRunId: "run-1",
       },
     };
