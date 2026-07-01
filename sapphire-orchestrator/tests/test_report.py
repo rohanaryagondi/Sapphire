@@ -145,6 +145,93 @@ class TestReportFallback(unittest.TestCase):
         self.assertTrue(out.strip(), "Even with empty inputs the fallback must not be empty.")
 
 
+class TestReportOnChunk(unittest.TestCase):
+    """WO-9 Phase 2 — progressive report streaming: the injected-runner contract."""
+
+    def test_on_chunk_fires_with_full_text_on_success(self):
+        """With an injected runner, on_chunk must fire ONCE with the full final text."""
+        expected = "# Report\n\nTSC2 is a high-confidence target."
+        seen: list[str] = []
+        out = synthesize_report(
+            query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+            recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+            known_unknowns=_KNOWN_UNKNOWNS, runner=_ok_runner(expected),
+            on_chunk=seen.append,
+        )
+        self.assertEqual(out, expected)
+        self.assertEqual(seen, [expected], "on_chunk must fire exactly once with the full text.")
+
+    def test_no_on_chunk_unchanged_behavior(self):
+        """Omitting on_chunk must behave byte-for-byte as before (regression guard)."""
+        expected = "# Report\n\nUnchanged."
+        out = synthesize_report(
+            query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+            recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+            known_unknowns=_KNOWN_UNKNOWNS, runner=_ok_runner(expected),
+        )
+        self.assertEqual(out, expected)
+
+    def test_on_chunk_not_called_on_runner_failure(self):
+        """A failing injected runner still returns the fallback; on_chunk must NOT fire
+        (nothing to stream — the run never produced real text)."""
+        seen: list[str] = []
+        out = synthesize_report(
+            query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+            recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+            known_unknowns=_KNOWN_UNKNOWNS, runner=_false_runner,
+            on_chunk=seen.append,
+        )
+        self.assertIn(_RECOMMENDATION, out, "Must still return the deterministic fallback.")
+        self.assertEqual(seen, [], "on_chunk must not fire when the runner failed.")
+
+    def test_on_chunk_not_called_on_runner_exception(self):
+        """A runner that raises still degrades to the fallback; on_chunk must NOT fire."""
+        seen: list[str] = []
+        out = synthesize_report(
+            query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+            recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+            known_unknowns=_KNOWN_UNKNOWNS, runner=_raising_runner,
+            on_chunk=seen.append,
+        )
+        self.assertIsInstance(out, str)
+        self.assertTrue(out.strip())
+        self.assertEqual(seen, [], "on_chunk must not fire when the runner raised.")
+
+
+class TestReportStreaming(unittest.TestCase):
+    """WO-9 Phase 2 — the real streaming Popen path (runner=None). Degrades cleanly with
+    CLAUDE_BIN=/usr/bin/false: shutil.which resolves it (a real binary that exists), so
+    `/usr/bin/false --output-format stream-json ...` spawns and exits 1 immediately with
+    empty stdout — must degrade to the fallback report, never hang or raise."""
+
+    def test_streaming_path_false_bin_degrades_to_fallback(self):
+        orig = os.environ.get("CLAUDE_BIN")
+        seen: list[str] = []
+        import importlib
+        import harness.dispatch as _dispatch_mod
+        import report as _report_mod
+        try:
+            os.environ["CLAUDE_BIN"] = "/usr/bin/false"
+            importlib.reload(_dispatch_mod)
+            importlib.reload(_report_mod)
+            out = _report_mod.synthesize_report(
+                query=_QUERY, dossier=_DOSSIER, round1=_ROUND1, round2=_ROUND2,
+                recommendation=_RECOMMENDATION, confidence=_CONFIDENCE,
+                known_unknowns=_KNOWN_UNKNOWNS, on_chunk=seen.append,
+            )
+            self.assertIsInstance(out, str)
+            self.assertTrue(out.strip())
+            self.assertIn(_RECOMMENDATION, out, "Must be the deterministic fallback.")
+            self.assertEqual(seen, [], "/usr/bin/false emits no stdout — no chunks to stream.")
+        finally:
+            if orig is None:
+                os.environ.pop("CLAUDE_BIN", None)
+            else:
+                os.environ["CLAUDE_BIN"] = orig
+            importlib.reload(_dispatch_mod)
+            importlib.reload(_report_mod)
+
+
 class TestReportLabels(unittest.TestCase):
     """Item 1: moat → 'Quiver data' in all user-facing provenance labels."""
 

@@ -10,10 +10,32 @@ CONTRACT
 --------
   synthesize_report(
       query, dossier, round1, round2, recommendation, confidence,
-      known_unknowns, runner=None,
+      known_unknowns, runner=None, on_chunk=None,
   ) -> str
 
   Returns Markdown string. Never raises. Always returns non-empty string.
+
+  `on_chunk` (optional, `Callable[[str], None]`) — WO-9 Phase 2 progressive-report
+  streaming. When provided:
+    - with an injected `runner` (tests / any caller mocking the subprocess): the
+      existing `runner(cmd)` synchronous path is UNCHANGED; `on_chunk` is simply
+      called ONCE with the full final text after a successful parse (no real
+      streaming subprocess needed to exercise this in hermetic tests).
+    - with `runner=None` (the real/production path): a SEPARATE `claude -p`
+      invocation is used, with `--output-format stream-json
+      --include-partial-messages --verbose` instead of `--output-format text`.
+      The subprocess is run via `subprocess.Popen` and its stdout is read
+      line-by-line; each JSONL line is parsed and, when it is a
+      `{"type": "stream_event", "event": {"type": "content_block_delta",
+      "delta": {"type": "text_delta", "text": "..."}}}` line, the delta text is
+      accumulated AND passed to `on_chunk` immediately. All other line shapes
+      (`thinking_delta`, `content_block_start/stop`, `message_*`, `"type":
+      "system"`, `"type": "result"`, malformed/non-JSON lines) are silently
+      skipped. The SAME 300s timeout used by the non-streaming path applies; on
+      timeout the subprocess is killed and the call degrades to the
+      deterministic fallback report (never returns a truncated report as if it
+      were complete). `on_chunk=None` ⇒ behavior is byte-for-byte identical to
+      before this parameter existed.
 
 HONESTY GUARD (in the prompt)
   Synthesize ONLY from the evidence provided below. Do not invent facts,
@@ -22,7 +44,7 @@ HONESTY GUARD (in the prompt)
   pending a live run rather than inventing stances.
 
 STDLIB-ONLY
-  Imports: os, json, subprocess, shutil + harness.dispatch.CLAUDE_BIN.
+  Imports: os, json, subprocess, shutil, time + harness.dispatch.CLAUDE_BIN.
   No third-party deps.
 """
 from __future__ import annotations
@@ -31,6 +53,7 @@ import json
 import os
 import shutil
 import subprocess
+import time
 
 try:
     from harness.dispatch import CLAUDE_BIN
@@ -285,6 +308,88 @@ def _fallback_report(
     return "\n".join(lines)
 
 
+# 300s: a full sonnet synthesis of the dossier runs ~70-100s; 120s was too tight and
+# silently fell back to the deterministic report under any variance/load. This cap only
+# bounds a hang. Shared by BOTH the non-streaming and the streaming subprocess paths.
+_TIMEOUT_S = 300
+
+
+def _stream_claude_report(cmd: list[str], on_chunk) -> str | None:
+    """Run `cmd` (a `claude -p ... --output-format stream-json ...` invocation) via
+    `subprocess.Popen`, streaming text deltas to `on_chunk` as they arrive.
+
+    Returns the accumulated report text on success, or `None` on spawn failure,
+    a non-zero return code, an empty accumulated buffer, or a timeout (bounded by
+    `_TIMEOUT_S`, same as the non-streaming path) — in every `None` case the caller
+    falls back to the deterministic report. Never raises.
+    """
+    try:
+        proc = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1,
+        )
+    except Exception:
+        return None
+
+    buf: list[str] = []
+    start = time.monotonic()
+    timed_out = False
+    try:
+        for line in proc.stdout:  # type: ignore[union-attr]
+            if time.monotonic() - start > _TIMEOUT_S:
+                timed_out = True
+                try:
+                    proc.kill()
+                except Exception:
+                    pass
+                break
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except Exception:
+                continue  # malformed/non-JSON lines are skipped silently
+            if not isinstance(obj, dict) or obj.get("type") != "stream_event":
+                continue  # system/result/other top-level lines are skipped silently
+            event = obj.get("event") or {}
+            if event.get("type") != "content_block_delta":
+                continue
+            delta = event.get("delta") or {}
+            if delta.get("type") != "text_delta":
+                continue  # thinking_delta (and any other delta kind) is never surfaced
+            chunk = delta.get("text") or ""
+            if not chunk:
+                continue
+            buf.append(chunk)
+            try:
+                on_chunk(chunk)
+            except Exception:
+                pass
+    except Exception:
+        pass
+    finally:
+        try:
+            proc.wait(timeout=5)
+        except Exception:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+        for pipe in (proc.stdout, proc.stderr):
+            try:
+                if pipe is not None:
+                    pipe.close()
+            except Exception:
+                pass
+
+    if timed_out:
+        return None
+    if (proc.returncode or 0) != 0:
+        return None
+    full = "".join(buf).strip()
+    return full or None
+
+
 def synthesize_report(
     query: str,
     dossier: list[dict],
@@ -294,6 +399,7 @@ def synthesize_report(
     confidence: str,
     known_unknowns: list[str],
     runner=None,
+    on_chunk=None,
 ) -> str:
     """Synthesize a Markdown diligence report from the engagement outputs.
 
@@ -308,6 +414,9 @@ def synthesize_report(
     known_unknowns: List of known-unknown strings from the flags.
     runner:         Optional callable ``(cmd: list[str]) -> proc`` injected in
                     tests. None → real claude -p subprocess.
+    on_chunk:       Optional ``Callable[[str], None]`` for progressive-report
+                    streaming (WO-9 Phase 2). See the module CONTRACT docstring
+                    for the exact semantics. ``None`` → unchanged behavior.
 
     Returns
     -------
@@ -327,17 +436,56 @@ def synthesize_report(
 
         cmd = [CLAUDE_BIN, "-p", prompt, "--output-format", "text", "--model", model]
 
-        if runner is None:
-            if not shutil.which(CLAUDE_BIN if CLAUDE_BIN != "claude" else "claude"):
+        if runner is not None:
+            # Injected-runner path (all existing + on_chunk tests): unchanged synchronous
+            # call. The only addition is a single terminal on_chunk(full_text) so tests can
+            # assert it fired without mocking a streaming Popen.
+            proc = runner(cmd)
+
+            rc = getattr(proc, "returncode", 0)
+            if rc != 0:
                 return _fallback_report(
                     query, dossier, round1, recommendation, confidence, known_unknowns
                 )
 
-            def runner(cmd: list[str]):  # type: ignore[misc]
-                # 300s: a full sonnet synthesis of the dossier runs ~70-100s;
-                # 120s was too tight and silently fell back to the deterministic
-                # report under any variance/load. This cap only bounds a hang.
-                return subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            text = (getattr(proc, "stdout", "") or "").strip()
+            if not text:
+                return _fallback_report(
+                    query, dossier, round1, recommendation, confidence, known_unknowns
+                )
+
+            if on_chunk is not None:
+                try:
+                    on_chunk(text)
+                except Exception:
+                    pass
+            return text
+
+        # runner is None — the real/production path.
+        if not shutil.which(CLAUDE_BIN if CLAUDE_BIN != "claude" else "claude"):
+            return _fallback_report(
+                query, dossier, round1, recommendation, confidence, known_unknowns
+            )
+
+        if on_chunk is not None:
+            # NEW streaming path: a separate stream-json invocation, never the
+            # `--output-format text` `cmd` above (that mode does not stream — the
+            # buffered non-streaming path below still uses it when on_chunk is absent).
+            stream_cmd = [
+                CLAUDE_BIN, "-p", prompt,
+                "--output-format", "stream-json",
+                "--include-partial-messages", "--verbose",
+                "--model", model,
+            ]
+            streamed = _stream_claude_report(stream_cmd, on_chunk)
+            if streamed:
+                return streamed
+            return _fallback_report(
+                query, dossier, round1, recommendation, confidence, known_unknowns
+            )
+
+        def runner(cmd: list[str]):  # type: ignore[misc]
+            return subprocess.run(cmd, capture_output=True, text=True, timeout=_TIMEOUT_S)
 
         proc = runner(cmd)
 

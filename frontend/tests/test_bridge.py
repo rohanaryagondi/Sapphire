@@ -72,8 +72,12 @@ class TestBridge(unittest.TestCase):
         self.assertEqual(validate_run_live(r), [])      # still a valid run
         self.assertTrue(events, "bridge.run must forward on_progress to run_live")
         stages = {e["stage"] for e in events}
-        self.assertEqual(stages, {"plan", "bucket1", "flags", "roundtable", "synthesis"})
+        # WO-9 Phase 2: a "report" stage is now always emitted (a terminal "done" event,
+        # plus "chunk" events whenever the report synthesizer produced streamable text).
+        self.assertEqual(stages, {"plan", "bucket1", "flags", "roundtable", "synthesis", "report"})
         self.assertEqual(events[0]["stage"], "plan")
+        report_phases = {e["phase"] for e in events if e["stage"] == "report"}
+        self.assertIn("done", report_phases, "the report stage must always emit a terminal 'done' event")
 
     def test_empty_query_does_not_crash(self):
         # An empty query never raises. The engine treats it as a general-CNS run (not a

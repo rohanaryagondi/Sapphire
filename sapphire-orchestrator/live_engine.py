@@ -1760,11 +1760,19 @@ def run_live(
             confidence=confidence,
             known_unknowns=known_unknowns,
             runner=ctx.get("runner"),
+            on_chunk=lambda text: _emit(
+                on_progress, eid, {"stage": "report", "phase": "chunk", "text": text}
+            ),
         )
         if _report_md:
             syn["report"] = _report_md
     except Exception:
         pass  # report is best-effort; never blocks the engagement
+    finally:
+        # Terminal report-stream event — unconditional (even an empty/fallback report)
+        # so the front end always knows streaming has ended and can safely fall back to
+        # rendering `result.synthesize.report` once the final `result` SSE frame lands.
+        _emit(on_progress, eid, {"stage": "report", "phase": "done"})
 
     # Close the trace and run the self-improvement reflection loop.
     trace.close_engagement(eid, syn)

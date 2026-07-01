@@ -239,7 +239,24 @@ export function TurnView({ turn }: { turn: Turn }) {
         <FollowupAnswer turn={turn} />
       ) : (
       <div className="space-y-3 fadeup">
-        {turn.status === "running" && !result && <TypingIndicator trace={turn.trace} />}
+        {/* WO-9 Phase 2: once the report starts streaming, replace the generic
+            typing indicator with the growing report itself (progressive render --
+            no 70-100s spinner). Reuses MarkdownDoc, the same component Synthesis
+            uses for the authoritative final report, so there's no rendering-logic
+            duplication and no visible flicker once `result` lands. */}
+        {turn.status === "running" && !result && (
+          turn.streamingReport ? (
+            <div className="space-y-2 fadeup">
+              <div className="flex items-center gap-1.5 text-[11px] text-[var(--color-fg-subtle)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent)] live-dot" />
+                writing the report…
+              </div>
+              <MarkdownDoc text={turn.streamingReport} turnId={turn.id} />
+            </div>
+          ) : (
+            <TypingIndicator trace={turn.trace} />
+          )
+        )}
 
         {/* Live status: running with or without a partial result */}
         {turn.status === "running" && (

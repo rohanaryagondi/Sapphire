@@ -11,6 +11,70 @@ Append-only log of what shipped to `main`. Newest at the top. One entry per feat
 
 ---
 
+## 2026-06-30 — WO-9 Phase 2: Live run — real, reliable, streamed  (`rohan/live-run-hardening`)
+- Built-By: `rohan` (PR pending Head Claude gate + merge). Sub-goals A and B of the assigned Phase 2 brief,
+  built end-to-end. **Sub-goal C (the demo-profile-default fix) was NOT implemented on this branch** — while
+  rebasing onto `origin/main` at ship time, `web/src/lib/store.ts`'s default already read `profile: "simulate"`
+  (landed via a concurrent PR, #163 "workspace polish", merged while this branch was in flight) — the exact
+  fix Sub-goal C called for. Verified post-rebase that no separate change was needed and there's no conflict
+  on that line. Three sub-goals as specced:
+  **A — verified Live is genuinely real.** By inspection: `harness/dispatch.py`'s `dispatch_claude()` only
+  substitutes the labeled `_simulate_claude()` placeholder (provenance `simulated`, 🧪 marker) when
+  `SAPPHIRE_SIMULATE_MODELS` is truthy, which `frontend/bridge.py` only sets for `simulate=True` — `profile=live`
+  never sets it. Confirmed with a REAL `profile=live` engagement (`bridge.run(mock=False)`, real API spend,
+  sanctioned) — see PR body for the engagement id + grep evidence. Added a `MockBadge`/`mockLabel`-driven badge
+  to each roundtable verdict card in `web/src/components/run/spread.tsx::VerdictCard` (mirrors
+  `dossier-tab.tsx`'s `FactCard` pattern exactly — `spread.tsx` and `synthesis.tsx` previously had ZERO
+  simulated-badge handling). Documented (code comment, not a fix — deliberately out of scope) the known
+  `os.environ` thread-safety constraint in `frontend/bridge.py` (a `ThreadingHTTPServer` worker thread mutating
+  process-global env around `run()`).
+  **B — the new architecture: progressive report streaming.** `claude -p --output-format text` never streams
+  (fully buffered, confirmed empirically); `--output-format stream-json --include-partial-messages --verbose`
+  does. `report.py`'s `synthesize_report()` gains an additive `on_chunk: Callable[[str], None] | None = None`.
+  Injected-runner path (all existing callers/tests): behavior is BYTE-FOR-BYTE unchanged, plus — only when
+  `on_chunk` is given — one terminal `on_chunk(full_text)` call after a successful parse (no real streaming
+  subprocess needed in hermetic tests). Production path (`runner=None` + `on_chunk` given): a NEW
+  `_stream_claude_report()` runs `subprocess.Popen` on a separate stream-json command, reads `proc.stdout`
+  line-by-line, accumulates+forwards only `{"type":"stream_event","event":{"type":"content_block_delta",
+  "delta":{"type":"text_delta","text":...}}}` lines (thinking-deltas/system/result/malformed lines silently
+  skipped), bounded by the SAME `_TIMEOUT_S=300` used by the non-streaming path — timeout/non-zero-rc/empty
+  buffer all degrade to the deterministic fallback, never a truncated "complete" report. `live_engine.py` wires
+  `on_chunk=lambda text: _emit(..., {"stage":"report","phase":"chunk","text":text})` at the `synthesize_report`
+  call site, plus an unconditional terminal `_emit(..., {"stage":"report","phase":"done"})` in a `finally` so
+  the frontend always knows streaming ended even on a fallback report. Frontend: `types.ts` gains `"report"`/
+  `"chunk"` to `TraceStage`/`TracePhase`; `store.ts`'s `Turn` gains `streamingReport?: string`; `submit()`'s
+  `onProgress` now branches — `stage==="report"` events accumulate into `streamingReport` (never hit
+  `pushTrace`, which would otherwise bloat the Monitor with dozens of per-token rows) — every other stage is
+  unchanged. `chat-thread.tsx` renders the growing `streamingReport` via the SAME `MarkdownDoc` component
+  `Synthesis` uses for the final report (no duplicated rendering logic), with a `live-dot`-pulsing "writing the
+  report…" indicator, replaced by the authoritative `result.synthesize.report` once the run completes.
+  **C — profile-default footgun fix — NOT touched on this branch**, and confirmed already landed on
+  `origin/main` (via #163) by the time of the rebase — see above. `web/src/lib/store.ts`'s `profile` field is
+  untouched by this diff (the pre-rebase branch tip carried no change to it either).
+  Two pre-existing tests legitimately updated for the new always-on `"report"` progress stage (a real,
+  intended consequence of Sub-goal B, not a regression): `frontend/tests/test_bridge.py`'s
+  `test_on_progress_forwarded_to_run_live` and `frontend2/tests/test_server.py`'s
+  `test_run_streams_progress_then_result` (stage-set now includes `"report"`); `sapphire-orchestrator/
+  tests/test_live_engine.py`'s `test_events_fire_in_stage_order` (now asserts the terminal event is
+  `{"stage":"report","phase":"done"}`, with the synthesis-done assertions moved to a dedicated lookup rather
+  than relying on it being last).
+- Gates: `CLAUDE_BIN=/usr/bin/false bash dev/run-tests.sh` → **Gate 1 GREEN — 1098 tests** (contracts 52 ·
+  harness 109 · emet 76 · memory 14 · selfimprove 20 · moat 95 · corpus 12 · `sapphire-orchestrator` top-level
+  tests 469 incl. 5 new `test_report.py` cases (`TestReportOnChunk` ×4 + `TestReportStreaming` ×1, the latter
+  proving `/usr/bin/false` under the new streaming path degrades cleanly to the fallback, no hang/crash) ·
+  frontend 67 · frontend2 48 · web/react 136). `cd web && npm run build` clean (zero type errors). `npx vitest
+  run` → 139/139 green incl. emoji-lint + 3 new `streaming-report.test.tsx` cases (progressive render while
+  running, generic typing indicator before any chunk arrives, authoritative final report replaces the stale
+  partial on completion). **Real `profile=live` verification** (`bridge.run(mock=False)`, real API spend):
+  engagement `eng_6444d0e8`, `_via="harness-live"`, 641.6s wall-clock, **135 streamed report chunks totaling
+  10,472 chars — exactly matching the final `report_len` of 10,472**, confirming the streaming path delivered
+  the complete report in production, not just in hermetic tests. Zero facts/verdicts with
+  `provenance=="simulated"`; zero `🧪`/"simulated model" marker text anywhere in the synthesized report.
+- Gaps/Follow-ups: Sub-goal C already resolved on `main` by a concurrent PR (#163) before this one shipped —
+  nothing further needed here. Phases 3–7 of WO-9 remain queued. The `os.environ` thread-safety constraint
+  (documented, not fixed) may need revisiting once Phase 5 (targeted re-invocation) can run concurrently with
+  an in-flight run.
+
 ## 2026-06-30 — WO-9 Phase 1 hardening: robust JSON parse in followup.py  (`rohan/followup-hardening`)
 - Built-By: `rohan` (PR pending Head Claude gate + merge). Gate-5 on a LIVE `/api/followup` call caught a bug the
   merged Phase 1 (#158) tests missed (they only fed clean JSON): real Claude output is frequently NOT clean JSON

@@ -182,6 +182,16 @@ def run(query: str, *, mock: bool = True, sequences: list | None = None,
     (single-user local surface); a concurrent run could briefly observe it, which is acceptable
     here. `None` → the CLI default (existing Demo/Live behavior unchanged).
 
+    KNOWN CONSTRAINT (WO-9 Phase 2, confirmed, not fixed here — out of proportion for this
+    phase): `SAPPHIRE_SIMULATE_MODELS` / `CLAUDE_MODEL` are mutated on `os.environ`, which is
+    process-global, not thread-local — but `frontend2/server.py` is a `ThreadingHTTPServer`
+    that runs each `/api/run` request's worker on its own thread. Two concurrent requests
+    (e.g. one `profile=simulate`, one `profile=live`) could theoretically race and leak the
+    env flag across each other for the duration of the overlap. Acceptable for today's
+    single-user local surface (this module's own design already accepts that tradeoff); worth
+    revisiting if a later WO-9 phase (e.g. Phase 5's targeted re-invocation) ever runs a
+    concurrent request against an in-flight live run.
+
     Never raises. On a hard failure returns `_error_envelope`. Adds a single TOTAL wall-clock
     (`_elapsed_s`) — per-agent timing is NOT available from the contract and is never faked.
     """

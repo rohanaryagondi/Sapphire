@@ -69,6 +69,11 @@ export interface Turn {
   kind?: "run" | "followup";
   /** present only when kind === "followup". */
   followup?: FollowupTurnData;
+  /** WO-9 Phase 2: the report's Markdown text as it streams in via progress
+   *  events (stage:"report", phase:"chunk") — accumulated, rendered while
+   *  status==="running" and no `result` has landed yet. Superseded by the
+   *  authoritative `result.synthesize.report` once the run completes. */
+  streamingReport?: string;
 }
 
 export type InspectorTab = "monitor" | "investigate";
@@ -601,7 +606,22 @@ export const useFirm = create<FirmState>((set, get) => ({
         },
         {
           onOpen: (ev) => patchTurn({ via: ev.via }),
-          onProgress: (ev) => pushTrace(ev),
+          // WO-9 Phase 2: "report" stage events are the progressive-report stream —
+          // they don't belong in the Trace/Monitor panel (would bloat it with dozens of
+          // tiny per-token rows unrelated to the agent trace). "chunk" accumulates into
+          // streamingReport; "done" needs no state change (the authoritative `result`
+          // event lands moments later). Every OTHER stage keeps flowing to pushTrace
+          // exactly as before.
+          onProgress: (ev) => {
+            if (ev.stage === "report") {
+              if (ev.phase === "chunk" && ev.text) {
+                const cur = get().turns.find((t) => t.id === turn.id);
+                patchTurn({ streamingReport: (cur?.streamingReport ?? "") + ev.text });
+              }
+              return;
+            }
+            pushTrace(ev);
+          },
           onResult: (result) => {
             finalResult = result;
             patchTurn({ result, status: "complete" });

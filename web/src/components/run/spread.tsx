@@ -1,9 +1,10 @@
 "use client";
 import { Users } from "lucide-react";
 import type { RunResult, Verdict } from "@/lib/types";
-import { cn, stanceKind, stripEmoji } from "@/lib/utils";
+import { cn, mockLabel, stanceKind, stripEmoji } from "@/lib/utils";
 import { finalVerdicts, isRebuttalRound } from "@/lib/verdicts";
 import { useFirm } from "@/lib/store";
+import { MockBadge } from "@/components/ui/chips";
 
 const stanceStyle: Record<string, { bar: string; text: string; fill: string }> = {
   advance: {
@@ -57,6 +58,7 @@ function VerdictCard({
   const ok = v.status === "ok";
   const kind = ok ? stanceKind(v.stance) : "neutral";
   const st = stanceStyle[kind];
+  const mock = mockLabel(v.provenance, v.rationale);
   const active =
     selection.kind === "verdict" &&
     selection.persona === v.persona &&
@@ -85,6 +87,11 @@ function VerdictCard({
           <span className="text-[11px] text-[var(--color-fg-subtle)]">abstained</span>
         )}
       </div>
+      {mock && (
+        <div className="mb-1.5">
+          <MockBadge label={mock} />
+        </div>
+      )}
 
       {v.conviction != null && (
         <div className="mb-1.5">
