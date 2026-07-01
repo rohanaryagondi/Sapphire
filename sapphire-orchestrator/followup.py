@@ -281,12 +281,22 @@ def _report_model() -> str:
 
 
 def _safe_fact(f: dict) -> dict:
-    """Extract only public-safe fields from a dossier fact. Mirrors report.py."""
+    """Extract only public-safe fields from a dossier fact.
+
+    EMET facts carry the FULL per-gene literature evidence (frequently many KB —
+    the whole BenchSci sweep for the query). Give them a large budget so a
+    follow-up can actually reason over the retrieved citations/mechanism, instead
+    of the first 300 chars. Ordinary facts stay bounded to keep the prompt tractable
+    (there is at most one large EMET evidence fact per run; its per-citation facts
+    are short).
+    """
+    prov = str(f.get("provenance", ""))
+    cap = 6000 if "emet" in prov.lower() else 300
     return {
-        "value": str(f.get("value", ""))[:300],
+        "value": str(f.get("value", ""))[:cap],
         "source": str(f.get("source", "")),
         "tier": str(f.get("tier", "")),
-        "provenance": str(f.get("provenance", "")),
+        "provenance": prov,
     }
 
 
